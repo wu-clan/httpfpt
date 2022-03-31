@@ -1,0 +1,32 @@
+# 测试项目
+[project]
+project = 'test'
+
+# 测试人员信息
+[tester]
+tester_name = '123'
+
+# 数据库
+[mysql]
+host = '127.0.0.1'
+port = 3306
+user = 'root'
+password = '123456'
+database = 'test'
+charset = 'utf8'
+
+# 邮件
+[email]
+host_server = 'smtp.qq.com'
+port = 465
+user = 'xxx'
+password = 'xxx'
+timeout = 10
+send_to = ['xxx']
+
+# 请求发送
+[request]
+timeout = 5
+interval = 0.5
+verify = false
+
