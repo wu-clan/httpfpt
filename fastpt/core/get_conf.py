@@ -4,7 +4,7 @@ import os
 
 from fastpt.common.toml_operate import read_toml
 
-__config = read_toml(os.getcwd(), 'conf.toml')
+__config = read_toml(os.path.join(os.getcwd(), 'core'), 'conf.toml')
 
 # 项目目录名
 PROJECT_NAME = __config['project']['project']

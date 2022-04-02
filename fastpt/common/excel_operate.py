@@ -5,17 +5,17 @@ import shutil
 from datetime import datetime
 from typing import Optional
 
-import openpyxl
 import xlrd
+from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment, Color
 from openpyxl.styles.colors import COLOR_INDEX
 
 from fastpt.common.log import log
 from fastpt.core.get_conf import TESTER_NAME
-from fastpt.core.path_conf import EXCEL_DATA_PATH, EXCEL_REPORT_PATH, EXCEL_REPORT_TEMPLATE_FILE
+from fastpt.core.path_conf import EXCEL_DATA_PATH, EXCEL_REPORT_PATH
 
 
-def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = 'Sheet1', ) -> Optional[list]:
+def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = 'Sheet1') -> Optional[list]:
     """
     读取 xlsx 文件
     :param filepath: 文件路径
@@ -61,7 +61,7 @@ def write_excel_report(datafile='APITestCaseTEMPLATE.xlsx', filename: str = f'AP
     _report_file = os.path.join(EXCEL_REPORT_PATH, filename)
     # copy测试数据为报告文件基础
     shutil.copyfile(datafile, _report_file)
-    wb = openpyxl.load_workbook(_report_file)
+    wb = load_workbook(_report_file)
     ws = wb.active
     font_green = Font(name='宋体', color=Color(rgb=COLOR_INDEX[3]), bold=True)
     font_red = Font(name='宋体', color=Color(rgb=COLOR_INDEX[2]), bold=True)

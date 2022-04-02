@@ -54,11 +54,11 @@ def write_yaml(filepath: str, filename: str, data=None, encoding: str = 'utf-8',
         return result
 
 
-def write_yaml_report(filename: str = f'APITestResult_{datetime.now()}.xlsx', data=None, encoding: str = 'utf-8',
+def write_yaml_report(filename: str = f'APITestResult_{datetime.now()}.yaml', *, data=None, encoding: str = 'utf-8',
                       mode: str = 'a'):
     """
     写入yaml测试报告
-    :param filename: 文件名
+    :param filename: 测试报告文件名
     :param data: 写入数据
     :param encoding: 文件编码格式
     :param mode: 文件写入模式
@@ -85,4 +85,7 @@ def get_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> str:
     :param filename: 文件名
     :return:
     """
-    return os.path.join(filepath, filename)
+    _file = os.path.join(filepath, filename)
+    if not os.path.exists(_file):
+        raise FileNotFoundError(f'测试数据文件 {filename} 不存在')
+    return _file

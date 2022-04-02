@@ -1,6 +1,6 @@
 # 测试项目
 [project]
-project = 'test'
+project = 'testproject'
 
 # 测试人员信息
 [tester]

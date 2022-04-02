@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-
 from loguru import logger
 
 
 class Logger:
-    # 日志存放路径
-    LOG_PATH = os.path.join(os.path.abspath(".."), 'log')
 
-    @classmethod
-    def log(cls) -> logger:
+    @staticmethod
+    def log() -> logger:
         """
         日志记录器
         :return:
         """
-        if not os.path.join(cls.LOG_PATH):
-            os.makedirs(cls.LOG_PATH)
+        # 日志存放路径
+        LOG_PATH = os.path.join(os.path.abspath("."), 'log')
 
-        log_file = os.path.join(cls.LOG_PATH, 'api_test.log')
+        if not os.path.join(LOG_PATH):
+            os.makedirs(LOG_PATH)
+
+        log_file = os.path.join(LOG_PATH, 'api_test.log')
 
         logger.add(
             log_file,
@@ -28,7 +28,7 @@ class Logger:
             encoding='utf-8',
             enqueue=True,
             backtrace=True,
-            diagnose=True
+            diagnose=True,
         )
 
         return logger
