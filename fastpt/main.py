@@ -13,6 +13,7 @@ from fastpt.core.path_conf import HTML_REPORT_PATH
 def run():
     """
     PS: 运行参数配置
+        - print_level:      str, 控制台打印输出级别
         - project_path:     str, 可选参数, 指定测试用例项目路径
         - class_path:       str, 可选参数, 指定测试用例类
         - function_path:    str, 可选参数, 指定测试用例函数
@@ -29,6 +30,7 @@ def run():
 
     # -------------------------- args setting -----------------------------
 
+    print_level: str = '-v'
     project_path: Optional[str] = f"./testcase/{PROJECT_NAME}/"
     class_path: Optional[str] = None
     function_path: Optional[str] = None
@@ -102,6 +104,7 @@ def run():
         is_disable_warings = ''
 
     pytest.main([
+        f'{print_level}',
         f'{run_path}',
         f'{is_html_report_file}',
         f'{is_html_report_self}',

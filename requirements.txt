@@ -1,0 +1,12 @@
+loguru==0.4.1
+requests==2.25.1
+toml==0.10.2
+pyyaml==5.4.1
+xlrd==1.2.0
+openpyxl==3.0.7
+pytest==6.2.3
+filelock==3.0.12
+pymysql==0.9.3
+dbutils==3.0.2
+py==1.10.0
+httpx==0.22.0

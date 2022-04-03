@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 import pytest
 from _pytest.logging import LogCaptureFixture
 from filelock import FileLock
@@ -52,30 +54,58 @@ def function_fixture(request) -> None:
 
 @pytest.fixture(autouse=True)
 def caplog(caplog: LogCaptureFixture):
-    """
-    将 pytest 的 caplog 夹具默认日志记录器改为 loguru,而非默认 logging
-    :param caplog:
-    :return:
-    """
+    # 将 pytest 的 caplog 夹具默认日志记录器改为 loguru,而非默认 logging
     handler_id = logger.add(caplog.handler, format="{message}")
     yield caplog
     logger.remove(handler_id)
 
 
-@pytest.mark.optionalhook
-def pytest_html_results_table_header(cells) -> None:
-    # 向html报告中的table添加额外信息
-    cells.insert(1, html.th('Case description', class_="sortable", col="name"))
+# html报告环境信息配置
+def pytest_configure(config):
+    # 添加接口地址与项目名称
+    config._metadata["Project Name"] = PROJECT_NAME
+    # config._metadata['Test Address'] =
+    # 删除Java_Home
+    config._metadata.pop("JAVA_HOME")
 
 
-def pytest_html_results_summary(prefix, summary, postfix) -> None:
+# html报告摘要信息配置
+def pytest_html_results_summary(prefix) -> None:
     # 向html报告中的summary添加额外信息
-    prefix.extend([html.p(f"test project: {PROJECT_NAME}")])
-    prefix.extend([html.p(f"tester: {TESTER_NAME}")])
+    # prefix.extend([html.p(f"Department:")])
+    prefix.extend([html.p(f"Tester: {TESTER_NAME}")])
 
 
+# html报告表格列配置
+@pytest.mark.optionalhook
+def pytest_html_results_table_header(cells):
+    cells.insert(1, html.th('Description'))
+    cells.insert(3, html.th('Time', class_='sortable time', col='time'))
+    cells.pop()
+
+
+# html报告表格列值配置
+@pytest.mark.optionalhook
+def pytest_html_results_table_row(report, cells):
+    cells.insert(1, html.td(report.description))
+    cells.insert(3, html.td(datetime.utcnow(), class_='col-time'))
+    cells.pop()
+
+
+# 自动化获取用例描述, 解决测试用例参数包含中文问题
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    if item.function.__doc__ is None:
+        report.description = str(item.function.__name__)
+    else:
+        report.description = str(item.function.__doc__)
+
+
+# 解决数据驱动ids参数为中文时,控制台输出乱码
 def pytest_collection_modifyitems(items) -> None:
-    # item表示每个用例, 避免在使用数据驱动ids参数为中文时,控制台输出乱码
+    # item表示每个用例
     for item in items:
         item.name = item.name.encode("utf-8").decode("unicode_escape")
         item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")

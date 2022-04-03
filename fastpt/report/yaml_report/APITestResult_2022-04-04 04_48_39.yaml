@@ -1,0 +1,19 @@
+- PASS:
+    request:
+      ID: event_query_001
+      UseCase: 搜狗高清壁纸
+      body: null
+      body_type: null
+      headers: null
+      method: post
+      model: 搜狗高清壁纸
+      msg: success
+      params: '{"format": "json"}'
+      result: null
+      status_code: 200
+      tester: null
+      url: https://api.66mz8.com/api/rand.sgimg.php
+    response:
+      code: 200
+      msg: success
+      pic_url: null
