@@ -10,6 +10,7 @@ from fastpt.common.log import log
 def read_toml(filepath: str, filename: str) -> dict:
     """
     读取 toml 文件
+
     :param filepath: 文件路径
     :param filename: 文件名
     :return:
@@ -30,6 +31,7 @@ def read_toml(filepath: str, filename: str) -> dict:
 def write_toml(filepath: str, filename: str, data: dict, encoding: str = 'utf-8', mode: str = 'a', encoder=None) -> str:
     """
     将字典写入包含 TOML 格式数据的文件
+
     :param filepath: 文件路径
     :param filename: 文件名称
     :param data: 写入内容

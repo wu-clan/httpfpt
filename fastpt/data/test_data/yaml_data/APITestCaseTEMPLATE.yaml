@@ -7,7 +7,7 @@
   params: '{"format": "json"}'
   headers:
   body:
-  type:
+  body_type:
   status_code: 200
   msg: success
   result:

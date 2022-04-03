@@ -10,6 +10,7 @@ class Logger:
     def log() -> logger:
         """
         日志记录器
+
         :return:
         """
         # 日志存放路径

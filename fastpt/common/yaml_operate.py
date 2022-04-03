@@ -12,7 +12,7 @@ from fastpt.core.path_conf import YAML_DATA_PATH, YAML_REPORT_PATH
 curr_time = time.strftime('%Y-%m-%d %H_%M_%S')
 
 
-def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> dict:
+def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> list:
     """
     读取 yaml 文件
     :param filepath: 文件路径
@@ -27,7 +27,7 @@ def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> dict:
         log.error(f'文件 {_filename} 不存在 \n {e}')
         raise e
     else:
-        return data
+        return list(data)
 
 
 def write_yaml(filepath: str, filename: str, data=None, encoding: str = 'utf-8', mode: str = 'a'):
@@ -54,16 +54,19 @@ def write_yaml(filepath: str, filename: str, data=None, encoding: str = 'utf-8',
         return result
 
 
-def write_yaml_report(filename: str = f'APITestResult_{datetime.now()}.yaml', *, data=None, encoding: str = 'utf-8',
-                      mode: str = 'a'):
+def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.yaml', *,
+                      data=None, encoding: str = 'utf-8', mode: str = 'a', status: str):
     """
     写入yaml测试报告
     :param filename: 测试报告文件名
     :param data: 写入数据
     :param encoding: 文件编码格式
     :param mode: 文件写入模式
+    :param status: 测试结果
     :return
     """
+    if status not in ('PASS', 'FAIL'):
+        raise ValueError('yaml测试报告结果用力状态只允许"PASS"或"FAIL"')
     if not os.path.exists(YAML_REPORT_PATH):
         os.makedirs(YAML_REPORT_PATH)
     _file = os.path.join(YAML_REPORT_PATH, filename)
@@ -74,6 +77,10 @@ def write_yaml_report(filename: str = f'APITestResult_{datetime.now()}.yaml', *,
         log.error(f'写入yaml测试报告失败 \n {e}')
         raise e
     else:
+        if status == 'PASS':
+            log.success('test result: ----> {}', status)
+        elif status == 'FAIL':
+            log.error('test result: ----> {}', status)
         log.success('写入yaml测试报告成功')
         return result
 

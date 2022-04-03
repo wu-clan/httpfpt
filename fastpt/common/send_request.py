@@ -25,8 +25,7 @@ class SendRequests:
     @staticmethod
     def __data(data) -> list:
         """
-        excel同步请求数据
-        :param data:
+        :param data: 请求数据
         :return:
         """
         method = data["method"]
@@ -43,9 +42,9 @@ class SendRequests:
             body_data = None
         else:
             body_data = eval(data["body"])
-        if data["type"] == "data":
+        if data["body_type"] == "data":
             body = body_data
-        elif data["type"] == "json":
+        elif data["body_type"] == "json":
             body = json.dumps(body_data)
         else:
             body = body_data
@@ -54,6 +53,7 @@ class SendRequests:
     def __send_req(self, data) -> Union[httpx_rq, requests_rq]:
         """
         发送请求
+
         :param data: 请求数据
         :return: response
         """
@@ -89,7 +89,7 @@ class SendRequests:
                 time.sleep(get_conf.REQUEST_INTERVAL)
                 with httpx.Client(verify=get_conf.REQUEST_VERIFY, follow_redirects=True) as client:
                     rq = client.request(method=req_method, url=req_url, params=req_params, headers=req_headers,
-                                        data=req_data, timeout=get_conf.REQUEST_TIMEOUT, )
+                                        data=req_data, timeout=get_conf.REQUEST_TIMEOUT)
                     return rq
             except Exception as e:
                 log.error(f'请求异常: \n {e}')
@@ -98,7 +98,8 @@ class SendRequests:
     def send_requests(self, data) -> requests_rq:
         """
         通过 requests 发送请求
-        :param data:
+
+        :param data: 请求数据
         :return:
         """
         self._req_log(data)
@@ -108,6 +109,7 @@ class SendRequests:
     def send_httpx(self, data) -> httpx_rq:
         """
         通过 httpx 发送请求
+
         :param data:
         :return:
         """
@@ -121,7 +123,7 @@ class SendRequests:
         log.info(f"请求 method: {data['method']}")
         log.info(f"请求 url: {data['url']}")
         log.info(f"请求 params: {data['params']}")
-        log.info(f"请求 body 类型：{data['type']}")
+        log.info(f"请求 body 类型：{data['body_type']}")
         log.info(f"请求 body：{data['body']}")
 
 
