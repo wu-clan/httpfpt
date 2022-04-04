@@ -15,6 +15,9 @@ EXCEL_DATA_PATH = os.path.join(BASE_DIR, 'data', 'test_data', 'excel_data')
 # Yaml测试数据路径
 YAML_DATA_PATH = os.path.join(BASE_DIR, 'data', 'test_data', 'yaml_data')
 
+# allure测试报告路径
+ALLURE_REPORT_PATH = os.path.join(BASE_DIR, 'report', 'allure_report')
+
 # EXCEL测试报告路径
 EXCEL_REPORT_PATH = os.path.join(BASE_DIR, 'report', 'excel_report')
 

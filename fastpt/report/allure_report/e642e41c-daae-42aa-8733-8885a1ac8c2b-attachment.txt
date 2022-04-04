@@ -1,0 +1,16 @@
+2022-04-04 22:50:39.528 | INFO     | fastpt.conftest:function_fixture:58 - ----------------- Running case: test_003 -----------------
+2022-04-04 22:50:39.530 | INFO     | fastpt.common.send_request:_req_log:122 - 正在调用的数据ID: --> event_query_001
+2022-04-04 22:50:39.530 | INFO     | fastpt.common.send_request:_req_log:123 - 请求 method: post
+2022-04-04 22:50:39.530 | INFO     | fastpt.common.send_request:_req_log:124 - 请求 url: https://api.66mz8.com/api/rand.sgimg.php
+2022-04-04 22:50:39.531 | INFO     | fastpt.common.send_request:_req_log:125 - 请求 params: {"format": "json"}
+2022-04-04 22:50:39.531 | INFO     | fastpt.common.send_request:_req_log:126 - 请求 body 类型：
+2022-04-04 22:50:39.531 | INFO     | fastpt.common.send_request:_req_log:127 - 请求 body：
+2022-04-04 22:50:40.752 | INFO     | fastpt.testcase.testproject.test_api:test_003:54 - response：{
+    "code": 200,
+    "msg": "success",
+    "pic_url": null
+}
+2022-04-04 22:50:40.769 | SUCCESS  | fastpt.common.excel_operate:write_excel_report:96 - test result: ----> PASS
+2022-04-04 22:50:40.769 | SUCCESS  | fastpt.common.excel_operate:write_excel_report:99 - 写入excel测试报告成功
+2022-04-04 22:50:40.776 | INFO     | fastpt.conftest:log_end:61 - end 
+

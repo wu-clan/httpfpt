@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 
 import pytest
@@ -13,12 +14,24 @@ from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME
 
 
 @pytest.fixture(scope='session', autouse=True)
-def session_fixture() -> None:
+def session_fixture(tmp_path_factory, worker_id) -> None:
     # 避免分布式执行用例循环执行此fixture
-    with FileLock("session.lock"):
-        ...
-    yield
-    ...
+    # 官方例子: https://www.yuque.com/poloyy/nz6yd2/wq3mby#MXI0w
+    # 优化例子: https://www.yuque.com/poloyy/nz6yd2/wq3mby#UYgcL
+    if worker_id == "master":
+        return None
+
+        # get the temp directory shared by all workers
+    root_tmp_dir = tmp_path_factory.getbasetemp().parent
+
+    fn = root_tmp_dir / "data.json"
+    with FileLock(str(fn) + ".lock"):
+        if fn.is_file():
+            data = json.loads(fn.read_text())
+        else:
+            data = None
+            fn.write_text(json.dumps(data))
+    return data
 
 
 @pytest.fixture(scope='package', autouse=True)
