@@ -10,3 +10,4 @@ pymysql==0.9.3
 dbutils==3.0.2
 py==1.10.0
 httpx==0.22.0
+allure-pytest==2.9.45
