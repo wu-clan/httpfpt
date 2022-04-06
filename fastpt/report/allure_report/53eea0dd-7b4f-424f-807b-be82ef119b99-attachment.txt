@@ -1,0 +1,18 @@
+2022-04-06 19:23:54.107 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case: test_004 -----------------
+2022-04-06 19:23:54.108 | INFO     | fastpt.common.send_request:_req_log:122 - 正在调用的数据ID: --> event_query_001
+2022-04-06 19:23:54.108 | INFO     | fastpt.common.send_request:_req_log:123 - 请求 method: post
+2022-04-06 19:23:54.108 | INFO     | fastpt.common.send_request:_req_log:124 - 请求 url: https://api.66mz8.com/api/rand.sgimg.php
+2022-04-06 19:23:54.108 | INFO     | fastpt.common.send_request:_req_log:125 - 请求 params: {"format": "json"}
+2022-04-06 19:23:54.108 | INFO     | fastpt.common.send_request:_req_log:126 - 请求 headers: None
+2022-04-06 19:23:54.109 | INFO     | fastpt.common.send_request:_req_log:127 - 请求 body 类型：None
+2022-04-06 19:23:54.109 | INFO     | fastpt.common.send_request:_req_log:128 - 请求 body：None
+2022-04-06 19:23:55.072 | INFO     | fastpt.testcase.testproject.test_api:test_004:72 - response：{
+    "code": 200,
+    "msg": "success",
+    "pic_url": null
+}
+2022-04-06 19:23:55.074 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:82 - test result: ----> PASS
+2022-04-06 19:23:55.074 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:85 - 写入yaml测试报告成功
+2022-04-06 19:23:55.075 | INFO     | fastpt.conftest:log_end:63 - end 
+
+2022-04-06 19:23:55.078 | INFO     | fastpt.conftest:package_fixture:41 - 测试用例执行结束

@@ -1,4 +1,0 @@
-2022-04-04 22:50:39.516 | INFO     | fastpt.conftest:function_fixture:58 - ----------------- Running case: test_001 -----------------
-2022-04-04 22:50:39.517 | INFO     | fastpt.testcase.testproject.test_api:test_001:28 - This is a frame's test
-2022-04-04 22:50:39.519 | INFO     | fastpt.conftest:log_end:61 - end 
-

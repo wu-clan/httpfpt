@@ -1,4 +1,0 @@
-2022-04-04 22:50:39.523 | INFO     | fastpt.conftest:function_fixture:58 - ----------------- Running case: test_002 -----------------
-2022-04-04 22:50:39.524 | INFO     | fastpt.testcase.testproject.test_api:test_002:35 - 这是一个框架xfail修饰测试
-2022-04-04 22:50:39.524 | INFO     | fastpt.conftest:log_end:61 - end 
-

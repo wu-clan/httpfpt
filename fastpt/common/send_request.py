@@ -123,6 +123,7 @@ class SendRequests:
         log.info(f"请求 method: {data['method']}")
         log.info(f"请求 url: {data['url']}")
         log.info(f"请求 params: {data['params']}")
+        log.info(f'请求 headers: {data["headers"]}')
         log.info(f"请求 body 类型：{data['body_type']}")
         log.info(f"请求 body：{data['body']}")
 

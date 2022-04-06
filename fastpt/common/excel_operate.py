@@ -3,7 +3,7 @@
 import os
 import shutil
 from datetime import datetime
-from typing import Optional
+from typing import Any, List, Dict
 
 import xlrd
 from openpyxl import load_workbook
@@ -15,7 +15,7 @@ from fastpt.core.get_conf import TESTER_NAME
 from fastpt.core.path_conf import EXCEL_DATA_PATH, EXCEL_REPORT_PATH
 
 
-def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = 'Sheet1') -> Optional[list]:
+def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = 'Sheet1') -> List[Dict[str, Any]]:
     """
     读取 xlsx 文件
 

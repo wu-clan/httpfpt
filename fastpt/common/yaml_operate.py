@@ -3,6 +3,7 @@
 import os
 import time
 from datetime import datetime
+from typing import Any, List, Dict
 
 import yaml
 
@@ -12,7 +13,7 @@ from fastpt.core.path_conf import YAML_DATA_PATH, YAML_REPORT_PATH
 curr_time = time.strftime('%Y-%m-%d %H_%M_%S')
 
 
-def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> list:
+def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> List[Dict[str, Any]]:
     """
     读取 yaml 文件
     :param filepath: 文件路径
