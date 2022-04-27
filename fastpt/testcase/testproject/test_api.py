@@ -7,7 +7,7 @@ from fastpt.common.excel_operate import write_excel_report, read_excel
 from fastpt.common.log import log
 from fastpt.common.send_request import send_request
 from fastpt.common.yaml_operate import write_yaml_report, read_yaml
-from fastpt.utils.parametrize_set import param_ids
+from fastpt.utils.data_extraction import get_ids
 
 excel_data = read_excel(filename='APITestCaseTEMPLATE.xlsx')
 yaml_data = read_yaml(filename='APITestCaseTEMPLATE.yaml')
@@ -17,8 +17,8 @@ class TestDemo:
     """ Demo """
 
     # 声明全局参数
-    excel_ids = param_ids(excel_data)
-    yaml_ids = param_ids(yaml_data)
+    excel_ids = get_ids(excel_data)
+    yaml_ids = get_ids(yaml_data)
 
     @pytest.mark.test_mark
     @pytest.mark.parametrize('a, b', [(1, 2)])

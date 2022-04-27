@@ -6,8 +6,8 @@ from typing import Union
 
 import httpx
 import requests
-from httpx import Response as httpx_rq
-from requests import Response as requests_rq
+from httpx import Response as httpx_request
+from requests import Response as requests_request
 
 from fastpt.common.log import log
 from fastpt.core import get_conf
@@ -20,7 +20,7 @@ class SendRequests:
         """
         :param requestMethod: 请求方式
         """
-        self.requestMethod = requestMethod
+        self.__requestMethod = requestMethod
 
     @staticmethod
     def __data(data) -> list:
@@ -50,16 +50,16 @@ class SendRequests:
             body = body_data
         return [method, url, params, headers, body]
 
-    def __send_req(self, data) -> Union[httpx_rq, requests_rq]:
+    def __send_request(self, data) -> Union[requests_request, httpx_request]:
         """
         发送请求
 
         :param data: 请求数据
         :return: response
         """
-        err = ['requests', 'httpx']
-        if self.requestMethod not in err:
-            raise ValueError(f'请求参数错误，仅 {err}')
+        request_method = ['requests', 'httpx']
+        if self.__requestMethod not in request_method:
+            raise ValueError(f'请求参数错误，仅 {args} 可用')
 
         # 记录请求参数
         req_args = self.__data(data)
@@ -69,7 +69,7 @@ class SendRequests:
         req_headers = req_args[3]
         req_data = req_args[4]
 
-        if self.requestMethod == 'requests':
+        if self.__requestMethod == 'requests':
             try:
                 # 消除安全警告
                 requests.packages.urllib3.disable_warnings()
@@ -83,7 +83,7 @@ class SendRequests:
                 log.error(f'请求异常: \n {e}')
                 raise e
 
-        if self.requestMethod == 'httpx':
+        if self.__requestMethod == 'httpx':
             try:
                 # 请求间隔
                 time.sleep(get_conf.REQUEST_INTERVAL)
@@ -95,30 +95,30 @@ class SendRequests:
                 log.error(f'请求异常: \n {e}')
                 raise e
 
-    def send_requests(self, data) -> requests_rq:
+    def send_requests(self, data) -> requests_request:
         """
         通过 requests 发送请求
 
         :param data: 请求数据
         :return:
         """
-        self._req_log(data)
-        self.requestMethod = 'requests'
-        return self.__send_req(data)
+        self.__req_log(data)
+        self.__requestMethod = 'requests'
+        return self.__send_request(data)
 
-    def send_httpx(self, data) -> httpx_rq:
+    def send_httpx(self, data) -> httpx_request:
         """
         通过 httpx 发送请求
 
         :param data:
         :return:
         """
-        self._req_log(data)
-        self.requestMethod = 'httpx'
-        return self.__send_req(data)
+        self.__req_log(data)
+        self.__requestMethod = 'httpx'
+        return self.__send_request(data)
 
     @staticmethod
-    def _req_log(data):
+    def __req_log(data):
         log.info(f"正在调用的数据ID: --> {data['ID']}")
         log.info(f"请求 method: {data['method']}")
         log.info(f"请求 url: {data['url']}")

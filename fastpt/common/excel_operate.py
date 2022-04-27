@@ -44,7 +44,7 @@ def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = '
         return data_list
     else:
         log.warning('数据表格没有数据!')
-        return None
+        raise ValueError('数据表格没有数据! 请检查数据文件内容是否正确!')
 
 
 def write_excel_report(datafile='APITestCaseTEMPLATE.xlsx',

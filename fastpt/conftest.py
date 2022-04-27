@@ -67,14 +67,24 @@ def function_fixture(request) -> None:
 
 @pytest.fixture(autouse=True)
 def caplog(caplog: LogCaptureFixture):
-    # 将 pytest 的 caplog 夹具默认日志记录器改为 loguru,而非默认 logging
+    """
+    将 pytest 的 caplog 夹具默认日志记录器改为 loguru,而非默认 logging
+
+    :param caplog:
+    :return:
+    """
     handler_id = logger.add(caplog.handler, format="{message}")
     yield caplog
     logger.remove(handler_id)
 
 
-# html报告环境信息配置
 def pytest_configure(config):
+    """
+    html报告环境信息配置
+
+    :param config:
+    :return:
+    """
     # 添加接口地址与项目名称
     config._metadata["Project Name"] = PROJECT_NAME
     # config._metadata['Test Address'] =
@@ -82,43 +92,73 @@ def pytest_configure(config):
     config._metadata.pop("JAVA_HOME")
 
 
-# html报告摘要信息配置
-def pytest_html_results_summary(prefix) -> None:
+def pytest_html_results_summary(prefix):
+    """
+    html报告摘要信息配置
+
+    :param prefix:
+    :return:
+    """
     # 向html报告中的summary添加额外信息
     # prefix.extend([html.p(f"Department:")])
     prefix.extend([html.p(f"Tester: {TESTER_NAME}")])
 
 
-# html报告表格列配置
 @pytest.mark.optionalhook
 def pytest_html_results_table_header(cells):
+    """
+    html报告表格列配置
+
+    :param cells:
+    :return:
+    """
     cells.insert(1, html.th('Description'))
     cells.insert(3, html.th('Time', class_='sortable time', col='time'))
     cells.pop()
 
 
-# html报告表格列值配置
 @pytest.mark.optionalhook
 def pytest_html_results_table_row(report, cells):
+    """
+    html报告表格列值配置
+
+    :param report:
+    :param cells:
+    :return:
+    """
     cells.insert(1, html.td(report.description))
     cells.insert(3, html.td(datetime.utcnow(), class_='col-time'))
     cells.pop()
 
 
-# 自动化获取用例描述, 解决测试用例参数包含中文问题
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item, call):
+    """
+    自动化获取用例描述, 解决测试用例参数包含中文问题
+
+    :param item:
+    :param call:
+    :return:
+    """
     outcome = yield
     report = outcome.get_result()
+    # 获取用例描述
     if item.function.__doc__ is None:
         report.description = str(item.function.__name__)
     else:
         report.description = str(item.function.__doc__)
 
 
-# 解决数据驱动ids参数为中文时,控制台输出乱码
 def pytest_collection_modifyitems(items) -> None:
+    """
+    解决数据驱动ids参数为中文时,控制台输出乱码问题
+
+    :param items:
+    :return:
+    """
     # item表示每个用例
     for item in items:
         item.name = item.name.encode("utf-8").decode("unicode_escape")
-        item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")
+        # 打开此注释可以解决控制台ids乱码问题,但是会影响报告中的ids参数乱码
+        # 问题在这里: https://github.com/pytest-dev/pytest-html/issues/450
+        # item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")
