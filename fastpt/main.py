@@ -8,6 +8,7 @@ import pytest
 
 from fastpt.core.get_conf import PROJECT_NAME
 from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH
+from fastpt.utils.send_email import SendMail
 
 
 def run():
@@ -30,7 +31,7 @@ def run():
         - disable_warings:  bool, 是否关闭控制台警告信息, 默认开启
     """
 
-    # -------------------------- args setting -----------------------------
+    # -------------------------- args settings -----------------------------
 
     print_level: str = '-v'
     project_path: Optional[str] = f"./testcase/{PROJECT_NAME}/"
@@ -131,6 +132,7 @@ def run():
     else:
         is_disable_warings = ''
 
+    # 运行入口
     pytest.main([
         f'{print_level}',
         f'{run_path}',
@@ -147,6 +149,11 @@ def run():
         f'{is_captrue}',
         f'{is_disable_warings}'
     ])
+
+    # 发送测试报告
+    if html_report:
+        send_mail = SendMail("--html=q".split('=')[1])
+        send_mail.send()
 
 
 if __name__ == '__main__':

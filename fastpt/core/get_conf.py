@@ -21,12 +21,12 @@ DB_DATABASE = __config['mysql']['database']
 DB_CHARSET = __config['mysql']['charset']
 
 # 邮件
-EMAIL_HOST_SERVER = __config['email']['host_server']
+EMAIL_SERVER = __config['email']['host_server']
 EMAIL_PORT = __config['email']['port']
 EMAIL_USER = __config['email']['user']
 EMAIL_PASSWORD = __config['email']['password']
-EMAIL_TIMEOUT = __config['email']['timeout']
 EMAIL_SEND_TO = __config['email']['send_to']
+EMAIL_SSL = __config['email']['is_ssl']
 
 # 请求发送
 REQUEST_TIMEOUT = __config['request']['timeout']

@@ -7,20 +7,19 @@ from loguru import logger
 
 class Logger:
 
-    @staticmethod
-    def log() -> logger:
+    def __init__(self, log_path=os.path.join(os.path.abspath("."), 'log')):
+        self.log_path = log_path
+
+    def log(self) -> logger:
         """
         日志记录器
 
         :return:
         """
-        # 日志存放路径
-        LOG_PATH = os.path.join(os.path.abspath("."), 'log')
+        if not os.path.join(self.log_path):
+            os.makedirs(self.log_path)
 
-        if not os.path.join(LOG_PATH):
-            os.makedirs(LOG_PATH)
-
-        log_file = os.path.join(LOG_PATH, 'api_test.log')
+        log_file = os.path.join(self.log_path, 'api_test.log')
 
         logger.add(
             log_file,
@@ -36,4 +35,4 @@ class Logger:
         return logger
 
 
-log = Logger.log()
+log = Logger().log()

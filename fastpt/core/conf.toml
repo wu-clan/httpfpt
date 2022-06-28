@@ -1,6 +1,6 @@
 # 测试项目
 [project]
-project = 'testproject'
+project = 'test_project'
 
 # 测试人员信息
 [tester]
@@ -21,8 +21,8 @@ host_server = 'smtp.qq.com'
 port = 465
 user = 'xxx'
 password = 'xxx'
-timeout = 10
-send_to = ['xxx']
+send_to = 'xxx'  # if more, use: [str]
+is_ssl = false
 
 # 请求发送
 [request]

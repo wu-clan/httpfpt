@@ -16,6 +16,7 @@ curr_time = time.strftime('%Y-%m-%d %H_%M_%S')
 def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> List[Dict[str, Any]]:
     """
     读取 yaml 文件
+
     :param filepath: 文件路径
     :param filename: 文件名
     :return:
@@ -34,6 +35,7 @@ def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> List[Dict[str
 def write_yaml(filepath: str, filename: str, data=None, encoding: str = 'utf-8', mode: str = 'a'):
     """
     将数据写入包含 yaml 格式数据的文件
+
     :param filepath: 文件路径
     :param filename: 文件名
     :param data: 数据
@@ -59,6 +61,7 @@ def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("
                       data=None, encoding: str = 'utf-8', mode: str = 'a', status: str):
     """
     写入yaml测试报告
+
     :param filename: 测试报告文件名
     :param data: 写入数据
     :param encoding: 文件编码格式
@@ -89,6 +92,7 @@ def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("
 def get_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> str:
     """
     获取 yaml 文件
+
     :param filepath: 文件路径
     :param filename: 文件名
     :return:
