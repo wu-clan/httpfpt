@@ -1,0 +1,11 @@
+# 开发环境
+dev: http://127.0.0.1:8080
+# 测试环境
+test: https://jsonplaceholder.typicode.com
+# 默认请求头
+headers:
+  Accept-Encoding: 'gzip, deflate'
+  Accept-Language: 'zh-CN,zh;q=0.9'
+  User-Agent: '''
+  Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+  '''

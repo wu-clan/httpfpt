@@ -10,7 +10,7 @@ from loguru import logger
 from py._xmlgen import html
 
 from fastpt.common.log import log
-from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME
+from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -87,9 +87,10 @@ def pytest_configure(config):
     """
     # 添加接口地址与项目名称
     config._metadata["Project Name"] = PROJECT_NAME
-    # config._metadata['Test Address'] =
-    # 删除Java_Home
-    config._metadata.pop("JAVA_HOME")
+    # config._metadata.pop("JAVA_HOME")
+    config._metadata.pop("Packages")
+    config._metadata.pop("Platform")
+    config._metadata.pop("Plugins")
 
 
 def pytest_html_results_summary(prefix):
@@ -105,6 +106,11 @@ def pytest_html_results_summary(prefix):
 
 
 @pytest.mark.optionalhook
+def pytest_html_report_title(report):
+    report.title = f"{HTML_REPORT_TITLE}"
+
+
+@pytest.mark.optionalhook
 def pytest_html_results_table_header(cells):
     """
     html报告表格列配置
@@ -113,7 +119,7 @@ def pytest_html_results_table_header(cells):
     :return:
     """
     cells.insert(1, html.th('Description'))
-    cells.insert(3, html.th('Time', class_='sortable time', col='time'))
+    cells.insert(3, html.th('Execute Time', class_='sortable time', col='time'))
     cells.pop()
 
 
@@ -126,7 +132,7 @@ def pytest_html_results_table_row(report, cells):
     :param cells:
     :return:
     """
-    cells.insert(1, html.td(report.description))
+    cells.insert(1, html.td(getattr(report, 'description', None)))
     cells.insert(3, html.td(datetime.utcnow(), class_='col-time'))
     cells.pop()
 
@@ -143,7 +149,7 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     # 获取用例描述
-    if item.function.__doc__ is None:
+    if getattr(item.function, '__doc__', None) is None:
         report.description = str(item.function.__name__)
     else:
         report.description = str(item.function.__doc__)

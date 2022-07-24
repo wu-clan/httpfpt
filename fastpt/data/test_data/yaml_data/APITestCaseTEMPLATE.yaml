@@ -1,14 +1,65 @@
 -
-  model: 搜狗高清壁纸
-  ID: event_query_001
-  UseCase: 搜狗高清壁纸
-  method: post
-  url: https://api.66mz8.com/api/rand.sgimg.php
-  params: '{"format": "json"}'
+  module: test
+  case_id: event_query_001
+  case_desc: 测试直接请求
+  is_run:
+  method: get
+  env:
+  url: https://jsonplaceholder.typicode.com/posts/1
+  params:
   headers:
-  body:
-  body_type:
-  status_code: 200
-  msg: success
-  result:
-  tester:
+  data_type:
+  data:
+  files:
+  sql:
+  assert:
+-
+  module: test
+  case_id: event_query_002
+  case_desc: 测试全局变量
+  is_run:
+  method: get
+  env: ${test}
+  url: /comments
+  params:
+    postId: 1
+  headers:
+  data_type:
+  data:
+  files:
+  sql:
+  assert:
+-
+  module: test
+  case_id: event_create_003
+  case_desc: 测试hooks
+  is_run:
+  method: post
+  env:
+  url: https://jsonplaceholder.typicode.com/posts
+  params:
+  headers:
+  data_type: json
+  data:
+    title: foo
+    body: ${random_phone()}
+    userId: 1
+  files:
+  sql:
+  assert:
+-
+  module: test
+  case_id: event_upload_004
+  case_desc: 测试文件上传
+  is_run:
+  method: post
+  env:
+  url: https://api.anonfiles.com/upload
+  params:
+  headers:
+  data_type:
+  data:
+  files:
+    file: D:\\0000000000_test\\666.txt
+  sql:
+  assert:

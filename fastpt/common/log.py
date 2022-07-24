@@ -7,7 +7,7 @@ from loguru import logger
 
 class Logger:
 
-    def __init__(self, log_path=os.path.join(os.path.abspath("."), 'log')):
+    def __init__(self, log_path=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))):
         self.log_path = log_path
 
     def log(self) -> logger:
@@ -19,7 +19,7 @@ class Logger:
         if not os.path.join(self.log_path):
             os.makedirs(self.log_path)
 
-        log_file = os.path.join(self.log_path, 'api_test.log')
+        log_file = os.path.join(self.log_path, 'log', 'api_test.log')
 
         logger.add(
             log_file,

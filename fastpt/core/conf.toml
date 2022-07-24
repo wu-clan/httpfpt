@@ -2,9 +2,14 @@
 [project]
 project = 'test_project'
 
-# 测试人员信息
-[tester]
+# 测试报告
+[report]
 tester_name = '123'
+
+# html 测试报告
+[report.html]
+title = "自动化测试报告"
+
 
 # 数据库
 [mysql]
@@ -13,20 +18,20 @@ port = 3306
 user = 'root'
 password = '123456'
 database = 'test'
-charset = 'utf8'
 
 # 邮件
 [email]
 host_server = 'smtp.qq.com'
 port = 465
-user = 'xxx'
-password = 'xxx'
-send_to = 'xxx'  # if more, use: [str]
-is_ssl = false
+user = '12345678@qq.com'
+password = '12345678'
+send_to = '87654321@qq.com'  # if more, use: [str]
+is_ssl = true
 
 # 请求发送
 [request]
-timeout = 5
-interval = 0.5
+timeout = 10
+interval = 0
 verify = false
-
+proxies.http = ''
+proxies.https = ''

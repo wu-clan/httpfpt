@@ -3,7 +3,7 @@
 import os
 import shutil
 from datetime import datetime
-from typing import Any, List, Dict
+from typing import Any, Dict, List
 
 import xlrd
 from openpyxl import load_workbook
@@ -31,7 +31,7 @@ def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = '
     rows = table.nrows
     cols = table.ncols
     if rows > 1:
-        # 获取第一行内容,通常为列说明
+        # 获取第一行内容, 通常为列说明
         keys = table.row_values(0)
         data_list = []
         # 获取文档剩下所有内容
@@ -39,8 +39,13 @@ def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = '
             values = table.row_values(col)
             # key, value组合为字典
             data = dict(zip(keys, values))
+            # 数据整理
+            for value in data:
+                if isinstance(data[value], str):
+                    data[value] = data[value].replace(' ', '').replace('\n', '')
+                if data[value] == '':
+                    data[value] = None
             data_list.append(data)
-
         return data_list
     else:
         log.warning('数据表格没有数据!')
@@ -51,7 +56,7 @@ def write_excel_report(datafile='APITestCaseTEMPLATE.xlsx',
                        filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.xlsx', *,
                        row_num: int, status: str):
     """
-    写入excel测试报告
+    写入 excel 测试报告
 
     :param datafile: excel测试数据文件名
     :param filename: 文件名
@@ -59,8 +64,8 @@ def write_excel_report(datafile='APITestCaseTEMPLATE.xlsx',
     :param status: 测试结果: 'PASS' or 'FAIL'
     :return
     """
-    if status not in ('PASS', 'FAIL'):
-        raise ValueError('excel测试报告结果用力状态只允许"PASS"或"FAIL"')
+    if status not in ('PASS', 'FAIL', 'SKIP'):
+        raise ValueError('excel测试报告结果用力状态只允许"PASS","FAIL"或"SKIP"')
     if not os.path.exists(EXCEL_REPORT_PATH):
         os.makedirs(EXCEL_REPORT_PATH)
     _datafile = os.path.join(EXCEL_DATA_PATH, datafile)
@@ -71,21 +76,28 @@ def write_excel_report(datafile='APITestCaseTEMPLATE.xlsx',
     ws = wb.active
     font_green = Font(name='宋体', color=Color(rgb=COLOR_INDEX[3]), bold=True)
     font_red = Font(name='宋体', color=Color(rgb=COLOR_INDEX[2]), bold=True)
+    font_yellow = Font(name='宋体', color=Color(rgb=COLOR_INDEX[5]), bold=True)
     font_black = Font(name='宋体', color=Color(), bold=True)
-    # 文件内容格式
-    align = Alignment(horizontal='center', vertical='center')
     # 所在行,列
-    L_n = "L" + str(row_num)
-    M_n = "M" + str(row_num)
+    wl = "L" + str(row_num)
+    wm = "M" + str(row_num)
+    # todo 新版写入待更新
+    # 用力状态
     if status == "PASS":
         ws.cell(row_num, 12, status)
-        ws[L_n].font = font_green
-    if status == "FAIL":
+        ws[wl].font = font_green
+    elif status == "FAIL":
         ws.cell(row_num, 12, status)
-        ws[L_n].font = font_red
+        ws[wl].font = font_red
+    elif status == "SKIP":
+        ws.cell(row_num, 12, status)
+        ws[wl].font = font_yellow
+    # 测试员
     ws.cell(row_num, 13, TESTER_NAME)
-    ws[M_n].font = font_black
-    ws[L_n].alignment = ws[M_n].alignment = align
+    ws[wm].font = font_black
+    # 文件内容格式
+    align = Alignment(horizontal='center', vertical='center')
+    ws[wl].alignment = ws[wm].alignment = align
     try:
         wb.save(_report_file)
     except Exception as e:
@@ -96,4 +108,17 @@ def write_excel_report(datafile='APITestCaseTEMPLATE.xlsx',
             log.success('test result: ----> {}', status)
         elif status == 'FAIL':
             log.error('test result: ----> {}', status)
+        elif status == 'SKIP':
+            log.warning('test result: ----> {}', status)
         log.success('写入excel测试报告成功')
+
+
+def get_excel_row(data: dict):
+    """
+    写入 excel 文件的行数
+
+    :param data:
+    :return:
+    """
+    row_num = int(data['case_id'].split("_")[2]) + 1
+    return row_num

@@ -6,6 +6,8 @@ import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from bs4 import BeautifulSoup
+
 from fastpt.common.log import log
 from fastpt.core import get_conf
 from fastpt.core.path_conf import HTML_REPORT_PATH
@@ -17,9 +19,12 @@ class SendMail:
         self.filename = filename
 
     def take_messages(self):
-        """生成邮件的内容，和html报告附件"""
+        """
+        生成邮件内容，和html报告附件
+        """
         msg = MIMEMultipart()
-        msg['Subject'] = get_conf.PROJECT_NAME
+        msg['Subject'] = get_conf.PROJECT_NAME + ' 自动化测试报告'
+        msg['From'] = get_conf.EMAIL_USER
         msg['date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
 
         # 读取要发送的附件
@@ -27,8 +32,12 @@ class SendMail:
             mail_body = str(f.read())
 
         # 邮件正文
-        html = MIMEText(mail_body, _subtype='html', _charset='utf-8')
-        msg.attach(html)
+        html = BeautifulSoup(mail_body, 'html.parser')
+        result = []
+        for _ in html.find_all('span'):
+            result.append(_.text)
+        context = '<h3>测试结果:</h3>' + '<br>'.join(result)
+        msg.attach(MIMEText(context, _subtype='html', _charset='utf-8'))
 
         # 邮件附件
         att1 = MIMEText(mail_body, 'base64', 'utf-8')
@@ -39,7 +48,9 @@ class SendMail:
         return msg
 
     def send(self):
-        """发送邮件"""
+        """
+        发送邮件
+        """
         try:
             if get_conf.EMAIL_SSL:
                 smtp = smtplib.SMTP_SSL(host=get_conf.EMAIL_SERVER, port=get_conf.EMAIL_PORT)
@@ -49,6 +60,6 @@ class SendMail:
             smtp.sendmail(get_conf.EMAIL_USER, get_conf.EMAIL_SEND_TO, self.take_messages().as_string())
             smtp.quit()
         except Exception as e:
-            log.error(f'测试报告邮件发送失败: \n {e}')
+            log.error(f'测试报告邮件发送失败: {e}')
         else:
             log.success("测试报告邮件发送成功")
