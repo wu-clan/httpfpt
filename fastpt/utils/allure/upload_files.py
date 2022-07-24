@@ -3,7 +3,7 @@
 
 import allure
 
-from fastpt.schema.allure_attach_type import AllureAttachmentType
+from fastpt.schema.allure.allure_attach import AllureAttachmentType
 from fastpt.utils.file_control import get_file_property
 
 
