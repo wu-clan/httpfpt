@@ -4,7 +4,7 @@ import re
 
 from fastpt.common.log import log
 from fastpt.common.yaml_operate import read_yaml
-from fastpt.core.path_conf import YAML_VARS_PATH
+from fastpt.core.path_conf import TEST_DATA_PATH
 
 
 class VarsExtractor:
@@ -28,7 +28,7 @@ class VarsExtractor:
                 str_target = str(target)
 
         # 获取所有自定义全局变量
-        read_vars = read_yaml(YAML_VARS_PATH, filename='global_vars.yml')
+        read_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
         while re.findall(self.regular_re, str_target):
             keys = re.search(self.regular_re, str_target)
