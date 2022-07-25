@@ -57,7 +57,7 @@ def class_fixture() -> None:
 
 @pytest.fixture(scope='function', autouse=True)
 def function_fixture(request) -> None:
-    log.info(f'----------------- Running case: {request.function.__name__} -----------------')
+    log.info(f'----------------- Running case func: {request.function.__name__} -----------------')
 
     def log_end():
         log.info('end \n')

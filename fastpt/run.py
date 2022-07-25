@@ -30,7 +30,7 @@ def run(
         x: bool = False,
         n: Union[str, int] = 'auto',
         dist: str = 'loadscope',
-        markers: bool = True,
+        markers: bool = False,
         captrue: bool = True,
         disable_warings: bool = True,
         **kwargs,
@@ -42,7 +42,7 @@ def run(
     :param case_path: 可选参数, 指定测试用例函数, 默认为空，如果指定，则执行执行用例，否则执行全部
     :param html_report: 是否生成 HTML 测试报告, 默认开启
     :param send_report: 是否发送测试报告, 默认发送, 如果已启用生成 html 测试报告
-    :param allure: allure 测试报告, 默认开启
+    :param allure: allure 测试报告, 默认关闭
     :param clear_allure: 清空 allure 报告历史记录, 默认开启
     :param allure_serve: 是否测试执行完成后自动打开 allure 测试报告服务, 如果已启用 allure 测试报告
     :param reruns: 每个用例的运行次数, 兼容性差, 默认关闭, 不建议开启
@@ -50,7 +50,7 @@ def run(
     :param x: 如果发生失败用例, 是否终止运行, 默认关闭
     :param n: 分布式运行,使用"auto"表示全核, 也可指定cpu内核数量, 大于0的正整数, 默认"auto"
     :param dist: 分布式顺序运行方式, 默认"loadscope", 详情:https://pytest-xdist.readthedocs.io/en/latest/distribution.html#
-    :param markers: markers 严格模式,只允许使用用例中创建的 mark,并只运行 pytest.ini 中 markers 包含的 mark 用例, 默认开启
+    :param markers: markers 严格模式,只允许使用用例中创建的 mark,并只运行 pytest.ini 中 markers 包含的 mark 用例, 默认关闭
     :param captrue: 避免在使用输出模式为"v"和"s"时,html报告中的表格log为空的情况, 默认开启
     :param disable_warings: 是否关闭控制台警告信息, 默认开启
     :return:
