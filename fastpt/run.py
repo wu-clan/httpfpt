@@ -15,9 +15,8 @@ from fastpt.utils.send_email import SendMail
 def run(
         *args,
         log_level: str = '-v',
-        # cases path
-        class_path: Optional[str] = None,
-        function_path: Optional[str] = None,
+        # case path
+        case_path: Optional[str] = None,
         # html report
         html_report: bool = True,
         send_report: bool = False,
@@ -40,8 +39,7 @@ def run(
     运行入口
 
     :param log_level: 控制台打印输出级别, 默认"-v"
-    :param class_path: 可选参数, 指定测试用例类, 默认为空
-    :param function_path: 可选参数, 指定测试用例函数, 默认为空
+    :param case_path: 可选参数, 指定测试用例函数, 默认为空，如果指定，则执行执行用例，否则执行全部
     :param html_report: 是否生成 HTML 测试报告, 默认开启
     :param send_report: 是否发送测试报告, 默认发送, 如果已启用生成 html 测试报告
     :param allure: allure 测试报告, 默认开启
@@ -57,31 +55,21 @@ def run(
     :param disable_warings: 是否关闭控制台警告信息, 默认开启
     :return:
     """
-    case_path = f"./testcase/{PROJECT_NAME}"  # 默认执行指定项目下的所有测试用例
-    if class_path is None and function_path is None:
-        run_path = case_path
-    elif class_path is not None and function_path is None:
-        if '::' not in class_path:
-            raise ValueError(
-                '类用例收集失败, 请检查路径参数 \n'
-                'example: \n'
-                '\tclass_path = "文件名::类名"'
-            )
-        run_path = case_path + '/' + class_path
-    elif function_path is not None and class_path is None:
-        if '::' not in function_path:
-            raise ValueError(
-                '类用例收集失败, 请检查路径参数 \n'
-                'example: \n'
-                '\t1. function_path = "文件名::类名::函数名" \n'
-                '\t2. function_path = "文件名::函数名"'
-            )
-        run_path = case_path + '/' + function_path
+    default_case_path = f"./testcase/{PROJECT_NAME}"  # 默认执行指定项目下的所有测试用例
+    if case_path is None:
+        run_path = default_case_path
     else:
-        raise ValueError(
-            '获取测试用例失败, 请检查路径运行参数, 参数 class_path 和 function_path 只能使用其中一种指定方式,'
-            '并将另一种方式设置为None, 否则引发此异常'
-        )
+        if '::' not in case_path:
+            raise ValueError(
+                '用例收集失败, 请检查路径参数 \n'
+                '类用例说明: \n'
+                '\t1. 项目目录下没有多级目录: class_path = "文件名::类名" \n'
+                '\t2. 项目目录下有多级目录: class_path = "目录名/.../文件名::类名" \n'
+                '函数用例说明: \n'
+                '\t1. 项目目录下没有多级目录: function_path = "文件名::类名::函数名" \n'
+                '\t2. 项目目录下有多级目录: function_path = "目录名/.../文件名::函数名"'
+            )
+        run_path = default_case_path + '/' + case_path
 
     if html_report:
         if not os.path.exists(HTML_REPORT_PATH):
