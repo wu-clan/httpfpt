@@ -50,13 +50,11 @@ class TestDemo:
         row_num = get_excel_row(data)
         rp = send_request.send_request(data)
         rs = rp['status_code']
-        try:
-            assert rs == 200 or rp == 201, "返回实际结果是->: %s" % rs  # 暂时的
-        except AssertionError:
-            status = 'FAIL'
-            write_excel_report('APITestCaseTEMPLATE.xlsx', row_num=row_num, status=status)
-        status = 'PASS'
-        write_excel_report('APITestCaseTEMPLATE.xlsx', row_num=row_num, status=status)
+        if rs == 200:
+            write_excel_report(row_num=row_num, status='pass')
+        else:
+            write_excel_report(row_num=row_num, status='fail')
+        assert rs == 200, "返回实际结果是->: %s" % rs  # 暂时的
 
     @allure.story("yaml数据测试输出")
     @pytest.mark.test_api
@@ -65,10 +63,10 @@ class TestDemo:
         """ 测试004 """
         rp = send_request.send_request(data)
         rs = rp['status_code']
-        try:
-            assert rs == 200 or rp == 201, "返回实际结果是->: %s" % rs  # 暂时的
-        except AssertionError:
+        if rs == 200:
+            status = 'PASS'
+            write_yaml_report(data=[{'case': data['case_id'], 'result': status}], status=status)
+        else:
             status = 'FAIL'
             write_yaml_report(data=[{'case': data['case_id'], 'result': status}], status=status)
-        status = 'PASS'
-        write_yaml_report(data=[{'case': data['case_id'], 'result': status}], status=status)
+        assert rs == 200, "返回实际结果是->: %s" % rs  # 暂时的

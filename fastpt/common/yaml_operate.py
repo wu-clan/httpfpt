@@ -26,7 +26,7 @@ def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> Union[List[Di
         with open(_filename, encoding='utf-8') as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
     except Exception as e:
-        log.error(f'文件 {_filename} 读取错误 \n {e}')
+        log.error(f'文件 {_filename} 读取错误: {e}')
         raise e
     else:
         return data
@@ -50,7 +50,7 @@ def write_yaml(filepath: str, filename: str, data=None, encoding: str = 'utf-8',
         with open(_file, encoding=encoding, mode=mode) as f:
             result = yaml.dump(data, f, allow_unicode=True)
     except Exception as e:
-        log.error(f'写入文件 "{_file}" 错误 \n {e}')
+        log.error(f'写入文件 "{_file}" 错误: {e}')
         raise e
     else:
         log.success(f'写入文件 {_file} 成功')
@@ -58,7 +58,7 @@ def write_yaml(filepath: str, filename: str, data=None, encoding: str = 'utf-8',
 
 
 def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.yaml', *,
-                      data: list, encoding: str = 'utf-8', mode: str = 'a', status: str):
+                      data: Union[str, list], encoding: str = 'utf-8', mode: str = 'a', status: str):
     """
     写入yaml测试报告
 
@@ -69,7 +69,8 @@ def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("
     :param status: 测试结果
     :return
     """
-    if status not in ('PASS', 'FAIL', 'SKIP'):
+    status_upper = status.upper()
+    if status_upper not in ('PASS', 'FAIL'):
         raise ValueError('yaml测试报告结果用力状态只允许"PASS","FAIL"或"SKIP"')
     if not os.path.exists(YAML_REPORT_PATH):
         os.makedirs(YAML_REPORT_PATH)
@@ -78,15 +79,13 @@ def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("
         with open(_file, encoding=encoding, mode=mode) as f:
             yaml.dump(data, f, allow_unicode=True)
     except Exception as e:
-        log.error(f'写入yaml测试报告失败 \n {e}')
+        log.error(f'写入yaml测试报告失败: {e}')
         raise e
     else:
-        if status == 'PASS':
-            log.success('test result: ----> {}', status)
-        elif status == 'FAIL':
-            log.error('test result: ----> {}', status)
-        elif status == 'SKIP':
-            log.warning('test result: ----> {}', status)
+        if status_upper == 'PASS':
+            log.success('test result: ----> {}', status_upper)
+        elif status_upper == 'FAIL':
+            log.error('test result: ----> {}', status_upper)
         log.success('写入yaml测试报告成功')
 
 

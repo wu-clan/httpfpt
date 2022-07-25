@@ -3,12 +3,11 @@
 import os
 import shutil
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import xlrd
 from openpyxl import load_workbook
-from openpyxl.styles import Font, Alignment, Color
-from openpyxl.styles.colors import COLOR_INDEX
+from openpyxl.styles import Font, Alignment
 
 from fastpt.common.log import log
 from fastpt.core.get_conf import TESTER_NAME
@@ -52,68 +51,79 @@ def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = '
         raise ValueError('数据表格没有数据! 请检查数据文件内容是否正确!')
 
 
-def write_excel_report(datafile='APITestCaseTEMPLATE.xlsx',
-                       filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.xlsx', *,
-                       row_num: int, status: str):
+def write_excel_report(
+        datafile='APITestCaseTEMPLATE.xlsx',
+        filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.xlsx',
+        *,
+        row_num: int,
+        status: str,
+        extension: Union[str, None] = None
+) -> None:
     """
     写入 excel 测试报告
 
     :param datafile: excel测试数据文件名
     :param filename: 文件名
-    :param row_num:数据所在行数
-    :param status: 测试结果: 'PASS' or 'FAIL'
+    :param row_num: 数据写入行
+    :param status: 测试结果: PASS / FAIL / SKIP
+    :param extension: 测试结果扩展信息，如果有，则覆盖默认写入的结果
     :return
     """
-    if status not in ('PASS', 'FAIL', 'SKIP'):
-        raise ValueError('excel测试报告结果用力状态只允许"PASS","FAIL"或"SKIP"')
+    status_upper = status.upper()
+    if status_upper not in ('PASS', 'FAIL'):
+        raise ValueError('excel测试报告结果用力状态只允许"PASS","FAIL')
     if not os.path.exists(EXCEL_REPORT_PATH):
         os.makedirs(EXCEL_REPORT_PATH)
-    _datafile = os.path.join(EXCEL_DATA_PATH, datafile)
-    _report_file = os.path.join(EXCEL_REPORT_PATH, filename)
-    # copy测试数据为报告文件基础
-    shutil.copyfile(_datafile, _report_file)
-    wb = load_workbook(_report_file)
-    ws = wb.active
-    font_green = Font(name='宋体', color=Color(rgb=COLOR_INDEX[3]), bold=True)
-    font_red = Font(name='宋体', color=Color(rgb=COLOR_INDEX[2]), bold=True)
-    font_yellow = Font(name='宋体', color=Color(rgb=COLOR_INDEX[5]), bold=True)
-    font_black = Font(name='宋体', color=Color(), bold=True)
-    # 所在行,列
-    wl = "L" + str(row_num)
-    wm = "M" + str(row_num)
-    # todo 新版写入待更新
-    # 用力状态
-    if status == "PASS":
-        ws.cell(row_num, 12, status)
-        ws[wl].font = font_green
-    elif status == "FAIL":
-        ws.cell(row_num, 12, status)
-        ws[wl].font = font_red
-    elif status == "SKIP":
-        ws.cell(row_num, 12, status)
-        ws[wl].font = font_yellow
-    # 测试员
-    ws.cell(row_num, 13, TESTER_NAME)
-    ws[wm].font = font_black
+    data_file = os.path.join(EXCEL_DATA_PATH, datafile)
+    report_file = os.path.join(EXCEL_REPORT_PATH, filename)
+    if not os.path.exists(report_file):
+        # copy测试数据为报告文件基础
+        shutil.copyfile(data_file, report_file)
+    wb = load_workbook(report_file)
+    wa = wb.active
+    # 字体颜色
+    green = Font(name='Consolas', color='99CC00', bold=True)
+    red = Font(name='Consolas', color='FF0000', bold=True)
+    black = Font(name='Consolas', color='000000', bold=True)
     # 文件内容格式
-    align = Alignment(horizontal='center', vertical='center')
-    ws[wl].alignment = ws[wm].alignment = align
+    align = Alignment(horizontal='left', vertical='center')
+    # 所在指定单元格: 列字母+所在行
+    result_box = "N" + str(row_num)
+    tester_title_box = "O1"
+    tester_box = "O2"  # 字母 O，不是数字 0
+    # 结果写入列
+    result_col = 14
+    tester_col = result_col + 1
+    # 写入测试结果
+    if extension:
+        wa.cell(row_num, result_col, extension)
+    else:
+        wa.cell(row_num, result_col, status_upper)
+    if status_upper == "PASS":
+        wa[result_box].font = green
+    elif status_upper == "FAIL":
+        wa[result_box].font = red
+    # 测试员，仅写入一次
+    if not wa[tester_box].value:
+        wa.cell(1, tester_col, 'tester')
+        wa[tester_title_box].font = black
+        wa.cell(2, tester_col, TESTER_NAME)
+        wa[tester_box].font = black
+    wa[result_box].alignment = wa[tester_box].alignment = align
     try:
-        wb.save(_report_file)
+        wb.save(report_file)
     except Exception as e:
-        log.error(f'写入excel测试报告失败 \n {e}')
+        log.error(f'写入excel测试报告失败: {e}')
         raise e
     else:
-        if status == 'PASS':
-            log.success('test result: ----> {}', status)
-        elif status == 'FAIL':
-            log.error('test result: ----> {}', status)
-        elif status == 'SKIP':
-            log.warning('test result: ----> {}', status)
+        if status_upper == 'PASS':
+            log.success('test result: ----> {}', status_upper)
+        elif status_upper == 'FAIL':
+            log.error('test result: ----> {}', status_upper)
         log.success('写入excel测试报告成功')
 
 
-def get_excel_row(data: dict):
+def get_excel_row(data: dict) -> int:
     """
     写入 excel 文件的行数
 
