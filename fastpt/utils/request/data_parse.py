@@ -122,6 +122,10 @@ class DataParse:
         sql = self.request_data['sql']
         if sql is not None:
             sql = VarsExtractor().vars_replace(sql)
+            if not isinstance(sql, list):
+                sql = eval(sql)
+                if not isinstance(sql, list):
+                    raise ValueError('请求参数 sql 类型错误, 请使用 list 类型表达语句')
         return sql
 
     @property

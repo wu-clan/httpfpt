@@ -1,8 +1,0 @@
-- case: event_query_001
-  result: PASS
-- case: event_create_003
-  result: PASS
-- case: event_create_003
-  result: PASS
-- case: event_upload_004
-  result: PASS

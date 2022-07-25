@@ -1,0 +1,15 @@
+2022-07-25 17:38:19.293 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_004 -----------------
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:145 - 用例 module: test
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:146 - 用例 case_id: event_upload_004
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:147 - 请求 method: post
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:148 - 请求 url: https://api.anonfiles.com/upload
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:149 - 请求 params: None
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:150 - 请求 headers: None
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:151 - 请求 data 类型：None
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:153 - 请求 data：None
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:156 - 请求 sql: None
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:157 - 请求 files: {'file': 'D:\\\\0000000000_test\\\\666.txt'}
+2022-07-25 17:38:19.293 | INFO     | fastpt.common.send_request:log_request_up:158 - 请求 assert: None
+2022-07-25 17:38:19.325 | INFO     | fastpt.conftest:log_end:63 - end 
+
+2022-07-25 17:38:19.325 | INFO     | fastpt.conftest:package_fixture:41 - 测试用例执行结束

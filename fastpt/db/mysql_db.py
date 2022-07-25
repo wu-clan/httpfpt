@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
+import datetime
+import decimal
+
 import pymysql
 from dbutils.pooled_db import PooledDB
 
@@ -22,7 +25,7 @@ class DB:
                 database=get_conf.DB_DATABASE,
             ).connection()
         except BaseException as e:
-            log.error(f'数据库连接失败 \n {e}')
+            log.error(f'数据库连接失败: {e}')
         # 声明游标
         self.cursor = self.conn.cursor()
 
@@ -53,7 +56,7 @@ class DB:
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            log.error(f'执行 {sql} 失败 \n {e}')
+            log.error(f'执行 {sql} 失败: {e}')
         finally:
             self.close()
 
@@ -66,5 +69,25 @@ class DB:
         self.cursor.close()
         self.conn.close()
 
+    def exec_case_sql(self, sql: list) -> dict:
+        """
+        执行用例 sql
 
-db = DB()
+        :param sql:
+        :return:
+        """
+        data = {}
+        rejected_sql_type = ['UPDATE', 'DELETE', 'INSERT', 'update', 'delete', 'insert']
+        if any(_ in sql for _ in rejected_sql_type):
+            raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 DQL 类型 sql 语句')
+        else:
+            for s in sql:
+                query_data = self.query(s)
+                for k, v in query_data.items():
+                    if isinstance(v, decimal.Decimal):
+                        data[k] = float(v)
+                    elif isinstance(v, datetime.datetime):
+                        data[k] = str(v)
+                    else:
+                        data[k] = v
+            return data

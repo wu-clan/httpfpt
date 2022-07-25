@@ -13,6 +13,7 @@ from requests import Response as RequestsResponse
 
 from fastpt.common.log import log
 from fastpt.core import get_conf
+from fastpt.db.mysql_db import DB
 from fastpt.utils.allure.upload_files import allure_attach_file
 from fastpt.utils.request.data_parse import DataParse
 
@@ -115,6 +116,8 @@ class SendRequests:
         # 日志记录请求数据
         self.log_request_up(parsed_data)
         self.allure_request_up(parsed_data)
+        # 执行 sql
+        sql_data = DB().exec_case_sql(parsed_data.sql)
         # 执行时间
         execute_time = datetime.datetime.now()
         response_data['stat']['execute_time'] = execute_time
@@ -136,6 +139,7 @@ class SendRequests:
         response_data['result'] = json.dumps(json_data)
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
+        response_data['sql_data'] = sql_data
         self.log_request_down(response_data)
 
         return response_data

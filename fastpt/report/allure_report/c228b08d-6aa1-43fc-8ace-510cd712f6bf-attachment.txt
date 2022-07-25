@@ -1,0 +1,20 @@
+2022-07-25 17:38:16.275 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_004 -----------------
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:145 - 用例 module: test
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:146 - 用例 case_id: event_query_001
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:147 - 请求 method: get
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:148 - 请求 url: https://jsonplaceholder.typicode.com/posts/1
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:149 - 请求 params: None
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:150 - 请求 headers: None
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:151 - 请求 data 类型：None
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:153 - 请求 data：None
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:156 - 请求 sql: None
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:157 - 请求 files: None
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:log_request_up:158 - 请求 assert: None
+2022-07-25 17:38:16.275 | INFO     | fastpt.common.send_request:__requests_engin:63 - 开始发送请求...
+2022-07-25 17:38:16.760 | INFO     | fastpt.common.send_request:log_request_down:162 - 请求发送时间: 2022-07-25 17:38:16.275506
+2022-07-25 17:38:16.760 | INFO     | fastpt.common.send_request:log_request_down:163 - 响应状态码: 200
+2022-07-25 17:38:16.760 | INFO     | fastpt.common.send_request:log_request_down:164 - 响应时间: 481.057 ms
+2022-07-25 17:38:16.775 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:86 - test result: ----> PASS
+2022-07-25 17:38:16.775 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:89 - 写入yaml测试报告成功
+2022-07-25 17:38:16.775 | INFO     | fastpt.conftest:log_end:63 - end 
+

@@ -1,0 +1,20 @@
+2022-07-25 17:38:15.431 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:145 - 用例 module: test
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:146 - 用例 case_id: event_create_003
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:147 - 请求 method: post
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:148 - 请求 url: https://jsonplaceholder.typicode.com/posts
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:149 - 请求 params: None
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:150 - 请求 headers: None
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:151 - 请求 data 类型：json
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:155 - 请求 json: {"title": "foo", "body": "http://127.0.0.1:8080", "userId": 1}
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:156 - 请求 sql: None
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:157 - 请求 files: None
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:log_request_up:158 - 请求 assert: None
+2022-07-25 17:38:15.431 | INFO     | fastpt.common.send_request:__requests_engin:63 - 开始发送请求...
+2022-07-25 17:38:16.088 | INFO     | fastpt.common.send_request:log_request_down:162 - 请求发送时间: 2022-07-25 17:38:15.431755
+2022-07-25 17:38:16.088 | INFO     | fastpt.common.send_request:log_request_down:163 - 响应状态码: 500
+2022-07-25 17:38:16.088 | INFO     | fastpt.common.send_request:log_request_down:164 - 响应时间: 657.707 ms
+2022-07-25 17:38:16.119 | ERROR    | fastpt.common.excel_operate:write_excel_report:122 - test result: ----> FAIL
+2022-07-25 17:38:16.119 | SUCCESS  | fastpt.common.excel_operate:write_excel_report:123 - 写入excel测试报告成功
+2022-07-25 17:38:16.259 | INFO     | fastpt.conftest:log_end:63 - end 
+
