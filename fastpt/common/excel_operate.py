@@ -87,14 +87,18 @@ def write_excel_report(
     black = Font(name='Consolas', color='000000', bold=True)
     # 文件内容格式
     align = Alignment(horizontal='left', vertical='center')
-    # 所在指定单元格: 列字母+所在行
-    result_box = "N" + str(row_num)
-    tester_title_box = "O1"
-    tester_box = "O2"  # 字母 O，不是数字 0
+    # 所在指定单元格: 列字母 + 所在行
+    result_title_box = 'O1'  # 字母 O，不是数字 0
+    result_box = "O" + str(row_num)
+    tester_title_box = "P1"
+    tester_box = "P2"
     # 结果写入列
-    result_col = 14
+    result_col = 15
     tester_col = result_col + 1
     # 写入测试结果
+    if not wa[result_title_box]:
+        wa.cell(1, result_title_box, 'result')
+        wa[result_title_box].font = black
     if extension:
         wa.cell(row_num, result_col, extension)
     else:
@@ -103,12 +107,13 @@ def write_excel_report(
         wa[result_box].font = green
     elif status_upper == "FAIL":
         wa[result_box].font = red
-    # 测试员，仅写入一次
+    # 写入测试员
     if not wa[tester_box].value:
         wa.cell(1, tester_col, 'tester')
         wa[tester_title_box].font = black
         wa.cell(2, tester_col, TESTER_NAME)
         wa[tester_box].font = black
+    # 修改写入单元格样式
     wa[result_box].alignment = wa[tester_box].alignment = align
     try:
         wb.save(report_file)
