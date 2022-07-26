@@ -217,9 +217,9 @@ class Asserter:
             assert len(str(expected_value)) < len(str(actual_value))
         elif assert_type == AssertType.length_less_than_or_equal:
             assert len(str(expected_value)) <= len(str(actual_value))
-        elif assert_type == AssertType.contain:
+        elif assert_type == AssertType.contains:
             assert str(expected_value) in str(actual_value)
-        elif assert_type == AssertType.not_contain:
+        elif assert_type == AssertType.not_contains:
             assert str(expected_value) not in str(actual_value)
         elif assert_type == AssertType.startswith:
             assert str(expected_value).startswith(str(actual_value))
