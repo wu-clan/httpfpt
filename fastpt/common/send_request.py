@@ -116,8 +116,6 @@ class SendRequests:
         # 日志记录请求数据
         self.log_request_up(parsed_data)
         self.allure_request_up(parsed_data)
-        # 执行 sql
-        sql_data = DB().exec_case_sql(parsed_data.sql)
         # 执行时间
         execute_time = datetime.datetime.now()
         response_data['stat']['execute_time'] = execute_time
@@ -126,6 +124,8 @@ class SendRequests:
             response = self.__requests_engin(**parsed_data.get_request_args_parsed, **kwargs)
         elif request_engin == 'httpx':
             response = self.__httpx_engin(**parsed_data.get_request_args_parsed, **kwargs)
+        # 后置执行 sql
+        sql_data = DB().exec_case_sql(parsed_data.sql)
         # 记录响应的信息
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
