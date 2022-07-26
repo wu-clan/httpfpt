@@ -35,8 +35,10 @@ class DataParse:
         if skip is not None:
             if isinstance(skip, str):
                 if str(skip).lower() == 'false':
+                    log.warning('用例跳过')
                     raise Skipped('用例跳过')
             if not skip:
+                log.warning('用例跳过')
                 raise Skipped('用例跳过')
 
     @property
@@ -70,7 +72,7 @@ class DataParse:
                 headers = eval(headers)
             else:
                 if not isinstance(headers, dict):
-                    raise ValueError('参数 headers 格式错误')
+                    raise ValueError('参数 headers 格式错误, 必须为 dict')
         return headers
 
     @property
@@ -91,8 +93,7 @@ class DataParse:
                 try:
                     data = json.dumps(data, ensure_ascii=False)
                 except Exception as e:
-                    log.error('data参数不是有效的json')
-                    raise e
+                    raise ValueError('data 参数不是有效的 json')
         return data
 
     @property
