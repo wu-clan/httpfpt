@@ -116,25 +116,39 @@ class DataParse:
     @property
     def files_no_parse(self) -> Union[dict, None]:
         files = self.request_data['files']
-        return files if not isinstance(files, str) else eval(files)
+        if files is not None:
+            if isinstance(files, str):
+                files = eval(files)
+            else:
+                if not isinstance(files, (list, dict)):
+                    raise ValueError('参数 files 格式错误, 可能由于路径中包含转义符而引起')
+        return files
 
     @property
-    def sql(self):
+    def sql(self) -> Union[list, None]:
         sql = self.request_data['sql']
         if sql is not None:
             sql = VarsExtractor().vars_replace(sql)
-            if not isinstance(sql, list):
+            if isinstance(sql, str):
                 sql = eval(sql)
+            else:
                 if not isinstance(sql, list):
                     raise ValueError('请求参数 sql 类型错误, 请使用 list 类型表达语句')
         return sql
 
     @property
-    def assert_text(self) -> Union[dict, None]:
+    def assert_text(self) -> Union[str, list, dict, None]:
         assert_text = self.request_data['assert']
         if assert_text is not None:
             assert_text = VarsExtractor().vars_replace(assert_text)
-        return assert_text if not isinstance(assert_text, str) else eval(assert_text)
+            if isinstance(assert_text, str):
+                if not assert_text.startswith('assert'):
+                    assert_text = eval(assert_text)
+            else:
+                if not isinstance(assert_text, list):
+                    if not isinstance(assert_text, dict):
+                        raise ValueError('请求参数 assert 类型错误, 请检查')
+        return assert_text  # todo 这里从 excel 读取的 code 断言要加做处理, 不然脚本的空格会丢失
 
     @property
     def get_request_args_parsed(self) -> dict:
