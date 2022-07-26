@@ -13,6 +13,10 @@
   files:
   sql:
   assert:
+    response_code:
+      value: 200
+      type: eq
+      jsonpath: $.status_code
 -
   module: test
   case_id: event_query_002
@@ -29,6 +33,8 @@
   files:
   sql:
   assert:
+    - assert 200 == pm.response.get('status_code')
+    - assert '{}' in pm.response.get('sql_data'), '没有返回{}'
 -
   module: test
   case_id: event_create_003
@@ -46,7 +52,7 @@
     userId: 1
   files:
   sql:
-  assert:
+  assert: assert 200 == pm.response.get('status_code')
 -
   module: test
   case_id: event_upload_004
