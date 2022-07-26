@@ -9,7 +9,7 @@ from fastpt.schema.assert_type import AssertType
 
 class Asserter:
 
-    def code_asserter(self, response: dict, assert_text: Union[str, list]) -> None:
+    def _code_asserter(self, response: dict, assert_text: Union[str, list]) -> None:
         """
         **代码断言器, 像 pytest 断言一样使用它**
 
@@ -63,7 +63,7 @@ class Asserter:
         else:
             raise ValueError('断言内容格式错误, 请检查断言脚本是否为 str / list 格式')
 
-    def json_asserter(self, response: dict, assert_text: dict) -> None:
+    def _json_asserter(self, response: dict, assert_text: dict) -> None:
         """
         **json 提取断言器**
 
@@ -227,3 +227,18 @@ class Asserter:
             assert str(expected_value).endswith(str(actual_value))
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
+
+    def exec_asserter(self, response: dict, assert_text: Union[str, list, dict, None]) -> None:
+        """
+        执行断言器
+
+        :param response:
+        :param assert_text:
+        :return:
+        """
+        if not assert_text:
+            ...
+        elif isinstance(assert_text, dict):
+            self._json_asserter(response, assert_text)
+        else:
+            self._code_asserter(response, assert_text)
