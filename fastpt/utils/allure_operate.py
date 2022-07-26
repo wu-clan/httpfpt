@@ -7,6 +7,16 @@ from fastpt.schema.allure.allure_attach import AllureAttachmentType
 from fastpt.utils.file_control import get_file_property
 
 
+def allure_step(title: str):
+    """
+    allure 操作步骤
+
+    :return:
+    """
+    with allure.step(title):
+        ...
+
+
 def allure_attach(body=None, name=None, attachment_type: str = 'JSON', extension=None):
     """
     allure 报告上传附件

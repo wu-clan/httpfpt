@@ -14,7 +14,7 @@ from requests import Response as RequestsResponse
 from fastpt.common.log import log
 from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
-from fastpt.utils.allure.upload_files import allure_attach_file
+from fastpt.utils.allure_operate import allure_attach_file, allure_step
 from fastpt.utils.request.data_parse import DataParse
 
 
@@ -124,8 +124,11 @@ class SendRequests:
             response = self.__requests_engin(**parsed_data.get_request_args_parsed, **kwargs)
         elif request_engin == 'httpx':
             response = self.__httpx_engin(**parsed_data.get_request_args_parsed, **kwargs)
-        # 后置执行 sql
-        sql_data = DB().exec_case_sql(parsed_data.sql)
+        # 后置 sql
+        if parsed_data.sql:
+            sql_data = DB().exec_case_sql(parsed_data.sql)
+        else:
+            sql_data = parsed_data.sql
         # 记录响应的信息
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
@@ -169,18 +172,19 @@ class SendRequests:
 
     @staticmethod
     def allure_request_up(parsed: DataParse):
-        allure.title(f"用例模块: {parsed.module} :: 用例 id: {parsed.case_id}")
-        allure.description(parsed.case_desc) if parsed.case_desc else ...
-        allure.step(f"请求 method: {parsed.method}")
-        allure.link(parsed.url)
-        allure.step(f"请求 params: {parsed.params}")
-        allure.step(f'请求 headers: {parsed.headers}')
-        allure.step(f"请求 data 类型：{parsed.data_type}")
+        allure.dynamic.title(f"用例 module: {parsed.module}")
+        allure.dynamic.title(f"用例 case_id: {parsed.case_id}")
+        allure.dynamic.description(parsed.case_desc) if parsed.case_desc else ...
+        allure_step(f"请求 method: {parsed.method}")
+        allure.dynamic.link(parsed.url)
+        allure_step(f"请求 params: {parsed.params}")
+        allure_step(f'请求 headers: {parsed.headers}')
+        allure_step(f"请求 data 类型：{parsed.data_type}")
         if parsed.data_type != 'json':
-            allure.step(f"请求 data：{parsed.data}")
+            allure_step(f"请求 data：{parsed.data}")
         else:
-            allure.step(f"请求 json: {parsed.data}")
-        allure.step(f"请求 sql: {parsed.sql}")
+            allure_step(f"请求 json: {parsed.data}")
+        allure_step(f"请求 sql: {parsed.sql}")
         if parsed.files_no_parse is not None:
             for k, v in parsed.files_no_parse.items():
                 if isinstance(v, list):
@@ -188,7 +192,7 @@ class SendRequests:
                         allure_attach_file(path)
                 else:
                     allure_attach_file(parsed.files_no_parse)
-        allure.step(f"请求 assert: {parsed.assert_text}")
+        allure_step(f"请求 assert: {parsed.assert_text}")
 
 
 send_request = SendRequests()
