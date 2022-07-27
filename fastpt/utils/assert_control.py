@@ -112,6 +112,8 @@ class Asserter:
         :return:
         """
         assert_split = assert_text.split(' ')
+        if assert_text.startswith("'{") or assert_text.startswith("'["):
+            raise ValueError('断言内容格式错误, 使用了为解析的数据')
         if not assert_text.startswith('assert '):
             raise ValueError('断言取值表达式格式错误, 必须以 assert 开头')
         if len(assert_split) < 2:
@@ -148,7 +150,7 @@ class Asserter:
                     raise ValueError('断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')
                 else:
                     try:
-                        response_value = f'{response}.{use_code}'
+                        response_value = eval(f'{response}.{use_code}')
                     except Exception as e:
                         err_msg = str(e.args).replace("\'", '"').replace('\\', '')
                         raise ValueError(f'断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
@@ -198,7 +200,7 @@ class Asserter:
                         raise ValueError('断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')
                     else:
                         try:
-                            response_value = f'{response}.{use_code}'
+                            response_value = eval(f'{response}.{use_code}')
                         except Exception as e:
                             err_msg = str(e.args).replace("\'", '"').replace('\\', '')
                             raise ValueError(f'断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')

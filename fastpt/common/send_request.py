@@ -16,6 +16,7 @@ from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
 from fastpt.utils.allure_operate import allure_attach_file, allure_step
 from fastpt.utils.request.data_parse import DataParse
+from fastpt.utils.time_control import get_current_time
 
 
 class SendRequests:
@@ -33,6 +34,18 @@ class SendRequests:
         :return: 响应元数据
         """
         response_meta_data = {
+            "request_data": {
+                "module": None,
+                "case_id": None,
+                "case_desc": None,
+                "method": None,
+                "params": None,
+                "data_type": None,
+                "data": None,
+                "files": None,
+                "sql": None,
+                "assert": None,
+            },
             "url": None,
             "status_code": 200,
             "elapsed": 0,
@@ -49,7 +62,7 @@ class SendRequests:
         return response_meta_data
 
     @staticmethod
-    def __requests_engin(**kwargs) -> RequestsResponse:
+    def _requests_engin(**kwargs) -> RequestsResponse:
         """
         requests 引擎
 
@@ -74,7 +87,7 @@ class SendRequests:
             raise e
 
     @staticmethod
-    def __httpx_engin(**kwargs) -> HttpxResponse:
+    def _httpx_engin(**kwargs) -> HttpxResponse:
         """
         httpx 引擎
 
@@ -99,7 +112,7 @@ class SendRequests:
             log.error(f'请求异常: {e}')
             raise e
 
-    def send_request(self, data: dict, request_engin: str = 'requests', **kwargs):
+    def send_request(self, data: dict, *, request_engin: str = 'requests', **kwargs):
         """
         发送请求
 
@@ -117,24 +130,35 @@ class SendRequests:
         self.log_request_up(parsed_data)
         self.allure_request_up(parsed_data)
         # 执行时间
-        execute_time = datetime.datetime.now()
+        execute_time = get_current_time()
         response_data['stat']['execute_time'] = execute_time
         response = None
         if request_engin == 'requests':
-            response = self.__requests_engin(**parsed_data.get_request_args_parsed, **kwargs)
+            response = self._requests_engin(**parsed_data.get_request_args_parsed, **kwargs)
         elif request_engin == 'httpx':
-            response = self.__httpx_engin(**parsed_data.get_request_args_parsed, **kwargs)
+            response = self._httpx_engin(**parsed_data.get_request_args_parsed, **kwargs)
         # 后置 sql
         if parsed_data.sql:
             sql_data = DB().exec_case_sql(parsed_data.sql)
         else:
             sql_data = parsed_data.sql
-        # 记录响应的信息
+        # 记录请求数据
+        response_data['request_data']['module'] = parsed_data.url
+        response_data['request_data']['case_id'] = parsed_data.case_id
+        response_data['request_data']['case_desc'] = parsed_data.case_desc
+        response_data['request_data']['method'] = parsed_data.method
+        response_data['request_data']['params'] = parsed_data.params
+        response_data['request_data']['data_type'] = parsed_data.data_type
+        response_data['request_data']['data'] = parsed_data.data
+        response_data['request_data']['files'] = parsed_data.files
+        response_data['request_data']['sql'] = parsed_data.sql
+        response_data['request_data']['assert'] = parsed_data.assert_text
+        # 记录响应数据
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
         response_data['headers'] = response.headers
-        response_data['cookies'] = response.cookies
+        response_data['cookies'] = dict(response.cookies)
         try:
             json_data = response.json()
         except JSONDecodeError:
@@ -143,6 +167,7 @@ class SendRequests:
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
         response_data['sql_data'] = sql_data
+        # 响应日志记录
         self.log_request_down(response_data)
 
         return response_data

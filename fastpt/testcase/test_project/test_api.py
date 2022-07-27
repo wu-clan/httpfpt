@@ -54,7 +54,8 @@ class TestDemo:
             write_excel_report(row_num=row_num, status='pass')
         else:
             write_excel_report(row_num=row_num, status='fail')
-        Asserter().exec_asserter(response, assert_text=data['assert'])
+        # 请求数据中包含非常规字符串内容时, 强烈建议使用请求响应数据, 应为解析后的接口请求数据也包含在内
+        Asserter().exec_asserter(response, assert_text=response['request_data']['assert'])
 
     @allure.story("yaml数据测试输出")
     @pytest.mark.test_api
@@ -69,4 +70,4 @@ class TestDemo:
             write_yaml_report(data=[{'case': data['case_id'], 'result': 'PASS'}], status='pass')
         else:
             write_yaml_report(data=[{'case': data['case_id'], 'result': 'FAIL'}], status='fail')
-        Asserter().exec_asserter(response, assert_text=data['assert'])
+        Asserter().exec_asserter(response, assert_text=response['request_data']['assert'])
