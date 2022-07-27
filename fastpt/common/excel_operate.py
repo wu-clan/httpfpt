@@ -40,8 +40,7 @@ def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = '
             data = dict(zip(keys, values))
             # 数据整理
             for value in data:
-                if isinstance(data[value], str):
-                    data[value] = data[value].replace(' ', '').replace('\n', '')
+                # 替换空字符串为 None, 保证与 yaml 数据返回格式一致
                 if data[value] == '':
                     data[value] = None
             data_list.append(data)

@@ -3,6 +3,7 @@
 import json
 from typing import Union
 
+import allure
 from _pytest.outcomes import Skipped
 
 from fastpt.common.log import log
@@ -33,13 +34,13 @@ class DataParse:
     def skip(self):
         skip = self.request_data['is_run']
         if skip is not None:
-            if isinstance(skip, str):
-                if str(skip).lower() == 'false':
-                    log.warning('用例跳过')
-                    raise Skipped('用例跳过')
-            if not skip:
-                log.warning('用例跳过')
-                raise Skipped('用例跳过')
+            if not skip or str(skip).lower() == 'false':
+                allure.dynamic.title(
+                    f"用例 module: {self.module};"
+                    f"用例 case_id: {self.case_id}"
+                )
+                log.warning('此用例已设置跳过')
+                raise Skipped('此用例已设置跳过')
 
     @property
     def method(self) -> str:
@@ -142,13 +143,14 @@ class DataParse:
         if assert_text is not None:
             assert_text = VarsExtractor().vars_replace(assert_text)
             if isinstance(assert_text, str):
+                # 单条 code 断言时, 跳过处理
                 if not assert_text.startswith('assert'):
                     assert_text = eval(assert_text)
             else:
                 if not isinstance(assert_text, list):
                     if not isinstance(assert_text, dict):
                         raise ValueError('请求参数 assert 类型错误, 请检查')
-        return assert_text  # todo 这里从 excel 读取的 code 断言要加做处理, 不然脚本的空格会丢失
+        return assert_text
 
     @property
     def get_request_args_parsed(self) -> dict:

@@ -172,8 +172,10 @@ class SendRequests:
 
     @staticmethod
     def allure_request_up(parsed: DataParse):
-        allure.dynamic.title(f"用例 module: {parsed.module}")
-        allure.dynamic.title(f"用例 case_id: {parsed.case_id}")
+        allure.dynamic.title(
+            f"用例 module: {parsed.module};"
+            f"用例 case_id: {parsed.case_id}"
+        )
         allure.dynamic.description(parsed.case_desc) if parsed.case_desc else ...
         allure_step(f"请求 method: {parsed.method}")
         allure.dynamic.link(parsed.url)
