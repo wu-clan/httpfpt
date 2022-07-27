@@ -34,7 +34,7 @@
   sql:
   assert:
     - assert 200 == pm.response.get('status_code')
-    - assert '{}' in pm.response.get('sql_data'), '没有返回{}'
+    - assert '{}' in pm.response.get('content'), '没有返回content'
 -
   module: test
   case_id: event_create_003
@@ -69,3 +69,4 @@
     file: D:\\0000000000_test\\666.txt
   sql:
   assert:
+    assert pm.response.get('status_code') == IsInt

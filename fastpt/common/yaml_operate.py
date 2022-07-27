@@ -71,7 +71,7 @@ def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("
     """
     status_upper = status.upper()
     if status_upper not in ('PASS', 'FAIL'):
-        raise ValueError('yaml测试报告结果用力状态只允许"PASS","FAIL"或"SKIP"')
+        raise ValueError('yaml测试报告结果用力状态只允许"PASS","FAIL"')
     if not os.path.exists(YAML_REPORT_PATH):
         os.makedirs(YAML_REPORT_PATH)
     _file = os.path.join(YAML_REPORT_PATH, filename)
