@@ -100,10 +100,10 @@ def run(
 
     is_disable_warings = '--disable-warnings' if disable_warings else ''
 
-    kw = [f"'{k}={v}'" for k, v in kwargs.items()]
+    kw = [f"{k}={v}" for k, v in kwargs.items()]
 
     pytest.main(
-        [
+        [r for r in [
             *args,
             f'{log_level}',
             f'{run_path}',
@@ -111,7 +111,7 @@ def run(
             f'{is_html_report_self}',
             f'{is_allure}',
             f'{is_clear_allure}'
-            # f'{is_reruns}'
+            # f'{is_reruns}',
             f'{is_maxfail}',
             f'{is_x}',
             f'{is_n}',
@@ -119,13 +119,14 @@ def run(
             f'{is_markers}',
             f'{is_captrue}',
             f'{is_disable_warings}'
-        ] + kw
+        ] + kw if r.strip() != '']
     )
 
-    SendMail(is_html_report_file.split('=')[1]).send() if send_report else ... if html_report else ...
+    SendMail(is_html_report_file.split('=')[1]).send() if send_report and html_report else ...
 
-    shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE) if allure else ...
-    os.popen(f'allure serve {ALLURE_REPORT_PATH}') if allure_serve else ... if allure else ...
+    shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE) if allure else ... if not os.path.exists(
+        ALLURE_REPORT_ENV_FILE) else ...
+    os.popen(f'allure serve {ALLURE_REPORT_PATH}') if allure_serve and allure else ...
 
 
 if __name__ == '__main__':

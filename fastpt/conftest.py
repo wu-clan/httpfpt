@@ -14,14 +14,14 @@ from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE
 
 
 @pytest.fixture(scope='session', autouse=True)
-def session_fixture(tmp_path_factory, worker_id) -> None:
+def session_fixture(tmp_path_factory, worker_id):
     # 避免分布式执行用例循环执行此fixture
-    # 官方例子: https://www.yuque.com/poloyy/nz6yd2/wq3mby#MXI0w
+    # 例子: https://www.yuque.com/poloyy/nz6yd2/wq3mby#MXI0w
     # 优化例子: https://www.yuque.com/poloyy/nz6yd2/wq3mby#UYgcL
     if worker_id == "master":
         return None
 
-        # get the temp directory shared by all workers
+    # get the temp directory shared by all workers
     root_tmp_dir = tmp_path_factory.getbasetemp().parent
 
     fn = root_tmp_dir / "data.json"
@@ -35,28 +35,28 @@ def session_fixture(tmp_path_factory, worker_id) -> None:
 
 
 @pytest.fixture(scope='package', autouse=True)
-def package_fixture() -> None:
+def package_fixture():
     ...
     yield
     log.info('测试用例执行结束')
 
 
 @pytest.fixture(scope='module', autouse=True)
-def module_fixture() -> None:
+def module_fixture():
     ...
     yield
     ...
 
 
 @pytest.fixture(scope='class', autouse=True)
-def class_fixture() -> None:
+def class_fixture():
     ...
     yield
     ...
 
 
 @pytest.fixture(scope='function', autouse=True)
-def function_fixture(request) -> None:
+def function_fixture(request):
     log.info(f'----------------- Running case func: {request.function.__name__} -----------------')
 
     def log_end():
