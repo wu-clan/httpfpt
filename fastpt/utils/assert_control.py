@@ -14,8 +14,8 @@ class Asserter:
         **代码断言器, 像 pytest 断言一样使用它**
 
         基本语法::
-            1. assert 期望值 条件 取值表达式(pm.response.get()...), 错误信息(可选, 如果不填写, 记得去掉前面的逗号)
-            2. assert 取值表达式
+            1. assert  期望值 条件 取值表达式(pm.response.get()...)
+            2. assert 期望值 条件 取值表达式(pm.response.get()...), 错误信息(可选, 如果不填写, 记得去掉前面的逗号, 建议填写)
 
         扩展语法::
             dirty-equals 断言库专属, 请不要在断言内容中使用带有函数引用的断言方式, 仅支持简易验证操作, 使用前,
@@ -116,16 +116,8 @@ class Asserter:
             raise ValueError('断言内容格式错误, 使用了为解析的数据')
         if not assert_text.startswith('assert '):
             raise ValueError('断言取值表达式格式错误, 必须以 assert 开头')
-        if len(assert_split) < 2:
+        if len(assert_split) <= 2:
             raise ValueError('断言取值表达式格式错误, 却少条件语句')
-        elif len(assert_split) == 2:
-            if not assert_split[1].startswith('pm.response.get'):
-                raise ValueError(
-                    f'断言表达式格式错误, 含有不支持的断言类型: {assert_split[1]} '
-                    f'取值表达式必须以 pm.response.get 开头并使用 get() 方法取值, 首位暂不支持下标取值方式'
-                )
-            # 简约型脚本直接运行
-            exec(assert_text)
         elif len(assert_split) > 6:
             raise ValueError('断言取值表达式格式错误, 不符合语法规范')
         else:
@@ -206,6 +198,8 @@ class Asserter:
                             raise ValueError(f'断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
                         else:
                             # 执行断言
+                            print(pm_code)
+                            print(response_value)
                             format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
                             exec(format_assert_text)
 
@@ -220,39 +214,56 @@ class Asserter:
         :return:
         """
         if assert_type == AssertType.equal:
-            assert expected_value == actual_value
+            assert expected_value == actual_value, \
+                f'expected {expected_value} equal to {actual_value}'
         elif assert_type == AssertType.not_equal:
-            assert expected_value != actual_value
+            assert expected_value != actual_value, \
+                f'expected {expected_value} not equal to {actual_value}'
         elif assert_type == AssertType.greater_than:
-            assert expected_value > actual_value
+            assert expected_value > actual_value, \
+                f'expected {expected_value} greater than to {actual_value}'
         elif assert_type == AssertType.greater_than_or_equal:
-            assert expected_value >= actual_value
+            assert expected_value >= actual_value, \
+                f'expected {expected_value} greater than or equal to {actual_value}'
         elif assert_type == AssertType.less_than:
-            assert expected_value < actual_value
+            assert expected_value < actual_value, \
+                f'expected {expected_value} less than to {actual_value}'
         elif assert_type == AssertType.less_than_or_equal:
-            assert expected_value <= actual_value
+            assert expected_value <= actual_value, \
+                f'expected {expected_value} less than or equal to {actual_value}'
         elif assert_type == AssertType.string_equal:
-            assert str(expected_value) == str(actual_value)
+            assert str(expected_value) == str(actual_value), \
+                f'expected {str(expected_value)} equal to {str(actual_value)}'
         elif assert_type == AssertType.length_equal:
-            assert len(str(expected_value)) == len(str(actual_value))
+            assert len(str(expected_value)) == len(str(actual_value)), \
+                f'expected {str(expected_value)} length equal to {str(actual_value)} length'
         elif assert_type == AssertType.not_length_equal:
-            assert len(str(expected_value)) != len(str(actual_value))
+            assert len(str(expected_value)) != len(str(actual_value)), \
+                f'expected {str(expected_value)} length not equal to {str(actual_value)} length'
         elif assert_type == AssertType.length_greater_than:
-            assert len(str(expected_value)) > len(str(actual_value))
+            assert len(str(expected_value)) > len(str(actual_value)), \
+                f'expected {str(expected_value)} length greater than to {str(actual_value)} length'
         elif assert_type == AssertType.length_greater_than_or_equal:
-            assert len(str(expected_value)) >= len(str(actual_value))
+            assert len(str(expected_value)) >= len(str(actual_value)), \
+                f'expected {str(expected_value)} length greater than or equal to {str(actual_value)} length'
         elif assert_type == AssertType.length_less_than:
-            assert len(str(expected_value)) < len(str(actual_value))
+            assert len(str(expected_value)) < len(str(actual_value)), \
+                f'expected {str(expected_value)} length less than to {str(actual_value)} length'
         elif assert_type == AssertType.length_less_than_or_equal:
-            assert len(str(expected_value)) <= len(str(actual_value))
+            assert len(str(expected_value)) <= len(str(actual_value)), \
+                f'expected {str(expected_value)} length less than or equal to {str(actual_value)} length'
         elif assert_type == AssertType.contains:
-            assert str(expected_value) in str(actual_value)
+            assert str(expected_value) in str(actual_value), \
+                f'expected {str(expected_value)} contains {str(actual_value)}'
         elif assert_type == AssertType.not_contains:
-            assert str(expected_value) not in str(actual_value)
+            assert str(expected_value) not in str(actual_value), \
+                f'expected {str(expected_value)} not contains {str(actual_value)}'
         elif assert_type == AssertType.startswith:
-            assert str(expected_value).startswith(str(actual_value))
+            assert str(expected_value).startswith(str(actual_value)), \
+                f'expected {str(expected_value)} starts with {str(actual_value)}'
         elif assert_type == AssertType.endswith:
-            assert str(expected_value).endswith(str(actual_value))
+            assert str(expected_value).endswith(str(actual_value)), \
+                f'expected {str(expected_value)} ends with {str(actual_value)}'
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 
