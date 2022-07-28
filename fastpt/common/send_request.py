@@ -149,7 +149,7 @@ class SendRequests:
         response_data['request_data']['params'] = parsed_data.params
         response_data['request_data']['data_type'] = parsed_data.data_type
         response_data['request_data']['data'] = parsed_data.data
-        response_data['request_data']['files'] = parsed_data.files
+        response_data['request_data']['files'] = parsed_data.files_no_parse
         response_data['request_data']['sql'] = parsed_data.sql
         response_data['request_data']['assert'] = parsed_data.assert_text
         # 记录响应数据

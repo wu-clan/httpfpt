@@ -113,13 +113,13 @@ class Asserter:
         """
         assert_split = assert_text.split(' ')
         if assert_text.startswith("'{") or assert_text.startswith("'["):
-            raise ValueError('断言内容格式错误, 使用了为解析的数据')
+            raise ValueError('code 断言内容语法错误, 请查看是否为 str / list 类型, 并检查断言语法是否规范')
         if not assert_text.startswith('assert '):
-            raise ValueError('断言取值表达式格式错误, 必须以 assert 开头')
-        if len(assert_split) <= 2:
-            raise ValueError('断言取值表达式格式错误, 却少条件语句')
+            raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
+        if len(assert_split) < 4:
+            raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
         elif len(assert_split) > 6:
-            raise ValueError('断言取值表达式格式错误, 不符合语法规范')
+            raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
         else:
             # 是否 dirty-equals 断言表达式
             if assert_split[1].startswith('pm.response.get'):
@@ -127,17 +127,16 @@ class Asserter:
                     raise ValueError(f'断言取值表达式格式错误, 含有不支持的断言类型 {assert_split[2]}')
                 if not assert_split[3].startswith('Is'):
                     raise ValueError('断言取值表达式格式错误, 不符合 dirty-equals 断言表达式规范')
-                if len(assert_split) != 4:
-                    raise ValueError('断言取值表达式格式错误, 不符合 dirty-equals 断言表达式规范')
                 # 处理比较值获取代码
                 pm_code = assert_split[1]
                 get_code = pm_code.split('.')[2:]
-                if len(get_code) < 1:
-                    raise ValueError('断言取值表达式格式错误, 取值表达式缺少执行条件')
-                elif len(get_code) == 1:
+                if len(get_code) == 1:
                     use_code = get_code[0]
                 else:
                     use_code = '.'.join(get_code)
+                # 如果断言有转型
+                if use_code.endswith('))'):
+                    use_code = use_code.replace('))', ')')
                 if not use_code.startswith('get('):
                     raise ValueError('断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')
                 else:
@@ -149,6 +148,11 @@ class Asserter:
                     else:
                         # 执行断言
                         format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
+                        if len(assert_split) == 4:
+                            # stdout 作为没有自定义断言错误时的信息补充
+                            # 当断言错误触发时, 如果错误信息中包含自定义错误, 此项可忽略
+                            print('Warning: 未自定义断言错误信息的断言:')
+                            print(f'-> {format_assert_text}')
                         exec('from dirty_equals import *')
                         exec(format_assert_text)
             else:
@@ -159,10 +163,9 @@ class Asserter:
                         if assert_split[3] != 'in':
                             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {" ".join(assert_split[2:4])}')
                         else:
-                            if not assert_split[4].startswith('pm.response.get'):
+                            if 'pm.response.get' not in assert_split[4]:
                                 raise ValueError(
-                                    f'断言取值表达式格式或断言类型错误, 含有不支持的条件语句 {assert_split[3]} '
-                                    f'取值表达式必须以 pm.response.get 开头并使用 get() 方法取值, 首位暂不支持下标取值方式'
+                                    f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}'
                                 )
                             # 如果包含自定义错误信息
                             if len(assert_split) == 6:
@@ -171,10 +174,9 @@ class Asserter:
                                 pm_code = assert_split[4]
                     else:
                         # 非 dirty-equals 或 not in 断言表达式
-                        if not assert_split[3].startswith('pm.response.get'):
+                        if 'pm.response.get' not in assert_split[3]:
                             raise ValueError(
-                                f'断言取值表达式格式或断言类型错误, 含有不支持的条件语句 {assert_split[3]}'
-                                f'取值表达式必须以 pm.response.get 开头并使用 get() 方法取值, 首位暂不支持下标取值方式'
+                                f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}'
                             )
                         if len(assert_split) == 5:
                             pm_code = assert_split[3].replace(',', '')
@@ -182,12 +184,12 @@ class Asserter:
                             pm_code = assert_split[3]
                     # 处理取值代码执行断言
                     get_code = pm_code.split('.')[2:]
-                    if len(get_code) < 1:
-                        raise ValueError('断言取值表达式格式错误, 取值表达式缺少执行条件')
-                    elif len(get_code) == 1:
+                    if len(get_code) == 1:
                         use_code = get_code[0]
                     else:
                         use_code = '.'.join(get_code)
+                    if use_code.endswith('))'):
+                        use_code = use_code.replace('))', ')')
                     if not use_code.startswith('get('):
                         raise ValueError('断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')
                     else:
@@ -198,9 +200,12 @@ class Asserter:
                             raise ValueError(f'断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
                         else:
                             # 执行断言
-                            print(pm_code)
-                            print(response_value)
                             format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
+                            if len(assert_split) == 4:
+                                # stdout 作为没有自定义断言错误时的信息补充
+                                # 当断言错误触发时, 如果错误信息中包含自定义错误, 此项可忽略
+                                print('Warning: 未自定义断言错误信息的断言:')
+                                print(f'-> {format_assert_text}')
                             exec(format_assert_text)
 
     @staticmethod

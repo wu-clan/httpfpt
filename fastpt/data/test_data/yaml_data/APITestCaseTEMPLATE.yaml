@@ -34,7 +34,7 @@
   sql:
   assert:
     - assert 200 == pm.response.get('status_code')
-    - assert '{}' in pm.response.get('content'), '没有返回content'
+    - assert 'postId' not in str(pm.response.get('content')), '没有返回content'
 -
   module: test
   case_id: event_create_003
