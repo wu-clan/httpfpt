@@ -191,7 +191,11 @@ class SendRequests:
     @staticmethod
     def log_request_down(response_data: dict):
         log.info(f"请求发送时间: {response_data['stat']['execute_time']}")
-        log.info(f"响应状态码: {response_data['status_code']}")
+        str_status_code = str(response_data['status_code'])
+        if str_status_code.startswith('4') or str_status_code.startswith('5'):
+            log.error(f"响应状态码: {response_data['status_code']}")
+        else:
+            log.success(f"响应状态码: {response_data['status_code']}")
         log.info(f"响应时间: {response_data['elapsed']} ms")
 
     @staticmethod
@@ -217,7 +221,7 @@ class SendRequests:
                     for path in v:
                         allure_attach_file(path)
                 else:
-                    allure_attach_file(parsed.files_no_parse)
+                    allure_attach_file(v)
         allure_step(f"请求 assert: {parsed.assert_text}")
 
 

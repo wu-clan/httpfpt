@@ -3,7 +3,7 @@
 
 import allure
 
-from fastpt.schema.allure.allure_attach import AllureAttachmentType
+from fastpt.schema.allure_attach import AllureAttachmentType
 from fastpt.utils.file_control import get_file_property
 
 
@@ -35,7 +35,7 @@ def allure_attach(body=None, name=None, attachment_type: str = 'JSON', extension
     )
 
 
-def allure_attach_file(filepath: dict, name=None, extension=None):
+def allure_attach_file(filepath: str, name=None, extension=None):
     """
     allure 报告上传附件
 
@@ -44,13 +44,12 @@ def allure_attach_file(filepath: dict, name=None, extension=None):
     :param extension:
     :return:
     """
-    for k, v in filepath.items():
-        file_pp = get_file_property(v)
-        filename = file_pp[0]
-        filetype = file_pp[2]
-        allure.attach.file(
-            source=v,
-            name=filename if name is None else name,
-            attachment_type=getattr(AllureAttachmentType, filetype.upper(), None),
-            extension=extension
-        )
+    file_property = get_file_property(filepath)
+    filename = file_property[0]
+    filetype = file_property[2]
+    allure.attach.file(
+        source=filepath,
+        name=filename if name is None else name,
+        attachment_type=getattr(AllureAttachmentType, filetype.upper(), None),
+        extension=extension
+    )
