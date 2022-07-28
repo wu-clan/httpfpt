@@ -82,10 +82,6 @@ def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("
         log.error(f'写入yaml测试报告失败: {e}')
         raise e
     else:
-        if status_upper == 'PASS':
-            log.success('test result: ----> {}', status_upper)
-        elif status_upper == 'FAIL':
-            log.error('test result: ----> {}', status_upper)
         log.success('写入yaml测试报告成功')
 
 

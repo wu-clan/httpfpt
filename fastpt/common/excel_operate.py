@@ -120,10 +120,6 @@ def write_excel_report(
         log.error(f'写入excel测试报告失败: {e}')
         raise e
     else:
-        if status_upper == 'PASS':
-            log.success('test result: ----> {}', status_upper)
-        elif status_upper == 'FAIL':
-            log.error('test result: ----> {}', status_upper)
         log.success('写入excel测试报告成功')
 
 
