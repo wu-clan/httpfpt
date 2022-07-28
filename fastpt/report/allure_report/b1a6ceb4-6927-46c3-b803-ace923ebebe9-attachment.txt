@@ -1,0 +1,19 @@
+2022-07-28 23:46:28.852 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
+2022-07-28 23:46:28.853 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:28.853 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_query_001
+2022-07-28 23:46:28.853 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: get
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://jsonplaceholder.typicode.com/posts/1
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: None
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：None
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:184 - 请求 data：None
+2022-07-28 23:46:28.855 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:28.855 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: None
+2022-07-28 23:46:28.856 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: {'casual': {'value': 200, 'type': 'eq', 'jsonpath': '$.status_code'}}
+2022-07-28 23:46:28.858 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:29.999 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:28
+2022-07-28 23:46:29.999 | SUCCESS  | fastpt.common.send_request:log_request_down:198 - 响应状态码: 200
+2022-07-28 23:46:29.999 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 138.069 ms
+2022-07-28 23:46:30.020 | SUCCESS  | fastpt.common.excel_operate:write_excel_report:123 - 写入excel测试报告成功
+2022-07-28 23:46:30.022 | INFO     | fastpt.conftest:log_end:63 - end 
+

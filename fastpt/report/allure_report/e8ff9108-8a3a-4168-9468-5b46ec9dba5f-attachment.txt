@@ -1,0 +1,2 @@
+Warning: 未自定义断言错误信息的断言:
+-> assert 200 == IsInt

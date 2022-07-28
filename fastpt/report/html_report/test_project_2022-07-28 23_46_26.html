@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <style>body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #E6E6E6;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #E6E6E6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.log {
+  background-color: #e6e6e6;
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  height: 230px;
+  overflow-y: scroll;
+  padding: 5px;
+  white-space: pre-wrap;
+}
+.log:only-child {
+  height: inherit;
+}
+
+div.image {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin-left: 5px;
+  overflow: hidden;
+  width: 320px;
+}
+div.image img {
+  width: 320px;
+}
+
+div.video {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin-left: 5px;
+  overflow: hidden;
+  width: 320px;
+}
+div.video video {
+  overflow: hidden;
+  width: 320px;
+  height: 240px;
+}
+
+.collapsed {
+  display: none;
+}
+
+.expander::after {
+  content: " (show details)";
+  color: #BBB;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.collapser::after {
+  content: " (hide details)";
+  color: #BBB;
+  font-style: italic;
+  cursor: pointer;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+
+.sort-icon {
+  font-size: 0px;
+  float: left;
+  margin-right: 5px;
+  margin-top: 5px;
+  /*triangle*/
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+}
+.inactive .sort-icon {
+  /*finish triangle*/
+  border-top: 8px solid #E6E6E6;
+}
+.asc.active .sort-icon {
+  /*finish triangle*/
+  border-bottom: 8px solid #999;
+}
+.desc.active .sort-icon {
+  /*finish triangle*/
+  border-top: 8px solid #999;
+}
+</style></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) { // eslint-disable-line no-redeclare
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function findAll(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sortColumn(elem) {
+    toggleSortStates(elem);
+    const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    let key;
+    if (elem.classList.contains('result')) {
+        key = keyResult;
+    } else if (elem.classList.contains('links')) {
+        key = keyLink;
+    } else {
+        key = keyAlpha;
+    }
+    sortTable(elem, key(colIndex));
+}
+
+function showAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(showExtras);
+}
+
+function hideAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(hideExtras);
+}
+
+function showExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.remove('collapsed');
+    expandcollapse.classList.remove('expander');
+    expandcollapse.classList.add('collapser');
+}
+
+function hideExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.add('collapsed');
+    expandcollapse.classList.remove('collapser');
+    expandcollapse.classList.add('expander');
+}
+
+function showFilters() {
+    const filterItems = document.getElementsByClassName('filter');
+    for (let i = 0; i < filterItems.length; i++)
+        filterItems[i].hidden = false;
+}
+
+function addCollapse() {
+    // Add links for show/hide all
+    const resulttable = find('table#results-table');
+    const showhideall = document.createElement('p');
+    showhideall.innerHTML = '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+                            '<a href="javascript:hideAllExtras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    findAll('.col-result').forEach(function(elem) {
+        const collapsed = getQueryParameter('collapsed') || 'Passed';
+        const extras = elem.parentNode.nextElementSibling;
+        const expandcollapse = document.createElement('span');
+        if (extras.classList.contains('collapsed')) {
+            expandcollapse.classList.add('expander');
+        } else if (collapsed.includes(elem.innerHTML)) {
+            extras.classList.add('collapsed');
+            expandcollapse.classList.add('expander');
+        } else {
+            expandcollapse.classList.add('collapser');
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener('click', function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains('collapsed')) {
+                showExtras(event.currentTarget);
+            } else {
+                hideExtras(event.currentTarget);
+            }
+        });
+    });
+}
+
+function getQueryParameter(name) {
+    const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function init () { // eslint-disable-line no-unused-vars
+    resetSortHeaders();
+
+    addCollapse();
+
+    showFilters();
+
+    sortColumn(find('.initial-sort'));
+
+    findAll('.sortable').forEach(function(elem) {
+        elem.addEventListener('click',
+            function() {
+                sortColumn(elem);
+            }, false);
+    });
+}
+
+function sortTable(clicked, keyFunc) {
+    const rows = findAll('.results-table-row');
+    const reversed = !clicked.classList.contains('asc');
+    const sortedRows = sort(rows, keyFunc, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    const thead = document.getElementById('results-table-head');
+    document.getElementById('results-table').remove();
+    const parent = document.createElement('table');
+    parent.id = 'results-table';
+    parent.appendChild(thead);
+    sortedRows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName('BODY')[0].appendChild(parent);
+}
+
+function sort(items, keyFunc, reversed) {
+    const sortArray = items.map(function(item, i) {
+        return [keyFunc(item), i];
+    });
+
+    sortArray.sort(function(a, b) {
+        const keyA = a[0];
+        const keyB = b[0];
+
+        if (keyA == keyB) return 0;
+
+        if (reversed) {
+            return keyA < keyB ? 1 : -1;
+        } else {
+            return keyA > keyB ? 1 : -1;
+        }
+    });
+
+    return sortArray.map(function(item) {
+        const index = item[1];
+        return items[index];
+    });
+}
+
+function keyAlpha(colIndex) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[colIndex].firstChild.data.toLowerCase();
+    };
+}
+
+function keyLink(colIndex) {
+    return function(elem) {
+        const dataCell = elem.childNodes[1].childNodes[colIndex].firstChild;
+        return dataCell == null ? '' : dataCell.innerText.toLowerCase();
+    };
+}
+
+function keyResult(colIndex) {
+    return function(elem) {
+        const strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+            'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[colIndex].firstChild.data);
+    };
+}
+
+function resetSortHeaders() {
+    findAll('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    findAll('.sortable').forEach(function(elem) {
+        const icon = document.createElement('div');
+        icon.className = 'sort-icon';
+        icon.textContent = 'vvv';
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove('desc', 'active');
+        elem.classList.add('asc', 'inactive');
+    });
+}
+
+function toggleSortStates(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        resetSortHeaders();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function isAllRowsHidden(value) {
+    return value.hidden == false;
+}
+
+function filterTable(elem) { // eslint-disable-line no-unused-vars
+    const outcomeAtt = 'data-test-result';
+    const outcome = elem.getAttribute(outcomeAtt);
+    const classOutcome = outcome + ' results-table-row';
+    const outcomeRows = document.getElementsByClassName(classOutcome);
+
+    for(let i = 0; i < outcomeRows.length; i++){
+        outcomeRows[i].hidden = !elem.checked;
+    }
+
+    const rows = findAll('.results-table-row').filter(isAllRowsHidden);
+    const allRowsHidden = rows.length == 0 ? true : false;
+    const notFoundMessage = document.getElementById('not-found-message');
+    notFoundMessage.hidden = !allRowsHidden;
+}
+</script>
+    <h1>自动化测试报告</h1>
+    <p>Report generated on 28-Jul-2022 at 23:46:42 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.1.1</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>JAVA_HOME</td>
+        <td>C:\Program Files\AdoptOpenJDK\jdk-8.0.292.10-hotspot\</td></tr>
+      <tr>
+        <td>Project Name</td>
+        <td>test_project</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.8.8</td></tr></table>
+    <h2>Summary</h2>
+    <p>Tester: 123</p>
+    <p>9 tests ran in 15.77 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">7 passed</span>, <input checked="true" class="filter" data-test-result="skipped" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">1 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">2 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th>Description</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable time" col="time">Execute Time</th>
+          <th class="sortable" col="duration">Duration</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="5">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td> 测试002 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_002</td>
+          <td class="col-time">2022-07-28 15:46:42.427513</td>
+          <td class="col-duration">0.00</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[XPASS(strict)][gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:28.846 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_002 -----------------
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:28.847 | INFO     | fastpt.testcase.test_project.test_api:test_002:40 - 这是一个框架xfail修饰测试
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:28.847 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td> 测试004 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_004[module: test, case_id: event_create_003, case_desc: 测试hooks, is_run: None, method: post, env: None, url: https://jsonplaceholder.typicode.com/posts, params: None, headers: None,data_type: json,data: {&apos;title&apos;: &apos;foo&apos;, &apos;body&apos;: &apos;${random_phone()}&apos;, &apos;userId&apos;: 1},files: None,sql: None,assert: assert 200 == pm.response.get(&apos;status_code&apos;),]</td>
+          <td class="col-time">2022-07-28 15:46:42.428512</td>
+          <td class="col-duration">1.41</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/><br/>self = &lt;fastpt.testcase.test_project.test_api.TestDemo object at 0x0000016C5DC19250&gt;<br/>data = {&#x27;assert&#x27;: &quot;assert 200 == pm.response.get(&#x27;status_code&#x27;)&quot;, &#x27;case_desc&#x27;: &#x27;测试hooks&#x27;, &#x27;case_id&#x27;: &#x27;event_create_003&#x27;, &#x27;data&#x27;: {&#x27;body&#x27;: &#x27;${random_phone()}&#x27;, &#x27;title&#x27;: &#x27;foo&#x27;, &#x27;userId&#x27;: 1}, ...}<br/><br/>    @allure.story(&quot;yaml数据测试输出&quot;)<br/>    @pytest.mark.test_api<br/>    @pytest.mark.parametrize(&#x27;data&#x27;, yaml_data, ids=yaml_ids)<br/>    def test_004(self, data):<br/>        &quot;&quot;&quot; 测试004 &quot;&quot;&quot;<br/>        response = send_request.send_request(data)<br/>        rs = response[&#x27;status_code&#x27;]<br/>        # yaml 测试报告需要手动写入<br/>        # 条件, 写入内容均可自定义<br/>        if rs == 200:<br/>            write_yaml_report(data=[{&#x27;case&#x27;: data[&#x27;case_id&#x27;], &#x27;result&#x27;: &#x27;PASS&#x27;}], status=&#x27;pass&#x27;)<br/>        else:<br/>            write_yaml_report(data=[{&#x27;case&#x27;: data[&#x27;case_id&#x27;], &#x27;result&#x27;: &#x27;FAIL&#x27;}], status=&#x27;fail&#x27;)<br/>&gt;       Asserter().exec_asserter(response, assert_text=response[&#x27;request_data&#x27;][&#x27;assert&#x27;])<br/><br/>testcase\test_project\test_api.py:72: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _<br/>utils\assert_control.py:288: in exec_asserter<br/>    self._code_asserter(response, assert_text)<br/>utils\assert_control.py:59: in _code_asserter<br/>    self._exec_code_assert(response, assert_text)<br/>utils\assert_control.py:209: in _exec_code_assert<br/>    exec(format_assert_text)<br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _<br/><br/>&gt;   ???<br/><span class="error">E   AssertionError</span><br/><br/>&lt;string&gt;:1: AssertionError[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:36.764 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_004 -----------------
+<br/> ------------------------------Captured stdout call------------------------------ <br/>Warning: 未自定义断言错误信息的断言:
+-&gt; assert 200 == 500
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:36.765 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:36.765 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_create_003
+2022-07-28 23:46:36.765 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: post
+2022-07-28 23:46:36.766 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://jsonplaceholder.typicode.com/posts
+2022-07-28 23:46:36.766 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: None
+2022-07-28 23:46:36.766 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:36.766 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：json
+2022-07-28 23:46:36.957 | INFO     | fastpt.common.send_request:log_request_up:186 - 请求 json: {&quot;title&quot;: &quot;foo&quot;, &quot;body&quot;: &quot;13065261795&quot;, &quot;userId&quot;: 1}
+2022-07-28 23:46:36.957 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:36.957 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: None
+2022-07-28 23:46:36.958 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: assert 200 == pm.response.get(&#x27;status_code&#x27;)
+2022-07-28 23:46:36.961 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:38.173 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:36
+2022-07-28 23:46:38.173 | ERROR    | fastpt.common.send_request:log_request_down:196 - 响应状态码: 500
+2022-07-28 23:46:38.174 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 208.777 ms
+2022-07-28 23:46:38.176 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:85 - 写入yaml测试报告成功
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:38.352 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td> 测试003 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_003[module: test, case_id: event_upload_004, case_desc: 测试文件上传, is_run: 0, method: post, env: None, url: https://api.anonfiles.com/upload, params: None, headers: None,data_type: None,data: None,files: {&quot;file&quot;:[&quot;D:\\0000000000_test\\666.txt&quot;,&quot;D:\\0000000000_test\\888.text},sql: None,assert: {&quot;response_code&quot;: {&quot;value&quot;:200,&quot;type&quot;:&quot;eq&quot;,&quot;jsonpath&quot;:&quot;$.status_code&quot;}},]</td>
+          <td class="col-time">2022-07-28 15:46:42.427513</td>
+          <td class="col-duration">0.00</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>(&#x27;D:\\gitproject\\python\\automated_api_pytest\\fastpt\\utils\\request\\data_parse.py&#x27;, 43, &#x27;Skipped: 此用例已设置跳过&#x27;)[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:34.547 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:34.547 | WARNING  | fastpt.utils.request.data_parse:skip:42 - 此用例已设置跳过
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:34.549 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td> 测试001 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_001[1-2]</td>
+          <td class="col-time">2022-07-28 15:46:42.426513</td>
+          <td class="col-duration">0.06</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:28.838 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_001 -----------------
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:28.840 | INFO     | fastpt.testcase.test_project.test_api:test_001:32 - This is a demo&#x27;s test
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:28.841 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td> 测试003 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_003[module: test, case_id: event_query_001, case_desc: 测试直接请求, is_run: None, method: get, env: None, url: https://jsonplaceholder.typicode.com/posts/1, params: None, headers: None,data_type: None,data: None,files: None,sql: None,assert: {&quot;casual&quot;:{&quot;value&quot;:200,&quot;type&quot;:&quot;eq&quot;,&quot;jsonpath&quot;:&quot;$.status_code&quot;}},]</td>
+          <td class="col-time">2022-07-28 15:46:42.427513</td>
+          <td class="col-duration">1.17</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:28.852 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:28.853 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:28.853 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_query_001
+2022-07-28 23:46:28.853 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: get
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://jsonplaceholder.typicode.com/posts/1
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: None
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：None
+2022-07-28 23:46:28.854 | INFO     | fastpt.common.send_request:log_request_up:184 - 请求 data：None
+2022-07-28 23:46:28.855 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:28.855 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: None
+2022-07-28 23:46:28.856 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: {&#x27;casual&#x27;: {&#x27;value&#x27;: 200, &#x27;type&#x27;: &#x27;eq&#x27;, &#x27;jsonpath&#x27;: &#x27;$.status_code&#x27;}}
+2022-07-28 23:46:28.858 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:29.999 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:28
+2022-07-28 23:46:29.999 | SUCCESS  | fastpt.common.send_request:log_request_down:198 - 响应状态码: 200
+2022-07-28 23:46:29.999 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 138.069 ms
+2022-07-28 23:46:30.020 | SUCCESS  | fastpt.common.excel_operate:write_excel_report:123 - 写入excel测试报告成功
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:30.022 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td> 测试003 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_003[module: test, case_id: event_query_002, case_desc: 测试全局变量, is_run: None, method: get, env: ${test}, url: /comments, params: {&quot;postId&quot;:1}, headers: None,data_type: None,data: None,files: None,sql: None,assert: assert 200 == pm.response.get(&apos;status_code&apos;),]</td>
+          <td class="col-time">2022-07-28 15:46:42.427513</td>
+          <td class="col-duration">3.24</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:30.027 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
+<br/> ------------------------------Captured stdout call------------------------------ <br/>Warning: 未自定义断言错误信息的断言:
+-&gt; assert 200 == 200
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:30.027 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:30.028 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_query_002
+2022-07-28 23:46:30.028 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: get
+2022-07-28 23:46:30.029 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://jsonplaceholder.typicode.com/comments
+2022-07-28 23:46:30.030 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: {&#x27;postId&#x27;: 1}
+2022-07-28 23:46:30.030 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:30.030 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：None
+2022-07-28 23:46:30.031 | INFO     | fastpt.common.send_request:log_request_up:184 - 请求 data：None
+2022-07-28 23:46:30.031 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:30.031 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: None
+2022-07-28 23:46:30.032 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: assert 200 == pm.response.get(&#x27;status_code&#x27;)
+2022-07-28 23:46:30.037 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:33.248 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:30
+2022-07-28 23:46:33.248 | SUCCESS  | fastpt.common.send_request:log_request_down:198 - 响应状态码: 200
+2022-07-28 23:46:33.249 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 86.61 ms
+2022-07-28 23:46:33.266 | SUCCESS  | fastpt.common.excel_operate:write_excel_report:123 - 写入excel测试报告成功
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:33.268 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td> 测试003 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_003[module: test, case_id: event_create_003, case_desc: 测试post, is_run: None, method: post, env: ${test}, url: /posts, params: None, headers: None,data_type: json,data: {&quot;title&quot;:&quot;foo&quot;,  &quot;body&quot;:&quot;${dev}&quot;,&quot;userId&quot;:1     },files: None,sql: None,assert: [&quot;assert pm.response.get(&apos;status_code&apos;) == IsInt&quot;],]</td>
+          <td class="col-time">2022-07-28 15:46:42.427513</td>
+          <td class="col-duration">1.27</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:33.273 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
+<br/> ------------------------------Captured stdout call------------------------------ <br/>Warning: 未自定义断言错误信息的断言:
+-&gt; assert 500 == IsInt
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:33.274 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:33.274 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_create_003
+2022-07-28 23:46:33.274 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: post
+2022-07-28 23:46:33.276 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://jsonplaceholder.typicode.com/posts
+2022-07-28 23:46:33.276 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: None
+2022-07-28 23:46:33.276 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:33.276 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：json
+2022-07-28 23:46:33.277 | INFO     | fastpt.common.send_request:log_request_up:186 - 请求 json: {&quot;title&quot;: &quot;foo&quot;, &quot;body&quot;: &quot;http://127.0.0.1:8080&quot;, &quot;userId&quot;: 1}
+2022-07-28 23:46:33.278 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:33.278 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: None
+2022-07-28 23:46:33.279 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: [&quot;assert pm.response.get(&#x27;status_code&#x27;) == IsInt&quot;]
+2022-07-28 23:46:33.283 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:34.522 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:33
+2022-07-28 23:46:34.523 | ERROR    | fastpt.common.send_request:log_request_down:196 - 响应状态码: 500
+2022-07-28 23:46:34.523 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 235.541 ms
+2022-07-28 23:46:34.540 | SUCCESS  | fastpt.common.excel_operate:write_excel_report:123 - 写入excel测试报告成功
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:34.542 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td> 测试004 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_004[module: test, case_id: event_query_001, case_desc: 测试直接请求, is_run: None, method: get, env: None, url: https://jsonplaceholder.typicode.com/posts/1, params: None, headers: None,data_type: None,data: None,files: None,sql: None,assert: {&apos;response_code&apos;: {&apos;value&apos;: 200, &apos;type&apos;: &apos;eq&apos;, &apos;jsonpath&apos;: &apos;$.status_code&apos;}},]</td>
+          <td class="col-time">2022-07-28 15:46:42.427513</td>
+          <td class="col-duration">1.10</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:34.553 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_004 -----------------
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:34.554 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:34.554 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_query_001
+2022-07-28 23:46:34.554 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: get
+2022-07-28 23:46:34.554 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://jsonplaceholder.typicode.com/posts/1
+2022-07-28 23:46:34.555 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: None
+2022-07-28 23:46:34.555 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:34.555 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：None
+2022-07-28 23:46:34.555 | INFO     | fastpt.common.send_request:log_request_up:184 - 请求 data：None
+2022-07-28 23:46:34.555 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:34.555 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: None
+2022-07-28 23:46:34.557 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: {&#x27;response_code&#x27;: {&#x27;value&#x27;: 200, &#x27;type&#x27;: &#x27;eq&#x27;, &#x27;jsonpath&#x27;: &#x27;$.status_code&#x27;}}
+2022-07-28 23:46:34.558 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:35.649 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:34
+2022-07-28 23:46:35.649 | SUCCESS  | fastpt.common.send_request:log_request_down:198 - 响应状态码: 200
+2022-07-28 23:46:35.650 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 88.794 ms
+2022-07-28 23:46:35.652 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:85 - 写入yaml测试报告成功
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:35.654 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td> 测试004 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_004[module: test, case_id: event_query_002, case_desc: 测试全局变量, is_run: None, method: get, env: ${test}, url: /comments, params: {&apos;postId&apos;: 1}, headers: None,data_type: None,data: None,files: None,sql: None,assert: [&quot;assert 200 == pm.response.get(&apos;status_code&apos;)&quot;, &quot;assert &apos;postId&apos; not in str(pm.response.get(&apos;content&apos;)), &apos;没有返回content&apos;&quot;],]</td>
+          <td class="col-time">2022-07-28 15:46:42.427513</td>
+          <td class="col-duration">1.10</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:35.658 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_004 -----------------
+<br/> ------------------------------Captured stdout call------------------------------ <br/>Warning: 未自定义断言错误信息的断言:
+-&gt; assert 200 == 200
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:35.659 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:35.659 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_query_002
+2022-07-28 23:46:35.660 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: get
+2022-07-28 23:46:35.661 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://jsonplaceholder.typicode.com/comments
+2022-07-28 23:46:35.662 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: {&#x27;postId&#x27;: 1}
+2022-07-28 23:46:35.662 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:35.662 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：None
+2022-07-28 23:46:35.662 | INFO     | fastpt.common.send_request:log_request_up:184 - 请求 data：None
+2022-07-28 23:46:35.663 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:35.663 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: None
+2022-07-28 23:46:35.664 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: [&quot;assert 200 == pm.response.get(&#x27;status_code&#x27;)&quot;, &quot;assert &#x27;postId&#x27; not in str(pm.response.get(&#x27;content&#x27;)), &#x27;没有返回content&#x27;&quot;]
+2022-07-28 23:46:35.668 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:36.754 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:35
+2022-07-28 23:46:36.755 | SUCCESS  | fastpt.common.send_request:log_request_down:198 - 响应状态码: 200
+2022-07-28 23:46:36.755 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 82.337 ms
+2022-07-28 23:46:36.757 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:85 - 写入yaml测试报告成功
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:36.759 | INFO     | fastpt.conftest:log_end:63 - end 
+
+<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td> 测试004 </td>
+          <td class="col-name">testcase/test_project/test_api.py::TestDemo::test_004[module: test, case_id: event_upload_004, case_desc: 测试文件上传, is_run: None, method: post, env: None, url: https://api.anonfiles.com/upload, params: None, headers: None,data_type: None,data: None,files: {&apos;file&apos;: &apos;D:\\\\0000000000_test\\\\666.txt&apos;},sql: None,assert: assert pm.response.get(&apos;status_code&apos;) == IsInt,]</td>
+          <td class="col-time">2022-07-28 15:46:42.428512</td>
+          <td class="col-duration">3.29</td></tr>
+        <tr class="collapsed">
+          <td class="extra" colspan="5">
+            <div class="log">[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/>[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe[gw0] win32 -- Python 3.8.8 D:\gitproject\python\automated_api_pytest\venv\Scripts\python.exe<br/> -----------------------------Captured stderr setup------------------------------ <br/>2022-07-28 23:46:38.357 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_004 -----------------
+<br/> ------------------------------Captured stdout call------------------------------ <br/>Warning: 未自定义断言错误信息的断言:
+-&gt; assert 200 == IsInt
+<br/> ------------------------------Captured stderr call------------------------------ <br/>2022-07-28 23:46:38.358 | INFO     | fastpt.common.send_request:log_request_up:176 - 用例 module: test
+2022-07-28 23:46:38.358 | INFO     | fastpt.common.send_request:log_request_up:177 - 用例 case_id: event_upload_004
+2022-07-28 23:46:38.358 | INFO     | fastpt.common.send_request:log_request_up:178 - 请求 method: post
+2022-07-28 23:46:38.359 | INFO     | fastpt.common.send_request:log_request_up:179 - 请求 url: https://api.anonfiles.com/upload
+2022-07-28 23:46:38.359 | INFO     | fastpt.common.send_request:log_request_up:180 - 请求 params: None
+2022-07-28 23:46:38.359 | INFO     | fastpt.common.send_request:log_request_up:181 - 请求 headers: None
+2022-07-28 23:46:38.359 | INFO     | fastpt.common.send_request:log_request_up:182 - 请求 data 类型：None
+2022-07-28 23:46:38.359 | INFO     | fastpt.common.send_request:log_request_up:184 - 请求 data：None
+2022-07-28 23:46:38.359 | INFO     | fastpt.common.send_request:log_request_up:187 - 请求 sql: None
+2022-07-28 23:46:38.360 | INFO     | fastpt.common.send_request:log_request_up:188 - 请求 files: {&#x27;file&#x27;: &#x27;D:\\\\0000000000_test\\\\666.txt&#x27;}
+2022-07-28 23:46:38.361 | INFO     | fastpt.common.send_request:log_request_up:189 - 请求 assert: assert pm.response.get(&#x27;status_code&#x27;) == IsInt
+2022-07-28 23:46:38.371 | INFO     | fastpt.common.send_request:_requests_engin:76 - 开始发送请求...
+2022-07-28 23:46:41.644 | INFO     | fastpt.common.send_request:log_request_down:193 - 请求发送时间: 2022-07-28 23:46:38
+2022-07-28 23:46:41.644 | SUCCESS  | fastpt.common.send_request:log_request_down:198 - 响应状态码: 200
+2022-07-28 23:46:41.645 | INFO     | fastpt.common.send_request:log_request_down:199 - 响应时间: 270.418 ms
+2022-07-28 23:46:41.647 | SUCCESS  | fastpt.common.yaml_operate:write_yaml_report:85 - 写入yaml测试报告成功
+<br/> ----------------------------Captured stderr teardown---------------------------- <br/>2022-07-28 23:46:41.649 | INFO     | fastpt.conftest:log_end:63 - end 
+
+2022-07-28 23:46:41.652 | INFO     | fastpt.conftest:package_fixture:41 - 测试用例执行结束
+<br/></div></td></tr></tbody></table></body></html>

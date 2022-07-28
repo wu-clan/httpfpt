@@ -1,3 +1,0 @@
-2022-07-25 17:38:16.275 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
-2022-07-25 17:38:16.275 | INFO     | fastpt.conftest:log_end:63 - end 
-

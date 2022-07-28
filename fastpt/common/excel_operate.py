@@ -96,7 +96,7 @@ def write_excel_report(
     tester_col = result_col + 1
     # 写入测试结果
     if not wa[result_title_box].value:
-        wa.cell(1, result_title_box, 'result')
+        wa.cell(1, result_col, 'result')
         wa[result_title_box].font = black
     if extension:
         wa.cell(row_num, result_col, extension)

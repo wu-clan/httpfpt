@@ -63,11 +63,11 @@ def run(
             raise ValueError(
                 '用例收集失败, 请检查路径参数 \n'
                 '类用例说明: \n'
-                '\t1. 项目目录下没有多级目录: class_path = "文件名::类名" \n'
-                '\t2. 项目目录下有多级目录: class_path = "目录名/.../文件名::类名" \n'
+                '\t1. testcase 目录下没有多级目录: case_path = "文件名::类名" \n'
+                '\t2. testcase 目录下有多级目录: case_path = "目录名/.../文件名::类名" \n'
                 '函数用例说明: \n'
-                '\t1. 项目目录下没有多级目录: function_path = "文件名::类名::函数名" \n'
-                '\t2. 项目目录下有多级目录: function_path = "目录名/.../文件名::函数名"'
+                '\t1. testcase 目录下没有多级目录: case_path = "文件名::类名::函数名" \n'
+                '\t2. testcase 目录下有多级目录: case_path = "目录名/.../文件名::函数名"'
             )
         run_path = default_case_path + '/' + case_path
 
