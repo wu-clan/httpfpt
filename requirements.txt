@@ -19,3 +19,4 @@ dirty_equals==0.4
 beautifulsoup4==4.11.1
 faker==13.15.0
 jsonpath==0.82
+cache3==0.2.1
