@@ -1,0 +1,64 @@
+config:
+  # allure测试报告(必填)
+  allure:
+    epic:
+    feature:
+    story:
+  # 基础请求信息
+  request:
+    env:  # 必填
+    headers:  # 选填
+    timeout:  # 选填
+    verify:  # 选填
+    redirects:  # 选填
+    proxies:  # 选填
+      http:
+      https:
+  # 用例综合信息
+  module:  # 必填
+
+test_steps:
+  - # 基础信息
+    name:  # 必填
+    id:  # 必填
+    description:  # 选填
+    is_run:  # 选填
+    # 请求参数, 必填
+    request:
+      method: get
+      url: https://jsonplaceholder.typicode.com/posts/1
+      params:
+      data_type:
+      data:
+      files:
+    # 前置操作, 选填
+    setup:
+      # sql, 选填, list
+      sql:
+        - name:
+          # 设置类型, 选填, cache, env, global, 默认 cache
+          set_type:
+          jsonpath:
+      # 钩子, 选填, list
+      hooks:
+        - func:
+      wait_time:
+    # 后置操作
+    teardown:
+      # 同上
+      sql:
+      # 同上
+      hooks:
+      # 参数提取, 选填, list
+      extract:
+        - name:
+          set_type:
+          jsonpath:
+      # 断言, 必填, str / list
+      # assert:
+      assert:
+        - description:
+          value:
+          type:
+          jsonpath:
+      wait_time:
