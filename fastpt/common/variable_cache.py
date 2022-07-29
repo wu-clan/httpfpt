@@ -5,12 +5,12 @@ from cache3 import SafeCache
 from fastpt.common.log import log
 
 
-class MemoryCache:
+class VariableCache:
 
     def __init__(self, cache=SafeCache()):
         self.cache = cache
 
-    def cache_get(self, key: str, **kwargs) -> Any:
+    def get(self, key: str, **kwargs) -> Any:
         """
         获取缓存值
 
@@ -23,7 +23,7 @@ class MemoryCache:
             log.info(f'获取临时变量: {key}')
         return result
 
-    def cache_set(self, key: Any, value: Any, **kwargs) -> bool:
+    def set(self, key: Any, value: Any, **kwargs) -> bool:
         """
         设置缓存值
 
@@ -37,7 +37,7 @@ class MemoryCache:
             log.info(f'设置临时变量: {key} -> {value}')
         return result
 
-    def cache_delete(self, key: str, **kwargs) -> bool:
+    def delete(self, key: str, **kwargs) -> bool:
         """
         删除缓存值
 
@@ -45,9 +45,12 @@ class MemoryCache:
         :param kwargs:
         :return:
         """
-        return self.cache.delete(key, **kwargs)
+        result = self.cache.delete(key, **kwargs)
+        if result:
+            log.info(f'删除临时变量: {key}')
+        return result
 
-    def cache_has(self, key: str, **kwargs) -> bool:
+    def has_key(self, key: str, **kwargs) -> bool:
         """
         是否存在缓存值
 
@@ -60,7 +63,7 @@ class MemoryCache:
             log.info(f'存在临时变量: {key}')
         return result
 
-    def cache_incr(self, key, **kwargs) -> Union[int, float]:
+    def incr(self, key, **kwargs) -> Union[int, float]:
         """
         是否存在缓存值, 当不存在时触发 ValueError
 
@@ -73,7 +76,7 @@ class MemoryCache:
             log.info(f'存在临时变量: {key}')
         return result
 
-    def cache_clear(self) -> bool:
+    def clear(self) -> bool:
         """
         清空缓存值
 

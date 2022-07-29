@@ -10,6 +10,7 @@ from loguru import logger
 from py._xmlgen import html
 
 from fastpt.common.log import log
+from fastpt.common.variable_cache import VariableCache
 from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE
 
 
@@ -52,7 +53,8 @@ def module_fixture():
 def class_fixture():
     ...
     yield
-    ...
+    # 自动清理临时变量
+    VariableCache().clear()
 
 
 @pytest.fixture(scope='function', autouse=True)
