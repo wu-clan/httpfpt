@@ -13,7 +13,7 @@ from requests import Response as RequestsResponse
 from fastpt.common.log import log
 from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
-from fastpt.utils.allure_operate import allure_attach_file, allure_step
+from fastpt.utils.allure_control import allure_attach_file, allure_step
 from fastpt.utils.request.data_parse import DataParse
 from fastpt.utils.time_control import get_current_time
 
