@@ -12,15 +12,19 @@ config:
     verify:  # 选填
     redirects:  # 选填
     proxies:  # 选填
-      http:
-      https:
+      requests:
+        http:
+        https:
+#      httpx:
+#        http://:
+#        https://:
   # 用例综合信息
   module:  # 必填
 
 test_steps:
   - # 基础信息
     name:  # 必填
-    id:  # 必填
+    case_id:  # 必填
     description:  # 选填
     is_run:  # 选填
     # 请求参数, 必填
@@ -28,9 +32,11 @@ test_steps:
       method: get
       url: https://jsonplaceholder.typicode.com/posts/1
       params:
+      headers:
       data_type:
       data:
       files:
+        xxx: # str / list
     # 前置操作, 选填
     setup:
       # sql, 选填, list
@@ -57,7 +63,7 @@ test_steps:
       # 断言, 必填, str / list
       # assert:
       assert:
-        - description:
+        - check:
           value:
           type:
           jsonpath:

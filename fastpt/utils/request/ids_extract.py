@@ -34,3 +34,5 @@ def get_ids(request_data: list) -> list:
             f'sql: {d[12]},assert: {d[13]},'
         )
     return ids
+
+# todo 更新ids解析

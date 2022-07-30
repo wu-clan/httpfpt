@@ -38,3 +38,6 @@ ALLURE_ENV_FILE = os.path.join(BASE_DIR, 'core', 'allure_env', 'environment.prop
 
 # allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失
 ALLURE_REPORT_ENV_FILE = os.path.join(ALLURE_REPORT_PATH, 'environment.properties')
+
+# 运行环境文件路径
+RUN_ENV_PATH = os.path.join(BASE_DIR, 'core', 'run_env')
