@@ -6,7 +6,6 @@ from typing import Union
 
 import allure
 from _pytest.outcomes import Skipped
-from dotenv import dotenv_values
 
 from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
@@ -14,7 +13,7 @@ from fastpt.utils.env_control import get_env_dict
 from fastpt.utils.request.vars_extract import VarsExtractor
 
 
-class DataParse:
+class RequestDataParse:
 
     def __init__(self, request_data: dict):
         self.request_data = request_data

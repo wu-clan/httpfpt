@@ -14,7 +14,7 @@ from fastpt.common.log import log
 from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
 from fastpt.utils.allure_control import allure_attach_file, allure_step
-from fastpt.utils.request.data_parse import DataParse
+from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.time_control import get_current_time
 
 
@@ -122,7 +122,7 @@ class SendRequests:
         if request_engin not in self.request_engin_list:
             raise ValueError(f'请求发起失败，请使用正确的请求引擎')
         # 获取解析后的请求数据
-        parsed_data = DataParse(data)
+        parsed_data = RequestDataParse(data)
         # 初始化响应元数据
         response_data = self.init_response_meta_data
         # 日志记录请求数据
@@ -172,7 +172,7 @@ class SendRequests:
         return response_data
 
     @staticmethod
-    def log_request_up(parsed: DataParse):
+    def log_request_up(parsed: RequestDataParse):
         log.info(f"用例 module: {parsed.module}")
         log.info(f"用例 case_id: {parsed.case_id}")
         log.info(f"请求 method: {parsed.method}")
@@ -199,7 +199,7 @@ class SendRequests:
         log.info(f"响应时间: {response_data['elapsed']} ms")
 
     @staticmethod
-    def allure_request_up(parsed: DataParse):
+    def allure_request_up(parsed: RequestDataParse):
         allure.dynamic.title(
             f"用例 module: {parsed.module};"
             f"用例 case_id: {parsed.case_id}"
