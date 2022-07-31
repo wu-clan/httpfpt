@@ -1,38 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-def get_values(request_data: list) -> list:
+
+def get_ids(request_data: list):
     """
-    获取读取的 excel/yaml 数据,并取出数据中的 values 重新组合
-
-    :param request_data: 读取的 excel 数据或者 yaml 数据
-    :return: [(value1, value2, ...)] or [(value1, value2, ...), ..., (value1, value2, ...)]
-    """
-
-    new_data = []
-
-    for _ in request_data:
-        i = tuple(_.values())
-        new_data.append(i)
-    return new_data
+    从请求数据获取数据驱动下的 ids 数据
 
 
-def get_ids(request_data: list) -> list:
-    """
-    将请求数据中的 values 重新组合为 ids 格式
-
-    :param request_data: 读取的 excel 数据或者 yaml 数据
+    :param request_data: 请求数据
     :return:
     """
-    data = get_values(request_data)
-
     ids = []
-    for d in data:
-        ids.append(
-            f'module: {d[0]}, case_id: {d[1]}, case_desc: {d[2]}, is_run: {d[3]}, method: {d[4]}, env: {d[5]}, '
-            f'url: {d[6]}, params: {d[7]}, headers: {d[8]},data_type: {d[9]},data: {d[10]},files: {d[11]},'
-            f'sql: {d[12]},assert: {d[13]},'
-        )
+    for data in request_data:
+        try:
+            module = data['config']['module']
+            name = data['test_steps']['name']
+            case_id = data['test_steps']['case_id']
+        except KeyError as e:
+            raise ValueError('测试用例 ids 获取失败, 请检查测试用例数据是否符合规范: {}'.format(e))
+        ids.append('module: {}, name: {}, case_id: {}'.format(module, name, case_id))
     return ids
-
-# todo 更新ids解析
