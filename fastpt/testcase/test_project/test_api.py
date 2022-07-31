@@ -4,11 +4,10 @@ import allure
 import pytest
 from dirty_equals import IsInt
 
-from fastpt.common.excel_operate import write_excel_report, read_excel, get_excel_row
+from fastpt.common.excel_handler import write_excel_report, read_excel, get_excel_row
 from fastpt.common.log import log
 from fastpt.common.send_request import send_request
-from fastpt.common.yaml_operate import write_yaml_report, read_yaml
-from fastpt.utils.assert_control import Asserter
+from fastpt.common.yaml_handler import write_yaml_report, read_yaml
 from fastpt.utils.request.ids_extract import get_ids
 
 excel_data = read_excel(filename='APITestCaseTEMPLATE.xlsx')
@@ -54,7 +53,6 @@ class TestDemo:
             write_excel_report(row_num=row_num, status='pass')
         else:
             write_excel_report(row_num=row_num, status='fail')
-        Asserter().exec_asserter(response, assert_text=response['request_data']['assert'])
 
     @allure.story("yaml数据测试输出")
     @pytest.mark.test_api
@@ -69,4 +67,3 @@ class TestDemo:
             write_yaml_report(data=[{'case': data['case_id'], 'result': 'PASS'}], status='pass')
         else:
             write_yaml_report(data=[{'case': data['case_id'], 'result': 'FAIL'}], status='fail')
-        Asserter().exec_asserter(response, assert_text=response['request_data']['assert'])

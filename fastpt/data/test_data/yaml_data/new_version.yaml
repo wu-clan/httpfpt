@@ -11,13 +11,13 @@ config:
     timeout:  # 选填
     verify:  # 选填
     redirects:  # 选填
-    proxies:  # 选填
+    proxies: # 选填
       requests:
         http:
         https:
-#      httpx:
-#        http://:
-#        https://:
+  #      httpx:
+  #        http://:
+  #        https://:
   # 用例综合信息
   module:  # 必填
 
@@ -41,13 +41,17 @@ test_steps:
     setup:
       # sql, 选填, list
       sql:
-        - name:
+        - key:
           # 设置类型, 选填, cache, env, global, 默认 cache
           set_type:
+          sql:
           jsonpath:
+      # 执行 sql 也是允许的
+#        - select * from xxx where xxx=xxx
       # 钩子, 选填, list
       hooks:
         - func:
+      # 等待时间, 选填
       wait_time:
     # 后置操作
     teardown:
@@ -57,7 +61,7 @@ test_steps:
       hooks:
       # 参数提取, 选填, list
       extract:
-        - name:
+        - key:
           set_type:
           jsonpath:
       # 断言, 必填, str / list
@@ -67,4 +71,5 @@ test_steps:
           value:
           type:
           jsonpath:
+      # 同上
       wait_time:

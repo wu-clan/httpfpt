@@ -31,7 +31,7 @@ is_ssl = true
 # 请求发送
 [request]
 timeout = 10
-interval = 0
 verify = false
+redirects = true
 proxies.http = ''
 proxies.https = ''

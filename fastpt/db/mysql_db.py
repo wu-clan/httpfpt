@@ -5,9 +5,14 @@ import decimal
 
 import pymysql
 from dbutils.pooled_db import PooledDB
+from jsonpath import jsonpath
 
+from fastpt.common.env_handler import write_env
 from fastpt.common.log import log
+from fastpt.common.variable_cache import VariableCache
+from fastpt.common.yaml_handler import write_yaml_vars
 from fastpt.core import get_conf
+from fastpt.core.path_conf import RUN_ENV_PATH
 
 
 class DB:
@@ -69,11 +74,12 @@ class DB:
         self.cursor.close()
         self.conn.close()
 
-    def exec_case_sql(self, sql: list) -> dict:
+    def exec_case_sql(self, sql: list, env: str = None) -> dict:
         """
         执行用例 sql
 
         :param sql:
+        :param env:
         :return:
         """
         data = {}
@@ -82,12 +88,34 @@ class DB:
             raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 DQL 类型 sql 语句')
         else:
             for s in sql:
-                query_data = self.query(s)
-                for k, v in query_data.items():
-                    if isinstance(v, decimal.Decimal):
-                        data[k] = float(v)
-                    elif isinstance(v, datetime.datetime):
-                        data[k] = str(v)
+                # 获取返回数据
+                if isinstance(s, str):
+                    query_data = self.query(s)
+                    for k, v in query_data.items():
+                        if isinstance(v, decimal.Decimal):
+                            data[k] = float(v)
+                        elif isinstance(v, datetime.datetime):
+                            data[k] = str(v)
+                        else:
+                            data[k] = v
+                # 设置变量
+                if isinstance(s, dict):
+                    key = s['key']
+                    set_type = s['set_type']
+                    sql = s['sql']
+                    json_path = s['jsonpath']
+                    query_data = self.query(sql)
+                    value = jsonpath(query_data, json_path)
+                    if set_type is None:
+                        VariableCache().set(key, value)
+                    elif set_type == 'cache':
+                        VariableCache().set(key, value)
+                    elif set_type == 'env':
+                        if env is None:
+                            raise ValueError('写入环境变量准备失败, 缺少参数 env, 请检查传参')
+                        write_env(RUN_ENV_PATH, env, key, value)
+                    elif set_type == 'global':
+                        write_yaml_vars({key: value})
                     else:
-                        data[k] = v
+                        raise ValueError('前置 sql 设置变量失败, 用例参数 "set_type" 类型错误')
             return data

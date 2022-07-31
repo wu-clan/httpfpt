@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 
-from fastpt.common.toml_operate import read_toml
+from fastpt.common.toml_handler import read_toml
 
 __config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
 
@@ -32,8 +32,8 @@ EMAIL_SSL = __config['email']['is_ssl']
 
 # 请求发送
 REQUEST_TIMEOUT = __config['request']['timeout']
-REQUEST_INTERVAL = __config['request']['interval']
 REQUEST_VERIFY = __config['request']['verify']
+REQUEST_REDIRECTS = __config['request']['redirects']
 REQUEST_PROXIES_REQUESTS = {
     'http': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,
     'https': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None
