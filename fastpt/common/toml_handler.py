@@ -19,10 +19,10 @@ def read_toml(filepath: str, filename: str) -> dict:
     try:
         data = toml.load(_filename)
     except TypeError as e:
-        log.error(f'文件 {_filename} 内存在格式错误 \n {e}')
+        log.error(f'文件 {filename} 内存在格式错误 \n {e}')
         raise e
     except toml.TomlDecodeError as e:
-        log.critical('toml文件解析错误')
+        log.error(f'文件 {filename} 解析错误')
         raise e
     else:
         return data
@@ -48,8 +48,8 @@ def write_toml(filepath: str, filename: str, data: dict, encoding: str = 'utf-8'
         with open(_file, encoding=encoding, mode=mode) as f:
             result = toml.dump(data, f, encoder=encoder)
     except TypeError as e:
-        log.error(f'写入文件 "{_file}" 错误 \n {e}')
+        log.error(f'写入文件 "{filename}" 错误 \n {e}')
         raise e
     else:
-        log.success(f'写入文件 {_file} 成功')
+        log.success(f'写入文件 {filename} 成功')
         return result

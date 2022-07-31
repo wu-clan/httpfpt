@@ -46,8 +46,8 @@ def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = '
             data_list.append(data)
         return data_list
     else:
-        log.warning('数据表格没有数据!')
-        raise ValueError('数据表格没有数据! 请检查数据文件内容是否正确!')
+        log.warning(f'数据表格 {filename} 没有数据!')
+        raise ValueError(f'数据表格 {filename} 没有数据! 请检查数据文件内容是否正确!')
 
 
 def write_excel_report(
@@ -117,10 +117,10 @@ def write_excel_report(
     try:
         wb.save(report_file)
     except Exception as e:
-        log.error(f'写入excel测试报告失败: {e}')
+        log.error(f'写入 {filename} 测试报告失败: {e}')
         raise e
     else:
-        log.success('写入excel测试报告成功')
+        log.success(f'写入 {filename} 测试报告成功')
 
 
 def get_excel_row(data: dict) -> int:
