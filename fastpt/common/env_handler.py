@@ -5,7 +5,6 @@ import os.path
 import dotenv
 
 from fastpt.common.log import log
-from fastpt.core.path_conf import RUN_ENV_PATH
 
 
 def get_env_dict(filepath: str) -> dict:
@@ -20,9 +19,9 @@ def get_env_dict(filepath: str) -> dict:
     return env_dict
 
 
-def write_env(filepath: str, filename: str, key: str, value: str):
+def write_env_vars(filepath: str, filename: str, key: str, value: str):
     """
-    写入 env 字典信息
+    写入 env 信息
 
     :param filepath:
     :param filename:

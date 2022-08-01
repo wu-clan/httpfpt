@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 import os
 
-from fastpt.core.get_conf import PROJECT_NAME
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-# 测试用例路径
-TESTCASE_PATH = os.path.join(BASE_DIR, 'test_case', PROJECT_NAME)
+# 获取日志路径
+LOG_PATH = os.path.join(BASE_DIR, 'log')
 
 # 测试数据路径
 TEST_DATA_PATH = os.path.join(BASE_DIR, 'data')

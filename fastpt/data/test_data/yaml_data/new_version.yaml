@@ -71,5 +71,6 @@ test_steps:
           value:
           type:
           jsonpath:
+#        assert 200 = pm.response.get('status_code')
       # 同上
       wait_time:

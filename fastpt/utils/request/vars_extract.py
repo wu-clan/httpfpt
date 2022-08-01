@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 import os.path
 import re
-from typing import Union, Any
+from typing import Union
 
 from jsonpath import jsonpath
 
+from fastpt.common.env_handler import get_env_dict, write_env_vars
 from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import read_yaml, write_yaml_vars
 from fastpt.core.path_conf import TEST_DATA_PATH, RUN_ENV_PATH
-from fastpt.common.env_handler import get_env_dict, write_env
 
 
 class VarsExtractor:
@@ -110,28 +110,30 @@ class VarsExtractor:
         return str_target
 
     @staticmethod
-    def teardown_var_extract(response: dict, ext: list, env=None):
+    def teardown_var_extract(response: dict, extract: list, env=None):
         """
         后置参数提取
 
         :param response:
-        :param ext:
+        :param extract:
         :param env:
         :return:
         """
-        for t in ext:
-            key = t['key']
-            set_type = t['set_type']
-            json_path = t['jsonpath']
+        for et in extract:
+            key = et['key']
+            set_type = et['set_type']
+            json_path = et['jsonpath']
             value = jsonpath(response, json_path)
+            if value:
+                value = value[0]
+            else:
+                raise ValueError(f'jsonpath取值失败, 表达式: {json_path}')
             if set_type is None:
                 VariableCache().set(key, value)
             elif set_type == 'cache':
                 VariableCache().set(key, value)
             elif set_type == 'env':
-                if env is None:
-                    raise ValueError('写入环境变量准备失败, 缺少参数 env, 请检查传参')
-                write_env(RUN_ENV_PATH, env, key, value)
+                write_env_vars(RUN_ENV_PATH, env, key, value)
             elif set_type == 'global':
                 write_yaml_vars({key: value})
             else:

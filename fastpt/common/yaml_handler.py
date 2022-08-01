@@ -101,9 +101,9 @@ def write_yaml_vars(data: dict):
     :param data:
     :return:
     """
-    _file = os.path.join(TEST_DATA_PATH, 't.yaml')
+    _file = os.path.join(TEST_DATA_PATH, 'global_vars.yaml')
     try:
-        _vars = read_yaml(TEST_DATA_PATH, filename='t.yaml')
+        _vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
         _vars.update(data)
         with open(_file, encoding='utf-8', mode='w') as f:
             yaml.dump(_vars, f, allow_unicode=True)

@@ -4,22 +4,22 @@ import os
 
 from loguru import logger
 
+from fastpt.core.path_conf import LOG_PATH
+
 
 class Logger:
 
-    def __init__(self, log_path=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))):
-        self.log_path = log_path
-
-    def log(self) -> logger:
+    @staticmethod
+    def log() -> logger:
         """
         日志记录器
 
         :return:
         """
-        if not os.path.join(self.log_path):
-            os.makedirs(self.log_path)
+        if not os.path.join(LOG_PATH):
+            os.makedirs(LOG_PATH)
 
-        log_file = os.path.join(self.log_path, 'log', 'api_test.log')
+        log_file = os.path.join(LOG_PATH, 'api_test.log')
 
         logger.add(
             log_file,

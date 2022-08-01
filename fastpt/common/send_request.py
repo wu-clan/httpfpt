@@ -13,7 +13,7 @@ from requests import Response as RequestsResponse
 from fastpt.common.log import log
 from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
-from fastpt.utils.allure_control import allure_attach_file, allure_step
+from fastpt.utils.allure_control import allure_attach_file
 from fastpt.utils.assert_control import Asserter
 from fastpt.utils.hooks_executor import HookExecutor
 from fastpt.utils.request.request_data_parse import RequestDataParse
@@ -59,28 +59,18 @@ class SendRequests:
         :return:
         """
         try:
-            timeout = kwargs['timeout']
-            if timeout is None:
-                timeout = get_conf.REQUEST_TIMEOUT
-            verify = kwargs['verify']
-            if verify is None:
-                verify = get_conf.REQUEST_VERIFY
-            proxies = kwargs['proxies']
-            if proxies is None:
-                proxies = get_conf.REQUEST_PROXIES_REQUESTS
-            redirects = kwargs['redirects']
-            if redirects is None:
-                redirects = get_conf.REQUEST_REDIRECTS
+            if kwargs['timeout'] is None:
+                kwargs['timeout'] = get_conf.REQUEST_TIMEOUT
+            if kwargs['verify'] is None:
+                kwargs['verify'] = get_conf.REQUEST_VERIFY
+            if kwargs['proxies'] is None:
+                kwargs['proxies'] = get_conf.REQUEST_PROXIES_REQUESTS
+            if kwargs['allow_redirects'] is None:
+                kwargs['allow_redirects'] = get_conf.REQUEST_REDIRECTS
             # 消除安全警告
             requests.packages.urllib3.disable_warnings()  # noqa
             log.info('开始发送请求...')
-            response = requests.session().request(
-                timeout=timeout,
-                verify=verify,
-                proxies=proxies,
-                allow_redirects=redirects,
-                **kwargs
-            )
+            response = requests.session().request(**kwargs)
             return response
         except Exception as e:
             log.error(f'发送 requests 请求异常: {e}')
@@ -95,28 +85,20 @@ class SendRequests:
         :return:
         """
         try:
-            timeout = kwargs['timeout']
-            if timeout is None:
-                timeout = get_conf.REQUEST_TIMEOUT
-            verify = kwargs['verify']
-            if verify is None:
-                verify = get_conf.REQUEST_VERIFY
-            proxies = kwargs['proxies']
-            if proxies is None:
-                proxies = get_conf.REQUEST_PROXIES_REQUESTS
-            redirects = kwargs['redirects']
-            if redirects is None:
-                redirects = get_conf.REQUEST_REDIRECTS
+            kwargs['timeout'] = get_conf.REQUEST_TIMEOUT if kwargs['timeout'] is None else kwargs['timeout']
+            verify = get_conf.REQUEST_VERIFY if kwargs['verify'] is None else kwargs['verify']
+            proxies = get_conf.REQUEST_PROXIES_REQUESTS if kwargs['proxies'] is None else kwargs['proxies']
+            redirects = get_conf.REQUEST_REDIRECTS if kwargs['allow_redirects'] is None else kwargs['allow_redirects']
+            del kwargs['verify']
+            del kwargs['proxies']
+            del kwargs['allow_redirects']
             log.info('开始发送请求...')
             with httpx.Client(
                     verify=verify,
                     proxies=proxies,
                     follow_redirects=redirects,
             ) as client:
-                response = client.request(
-                    timeout=timeout,
-                    **kwargs
-                )
+                response = client.request(**kwargs)
                 return response
         except Exception as e:
             log.error(f'发送 httpx 请求异常: {e}')
@@ -152,23 +134,23 @@ class SendRequests:
         self.allure_request_up(parsed_data)
 
         # 发送请求
+        request_conf = {
+            'timeout': parsed_data.timeout,
+            'verify': parsed_data.verify,
+            'proxies': parsed_data.proxies,
+            'allow_redirects': parsed_data.redirects,
+        }
         response_data = self.init_response_meta_data
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == 'requests':
             response = self._requests_engin(
-                timeout=parsed_data.timeout,
-                verify=parsed_data.verify,
-                proxies=parsed_data.proxies,
-                allow_redirects=parsed_data.redirects,
+                **request_conf,
                 **parsed_data.get_request_args_parsed,
                 **kwargs
             )
         elif request_engin == 'httpx':
             response = self._httpx_engin(
-                timeout=parsed_data.timeout,
-                verify=parsed_data.verify,
-                proxies=parsed_data.proxies,
-                allow_redirects=parsed_data.redirects,
+                **request_conf,
                 **parsed_data.get_request_args_parsed,
                 **kwargs
             )
@@ -201,10 +183,10 @@ class SendRequests:
             HookExecutor().exec_case_func(teardown_hooks)
         teardown_extract = parsed_data.teardown_extract
         if teardown_extract is not None:
-            VarsExtractor().teardown_var_extract(response, teardown_extract, parsed_data.env)
+            VarsExtractor().teardown_var_extract(response_data, teardown_extract, parsed_data.env)
         teardown_assert = parsed_data.teardown_assert
         if teardown_assert is not None:
-            Asserter().exec_asserter(response, assert_text=teardown_assert)
+            Asserter().exec_asserter(response_data, assert_text=teardown_assert)
         wait_time = parsed_data.teardown_wait_time
         if wait_time is not None:
             time.sleep(wait_time)

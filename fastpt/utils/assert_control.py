@@ -88,19 +88,19 @@ class Asserter:
         """
         if not isinstance(assert_text, dict):
             raise ValueError('断言内容格式错误, 请检查断言脚本是否为 dict 格式')
-        for k, v in assert_text.items():
-            try:
-                assert_value = assert_text[k]['value']
-                assert_type = assert_text[k]['type']
-                assert_jsonpath = assert_text[k]['jsonpath']
-            except KeyError as e:
-                raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
-            else:
-                response_value = jsonpath(response, assert_jsonpath)
-            if response_value:
-                self._exec_json_assert(assert_value, assert_type, response_value[0])
-            else:
-                raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
+        try:
+            assert_check = assert_text['check']
+            assert_value = assert_text['value']
+            assert_type = assert_text['type']
+            assert_jsonpath = assert_text['jsonpath']
+        except KeyError as e:
+            raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
+        else:
+            response_value = jsonpath(response, assert_jsonpath)
+        if response_value:
+            self._exec_json_assert(assert_check, assert_value, assert_type, response_value[0])
+        else:
+            raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
 
     @staticmethod
     def _exec_code_assert(response: dict, assert_text: str) -> None:
@@ -209,10 +209,11 @@ class Asserter:
                             exec(format_assert_text)
 
     @staticmethod
-    def _exec_json_assert(expected_value, assert_type: str, actual_value) -> None:
+    def _exec_json_assert(assert_check: str, expected_value, assert_type: str, actual_value) -> None:
         """
         执行 jsonpath 断言
 
+        :param assert_check:
         :param expected_value:
         :param assert_type:
         :param actual_value:
@@ -220,55 +221,55 @@ class Asserter:
         """
         if assert_type == AssertType.equal:
             assert expected_value == actual_value, \
-                f'expected {expected_value} equal to {actual_value}'
+                f'{assert_check} -> expected {expected_value} equal to {actual_value}'
         elif assert_type == AssertType.not_equal:
             assert expected_value != actual_value, \
-                f'expected {expected_value} not equal to {actual_value}'
+                f'{assert_check} -> expected {expected_value} not equal to {actual_value}'
         elif assert_type == AssertType.greater_than:
             assert expected_value > actual_value, \
-                f'expected {expected_value} greater than to {actual_value}'
+                f'{assert_check} -> expected {expected_value} greater than to {actual_value}'
         elif assert_type == AssertType.greater_than_or_equal:
             assert expected_value >= actual_value, \
-                f'expected {expected_value} greater than or equal to {actual_value}'
+                f'{assert_check} -> expected {expected_value} greater than or equal to {actual_value}'
         elif assert_type == AssertType.less_than:
             assert expected_value < actual_value, \
-                f'expected {expected_value} less than to {actual_value}'
+                f'{assert_check} -> expected {expected_value} less than to {actual_value}'
         elif assert_type == AssertType.less_than_or_equal:
             assert expected_value <= actual_value, \
-                f'expected {expected_value} less than or equal to {actual_value}'
+                f'{assert_check} -> expected {expected_value} less than or equal to {actual_value}'
         elif assert_type == AssertType.string_equal:
             assert str(expected_value) == str(actual_value), \
-                f'expected {str(expected_value)} equal to {str(actual_value)}'
+                f'{assert_check} -> expected {str(expected_value)} equal to {str(actual_value)}'
         elif assert_type == AssertType.length_equal:
             assert len(str(expected_value)) == len(str(actual_value)), \
-                f'expected {str(expected_value)} length equal to {str(actual_value)} length'
+                f'{assert_check} -> expected {str(expected_value)} length equal to {str(actual_value)} length'
         elif assert_type == AssertType.not_length_equal:
             assert len(str(expected_value)) != len(str(actual_value)), \
-                f'expected {str(expected_value)} length not equal to {str(actual_value)} length'
+                f'{assert_check} -> expected {str(expected_value)} length not equal to {str(actual_value)} length'
         elif assert_type == AssertType.length_greater_than:
             assert len(str(expected_value)) > len(str(actual_value)), \
-                f'expected {str(expected_value)} length greater than to {str(actual_value)} length'
+                f'{assert_check} -> expected {str(expected_value)} length greater than to {str(actual_value)} length'
         elif assert_type == AssertType.length_greater_than_or_equal:
             assert len(str(expected_value)) >= len(str(actual_value)), \
-                f'expected {str(expected_value)} length greater than or equal to {str(actual_value)} length'
+                f'{assert_check} -> expected {str(expected_value)} length greater than or equal to {str(actual_value)} length'
         elif assert_type == AssertType.length_less_than:
             assert len(str(expected_value)) < len(str(actual_value)), \
-                f'expected {str(expected_value)} length less than to {str(actual_value)} length'
+                f'{assert_check} -> expected {str(expected_value)} length less than to {str(actual_value)} length'
         elif assert_type == AssertType.length_less_than_or_equal:
             assert len(str(expected_value)) <= len(str(actual_value)), \
-                f'expected {str(expected_value)} length less than or equal to {str(actual_value)} length'
+                f'{assert_check} -> expected {str(expected_value)} length less than or equal to {str(actual_value)} length'
         elif assert_type == AssertType.contains:
             assert str(expected_value) in str(actual_value), \
-                f'expected {str(expected_value)} contains {str(actual_value)}'
+                f'{assert_check} -> expected {str(expected_value)} contains {str(actual_value)}'
         elif assert_type == AssertType.not_contains:
             assert str(expected_value) not in str(actual_value), \
-                f'expected {str(expected_value)} not contains {str(actual_value)}'
+                f'{assert_check} -> expected {str(expected_value)} not contains {str(actual_value)}'
         elif assert_type == AssertType.startswith:
             assert str(expected_value).startswith(str(actual_value)), \
-                f'expected {str(expected_value)} starts with {str(actual_value)}'
+                f'{assert_check} -> expected {str(expected_value)} starts with {str(actual_value)}'
         elif assert_type == AssertType.endswith:
             assert str(expected_value).endswith(str(actual_value)), \
-                f'expected {str(expected_value)} ends with {str(actual_value)}'
+                f'{assert_check} -> expected {str(expected_value)} ends with {str(actual_value)}'
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 
@@ -282,7 +283,17 @@ class Asserter:
         """
         if not assert_text:
             ...
+        elif isinstance(assert_text, str):
+            self._code_asserter(response, assert_text)
         elif isinstance(assert_text, dict):
             self._json_asserter(response, assert_text)
+        elif isinstance(assert_text, list):
+            for at in assert_text:
+                if isinstance(at, str):
+                    self._exec_code_assert(response, at)
+                elif isinstance(at, dict):
+                    self._json_asserter(response, at)
+                else:
+                    raise ValueError(f'断言表达式格式错误: {at}')
         else:
-            self._code_asserter(response, assert_text)
+            raise ValueError(f'断言表达式格式错误: {assert_text}')

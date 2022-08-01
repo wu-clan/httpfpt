@@ -7,9 +7,9 @@ from typing import Union, Any
 import allure
 from _pytest.outcomes import Skipped
 
+from fastpt.common.env_handler import get_env_dict
 from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
-from fastpt.common.env_handler import get_env_dict
 from fastpt.utils.request.vars_extract import VarsExtractor
 
 
@@ -182,7 +182,7 @@ class RequestDataParse:
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 为空')
             if not isinstance(method, str):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 不是有效的 str 类型')
-            if any(_ in method.lower() for _ in ['get', 'post', 'put', 'delete', 'patch']):
+            if not any(_ == method.lower() for _ in ['get', 'post', 'put', 'delete', 'patch']):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 不是合法的请求类型')
             return method
 
@@ -236,9 +236,10 @@ class RequestDataParse:
         except KeyError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:data_type 参数')
         else:
-            if any(_ in data_type for _ in ['data', 'json', None]):
+            if not any(_ == data_type for _ in ['data', 'json', None]):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:data_type 不是合法类型')
-            data_type = data_type.lower()
+            if data_type is not None:
+                data_type = data_type.lower()
         return data_type
 
     @property
@@ -382,11 +383,10 @@ class RequestDataParse:
                 # 单条 code 断言时, 跳过处理
                 if not assert_text.startswith('assert'):
                     assert_text = eval(assert_text)
-            if not isinstance(assert_text, list):
-                if not isinstance(assert_text, dict):
-                    raise ValueError(
-                        '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
-                    )
+            if not any([isinstance(assert_text, list), isinstance(assert_text, dict)]):
+                raise ValueError(
+                    '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
+                )
         return assert_text
 
     @property

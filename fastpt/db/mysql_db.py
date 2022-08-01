@@ -7,7 +7,7 @@ import pymysql
 from dbutils.pooled_db import PooledDB
 from jsonpath import jsonpath
 
-from fastpt.common.env_handler import write_env
+from fastpt.common.env_handler import write_env_vars
 from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import write_yaml_vars
@@ -106,6 +106,10 @@ class DB:
                     json_path = s['jsonpath']
                     query_data = self.query(sql)
                     value = jsonpath(query_data, json_path)
+                    if value:
+                        value = value[0]
+                    else:
+                        raise ValueError(f'jsonpath取值失败, 表达式: {json_path}')
                     if set_type is None:
                         VariableCache().set(key, value)
                     elif set_type == 'cache':
@@ -113,7 +117,7 @@ class DB:
                     elif set_type == 'env':
                         if env is None:
                             raise ValueError('写入环境变量准备失败, 缺少参数 env, 请检查传参')
-                        write_env(RUN_ENV_PATH, env, key, value)
+                        write_env_vars(RUN_ENV_PATH, env, key, value)
                     elif set_type == 'global':
                         write_yaml_vars({key: value})
                     else:
