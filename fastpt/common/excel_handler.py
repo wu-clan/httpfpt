@@ -3,7 +3,7 @@
 import os
 import shutil
 from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 import xlrd
 from openpyxl import load_workbook
@@ -14,7 +14,12 @@ from fastpt.core.get_conf import TESTER_NAME
 from fastpt.core.path_conf import EXCEL_DATA_PATH, EXCEL_REPORT_PATH
 
 
-def read_excel(filepath: str = EXCEL_DATA_PATH, *, filename: str, sheet: str = 'Sheet1') -> List[Dict[str, Any]]:
+def read_excel(
+        filepath: str = EXCEL_DATA_PATH,
+        *,
+        filename: str,
+        sheet: str = 'Sheet1'
+) -> List[Dict[str, Optional[Any]]]:
     """
     读取 xlsx 文件
 
@@ -64,7 +69,7 @@ def write_excel_report(
     :param datafile: excel测试数据文件名
     :param filename: 文件名
     :param row_num: 数据写入行
-    :param status: 测试结果: PASS / FAIL / SKIP
+    :param status: 测试结果: PASS / FAIL
     :param extension: 测试结果扩展信息，如果有，则覆盖默认写入的结果
     :return
     """

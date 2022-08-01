@@ -3,7 +3,7 @@
 import os
 import time
 from datetime import datetime
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Optional
 
 import yaml
 
@@ -13,7 +13,7 @@ from fastpt.core.path_conf import YAML_DATA_PATH, YAML_REPORT_PATH, TEST_DATA_PA
 curr_time = time.strftime('%Y-%m-%d %H_%M_%S')
 
 
-def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> Union[List[Dict[str, Any]], dict]:
+def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> Union[List[Dict[str, Optional[Any]]], dict]:
     """
     读取 yaml 文件
 
@@ -28,8 +28,11 @@ def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> Union[List[Di
     except Exception as e:
         log.error(f'文件 {filename} 读取错误: {e}')
         raise e
-    else:
+    if data is not None:
         return data
+    else:
+        log.warning(f'数据文件 {filename} 没有数据!')
+        raise ValueError(f'数据文件 {filename} 没有数据! 请检查数据文件内容是否正确!')
 
 
 def write_yaml(filepath: str, filename: str, data=None, *, encoding: str = 'utf-8', mode: str = 'a'):
@@ -57,8 +60,14 @@ def write_yaml(filepath: str, filename: str, data=None, *, encoding: str = 'utf-
         return result
 
 
-def write_yaml_report(filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.yaml', *,
-                      data: Union[str, list], encoding: str = 'utf-8', mode: str = 'a', status: str):
+def write_yaml_report(
+        filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.yaml',
+        *,
+        data: Any,
+        encoding: str = 'utf-8',
+        mode: str = 'a',
+        status: str
+) -> None:
     """
     写入 yaml 测试报告
 
