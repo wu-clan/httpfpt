@@ -26,10 +26,11 @@ class Logger:
             level='DEBUG',
             rotation='00:00',
             retention='7 days',
-            encoding='utf-8',
+            encoding='utf8',
             enqueue=True,
             backtrace=True,
-            diagnose=True,
+            diagnose=False,
+            catch=True
         )
 
         return logger

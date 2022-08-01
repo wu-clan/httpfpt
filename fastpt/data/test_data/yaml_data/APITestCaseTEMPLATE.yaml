@@ -1,5 +1,4 @@
 config:
-  # allure测试报告(必填)
   allure:
     epic: demo接口
     feature: demo模块
@@ -87,7 +86,6 @@ test_steps:
       method: post
       url: /posts
       params:
-        postId: 1
       headers:
         Content-type: application/json; charset=UTF-8
       data_type: json
@@ -99,7 +97,6 @@ test_steps:
     setup:
       hooks:
         - ${current_time()}
-      wait_time: 0
     teardown:
       hooks:
         - ${random_phone()}
@@ -108,25 +105,3 @@ test_steps:
           set_type: global
           jsonpath: $.url
       assert: assert 200 == pm.response.get('status_code')
-
-  - name: 上传
-    case_id: event_upload_004
-    description: 测试文件上传
-    is_run:
-    request:
-      method: post
-      url: /upload
-      params:
-        postId: 1
-      headers:
-        Content-type: application/json; charset=UTF-8
-      data_type: json
-      data:
-        title: foo
-        body: ${random_phone()}
-        userId: 1
-      files:
-        file: D:\\0000000000_test\\666.txt
-    teardown:
-      assert:
-        - assert pm.response.get('status_code') == IsInt

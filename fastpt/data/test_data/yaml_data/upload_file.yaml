@@ -1,0 +1,29 @@
+config:
+  allure:
+    epic: demo接口
+    feature: demo模块
+    story: 文件上传测试
+  request:
+    env: pro.env
+  module: test
+
+test_steps:
+  - name: 上传
+    case_id: event_upload_004
+    description: 测试文件上传
+    is_run:
+    request:
+      method: post
+      url: /upload
+      params:
+      headers:
+      data_type:
+      data:
+      files:
+        file: D:\\0000000000_test\\666.txt
+    teardown:
+      assert:
+        - check: 检查接口链接
+          value: https://api.anonfiles.com/upload
+          type: str_eq
+          jsonpath: $.url

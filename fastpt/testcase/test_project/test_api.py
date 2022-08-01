@@ -14,8 +14,8 @@ from fastpt.utils.request.ids_extract import get_ids
 yaml_data = get_request_data(read_yaml(filename='APITestCaseTEMPLATE.yaml'))
 
 
-@allure.epic("demo接口")
-@allure.feature("demo模块")
+@allure.epic(yaml_data[0]['config']['allure']['epic'])
+@allure.feature(yaml_data[0]['config']['allure']['feature'])
 class TestDemo:
     """ Demo """
 
@@ -54,7 +54,7 @@ class TestDemo:
     #     else:
     #         write_excel_report(row_num=row_num, status='fail')
 
-    @allure.story("yaml数据测试输出")
+    @allure.story(yaml_data[0]['config']['allure']['story'])
     @pytest.mark.test_api
     @pytest.mark.parametrize('data', yaml_data, ids=yaml_ids)
     def test_004(self, data):
@@ -64,3 +64,6 @@ class TestDemo:
             write_yaml_report(data=[{'case': data['test_steps']['case_id'], 'result': 'FAIL'}], status='fail')
         else:
             write_yaml_report(data=[{'case': data['test_steps']['case_id'], 'result': 'PASS'}], status='pass')
+
+
+
