@@ -39,3 +39,6 @@ ALLURE_REPORT_ENV_FILE = os.path.join(ALLURE_REPORT_PATH, 'environment.propertie
 
 # 运行环境文件路径
 RUN_ENV_PATH = os.path.join(BASE_DIR, 'core', 'run_env')
+
+# 测试用例路径
+TEST_CASE_PATH = os.path.join(BASE_DIR, 'test_case')

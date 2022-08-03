@@ -10,8 +10,8 @@ from fastpt.common.yaml_handler import write_yaml_report, read_yaml
 from fastpt.utils.request.file_data_parse import get_request_data
 from fastpt.utils.request.ids_extract import get_ids
 
-# excel_data = get_request_data(read_excel(filename='APITestCaseTEMPLATE.xlsx'))
-yaml_data = get_request_data(read_yaml(filename='APITestCaseTEMPLATE.yaml'))
+# excel_data = get_request_data(read_excel(filename='api_test_case_template.xlsx'))
+yaml_data = get_request_data(read_yaml(filename='api_test_case_template.yaml'))
 
 
 @allure.epic(yaml_data[0]['config']['allure']['epic'])
@@ -58,7 +58,7 @@ class TestDemo:
     @pytest.mark.test_api
     @pytest.mark.parametrize('data', yaml_data, ids=yaml_ids)
     def test_004(self, data):
-        """ 测试004 """
+        """ {0} """ .format(data['test_steps']['description'])
         response = send_request.send_request(data)
         if response:
             write_yaml_report(data=[{'case': data['test_steps']['case_id'], 'result': 'FAIL'}], status='fail')

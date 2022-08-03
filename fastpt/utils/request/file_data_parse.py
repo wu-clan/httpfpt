@@ -39,7 +39,3 @@ def get_request_data(file_data: Union[dict, list]) -> List[dict]:
         raise ValueError('excel 配置未更新, 暂不可用')
     else:
         raise ValueError('获取请求数据失败, 传入了非法格式的测试用例数据, 请使用从测试用例文件读取的测试用例数据')
-
-
-if __name__ == '__main__':
-    get_request_data(read_yaml(filename='APITestCaseTEMPLATE.yaml'))

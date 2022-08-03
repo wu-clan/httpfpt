@@ -22,5 +22,5 @@ class TestUpload:
     @pytest.mark.test_api
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def test_004(self, data):
-        """ 测试004 """
+        """ {0} """ .format(data['test_steps']['description'])
         send_request.send_request(data)

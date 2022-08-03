@@ -56,7 +56,7 @@ def read_excel(
 
 
 def write_excel_report(
-        datafile='APITestCaseTEMPLATE.xlsx',
+        datafile='api_test_case_template.xlsx',
         filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.xlsx',
         *,
         row_num: int,

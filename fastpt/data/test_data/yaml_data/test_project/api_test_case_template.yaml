@@ -91,7 +91,7 @@ test_steps:
       data_type: json
       data:
         title: foo
-        body: ${random_phone()}
+        body: this is a test
         userId: 1
       files:
     setup:
