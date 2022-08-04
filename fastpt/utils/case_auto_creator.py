@@ -96,6 +96,4 @@ class {class_title}:
 
     log.success('测试用例自动生成完成')
 
-
-if __name__ == '__main__':
-    auto_generate_test_cases()
+# todo 添加开关控制并添加到run程序和文档

@@ -30,7 +30,7 @@ test_steps:
     # 请求参数, 必填
     request:
       method: get
-      url: https://jsonplaceholder.typicode.com/posts/1
+      url: /posts/1
       params:
       headers:
       data_type:
@@ -50,7 +50,7 @@ test_steps:
 #        - select * from xxx where xxx=xxx
       # 钩子, 选填, list
       hooks:
-        - func:
+        - func
       # 等待时间, 选填
       wait_time:
     # 后置操作
