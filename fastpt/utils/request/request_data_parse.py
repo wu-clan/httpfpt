@@ -16,7 +16,7 @@ from fastpt.utils.request.vars_extract import VarsExtractor
 class RequestDataParse:
 
     def __init__(self, request_data: dict):
-        self.request_data = VarsExtractor().new_vars_replace(request_data)
+        self.request_data = VarsExtractor().vars_replace(request_data)
         self._is_run()  # put down
 
     @property

@@ -20,39 +20,7 @@ class VarsExtractor:
         # 变量和 hooks 开头: a-zA-Z_
         self.vars_re = r'\$([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)\}'
 
-    def _vars_replace(self, target):
-        """
-        变量替换, 老版本, 仅作保留
-
-        :param target:
-        :return:
-        """
-        str_target = target
-        if target is not None:
-            if not isinstance(target, str):
-                str_target = str(target)
-
-        # 获取所有自定义全局变量
-        read_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
-
-        while re.findall(self.vars_re, str_target):
-            keys = re.search(self.vars_re, str_target)
-            key = keys.group(1) or keys.group(2) or keys.group(3)
-            try:
-                value = str(read_vars[f'{key}'])
-                str_target = re.sub(self.vars_re, value, str_target, 1)
-            except KeyError:
-                value = str(self.exec_func(key))
-                str_target = re.sub(self.vars_re, value, str_target, 1)
-            except NameError as e:
-                log.error('未在全局参数和hooks中找到: %s, 请检查变量名或函数名是否正确' % key)
-                raise e
-            except Exception as e:
-                log.error('请求数据内变量替换错误')
-                raise e
-        return str_target
-
-    def new_vars_replace(self, target) -> Union[dict, None]:
+    def vars_replace(self, target) -> Union[dict, None]:
         """
         变量替换
 
@@ -66,7 +34,7 @@ class VarsExtractor:
         try:
             env = target['config']['request']['env']
         except KeyError:
-            raise ValueError('测试环境获取失败, 测试用例缺少 config:request:env 参数')
+            raise ValueError('测试环境获取失败, 测试用例数据缺少 config:request:env 参数')
         if not isinstance(env, str):
             raise ValueError('测试环境获取失败, 请使用合法的环境配置')
         try:
