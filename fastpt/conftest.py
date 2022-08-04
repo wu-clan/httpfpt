@@ -62,7 +62,7 @@ def function_fixture(request):
     log.info(f'----------------- Running case func: {request.function.__name__} -----------------')
 
     def log_end():
-        log.info('end \n')
+        log.info('end')
 
     request.addfinalizer(log_end)  # teardown终结函数 == yield后的代码
 

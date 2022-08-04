@@ -28,8 +28,8 @@ def search_all_case_yaml_files() -> list:
 
     :return:
     """
-    files = glob.glob(os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**\\', '*.yaml'), recursive=True) + glob.glob(
-        os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**\\', '*.yml'), recursive=True)
+    files = glob.glob(os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', '*.yaml'), recursive=True) + glob.glob(
+        os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', '*.yml'), recursive=True)
     return files
 
 
@@ -39,5 +39,5 @@ def search_all_test_case_files() -> list:
 
     :return:
     """
-    files = glob.glob(os.path.join(TEST_CASE_PATH, f'{PROJECT_NAME}', '**\\', 'test_*.py'), recursive=True)
+    files = glob.glob(os.path.join(TEST_CASE_PATH, f'{PROJECT_NAME}', '**', 'test_*.py'), recursive=True)
     return files

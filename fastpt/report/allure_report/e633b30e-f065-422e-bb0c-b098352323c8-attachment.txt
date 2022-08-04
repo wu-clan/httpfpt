@@ -1,4 +1,0 @@
-2022-07-28 23:46:34.547 | INFO     | fastpt.conftest:function_fixture:60 - ----------------- Running case func: test_003 -----------------
-2022-07-28 23:46:34.547 | WARNING  | fastpt.utils.request.data_parse:skip:42 - 此用例已设置跳过
-2022-07-28 23:46:34.549 | INFO     | fastpt.conftest:log_end:63 - end 
-
