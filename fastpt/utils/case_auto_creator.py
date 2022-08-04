@@ -10,7 +10,7 @@ from fastpt.core.path_conf import YAML_DATA_PATH, TEST_CASE_PATH
 from fastpt.utils.file_control import search_all_case_yaml_files, search_all_test_case_files, get_file_property
 
 
-def auto_generate_test_cases(rewrite=False) -> None:
+def auto_generate_test_cases(rewrite: bool = False) -> None:
     """
     自动创建测试用例
 
@@ -48,6 +48,8 @@ def auto_generate_test_cases(rewrite=False) -> None:
     for _ in create_list_file_root_name:
         data_file = glob.glob(os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', f'{_}.*ml'), recursive=True)[0]
         yaml_data_files.append(data_file)
+
+    log.info('疯狂自动生成中...')
 
     for data in yaml_data_files:
         filename = get_file_property(data)[0]
@@ -95,5 +97,3 @@ class {class_title}:
                 f.write(case_code)
 
     log.success('测试用例自动生成完成')
-
-# todo 添加开关控制并添加到run程序和文档
