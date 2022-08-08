@@ -3,6 +3,8 @@
 import re
 from typing import Any
 
+from fastpt.common.log import log
+
 
 class HookExecutor:
 
@@ -21,7 +23,9 @@ class HookExecutor:
         while re.findall(self.func_re, str_target):
             key = re.search(self.func_re, str_target)
             hook_key = key.group(1)
-            hook_list.append(hook_key)
+            if hook_key is not None:
+                hook_list.append(hook_key)
+                str_target = str_target.replace(hook_key, '')
         return hook_list
 
     @staticmethod
@@ -46,7 +50,6 @@ class HookExecutor:
         :return:
         """
         func_list = self.case_func_extract(func_list)
-        loc = locals()
+        exec('from fastpt.data.hooks import *')
         for func in func_list:
-            exec('from fastpt.data.hooks import *')
-            exec(f'result = {func}')
+            exec(func)

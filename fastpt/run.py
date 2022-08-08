@@ -55,7 +55,7 @@ def run(
     :param disable_warings: 是否关闭控制台警告信息, 默认开启
     :return:
     """
-    default_case_path = f"./test_case/{PROJECT_NAME}"  # 默认执行指定项目下的所有测试用例
+    default_case_path = f"./test_case/{PROJECT_NAME}/"  # 默认执行指定项目下的所有测试用例
     if case_path is None:
         run_path = default_case_path
     else:
@@ -69,7 +69,7 @@ def run(
                 '\t1. 项目目录下没有多级目录: case_path = "文件名::类名::函数名" \n'
                 '\t2. 项目目录下有多级目录: case_path = "目录名/.../文件名::函数名"'
             )
-        run_path = default_case_path + '/' + case_path
+        run_path = default_case_path + case_path
 
     if html_report:
         if not os.path.exists(HTML_REPORT_PATH):

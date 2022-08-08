@@ -288,12 +288,12 @@ class Asserter:
         elif isinstance(assert_text, dict):
             self._json_asserter(response, assert_text)
         elif isinstance(assert_text, list):
-            for at in assert_text:
-                if isinstance(at, str):
-                    self._exec_code_assert(response, at)
-                elif isinstance(at, dict):
-                    self._json_asserter(response, at)
+            for text in assert_text:
+                if isinstance(text, str):
+                    self._code_asserter(response, text)
+                elif isinstance(text, dict):
+                    self._json_asserter(response, text)
                 else:
-                    raise ValueError(f'断言表达式格式错误: {at}')
+                    raise ValueError(f'断言表达式格式错误: {text}')
         else:
             raise ValueError(f'断言表达式格式错误: {assert_text}')

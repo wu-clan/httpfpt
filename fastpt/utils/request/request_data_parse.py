@@ -320,7 +320,7 @@ class RequestDataParse:
         return sql
 
     @property
-    def setup_hooks(self):
+    def setup_hooks(self) -> Union[list, None]:
         try:
             hook = self.request_data['test_steps']['setup']['hooks']
             if hook is not None:
@@ -333,7 +333,7 @@ class RequestDataParse:
         return hook
 
     @property
-    def setup_wait_time(self):
+    def setup_wait_time(self) -> Union[int, None]:
         try:
             time = self.request_data['test_steps']['setup']['wait_time']
             if time is not None:
@@ -371,7 +371,7 @@ class RequestDataParse:
         return sql
 
     @property
-    def teardown_hooks(self) -> Any:
+    def teardown_hooks(self) -> Union[list, None]:
         try:
             hook = self.request_data['test_steps']['teardown']['hooks']
             if hook is not None:
@@ -384,7 +384,7 @@ class RequestDataParse:
         return hook
 
     @property
-    def teardown_extract(self):
+    def teardown_extract(self) -> Union[list, None]:
         try:
             extract = self.request_data['test_steps']['teardown']['extract']
             if extract is not None:
@@ -407,14 +407,15 @@ class RequestDataParse:
                 # 单条 code 断言时, 跳过处理
                 if not assert_text.startswith('assert'):
                     assert_text = eval(assert_text)
-            if not any([isinstance(assert_text, list), isinstance(assert_text, dict)]):
-                raise ValueError(
-                    '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
-                )
+            else:
+                if not any([isinstance(assert_text, list), isinstance(assert_text, dict)]):
+                    raise ValueError(
+                        '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
+                    )
         return assert_text
 
     @property
-    def teardown_wait_time(self):
+    def teardown_wait_time(self) -> Union[int, None]:
         try:
             time = self.request_data['test_steps']['teardown']['wait_time']
             if time is not None:
