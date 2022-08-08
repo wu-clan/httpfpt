@@ -108,9 +108,9 @@ def write_yaml_vars(data: dict):
         with open(_file, encoding='utf-8', mode='w') as f:
             yaml.dump(_vars, f, allow_unicode=True)
     except Exception as e:
-        log.error(f'写入 global_vars.yaml 全局变量错误: {e}')
+        log.error(f'写入 global_vars.yaml 全局变量 {data} 错误: {e}')
     else:
-        log.success(f'写入 global_vars.yaml 全局变量成功')
+        log.success(f'写入 global_vars.yaml 全局变量 {data} 成功')
 
 
 def get_yaml_file(filepath: str = YAML_DATA_PATH, *, filename: str) -> str:

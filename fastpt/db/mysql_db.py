@@ -42,13 +42,19 @@ class DB:
         :param fetch: 查询条件; all / 任意内容（单条记录）
         :return:
         """
-        self.cursor.execute(sql)
-        if fetch == 'all':
-            query_data = self.cursor.fetchall()
+        try:
+            self.cursor.execute(sql)
+            if fetch == 'all':
+                query_data = self.cursor.fetchall()
+            else:
+                query_data = self.cursor.fetchone()
+        except Exception as e:
+            log.error(f'执行 {sql} 失败: {e}')
         else:
-            query_data = self.cursor.fetchone()
-        self.close()
-        return query_data
+            log.info(f'执行 {sql} 成功')
+            return query_data
+        finally:
+            self.close()
 
     def execute(self, sql: str):
         """
@@ -62,6 +68,8 @@ class DB:
         except Exception as e:
             self.conn.rollback()
             log.error(f'执行 {sql} 失败: {e}')
+        else:
+            log.info(f'执行 {sql} 成功')
         finally:
             self.close()
 
@@ -82,11 +90,11 @@ class DB:
         :param env:
         :return:
         """
-        data = {}
         rejected_sql_type = ['UPDATE', 'DELETE', 'INSERT', 'update', 'delete', 'insert']
         if any(_ in sql for _ in rejected_sql_type):
             raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 DQL 类型 sql 语句')
         else:
+            data = {}
             for s in sql:
                 # 获取返回数据
                 if isinstance(s, str):

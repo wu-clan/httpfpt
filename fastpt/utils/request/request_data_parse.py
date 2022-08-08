@@ -295,6 +295,18 @@ class RequestDataParse:
         return files
 
     @property
+    def is_setup(self) -> bool:
+        try:
+            setup = self.request_data['test_steps']['setup']
+        except KeyError:
+            return False
+        else:
+            if setup is not None:
+                return True
+            else:
+                return False
+
+    @property
     def setup_sql(self) -> Union[list, None]:
         try:
             sql = self.request_data['test_steps']['setup']['sql']
@@ -332,6 +344,18 @@ class RequestDataParse:
         except KeyError:
             time = None
         return time
+
+    @property
+    def is_teardown(self) -> bool:
+        try:
+            teardown = self.request_data['test_steps']['setup']
+        except KeyError:
+            return False
+        else:
+            if teardown is not None:
+                return True
+            else:
+                return False
 
     @property
     def teardown_sql(self) -> Union[list, None]:

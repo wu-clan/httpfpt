@@ -22,17 +22,10 @@ def session_fixture(tmp_path_factory, worker_id):
     if worker_id == "master":
         return None
 
-    # get the temp directory shared by all workers
     root_tmp_dir = tmp_path_factory.getbasetemp().parent
-
     fn = root_tmp_dir / "data.json"
     with FileLock(str(fn) + ".lock"):
-        if fn.is_file():
-            data = json.loads(fn.read_text())
-        else:
-            data = None
-            fn.write_text(json.dumps(data))
-    return data
+        ...
 
 
 @pytest.fixture(scope='package', autouse=True)
@@ -67,7 +60,7 @@ def function_fixture(request):
     request.addfinalizer(log_end)  # teardown终结函数 == yield后的代码
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def caplog(caplog: LogCaptureFixture):
     """
     将 pytest 的 caplog 夹具默认日志记录器改为 loguru,而非默认 logging

@@ -45,7 +45,7 @@ def generate_test_cases(generate: bool):
                 typer.secho('开始重新生成所有测试用例...', fg='cyan', bold=True)
                 auto_generate_test_cases(rewrite=True)
             else:
-                typer.secho('开始生成测试新用例...', fg='cyan', bold=True)
+                typer.secho('开始生成新测试用例...', fg='cyan', bold=True)
                 auto_generate_test_cases()
         except Exception as e:
             print(f'自动生成测试用例失败: {e}')

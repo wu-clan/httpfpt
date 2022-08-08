@@ -4,6 +4,8 @@ import glob
 import os.path
 from pathlib import Path
 
+import typer
+
 from fastpt.common.log import log
 from fastpt.core.get_conf import PROJECT_NAME
 from fastpt.core.path_conf import YAML_DATA_PATH, TEST_CASE_PATH
@@ -41,7 +43,7 @@ def auto_generate_test_cases(rewrite: bool = False) -> None:
         else:
             create_list_file_root_name.append(_)
     if len(create_list_file_root_name) == 0:
-        log.info('用例已经很完善了, 添加新测试用例数据后再来生成吧~')
+        print('用例已经很完善了, 添加新测试用例数据后再来生成吧~')
         return
 
     yaml_data_files = []
@@ -49,7 +51,7 @@ def auto_generate_test_cases(rewrite: bool = False) -> None:
         data_file = glob.glob(os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', f'{_}.*ml'), recursive=True)[0]
         yaml_data_files.append(data_file)
 
-    log.info('疯狂自动生成中...')
+    print('疯狂自动生成中...')
 
     for data in yaml_data_files:
         filename = get_file_property(data)[0]
@@ -96,4 +98,4 @@ class {class_title}:
             with open(case_path, 'w', encoding='utf-8') as f:
                 f.write(case_code)
 
-    log.success('测试用例自动生成完成')
+    typer.secho('测试用例自动生成完成', fg='green', bold=True)

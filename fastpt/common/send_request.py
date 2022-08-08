@@ -25,7 +25,7 @@ class SendRequests:
     """ 发送请求 """
 
     def __init__(self, ):
-        self.request_engin_list = [
+        self.__request_engin_list = [
             'requests',
             'httpx'
         ]
@@ -112,13 +112,20 @@ class SendRequests:
         :param request_engin: 请求引擎
         :return: response
         """
-        if request_engin not in self.request_engin_list:
-            raise ValueError(f'请求发起失败，请使用正确的请求引擎')
+        if request_engin not in self.__request_engin_list:
+            raise ValueError(f'请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
+        log.info('开始解析请求数据')
         parsed_data = RequestDataParse(request_data)
+        log.info('请求数据解析完成')
+
+        # 日志记录前置请求日志
+        self.log_request_setup(parsed_data)
 
         # 前置处理
+        if parsed_data.is_setup:
+            log.info('开始处理请求前置...')
         setup_sql = parsed_data.setup_sql
         if setup_sql is not None:
             DB().exec_case_sql(setup_sql, parsed_data.env)
@@ -128,6 +135,8 @@ class SendRequests:
         wait_time = parsed_data.setup_wait_time
         if wait_time is not None:
             time.sleep(wait_time)
+        if parsed_data.is_setup:
+            log.info('请求前置处理完成')
 
         # 日志记录请求数据
         self.log_request_up(parsed_data)
@@ -155,7 +164,7 @@ class SendRequests:
                 **kwargs
             )
         else:
-            response = {}
+            raise ValueError(f'请求发起失败，使用了不合法的请求引擎')
 
         # 记录响应数据
         response_data['url'] = str(response.url)
@@ -174,7 +183,12 @@ class SendRequests:
         # 日志记录响应
         self.log_request_down(response_data)
 
+        # 日志记录后置请求日志
+        self.log_request_teardown(parsed_data)
+
         # 后置处理
+        if parsed_data.is_teardown:
+            log.info('开始处理请求后置...')
         teardown_sql = parsed_data.teardown_sql
         if teardown_sql is not None:
             DB().exec_case_sql(teardown_sql, parsed_data.env)
@@ -190,8 +204,16 @@ class SendRequests:
         wait_time = parsed_data.teardown_wait_time
         if wait_time is not None:
             time.sleep(wait_time)
+        if parsed_data.is_setup:
+            log.info('请求后置处理完成')
 
         return response_data
+
+    @staticmethod
+    def log_request_setup(parsed: RequestDataParse):
+        log.info(f"请求 setup_sql: {parsed.setup_sql}")
+        log.info(f"请求 setup_hooks: {parsed.setup_hooks}")
+        log.info(f"请求 setup_wait_time: {parsed.setup_wait_time}")
 
     @staticmethod
     def log_request_up(parsed: RequestDataParse):
@@ -210,9 +232,9 @@ class SendRequests:
         else:
             log.info(f"请求 json: {parsed.data}")
         log.info(f"请求 files: {parsed.files_no_parse}")
-        log.info(f"请求 setup_sql: {parsed.setup_sql}")
-        log.info(f"请求 setup_hooks: {parsed.setup_hooks}")
-        log.info(f"请求 setup_wait_time: {parsed.setup_wait_time}")
+
+    @staticmethod
+    def log_request_teardown(parsed: RequestDataParse):
         log.info(f"请求 teardown_sql: {parsed.teardown_sql}")
         log.info(f"请求 teardown_extract: {parsed.teardown_extract}")
         log.info(f"请求 teardown_assert: {parsed.teardown_assert}")
