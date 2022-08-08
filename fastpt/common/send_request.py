@@ -41,7 +41,7 @@ class SendRequests:
             "elapsed": 0,
             "headers": None,
             "cookies": None,
-            "result": None,
+            "json": None,
             "content": None,
             "text": None,
             "stat": {
@@ -176,7 +176,7 @@ class SendRequests:
             json_data = response.json()
         except JSONDecodeError:
             json_data = {}
-        response_data['result'] = json.dumps(json_data)
+        response_data['json'] = json.dumps(json_data)
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
 
