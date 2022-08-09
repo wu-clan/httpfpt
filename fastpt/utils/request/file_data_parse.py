@@ -3,8 +3,6 @@
 import copy
 from typing import Union, List
 
-from fastpt.common.yaml_handler import read_yaml
-
 
 def get_request_data(file_data: Union[dict, list]) -> List[dict]:
     """
@@ -34,8 +32,8 @@ def get_request_data(file_data: Union[dict, list]) -> List[dict]:
                 else:
                     raise ValueError('请求测试用例数据 test_steps 格式错误, 请检查测试用例文件内容')
             return case_list
-    # excel todo 待更新
+    # excel
     elif isinstance(file_data, list):
-        raise ValueError('excel 配置未更新, 暂不可用')
+        raise ValueError('新版本以暂停对 excel 数据文件的支持')
     else:
         raise ValueError('获取请求数据失败, 传入了非法格式的测试用例数据, 请使用从测试用例文件读取的测试用例数据')

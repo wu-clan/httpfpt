@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import time
 from datetime import datetime
 from typing import List, Dict, Any, Union, Optional
 
@@ -10,10 +9,12 @@ import yaml
 from fastpt.common.log import log
 from fastpt.core.path_conf import YAML_DATA_PATH, YAML_REPORT_PATH, TEST_DATA_PATH
 
-curr_time = time.strftime('%Y-%m-%d %H_%M_%S')
 
-
-def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> Union[List[Dict[str, Optional[Any]]], dict]:
+def read_yaml(
+        filepath: Optional[str] = YAML_DATA_PATH,
+        *,
+        filename: str
+) -> Union[List[Dict[str, Optional[Any]]], dict]:
     """
     读取 yaml 文件
 
@@ -21,7 +22,10 @@ def read_yaml(filepath: str = YAML_DATA_PATH, *, filename: str) -> Union[List[Di
     :param filename: 文件名
     :return:
     """
-    _filename = os.path.join(filepath, filename)
+    if filepath is not None:
+        _filename = os.path.join(filepath, filename)
+    else:
+        _filename = filename
     try:
         with open(_filename, encoding='utf-8') as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
