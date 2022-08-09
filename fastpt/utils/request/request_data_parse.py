@@ -10,7 +10,7 @@ from _pytest.outcomes import Skipped
 from fastpt.common.env_handler import get_env_dict
 from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
-from fastpt.utils.request.vars_extract import VarsExtractor
+from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
 class RequestDataParse:

@@ -9,7 +9,7 @@ from rich import print  # noqa
 
 sys.path.append('..')
 
-from fastpt.utils.case_auto_creator import auto_generate_test_cases  # noqa
+from fastpt.utils.case_auto_generator import auto_generate_test_cases  # noqa
 
 app = typer.Typer(rich_markup_mode='rich')
 

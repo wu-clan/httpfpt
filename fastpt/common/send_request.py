@@ -15,9 +15,9 @@ from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
 from fastpt.utils.allure_control import allure_attach_file
 from fastpt.utils.assert_control import Asserter
-from fastpt.utils.hooks_executor import HookExecutor
+from fastpt.utils.request.hooks_executor import HookExecutor
 from fastpt.utils.request.request_data_parse import RequestDataParse
-from fastpt.utils.request.vars_extract import VarsExtractor
+from fastpt.utils.request.vars_extractor import VarsExtractor
 from fastpt.utils.time_control import get_current_time
 
 
