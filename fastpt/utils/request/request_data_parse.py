@@ -20,6 +20,15 @@ class RequestDataParse:
         self._is_run()  # put down
 
     @property
+    def config(self) -> dict:
+        try:
+            config = self.request_data['config']
+        except KeyError:
+            raise ValueError('测试用例数据解析失败，缺少 config 参数')
+        else:
+            return config
+
+    @property
     def allure_epic(self) -> str:
         try:
             epic = self.request_data['config']['allure']['epic']
@@ -103,10 +112,27 @@ class RequestDataParse:
         try:
             proxies = self.request_data['config']['request']['proxies']
             for k, v in proxies.items():
-                if k == 'requests' or k == 'httpx':
-                    proxies = v
-                    if not isinstance(proxies, dict):
-                        raise ValueError('测试用例数据解析失败, 参数 config:request:proxies 不是有效的 dict 类型')
+                proxies = v
+                if not isinstance(v, dict):
+                    raise ValueError('测试用例数据解析失败, 参数 config:request:proxies 不是有效的 dict 类型')
+                if k == 'requests':
+                    for qk, qv in proxies.items():
+                        if qk not in ['http', 'https']:
+                            raise ValueError('测试哟管理数据解析失败，参数 config:request:proxies:requests 不符合规范')
+                        if qv is not None:
+                            if not isinstance(qv, str):
+                                raise ValueError(
+                                    f'测试哟管理数据解析失败，参数 config:request:proxies:requests:{qv} 不符合规范'
+                                )
+                elif k == 'httpx':
+                    for hk, hv in proxies.items():
+                        if hk not in ['http://', 'https://']:  # noqa
+                            raise ValueError('测试哟管理数据解析失败，参数 config:request:proxies:httpx 不符合规范')
+                        if hv is not None:
+                            if not isinstance(hv, str):
+                                raise ValueError(
+                                    f'测试哟管理数据解析失败，参数 config:request:proxies:requests:{hv} 不符合规范'
+                                )
                 else:
                     raise ValueError('测试用例数据解析失败, 参数 config:request:proxies 不符合规范')
         except KeyError:
@@ -123,6 +149,15 @@ class RequestDataParse:
             if module is None:
                 raise ValueError('测试用例数据解析失败, 参数 config:module 为空')
             return module
+
+    @property
+    def test_steps(self) -> dict:
+        try:
+            test_steps = self.request_data['test_steps']
+        except KeyError:
+            raise ValueError('请求参数解析失败，缺少 test_steps 参数')
+        else:
+            return test_steps
 
     @property
     def name(self) -> str:
@@ -208,6 +243,8 @@ class RequestDataParse:
             if params is not None:
                 if isinstance(params, str):
                     params = eval(params)
+                if not isinstance(params, dict):
+                    raise ValueError('请求数据解析失败, 缺少 test_steps:request:params 参数不符合规范')
         return params
 
     @property
@@ -307,6 +344,32 @@ class RequestDataParse:
                 return False
 
     @property
+    def setup_testcase(self) -> Union[list, None]:
+        try:
+            testcase = self.request_data['test_steps']['setup']['testcase']
+            if testcase is not None:
+                if isinstance(testcase, str):
+                    testcase = eval(testcase)
+                if not isinstance(testcase, list):
+                    raise ValueError('请求数据解析失败, 参数 test_steps:setup:testcase 不是有效的 list 类型')
+                else:
+                    for i in testcase:
+                        if isinstance(i, dict):
+                            for k, v in i.items():
+                                if not isinstance(v, str):
+                                    raise ValueError(
+                                        f'请求参数解析失败，参数 test_steps:setup:testcase:{k} 不是有效的 str 类型'
+                                    )
+                        else:
+                            if not isinstance(i, str):
+                                raise ValueError(
+                                    f'请求数据解析失败, 参数 test_steps:setup:testcase:{i} 不是有效的 str 类型'
+                                )
+        except KeyError:
+            testcase = None
+        return testcase
+
+    @property
     def setup_sql(self) -> Union[list, None]:
         try:
             sql = self.request_data['test_steps']['setup']['sql']
@@ -315,6 +378,17 @@ class RequestDataParse:
                     sql = eval(sql)
                 if not isinstance(sql, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:setup:sql 不是有效的 list 类型')
+                else:
+                    for i in sql:
+                        if isinstance(i, dict):
+                            for k, v in i.items():
+                                if not isinstance(v, str):
+                                    raise ValueError(
+                                        f'请求参数解析失败，参数 test_steps:setup:sql:{k} 不是有效的 str 类型'
+                                    )
+                        else:
+                            if not isinstance(i, str):
+                                raise ValueError(f'请求数据解析失败, 参数 test_steps:setup:sql:{i} 不是有效的 str 类型')
         except KeyError:
             sql = None
         return sql
@@ -328,6 +402,10 @@ class RequestDataParse:
                     hook = eval(hook)
                 if not isinstance(hook, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:setup:hook 不是有效的 list 类型')
+                else:
+                    for v in hook:
+                        if not isinstance(v, str):
+                            raise ValueError(f'请求参数解析失败，参数 test_steps:setup:hooks:{v} 不是有效的 str 类型')
         except KeyError:
             hook = None
         return hook
@@ -366,6 +444,19 @@ class RequestDataParse:
                     sql = eval(sql)
                 if not isinstance(sql, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:sql 不是有效的 list 类型')
+                else:
+                    for i in sql:
+                        if isinstance(i, dict):
+                            for k, v in i.items():
+                                if not isinstance(v, str):
+                                    raise ValueError(
+                                        f'请求参数解析失败，参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'
+                                    )
+                        else:
+                            if not isinstance(i, str):
+                                raise ValueError(
+                                    f'请求数据解析失败, 参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'
+                                )
         except KeyError:
             sql = None
         return sql
@@ -379,6 +470,10 @@ class RequestDataParse:
                     hook = eval(hook)
                 if not isinstance(hook, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:hook 不是有效的 list 类型')
+                else:
+                    for v in hook:
+                        if not isinstance(v, str):
+                            raise ValueError(f'请求参数解析失败，参数 test_steps:setup:hooks:{v} 不是有效的 str 类型')
         except KeyError:
             hook = None
         return hook
@@ -392,6 +487,15 @@ class RequestDataParse:
                     extract = eval(extract)
                 if not isinstance(extract, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:extract 不是有效的 list 类型')
+                else:
+                    for i in extract:
+                        if isinstance(i, dict):
+                            for k, v in i.items():
+                                if not isinstance(v, str):
+                                    raise ValueError(
+                                        f'请求参数解析失败，参数 test_steps:setup:extract:{k} 不是有效的 str 类型')
+                        else:
+                            raise ValueError(f'请求参数解析失败，参数 test_steps:setup:extract:{i} 不是合法数据')
         except KeyError:
             extract = None
         return extract
@@ -412,6 +516,15 @@ class RequestDataParse:
                     raise ValueError(
                         '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
                     )
+                try:
+                    if isinstance(assert_text, list):
+                        for text in assert_text:
+                            if isinstance(text, dict):
+                                text['value'] = eval(text['value'])
+                    elif isinstance(assert_text, dict):
+                        assert_text['value'] = eval(assert_text['value'])
+                except Exception:  # noqa
+                    pass
         return assert_text
 
     @property

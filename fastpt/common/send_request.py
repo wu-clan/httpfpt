@@ -15,6 +15,7 @@ from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
 from fastpt.utils.allure_control import allure_attach_file
 from fastpt.utils.assert_control import Asserter
+from fastpt.utils.relate_testcase_executor import exec_setup_testcase
 from fastpt.utils.request.hooks_executor import HookExecutor
 from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.request.vars_extractor import VarsExtractor
@@ -104,12 +105,20 @@ class SendRequests:
             log.error(f'发送 httpx 请求异常: {e}')
             raise e
 
-    def send_request(self, request_data: dict, *, request_engin: str = 'requests', **kwargs):
+    def send_request(
+            self,
+            request_data: dict,
+            *,
+            request_engin: str = 'requests',
+            log_data: bool = True,
+            **kwargs
+    ) -> dict:
         """
         发送请求
 
         :param request_data: 请求数据
         :param request_engin: 请求引擎
+        :param log_data: 日志记录数据
         :return: response
         """
         if request_engin not in self.__request_engin_list:
@@ -121,11 +130,15 @@ class SendRequests:
         log.info('请求数据解析完成')
 
         # 日志记录前置请求日志
-        self.log_request_setup(parsed_data)
+        if log_data:
+            self.log_request_setup(parsed_data)
 
         # 前置处理
         if parsed_data.is_setup:
             log.info('开始处理请求前置...')
+        setup_testcase = parsed_data.setup_testcase
+        if setup_testcase is not None:
+            exec_setup_testcase(parsed_data, setup_testcase)
         setup_sql = parsed_data.setup_sql
         if setup_sql is not None:
             DB().exec_case_sql(setup_sql, parsed_data.env)
@@ -134,13 +147,15 @@ class SendRequests:
             HookExecutor().exec_case_func(setup_hooks)
         wait_time = parsed_data.setup_wait_time
         if wait_time is not None:
+            log.info(f'执行请求前等待：{wait_time} s')
             time.sleep(wait_time)
         if parsed_data.is_setup:
             log.info('请求前置处理完成')
 
         # 日志记录请求数据
-        self.log_request_up(parsed_data)
-        self.allure_request_up(parsed_data)
+        if log_data:
+            self.log_request_up(parsed_data)
+            self.allure_request_up(parsed_data)
 
         # 发送请求
         request_conf = {
@@ -181,10 +196,12 @@ class SendRequests:
         response_data['text'] = response.text
 
         # 日志记录响应
-        self.log_request_down(response_data)
+        if log_data:
+            self.log_request_down(response_data)
 
         # 日志记录后置请求日志
-        self.log_request_teardown(parsed_data)
+        if log_data:
+            self.log_request_teardown(parsed_data)
 
         # 后置处理
         if parsed_data.is_teardown:
@@ -203,6 +220,7 @@ class SendRequests:
             Asserter().exec_asserter(response_data, assert_text=teardown_assert)
         wait_time = parsed_data.teardown_wait_time
         if wait_time is not None:
+            log.info(f'执行请求后等待：{wait_time} s')
             time.sleep(wait_time)
         if parsed_data.is_setup:
             log.info('请求后置处理完成')
@@ -211,6 +229,7 @@ class SendRequests:
 
     @staticmethod
     def log_request_setup(parsed: RequestDataParse):
+        log.info(f'请求 setup_testcase: {parsed.setup_testcase}')
         log.info(f"请求 setup_sql: {parsed.setup_sql}")
         log.info(f"请求 setup_hooks: {parsed.setup_hooks}")
         log.info(f"请求 setup_wait_time: {parsed.setup_wait_time}")

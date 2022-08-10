@@ -82,6 +82,11 @@ test_steps:
       files:
         xxx:
     setup:
+      testcase:
+        - case_id:
+          key:
+          jsonpath:
+        - event_query_001
       sql:
         - key:
           set_type:
@@ -116,55 +121,72 @@ release 版本已不推荐使用，因为受限于数据 json 结构，对于 ex
 
 ### 参数说明：
 
-| 参数            |                类型                 | 必填  | 说明                                                               |
-|:--------------|:---------------------------------:|-----|:-----------------------------------------------------------------|
-| config        |               dict                | Y   | 测试用例配置                                                           |
-| + allure      |               dict                | Y   | allure 测试报告配置                                                    |
-| ++ epic       |                str                | Y   | allure epic                                                      |
-| ++ feature    |                str                | Y   | allure feature                                                   |
-| ++ story      |                str                | Y   | allure story                                                     |
-| + request     |               dict                | Y   | 请求参数                                                             |
-| ++ env        |                str                | Y   | 测试环境                                                             |
-| ++ headers    |            dict / null            | N   | 请求头                                                              |
-| ++ timeout    |            int / null             | N   | 请超时时长，如果存在且不为空，则应用本数据所有测试用例，<br/> 如果不存在或为空，则默认应用 conf 配置文件       |
-| ++ verify     |            bool / null            | N   | 请求验证，应用同上                                                        |
-| ++ redirects  |            bool / null            | N   | 重定向，应用同上                                                         |
-| ++ proxies    |            dict / null            | N   | 代理，应用同上                                                          |
-| +++ requests  |               dict                | N   | requests 引擎代理，仅当使用 requests 发送请求时，才能使用                           |
-| ++++ http     |            str / null             | / Y | http 代理                                                          |
-| ++++ https    |            str / null             | / Y | https 代理                                                         |
-| +++ httpx     |               dict                | N   | httpx 引擎代理，仅当使用 httpx 发送请求时，才能使用                                 |
-| ++++ http://  |            str / null             | / Y | http 代理                                                          |
-| ++++ https:// |            str / null             | / Y | https 代理                                                         |
-| + module      |                str                | Y   | 用例所属模块                                                           |
-| test_steps    |            list / dict            | Y   | 测试步骤，多用例时，必须使用 list 格式                                           |
-| + name        |                str                | Y   | 用例名称                                                             |
-| + case_id     |                str                | Y   | 用例 id                                                            |
-| + description |                str                | Y   | 用例描述                                                             |
-| + is_run      |            bool / null            | Y   | 是否跳过                                                             |
-| + request     |               dict                | Y   | 请求参数                                                             |
-| ++ method     |                str                | Y   | 请求方式                                                             |
-| ++ url        |                str                | Y   | 请求链接，不包含域名，域名在测试环境中以 host=xxx 配置                                 |
-| ++ params     |        dict / bytes / null        | Y   | 请求查询参数                                                           |
-| ++ headers    |            dict / null            | Y   | 请求头，如果为空，则会应用上方配置中的请求头                                           |
-| ++ data_type  |            str / null             | Y   | 请求数据类型: data / json                                              |
-| ++ data       | dict / bytes / Tuple(list) / null | Y   | 请求体                                                              |
-| ++ files      |   List\[Dict\[list/str]] / null   | Y   | 请求文件                                                             |
-| + setup       |               dict                | N   | 请求前置条件                                                           |
-| ++ sql        |    List\[ dict / str ] / null     | N   | 请求前置 sql，当为执行 sql 时，格式为 List\[str]，<br/> 当为设置变量时，格式为 List\[dict] |                                                              |
-| ++ hooks      |         List\[str] / null         | N   | 钩子函数                                                             |
-| ++ wait_time  |            int / null             | N   | 请求前等待时间                                                          |
-| + teardown    |               dict                | N   | 请求后置条件                                                           |
-| ++ sql        |    List\[ dict / str ] / null     | N   | 同前置                                                              |
-| ++ hooks      |         List\[str] / null         | N   | 同前置                                                              |
-| ++ extract    |            List\[dict]            | N   | 变量提取                                                             |
-| +++ key       |                str                | / Y | 变量 key                                                           |
-| +++ set_type  |                str                | / Y | 变量类型: env / global / cache，默认 cache                              |
-| +++ jsonpath  |               dict                | / Y | jsonpath 表达式，依赖 response 数据集                                     |
-| ++ assert     |        List\[ dict / str ]        | N   | 断言                                                               |                                                        |
-| ++ wait_time  |            int / null             | N   | 请求后等待时间                                                          |
+| 参数            |                类型                 | 必填  | 说明                                                                             |
+|:--------------|:---------------------------------:|-----|:-------------------------------------------------------------------------------|
+| config        |               dict                | Y   | 测试用例配置                                                                         |
+| + allure      |               dict                | Y   | allure 测试报告配置                                                                  |
+| ++ epic       |                str                | Y   | allure epic                                                                    |
+| ++ feature    |                str                | Y   | allure feature                                                                 |
+| ++ story      |                str                | Y   | allure story                                                                   |
+| + request     |               dict                | Y   | 请求参数                                                                           |
+| ++ env        |                str                | Y   | 测试环境                                                                           |
+| ++ headers    |            dict / null            | N   | 请求头                                                                            |
+| ++ timeout    |            int / null             | N   | 请超时时长，如果存在且不为空，则应用本数据所有测试用例，<br/> 如果不存在或为空，则默认应用 conf 配置文件                     |
+| ++ verify     |            bool / null            | N   | 请求验证，应用同上                                                                      |
+| ++ redirects  |            bool / null            | N   | 重定向，应用同上                                                                       |
+| ++ proxies    |            dict / null            | N   | 代理，应用同上                                                                        |
+| +++ requests  |               dict                | N   | requests 引擎代理，仅当使用 requests 发送请求时，才能使用                                         |
+| ++++ http     |            str / null             | / Y | http 代理                                                                        |
+| ++++ https    |            str / null             | / Y | https 代理                                                                       |
+| +++ httpx     |               dict                | N   | httpx 引擎代理，仅当使用 httpx 发送请求时，才能使用                                               |
+| ++++ http://  |            str / null             | / Y | http 代理                                                                        |
+| ++++ https:// |            str / null             | / Y | https 代理                                                                       |
+| + module      |                str                | Y   | 用例所属模块                                                                         |
+| test_steps    |            list / dict            | Y   | 测试步骤，多用例时，必须使用 list 格式                                                         |
+| + name        |                str                | Y   | 用例名称                                                                           |
+| + case_id     |                str                | Y   | 用例 id                                                                          |
+| + description |                str                | Y   | 用例描述                                                                           |
+| + is_run      |            bool / null            | Y   | 是否跳过                                                                           |
+| + request     |               dict                | Y   | 请求参数                                                                           |
+| ++ method     |                str                | Y   | 请求方式                                                                           |
+| ++ url        |                str                | Y   | 请求链接，不包含域名，域名在测试环境中以 host=xxx 配置                                               |
+| ++ params     |        dict / bytes / null        | Y   | 请求查询参数                                                                         |
+| ++ headers    |            dict / null            | Y   | 请求头，如果为空，则会应用上方配置中的请求头                                                         |
+| ++ data_type  |            str / null             | Y   | 请求数据类型: data / json                                                            |
+| ++ data       | dict / bytes / Tuple(list) / null | Y   | 请求体                                                                            |
+| ++ files      | List\[Dict\[ list / str ]] / null | Y   | 请求文件                                                                           |
+| + setup       |               dict                | N   | 请求前置条件                                                                         |
+| ++ testcase   |    List\[ dict / str ] / null     | N   | 请求前置 testcase，当执行测试用例时，格式为 List\[str]，<br/> 当设置当前测试执行过程中的缓存变量时，格式为 List\[dict] |  
+| ++ sql        |    List\[ dict / str ] / null     | N   | 请求前置 sql，当为执行 sql 时，格式为 List\[str]，<br/> 当为设置变量时，格式为 List\[dict]               |                                                              |
+| ++ hooks      |         List\[str] / null         | N   | 钩子函数                                                                           |
+| ++ wait_time  |            int / null             | N   | 请求前等待时间                                                                        |
+| + teardown    |               dict                | N   | 请求后置条件                                                                         |
+| ++ sql        |    List\[ dict / str ] / null     | N   | 同前置                                                                            |
+| ++ hooks      |         List\[str] / null         | N   | 同前置                                                                            |
+| ++ extract    |            List\[dict]            | N   | 变量提取                                                                           |
+| +++ key       |                str                | / Y | 变量 key                                                                         |
+| +++ set_type  |                str                | / Y | 变量类型: env / global / cache                                                     |
+| +++ jsonpath  |               dict                | / Y | jsonpath 表达式，依赖 response 数据集                                                   |
+| ++ assert     |        List\[ dict / str ]        | N   | 断言                                                                             |                                                        |
+| ++ wait_time  |            int / null             | N   | 请求后等待时间                                                                        |
 
-> **sql 参数附加说明：**
+#### testcase 参数附加说明
+
+setup testcase 参数支持两种功能：
+
+1. 执行关联测试用例
+2. 设置当前测试执行过程中的缓存变量，且仅供当前测试用例使用
+
+设置变量格式：
+
+```yaml
+testcase:
+  - case_id: 关联测试 case_id
+    key: 变量 key，str
+    jsonpath: jsonpath 表达式，用作 value
+```
+
+#### sql 参数附加说明
 
 set_up / tear_down 的 sql 参数支持两种功能：
 
@@ -175,13 +197,13 @@ set_up / tear_down 的 sql 参数支持两种功能：
 
 ```yaml
 sql:
-  - key: 变量 key / str
-    set_type: 变量类型：env / global / cache，默认 cache
-    sql: 执行 sql 查询
+  - key: 变量 key，str
+    set_type: 变量类型：env / global / cache
+    sql: 执行 sql 查询，str
     jsonpath: jsonpath 表达式，数据依赖 sql 查询
 ```
 
-> **assert 参数附加说明：**
+#### assert 参数附加说明
 
 断言支持多种格式，详细说明请打开 assert_control.py 文件，以 reStructuredText 方式查阅，
 以下两点做概要说明：
@@ -204,57 +226,108 @@ jsonpath 格式举例：
 
 ```yaml
 assert:
-  - check: 检查说明 / str
-    value: 比较值 / Any
-    type: 比较类型，请查阅 assert_type.py 文件
+  - check: 检查说明, str
+    value: 比较值, Any
+    type: 比较方式，str，请查阅 assert_type.py 文件
     jsonpath: jsonpath 表达式
 ```
 
 ### 变量及hooks的使用
 
-全局变量定义：
+#### 变量说明
+
+变量除了在用例数据中通过运行测试进行定义外，还可以进行手动定义
+
+全局变量手动定义：
 
 ```text
 仅在 data 目录下的 global_vars.yml 中以键值对形式进行定义，可参考demo
 ```
 
-环境变量定义：
+环境变量手动定义：
 
 ```text
 在测试用例依赖的环境文件中以键=值的形式进行定义
 ```
 
-hooks 函数定义:
+缓存变量手动定义:
+
+```text
+通过 hook 函数调用缓存变量设置函数进行定义
+```
+
+#### hooks 说明
 
 ```text
 仅在 data 目录下的 hooks.py 文件中定义，根据定义结构在用例数据文件中使用，可参考 demo    
 ```
 
-**使用表达式:**
+#### 变量使用表达式
 
-变量：
+普通变量：
 
-      ${var} 或 $var
+```text
+${var} 或 $var
+```
+
+关联测试用例变量：只在用例中含有关联测试用例并需要引用关联测试用例设置的变量时，使用此方式
+
+```text
+^{var} 或 ^var
+```
 
 hooks：仅在前后置 hooks 参数下配置时生效
 
-      ${func()} 或 ${func($var1, $var2)}
+```text
+${func()} 或 ${func($var1, $var2)}
+```
 
 约束：
 
-      变量和 hooks 开头: a-zA-Z_
+```text
+变量和 hooks 开头: a-zA-Z_
+```
 
 ### 用例中的变量替换
 
-在测试用例中，寻找变量顺序为： cache > env > global，找到变量后将自动替换数据，未找到将会抛出异常
-
-### 变量设置说明
-
-变量设置含有三种场景：
+普通变量：
 
 1. env：即在当前测试用例数据所调用的测试环境中进行持久化写入，键值不会重复，新值覆盖旧值
 2. global: 在全局变量文件中进行持久化写入，键值不会重复，新值覆盖旧值
-3. cache：写入当前用例类运行过程的内存中，不会持久化，类运行结束清楚自动清除
+3. cache：写入当前整个运行过程的内存中，不会持久化，运行结束后自动清除
+
+```text
+请求数据解析时，寻找变量顺序为： cache > env > global，找到变量自动替换数据，未找到抛出异常
+```
+
+关联用例变量：
+
+- 默认仅使用 cache 存储变量，
+
+```text
+关联用例执行后，在关联测试用例设置的变量中寻找，并且仅在当前正在执行的测试用例中有效， 
+找到变量自动替换数据，未找到抛出异常
+```
+
+### jsonpath 取值范围
+
+将请求发送后的 response 数据进行整合重组，结构如下：
+
+```json
+{
+  "url": null,
+  "status_code": 200,
+  "elapsed": 0,
+  "headers": null,
+  "cookies": null,
+  "json": null,
+  "content": null,
+  "text": null,
+  "stat": {
+    "execute_time": null
+  }
+}
+```
 
 ## 用例创建
 

@@ -4,12 +4,13 @@ from typing import Union
 
 from jsonpath import jsonpath
 
+from fastpt.common.log import log
 from fastpt.schema.assert_type import AssertType
 
 
 class Asserter:
 
-    def _code_asserter(self, response: dict, assert_text: Union[str, list]) -> None:
+    def _code_asserter(self, response: dict, assert_text: str) -> None:
         """
         **代码断言器, 像 pytest 断言一样使用它**
 
@@ -55,13 +56,8 @@ class Asserter:
         :param assert_text:
         :return:
         """
-        if isinstance(assert_text, str):
-            self._exec_code_assert(response, assert_text)
-        elif isinstance(assert_text, list):
-            for a in assert_text:
-                self._exec_code_assert(response, a)
-        else:
-            raise ValueError('断言内容格式错误, 请检查断言脚本是否为 str / list 格式')
+        log.info(f'执行断言：{assert_text}')
+        self._exec_code_assert(response, assert_text)
 
     def _json_asserter(self, response: dict, assert_text: dict) -> None:
         """
@@ -98,6 +94,7 @@ class Asserter:
         else:
             response_value = jsonpath(response, assert_jsonpath)
         if response_value:
+            log.info(f'执行断言：{assert_text}')
             self._exec_json_assert(assert_check, assert_value, assert_type, response_value[0])
         else:
             raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')

@@ -25,29 +25,25 @@ def session_fixture(tmp_path_factory, worker_id):
     root_tmp_dir = tmp_path_factory.getbasetemp().parent
     fn = root_tmp_dir / "data.json"
     with FileLock(str(fn) + ".lock"):
-        ...
+        pass
 
 
 @pytest.fixture(scope='package', autouse=True)
 def package_fixture():
-    ...
     yield
+    # 自动清理临时变量
+    VariableCache().clear()
     log.info('测试用例执行结束')
 
 
 @pytest.fixture(scope='module', autouse=True)
 def module_fixture():
-    ...
-    yield
-    ...
+    pass
 
 
 @pytest.fixture(scope='class', autouse=True)
 def class_fixture():
-    ...
-    yield
-    # 自动清理临时变量
-    VariableCache().clear()
+    pass
 
 
 @pytest.fixture(scope='function', autouse=True)

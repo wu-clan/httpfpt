@@ -39,10 +39,16 @@ test_steps:
         xxx: # str / list
     # 前置操作, 选填
     setup:
+      # testcase，选填，str / list
+      testcase:
+        - case_id:
+          key:
+          jsonpath:
+#        - event_query_001
       # sql, 选填, list
       sql:
         - key:
-          # 设置类型, 选填, cache, env, global, 默认 cache
+          # 设置类型, 选填, cache, env, global
           set_type:
           sql:
           jsonpath:
@@ -62,6 +68,7 @@ test_steps:
       # 参数提取, 选填, list
       extract:
         - key:
+          # 同上
           set_type:
           jsonpath:
       # 断言, 必填, str / list
@@ -71,6 +78,7 @@ test_steps:
           value:
           type:
           jsonpath:
+        - assert 200 = pm.response.get('status_code')
 #        assert 200 = pm.response.get('status_code')
       # 同上
       wait_time:

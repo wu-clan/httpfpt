@@ -32,6 +32,11 @@ test_steps:
       data:
       files:
     setup:
+      testcase:
+        - case_id: event_query_002
+          key: rcode
+          jsonpath: $.status_code
+        - event_query_002
       #      sql:
       #        - key:
       #          set_type:
@@ -49,7 +54,7 @@ test_steps:
           jsonpath: $.url
       assert:
         - check: 检查响应状态码
-          value: 200
+          value: ^rcode
           type: eq
           jsonpath: $.status_code
       wait_time: 0
@@ -68,6 +73,7 @@ test_steps:
       data:
       files:
     setup:
+      testcase:
       wait_time: 0
     teardown:
       extract:

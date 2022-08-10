@@ -98,6 +98,7 @@ class DB:
             for s in sql:
                 # 获取返回数据
                 if isinstance(s, str):
+                    log.info(f'执行 sql: {s}')
                     query_data = self.query(s)
                     for k, v in query_data.items():
                         if isinstance(v, decimal.Decimal):
@@ -108,6 +109,7 @@ class DB:
                             data[k] = v
                 # 设置变量
                 if isinstance(s, dict):
+                    log.info(f'执行变量提取 sql: {s["sql"]}')
                     key = s['key']
                     set_type = s['set_type']
                     sql = s['sql']
@@ -117,10 +119,8 @@ class DB:
                     if value:
                         value = value[0]
                     else:
-                        raise ValueError(f'jsonpath取值失败, 表达式: {json_path}')
-                    if set_type is None:
-                        VariableCache().set(key, value)
-                    elif set_type == 'cache':
+                        raise ValueError(f'jsonpath 取值失败, 表达式: {json_path}')
+                    if set_type == 'cache':
                         VariableCache().set(key, value)
                     elif set_type == 'env':
                         if env is None:
@@ -129,5 +129,5 @@ class DB:
                     elif set_type == 'global':
                         write_yaml_vars({key: value})
                     else:
-                        raise ValueError('前置 sql 设置变量失败, 用例参数 "set_type" 类型错误')
+                        raise ValueError(f'前置 sql 设置变量失败, 用例参数 "set_type: {set_type}" 类型错误')
             return data

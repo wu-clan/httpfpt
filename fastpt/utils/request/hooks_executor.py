@@ -10,6 +10,7 @@ class HookExecutor:
 
     def __init__(self):
         # hooks 表达: ${func()} 或 ${func(1, 2)}
+        # hooks 开头: a-zA-Z_
         self.func_re = r'\${([a-zA-Z_]\w*\([\$\w\.\-/\s=,]*\))}'
 
     def case_func_extract(self, target: list) -> list:
@@ -52,4 +53,5 @@ class HookExecutor:
         func_list = self.case_func_extract(func_list)
         exec('from fastpt.data.hooks import *')
         for func in func_list:
+            log.info(f'执行 hook：{func}')
             exec(func)
