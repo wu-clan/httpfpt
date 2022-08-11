@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from enum import Enum, unique
 
 
-class AssertType:
+@unique
+class AssertType(str, Enum):
     # 是否相等
     equal = "eq"
     # 判断实际结果不等于预期结果

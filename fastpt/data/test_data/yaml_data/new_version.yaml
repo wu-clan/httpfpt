@@ -71,7 +71,7 @@ test_steps:
           # 同上
           set_type:
           jsonpath:
-      # 断言, 必填, str / list
+      # 断言, 可选, str / list
       # assert:
       assert:
         - check:

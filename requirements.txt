@@ -22,3 +22,4 @@ jsonpath==0.82
 cache3==0.2.1
 python-dotenv==0.20.0
 typer[all]==0.6.1
+pydantic==1.9.2
