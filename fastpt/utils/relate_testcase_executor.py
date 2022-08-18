@@ -150,7 +150,7 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     :return:
     """
     from fastpt.common.send_request import send_request
-    log.info('执行变量提取关联测试用例：{}'.format(testcase_data['test_steps']['case_id']))
+    log.debug('执行变量提取关联测试用例：{}'.format(testcase_data['test_steps']['case_id']))
     response = send_request.send_request(testcase_data, log_data=False)
     value = jsonpath(response, testcase_data['set_var_jsonpath'])
     if value:
@@ -167,5 +167,5 @@ def relate_testcase_exec(testcase_data: dict) -> None:
     :return:
     """
     from fastpt.common.send_request import send_request
-    log.info('执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id']))
+    log.debug('执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id']))
     send_request.send_request(testcase_data, log_data=False)

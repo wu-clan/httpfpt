@@ -151,7 +151,7 @@ release 版本已不推荐使用，因为受限于数据 json 结构，对于 ex
 | ++ method     |                str                | Y   | 请求方式                                                                           |
 | ++ url        |                str                | Y   | 请求链接，不包含域名，域名在测试环境中以 host=xxx 配置                                               |
 | ++ params     |        dict / bytes / null        | Y   | 请求查询参数                                                                         |
-| ++ headers    |            dict / null            | Y   | 请求头，如果为空，则会应用上方配置中的请求头                                                         |
+| ++ headers    |            dict / null            | Y   | 请求头，如果为空，则会应用上方配置中的请求头，如果上方也未配置，则不使用请求头                                        |
 | ++ data_type  |            str / null             | Y   | 请求数据类型: data / json                                                            |
 | ++ data       | dict / bytes / Tuple(list) / null | Y   | 请求体                                                                            |
 | ++ files      | List\[Dict\[ list / str ]] / null | Y   | 请求文件                                                                           |
@@ -211,8 +211,7 @@ sql:
 1. 常规断言：像正常 assert 的格式，但是比较值受约束，从 response 数据集进行取值，
    并且以 pm.response.get('') 开始取值，后面可以继续 get()，也可以使用其他方法，只要
    是 python 可执行代码，并且为了避免引号问题，断言脚本必须使用单引号处理
-
-2. jsonpath：使用 jsonpath 从 response 进行取值比较
+2. jsonpath：使用 jsonpath 从response数据集进行取值比较
 3. 两种断言方式可以同时使用
 
 常规断言格式举例：
@@ -297,16 +296,18 @@ ${func()} 或 ${func($var1, $var2)}
 3. cache：写入当前整个运行过程的内存中，不会持久化，运行结束后自动清除
 
 ```text
-请求数据解析时，寻找变量顺序为： cache > env > global，找到变量自动替换数据，未找到抛出异常
+请求数据解析时，寻找变量顺序为： cache > env > global，找到变量自动替换数据，未找
+到抛出异常
+
+温馨提示: 变量持久化写入会冲刷掉手写注释内容
 ```
 
 关联用例变量：
 
-- 默认仅使用 cache 存储变量，
+- 默认仅使用 cache 存储变量，不会持久化，运行结束后自动清除
 
 ```text
-关联用例执行后，在关联测试用例设置的变量中寻找，并且仅在当前正在执行的测试用例中有效， 
-找到变量自动替换数据，未找到抛出异常
+关联用例执行后，在缓存变量中寻找，找到变量自动替换数据，未找到抛出异常
 ```
 
 ### jsonpath 取值范围
@@ -334,11 +335,17 @@ ${func()} 或 ${func($var1, $var2)}
 1. 根据数据结构及参数说明，手动编写测试用例
 2. 通过 cli 自动生成测试用例
 
-cli 生成测试用例说明:
+## cli 使用说明
+在项目中使用，确保终端在 fastpt 文件夹下打开：`cd fastpt
+
+cli 使用帮助:
+```shell
+python cli.py --help
+```
+
+cli 生成测试用例:
 
 ```shell
-cd fastpt
-
 python cli.py --gtc
 ```
 

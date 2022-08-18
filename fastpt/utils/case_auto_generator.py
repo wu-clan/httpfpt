@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import glob
 import os.path
 from pathlib import Path
 
 import typer
 
-from fastpt.common.log import log
 from fastpt.core.get_conf import PROJECT_NAME
-from fastpt.core.path_conf import YAML_DATA_PATH, TEST_CASE_PATH
+from fastpt.core.path_conf import TEST_CASE_PATH
 from fastpt.utils.file_control import search_all_case_yaml_files, search_all_test_case_files, get_file_property
 
 
@@ -19,83 +17,81 @@ def auto_generate_test_cases(rewrite: bool = False) -> None:
     :param rewrite:
     :return:
     """
-    yaml_files = search_all_case_yaml_files()
-    test_case_files = search_all_test_case_files()
-    if len(yaml_files) == 0:
+    # 获取所用用例数据文件
+    yaml_datafiles = search_all_case_yaml_files()
+    if len(yaml_datafiles) == 0:
         raise ValueError('自动生成用例失败，未在指定项目下找到测试用例数据文件，请检查项目目录是否正确')
 
-    yaml_file_names = []
+    # 获取所有测试用例文件
+    testcase_files = search_all_test_case_files()
+
+    # 获取所有用例文件名
+    yaml_filenames = []
     yaml_file_root_names = []
-    for _ in yaml_files:
-        _property = get_file_property(_)
-        yaml_file_names.append(_property[0])
-        yaml_file_root_names.append(_property[1])
+    for _ in yaml_datafiles:
+        pp = get_file_property(_)
+        yaml_filenames.append(pp[0])
+        yaml_file_root_names.append(pp[1])
 
-    test_case_file_names = []
-    for _ in test_case_files:
-        test_case_file_names.append(get_file_property(_)[0])
+    # 获取所有测试用例文件名
+    testcase_filenames = []
+    for _ in testcase_files:
+        testcase_filenames.append(get_file_property(_)[0])
 
-    create_list_file_root_name = []
-    for _ in yaml_file_root_names:
+    # 获取需要创建的测试用例文件名
+    create_file_root_names = []
+    for name in yaml_file_root_names:
         if not rewrite:
-            if ((_ if _.startswith('test_') else 'test_' + _) + '.py') not in test_case_file_names:
-                create_list_file_root_name.append(_)
+            if ((name if name.startswith('test_') else 'test_' + name) + '.py') not in testcase_filenames:
+                create_file_root_names.append(name)
         else:
-            create_list_file_root_name.append(_)
-    if len(create_list_file_root_name) == 0:
-        print('用例已经很完善了, 添加新测试用例数据后再来生成吧~')
+            create_file_root_names.append(name)
+    if len(create_file_root_names) == 0:
+        typer.secho('😝 用例已经很完善了, 添加新测试用例数据后再来生成吧~', fg='green', bold=True)
         return
 
-    yaml_data_files = []
-    for _ in create_list_file_root_name:
-        data_file = glob.glob(os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', f'{_}.*ml'), recursive=True)[0]
-        yaml_data_files.append(data_file)
+    typer.secho('⏳ 疯狂自动生成中...', fg='green', bold=True)
 
-    print('疯狂自动生成中...')
-
-    for data in yaml_data_files:
-        filename = get_file_property(data)[0]
-        file_root_name = get_file_property(data)[1]
-        next_filepath = os.sep.join(Path(data.replace(YAML_DATA_PATH, '')).parts[1:])
-        class_title = ''.join(name.title() for name in file_root_name.split('_'))
-        func_title = file_root_name
-        if not filename.startswith('test_'):
-            class_title = 'Test' + class_title
-            func_title = 'test_' + func_title
-        case_code = f'''#!/usr/bin/env python3
+    for create_file_root_name in create_file_root_names:
+        for yaml_filename in yaml_filenames:
+            if create_file_root_name == Path(yaml_filename).stem:
+                testcase_class_name = ''.join(name.title() for name in create_file_root_name.split('_'))
+                testcase_func_name = create_file_root_name
+                if not create_file_root_name.startswith('test_'):
+                    testcase_class_name = 'Test' + testcase_class_name
+                    testcase_func_name = 'test_' + testcase_func_name
+                case_code = f'''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-from pathlib import Path
 
 import allure
 import pytest
 
 from fastpt.common.send_request import send_request
 from fastpt.common.yaml_handler import read_yaml
+from fastpt.core.get_conf import PROJECT_NAME
 from fastpt.utils.request.file_data_parse import get_request_data
 from fastpt.utils.request.ids_extract import get_ids
 
-request_data = get_request_data(read_yaml(filename=os.sep.join(Path(r'{next_filepath}').parts)))
+request_data = get_request_data(read_yaml(filename=os.sep.join([PROJECT_NAME, '{yaml_filename}'])))
 allure_text = request_data[0]['config']['allure']
 request_ids = get_ids(request_data)
 
 
 @allure.epic(allure_text['epic'])
 @allure.feature(allure_text['feature'])
-class {class_title}:
+class {testcase_class_name}:
 
     @allure.story(allure_text['story'])
     # @pytest.mark.???
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
-    def {func_title}(self, data):
-        """ {{0}} """.format(data['test_steps']['description'])
+    def {testcase_func_name}(self, data):
+        """ {{0}} """.format(data['test_steps']['description'] or '未知')
         send_request.send_request(data)
         '''
-        case_path = os.path.join(
-            TEST_CASE_PATH, (next_filepath.split('.')[0].replace(file_root_name, func_title) + '.py')
-        )
-        if not os.path.exists(case_path):
-            with open(case_path, 'w', encoding='utf-8') as f:
-                f.write(case_code)
+                # 创建测试用例文件
+                case_path = os.path.join(TEST_CASE_PATH, PROJECT_NAME, testcase_func_name + '.py')
+                with open(case_path, 'w', encoding='utf-8') as f:
+                    f.write(case_code)
 
-    typer.secho('测试用例自动生成完成', fg='green', bold=True)
+    typer.secho('✅ 测试用例自动生成完成', fg='green', bold=True)
