@@ -23,11 +23,11 @@ def read_yaml(
     :return:
     """
     if filepath is not None:
-        _filename = os.path.join(filepath, filename)
+        _file = os.path.join(filepath, filename)
     else:
-        _filename = filename
+        _file = filename
     try:
-        with open(_filename, encoding='utf-8') as f:
+        with open(_file, encoding='utf-8') as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
     except Exception as e:
         log.error(f'文件 {filename} 读取错误: {e}')
