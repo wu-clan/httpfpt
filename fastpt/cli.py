@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
-from typing import Optional
+from typing import Optional, Tuple
 
 import typer
 from rich import print  # noqa
 
 sys.path.append('..')
 
-from fastpt.utils.case_auto_generator import auto_generate_test_cases
-from fastpt.utils.data_manage.openapi import SwaggerParser
+from fastpt.utils.case_auto_generator import auto_generate_test_cases  # noqa
+from fastpt.utils.data_manage.openapi import SwaggerParser  # noqa
 
 app = typer.Typer(rich_markup_mode='rich')
 
@@ -52,24 +52,21 @@ def generate_test_cases(generate: bool):
                 typer.secho('🔥 开始生成新测试用例...', fg='cyan', bold=True)
                 auto_generate_test_cases()
         except Exception as e:
-            print(f'❌ 自动生成测试用例失败: {e}')
+            typer.secho(f'❌ 自动生成测试用例失败: {e}', fg='red', bold=True)
             raise typer.Exit(1)
         else:
             raise typer.Exit()
 
 
-def import_openapi_cases(
-        ctx: typer.CallbackParam,
-        openapi: str = typer.Argument(..., help='openapi url/openapi file'),
-        project: Optional[str] = typer.Argument(None, help='指定导入项目，默认使用 conf 配置')):
+def import_openapi_cases(swagger: tuple):
     """
     导入 openapi 测试用例
     """
     typer.secho('🔥 开始导入 openapi 测试用例...', fg='cyan', bold=True)
     try:
-        SwaggerParser().import_openapi_to_yaml(openapi, project)
+        SwaggerParser().import_openapi_to_yaml(swagger[0], swagger[1])
     except Exception as e:
-        print(f'❌ 导入 openapi 测试用例失败: {e}')
+        typer.secho(f'❌ 导入 openapi 测试用例失败: {e}', fg='red', bold=True)
         raise typer.Exit(1)
     else:
         raise typer.Exit()
@@ -91,11 +88,12 @@ def main(
             help='生成测试用例',
             callback=generate_test_cases
         ),
-        # todo
-        _import_openapi_cases: str = typer.Option(
-            ...,
+        _import_openapi_cases: Tuple[str, str] = typer.Option(
+            (..., None),
             '--import-openapi_case',
             '-ioc',
+            show_default=False,
+            metavar='<openapi, project>',
             help='导入 openapi 测试用例',
             callback=import_openapi_cases
         )
