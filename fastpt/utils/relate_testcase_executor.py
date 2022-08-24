@@ -11,7 +11,7 @@ from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
-def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> dict:
+def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
     """
     执行前置关联测试用例
 

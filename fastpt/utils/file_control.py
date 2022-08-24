@@ -17,9 +17,9 @@ def get_file_property(filepath: str) -> Tuple[str, str, str]:
     :return:
     """
     filename = re.split(r'/|\'|\\|\\\\', filepath)[-1]
-    file_real_name = '.'.join(filename.split('.')[:-1])
+    file_root_name = '.'.join(filename.split('.')[:-1])
     filetype = filename.split('.')[-1]
-    return filename, file_real_name, filetype
+    return filename, file_root_name, filetype
 
 
 def search_all_case_yaml_files() -> list:

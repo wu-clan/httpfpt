@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import List, Dict, Any, Union, Optional
 
 import yaml
@@ -50,9 +51,9 @@ def write_yaml(filepath: str, filename: str, data=None, *, encoding: str = 'utf-
     :param mode: 文件写入模式
     :return:
     """
-    if not os.path.exists(filepath):
-        os.makedirs(filepath)
     _file = os.path.join(filepath, filename)
+    if not Path(_file).parent.exists():
+        Path(_file).parent.mkdir(parents=True, exist_ok=True)
     try:
         with open(_file, encoding=encoding, mode=mode) as f:
             result = yaml.dump(data, f, allow_unicode=True)

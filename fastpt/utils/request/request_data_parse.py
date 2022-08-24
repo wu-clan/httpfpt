@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-from typing import Union, Any
+from typing import Union
 
 import allure
 from _pytest.outcomes import Skipped

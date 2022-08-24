@@ -9,7 +9,8 @@ from rich import print  # noqa
 
 sys.path.append('..')
 
-from fastpt.utils.case_auto_generator import auto_generate_test_cases  # noqa
+from fastpt.utils.case_auto_generator import auto_generate_test_cases
+from fastpt.utils.data_manage.openapi import SwaggerParser
 
 app = typer.Typer(rich_markup_mode='rich')
 
@@ -52,9 +53,26 @@ def generate_test_cases(generate: bool):
                 auto_generate_test_cases()
         except Exception as e:
             print(f'❌ 自动生成测试用例失败: {e}')
-            typer.Exit(1)
+            raise typer.Exit(1)
         else:
             raise typer.Exit()
+
+
+def import_openapi_cases(
+        ctx: typer.CallbackParam,
+        openapi: str = typer.Argument(..., help='openapi url/openapi file'),
+        project: Optional[str] = typer.Argument(None, help='指定导入项目，默认使用 conf 配置')):
+    """
+    导入 openapi 测试用例
+    """
+    typer.secho('🔥 开始导入 openapi 测试用例...', fg='cyan', bold=True)
+    try:
+        SwaggerParser().import_openapi_to_yaml(openapi, project)
+    except Exception as e:
+        print(f'❌ 导入 openapi 测试用例失败: {e}')
+        raise typer.Exit(1)
+    else:
+        raise typer.Exit()
 
 
 @app.command(epilog='Made by :beating_heart: null')
@@ -68,10 +86,18 @@ def main(
         ),
         _generate_test_cases: Optional[bool] = typer.Option(
             None,
-            "--generate-test-cases",
-            "-gtc",
+            '--generate-test-cases',
+            '-gtc',
             help='生成测试用例',
             callback=generate_test_cases
+        ),
+        # todo
+        _import_openapi_cases: str = typer.Option(
+            ...,
+            '--import-openapi_case',
+            '-ioc',
+            help='导入 openapi 测试用例',
+            callback=import_openapi_cases
         )
 ):
     print('\n使用 --help 查看使用方法.\n')
