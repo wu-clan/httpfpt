@@ -13,7 +13,6 @@ from fastpt.common.yaml_handler import write_yaml
 from fastpt.core.get_conf import PROJECT_NAME
 from fastpt.core.path_conf import YAML_DATA_PATH
 from fastpt.utils.file_control import get_file_property
-from fastpt.utils.time_control import get_current_timestamp
 
 
 class SwaggerParser:
@@ -30,7 +29,7 @@ class SwaggerParser:
 
     def import_openapi_to_yaml(self, openapi: str, project: Optional[str] = None):
         """
-        导入 openapi 测试用例
+        导入 openapi 数据到 yaml
 
         :param openapi:
         :param project:
@@ -51,8 +50,10 @@ class SwaggerParser:
                 },
                 'module': self.data['info']['title']
             })
-            test_steps = []
             case = {}
+            tag = ''
+            tag_case = {}
+            root_case = {}
             for p, v in self.data['paths'].items():
                 for m, vv in v.items():
                     params = self.get_test_steps_params(vv)
@@ -77,7 +78,7 @@ class SwaggerParser:
                         'name': vv.get('summary'),
                         'case_id': vv.get('operationId'),
                         'description': vv.get('description'),
-                        'is_run': None,
+                        'is_run': vv.get('deprecated', True),
                         'request': {
                             'method': m,
                             'url': p,
@@ -88,22 +89,55 @@ class SwaggerParser:
                             'files': files
                         }
                     })
-                    test_steps.append(case)
-            case_file_data = {'config': config, 'test_steps': test_steps}
+                    # 按 tag 划分目录
+                    tag_ = vv.get('tags')
+                    if tag_ is not None:
+                        dtag = copy.deepcopy(tag)
+                        tag = tag_[0]
+                        if dtag != tag:
+                            tag_case.update({tag: [case]})
+                        else:
+                            tag_case[tag].append(case)
+
+                    else:
+                        root_case = copy.deepcopy(root_case)
+                        if root_case.get('root') is None:
+                            root_case.update({'root': [case]})
+                        else:
+                            root_case[tag].append(case)
+            if (len(tag_case) or len(root_case)) > 0:
+                typer.secho('⏳ 奋力导入中...', fg='green', bold=True)
+            # 写入项目 tag 目录
+            if len(tag_case) > 0:
+                for k, v in tag_case.items():
+                    case_file_data = {'config': config, 'test_steps': v}
+                    write_yaml(
+                        YAML_DATA_PATH,
+                        os.sep.join([
+                            PROJECT_NAME if project is None else project,
+                            k,
+                            get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
+                            f'openapi_{k}.yaml'
+                        ]),
+                        case_file_data
+                    )
+            # 写入项目根目录
+            if len(root_case) > 0:
+                for k, v in tag_case.items():
+                    case_file_data = {'config': config, 'test_steps': v}
+                    write_yaml(
+                        YAML_DATA_PATH,
+                        os.sep.join([
+                            PROJECT_NAME if project is None else project,
+                            get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
+                            f'openapi_{k}.yaml'
+                        ]),
+                        case_file_data
+                    )
         except Exception as e:
             raise e
-        typer.secho('⏳ 奋力导入中...', fg='green', bold=True)
-        # todo 将用例文件按 tag 分组写入
-        write_yaml(
-            YAML_DATA_PATH,
-            os.sep.join([
-                PROJECT_NAME if project is None else project,
-                get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
-                f'openapi_{get_current_timestamp()}.yaml'
-            ]),
-            case_file_data
-        )
-        typer.secho('✅ 导入 openapi 测试用例成功')
+        else:
+            typer.secho('✅ 导入 openapi 数据成功')
 
     def get_swagger_data(self, source: str) -> None:
         """

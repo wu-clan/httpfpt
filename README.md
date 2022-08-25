@@ -330,30 +330,30 @@ ${func()} 或 ${func($var1, $var2)}
 }
 ```
 
-## 用例创建
+## 用例数据导入
+
+统一使用 cli 自动导入
+
+## 测试用例创建
 
 1. 根据数据结构及参数说明，手动编写测试用例
 2. 通过 cli 自动生成测试用例
 
 ## cli 使用说明
-在项目中使用，确保终端在 fastpt 文件夹下打开：`cd fastpt
+
+在项目中使用，确保终端在 fastpt 文件夹下打开：`cd fastpt`
 
 cli 使用帮助:
+
 ```shell
 python cli.py --help
-```
-
-cli 生成测试用例:
-
-```shell
-python cli.py --gtc
 ```
 
 ## 如何运行测试
 
 运行 run.py 文件即可
 
-main 程序参数根据情况进行自定义
+main 程序参数根据情况可进行自定义
 
 ## 如何查看报告
 

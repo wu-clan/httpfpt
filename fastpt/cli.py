@@ -58,15 +58,15 @@ def generate_test_cases(generate: bool):
             raise typer.Exit()
 
 
-def import_openapi_cases(swagger: tuple):
+def import_openapi_data(swagger: tuple):
     """
     导入 openapi 测试用例
     """
-    typer.secho('🔥 开始导入 openapi 测试用例...', fg='cyan', bold=True)
+    typer.secho('🔥 开始导入 openapi 数据...', fg='cyan', bold=True)
     try:
         SwaggerParser().import_openapi_to_yaml(swagger[0], swagger[1])
     except Exception as e:
-        typer.secho(f'❌ 导入 openapi 测试用例失败: {e}', fg='red', bold=True)
+        typer.secho(f'❌ 导入 openapi 数据失败: {e}', fg='red', bold=True)
         raise typer.Exit(1)
     else:
         raise typer.Exit()
@@ -89,13 +89,13 @@ def main(
             callback=generate_test_cases
         ),
         _import_openapi_cases: Tuple[str, str] = typer.Option(
-            (..., None),
-            '--import-openapi_case',
-            '-ioc',
+            (..., ...),
+            '--import-openapi-data',
+            '-iod',
             show_default=False,
-            metavar='<openapi, project>',
-            help='导入 openapi 测试用例',
-            callback=import_openapi_cases
+            metavar='<swagger/openapi, project>',
+            help='导入 swagger / openapi 数据到 yaml 文件; 支持通过 json文件 / url链接 进行导入, project: 指定测试项目',
+            callback=import_openapi_data
         )
 ):
     print('\n使用 --help 查看使用方法.\n')
