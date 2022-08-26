@@ -13,6 +13,7 @@ from fastpt.common.yaml_handler import write_yaml
 from fastpt.core.get_conf import PROJECT_NAME
 from fastpt.core.path_conf import YAML_DATA_PATH
 from fastpt.utils.file_control import get_file_property
+from fastpt.utils.time_control import get_current_timestamp
 
 
 class SwaggerParser:
@@ -123,14 +124,14 @@ class SwaggerParser:
                     )
             # 写入项目根目录
             if len(root_case) > 0:
-                for k, v in tag_case.items():
+                for _, v in tag_case.items():
                     case_file_data = {'config': config, 'test_steps': v}
                     write_yaml(
                         YAML_DATA_PATH,
                         os.sep.join([
                             PROJECT_NAME if project is None else project,
                             get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
-                            f'openapi_{k}.yaml'
+                            f'openapi_{get_current_timestamp()}.yaml'
                         ]),
                         case_file_data
                     )

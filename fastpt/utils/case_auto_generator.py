@@ -29,9 +29,8 @@ def auto_generate_test_cases(rewrite: bool = False) -> None:
     yaml_filenames = []
     yaml_file_root_names = []
     for _ in yaml_datafiles:
-        pp = get_file_property(_)
-        yaml_filenames.append(pp[0])
-        yaml_file_root_names.append(pp[1])
+        yaml_filenames.append(_.rsplit(PROJECT_NAME)[1])
+        yaml_file_root_names.append(Path(_).stem)
 
     # 获取所有测试用例文件名
     testcase_filenames = []
@@ -90,7 +89,13 @@ class {testcase_class_name}:
         send_request.send_request(data)
         '''
                 # 创建测试用例文件
-                case_path = os.path.join(TEST_CASE_PATH, PROJECT_NAME, testcase_func_name + '.py')
+                tag = str(Path(yaml_filename).parent)[1:]
+                if tag != '':
+                    case_path = os.path.join(TEST_CASE_PATH, PROJECT_NAME, tag, testcase_func_name + '.py')
+                else:
+                    case_path = os.path.join(TEST_CASE_PATH, PROJECT_NAME, testcase_func_name + '.py')
+                if not Path(case_path).parent.exists():
+                    Path(case_path).parent.mkdir(parents=True, exist_ok=True)
                 with open(case_path, 'w', encoding='utf-8') as f:
                     f.write(case_code)
 
