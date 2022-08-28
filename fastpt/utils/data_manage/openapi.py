@@ -12,6 +12,7 @@ from fastpt.common.json_handler import read_json_file
 from fastpt.common.yaml_handler import write_yaml
 from fastpt.core.get_conf import PROJECT_NAME
 from fastpt.core.path_conf import YAML_DATA_PATH
+from fastpt.utils.data_manage.base_format import format_value
 from fastpt.utils.file_control import get_file_property
 from fastpt.utils.time_control import get_current_timestamp
 
@@ -57,11 +58,11 @@ class SwaggerParser:
             root_case = {}
             for p, v in self.data['paths'].items():
                 for m, vv in v.items():
-                    params = self.get_test_steps_params(vv)
-                    headers = self.get_test_steps_headers(vv)
+                    params = self.get_swagger_params(vv)
+                    headers = self.get_swagger_headers(vv)
                     if self.version == 2:
-                        data = self.get_request_data(vv) if m.lower() != 'get' else None
-                        files = self.get_request_files(vv) if m.lower() != 'get' else None
+                        data = self.get_swagger_request_data(vv) if m.lower() != 'get' else None
+                        files = self.get_swagger_request_files(vv) if m.lower() != 'get' else None
                     else:
                         try:
                             schema = vv['requestBody']['content'][headers['Content-Type']]['schema']['$ref'].split(
@@ -69,8 +70,8 @@ class SwaggerParser:
                         except KeyError:
                             schema = vv['requestBody']['content'][headers['Content-Type']]['schema']
                             warn_operationId = vv['operationId']
-                        data = self.get_request_data(schema) if schema is not None else None
-                        files = self.get_request_files(schema) if schema is not None else None
+                        data = self.get_swagger_request_data(schema) if schema is not None else None
+                        files = self.get_swagger_request_files(schema) if schema is not None else None
                     data_type = None
                     if headers is not None:
                         data_type = 'json' if 'application/json' in headers else 'data'
@@ -99,18 +100,18 @@ class SwaggerParser:
                             tag_case.update({tag: [case]})
                         else:
                             tag_case[tag].append(case)
-
                     else:
                         root_case = copy.deepcopy(root_case)
                         if root_case.get('root') is None:
                             root_case.update({'root': [case]})
                         else:
-                            root_case[tag].append(case)
+                            root_case['root'].append(case)
             if (len(tag_case) or len(root_case)) > 0:
                 typer.secho('⏳ 奋力导入中...', fg='green', bold=True)
             # 写入项目 tag 目录
             if len(tag_case) > 0:
                 for k, v in tag_case.items():
+                    config['allure']['feature'] = config['module'] = k
                     case_file_data = {'config': config, 'test_steps': v}
                     write_yaml(
                         YAML_DATA_PATH,
@@ -120,11 +121,12 @@ class SwaggerParser:
                             get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
                             f'openapi_{k}.yaml'
                         ]),
-                        case_file_data
+                        case_file_data,
+                        mode='w'
                     )
             # 写入项目根目录
             if len(root_case) > 0:
-                for _, v in tag_case.items():
+                for _, v in root_case.items():
                     case_file_data = {'config': config, 'test_steps': v}
                     write_yaml(
                         YAML_DATA_PATH,
@@ -133,7 +135,8 @@ class SwaggerParser:
                             get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
                             f'openapi_{get_current_timestamp()}.yaml'
                         ]),
-                        case_file_data
+                        case_file_data,
+                        mode='w'
                     )
         except Exception as e:
             raise e
@@ -169,7 +172,7 @@ class SwaggerParser:
             raise Exception("不受支持的 openapi 版本")
         self.data = data
 
-    def get_test_steps_params(self, value: dict) -> Union[dict, None]:
+    def get_swagger_params(self, value: dict) -> Union[dict, None]:
         """
         获取查询参数
 
@@ -191,7 +194,7 @@ class SwaggerParser:
                     data = {i['name']: None}
             return data if len(data) > 0 else None
 
-    def get_test_steps_headers(self, value: dict) -> Union[dict, None]:
+    def get_swagger_headers(self, value: dict) -> Union[dict, None]:
         """
         获取查询参数
 
@@ -211,7 +214,7 @@ class SwaggerParser:
                 data = {'Content-Type': f'{[k for k in content.keys()][0]}'}
             return data if len(data) > 0 else None
 
-    def get_schema_data(self, name: str) -> dict:
+    def get_swagger_schema_data(self, name: str) -> dict:
         """
         获取 schema 数据
 
@@ -224,7 +227,7 @@ class SwaggerParser:
             data = self.data.get('components').get('schemas').get(name)
         return data
 
-    def get_request_data(self, value: Union[str, dict]):
+    def get_swagger_request_data(self, value: Union[str, dict]) -> Union[dict, None]:
         """
         获取请求 data
 
@@ -240,27 +243,27 @@ class SwaggerParser:
                     else:
                         if i.get('type') != 'file':
                             data[i['name']] = self.format_value(i.get('type', 'object'))  # noqa
-            return data
+            return data if len(data) > 0 else None
         else:
             if not isinstance(value, dict):
-                schema_data = self.get_schema_data(value)
+                schema_data = self.get_swagger_schema_data(value)
                 for k, v in schema_data['properties'].items():
                     if v.get('format') is None:
-                        data[k] = self.format_value(v.get('type', 'object'))
+                        data[k] = format_value(v.get('type', 'object'))
                     else:
                         if v.get('format') != 'binary':
-                            data[k] = self.format_value(v.get('type', 'object'))
+                            data[k] = format_value(v.get('type', 'object'))
             else:
                 # 请求体使用了非 schema 格式入参
                 warnings.warn(f'接口(ID) {warn_operationId} 使用了非 schema 入参')
                 if value.get('type') is None:
-                    data[value['title']] = self.format_value('object')
+                    data[value['title']] = format_value('object')
                 else:
                     if value.get('type') != 'file':
-                        data[value['title']] = self.format_value(value.get('type', 'object'))
-            return data
+                        data[value['title']] = format_value(value.get('type', 'object'))
+            return data if len(data) > 0 else None
 
-    def get_request_files(self, value: Union[str, dict]):
+    def get_swagger_request_files(self, value: Union[str, dict]) -> Union[dict, None]:
         """
         获取请求 files
 
@@ -272,31 +275,11 @@ class SwaggerParser:
             for v in value['parameters']:
                 if v.get('type') == 'file':
                     files[v['name']] = self.format_value('object')  # noqa
-            return files
+            return files if len(files) > 0 else None
         else:
             if not isinstance(value, dict):
-                schema_data = self.get_schema_data(value)
+                schema_data = self.get_swagger_schema_data(value)
                 for k, v in schema_data['properties'].items():
                     if v.get('format') == 'binary':
-                        files[k] = self.format_value(v.get('type', 'object'))
-                return files
-
-    @staticmethod
-    def format_value(value_type: str):
-        if value_type == 'string':
-            v = ''
-        elif value_type == 'integer':
-            v = 0
-        elif value_type == 'number':
-            v = 0
-        elif value_type == 'boolean':
-            v = False
-        elif value_type == 'object':
-            v = {}
-        elif value_type == 'array':
-            v = [{}]
-        elif value_type == 'arrayString':
-            v = []
-        else:
-            raise Exception(f"存在不支持的类型：{value_type}")
-        return v
+                        files[k] = format_value(v.get('type', 'object'))
+                return files if len(files) > 0 else None
