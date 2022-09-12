@@ -39,6 +39,6 @@ REQUEST_PROXIES_REQUESTS = {
     'https': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None
 }
 REQUEST_PROXIES_HTTPX = {
-    'http://': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,
+    'http://': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,  # noqa
     'https://': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None
 }

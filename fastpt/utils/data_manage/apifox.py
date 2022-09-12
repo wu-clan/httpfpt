@@ -167,9 +167,10 @@ class ApiFoxParser:
             data_type = 'json' if 'application/json' in headers else 'data'
         data = self.get_apifox_request_data(value['api']['requestBody'])
         files = self.get_apifox_request_files(value['api']['requestBody'])
+        case_id = value.get('api').get('operationId')
         case = {
             'name': value.get('name'),
-            'case_id': value.get('api').get('id'),
+            'case_id': case_id if case_id is not None or case_id != '' else value.get('api').get('id'),
             'description': value.get('api').get('description'),
             'is_run': True if value.get('status') in ['released', 'tested'] else False,
             'request': {

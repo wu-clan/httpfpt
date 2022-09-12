@@ -264,6 +264,9 @@ class RequestDataParse:
                     headers = eval(headers)
                 if not isinstance(headers, dict):
                     raise ValueError('请求数据解析失败, 参数 headers 格式错误, 必须为 dict 类型')
+                else:
+                    if len(headers) == 0:
+                        raise ValueError('请求数据解析失败, 参数 headers 内容为空')
             return headers
 
     @property
@@ -273,6 +276,7 @@ class RequestDataParse:
         except KeyError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:data_type 参数')
         else:
+            # todo 添加常规data_type
             if not any(_ == data_type for _ in ['data', 'json', None]):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:data_type 不是合法类型')
             if data_type is not None:
@@ -547,6 +551,7 @@ class RequestDataParse:
 
         :return:
         """
+        # todo 适配data_type
         if self.data_type != 'json':
             parsed_data = {
                 'method': self.method,
