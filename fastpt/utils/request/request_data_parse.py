@@ -10,13 +10,16 @@ from _pytest.outcomes import Skipped
 from fastpt.common.env_handler import get_env_dict
 from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
+from fastpt.enums.request.body import BodyType
+from fastpt.enums.request.engin import EnginType
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
 class RequestDataParse:
 
-    def __init__(self, request_data: dict):
+    def __init__(self, request_data: dict, request_engin: str):
         self.request_data = VarsExtractor().vars_replace(request_data)
+        self.request_engin = request_engin
         self._is_run()  # put down
 
     @property
@@ -25,6 +28,8 @@ class RequestDataParse:
             config = self.request_data['config']
         except KeyError:
             raise ValueError('测试用例数据解析失败，缺少 config 参数')
+        if not isinstance(config, dict):
+            raise ValueError('测试用例数据解析失败, 参数 config 不是有效的 dict 类型')
         else:
             return config
 
@@ -37,6 +42,8 @@ class RequestDataParse:
         else:
             if epic is None:
                 raise ValueError('测试用例数据解析失败, 参数 config:allure:epic 为空')
+            if not isinstance(epic, str):
+                raise ValueError('测试用例数据解析失败, 参数 config:allure:epic 不是有效的 str 类型')
             return epic
 
     @property
@@ -48,6 +55,8 @@ class RequestDataParse:
         else:
             if feature is None:
                 raise ValueError('测试用例数据解析失败, 参数 config:allure:feature 为空')
+            if not isinstance(feature, str):
+                raise ValueError('测试用例数据解析失败, 参数 config:allure:feature 不是有效的 str 类型')
             return feature
 
     @property
@@ -59,6 +68,8 @@ class RequestDataParse:
         else:
             if story is None:
                 raise ValueError('测试用例数据解析失败, 参数 config:allure:story 为空')
+            if not isinstance(story, str):
+                raise ValueError('测试用例数据解析失败, 参数 config:allure:story 不是有效的 str 类型')
             return story
 
     @property
@@ -111,30 +122,21 @@ class RequestDataParse:
     def proxies(self) -> Union[dict, None]:
         try:
             proxies = self.request_data['config']['request']['proxies']
-            for k, v in proxies.items():
-                proxies = v
-                if not isinstance(v, dict):
+            if proxies is not None:
+                if not isinstance(proxies, dict):
                     raise ValueError('测试用例数据解析失败, 参数 config:request:proxies 不是有效的 dict 类型')
-                if k == 'requests':
-                    for qk, qv in proxies.items():
-                        if qk not in ['http', 'https']:
-                            raise ValueError('测试哟管理数据解析失败，参数 config:request:proxies:requests 不符合规范')
-                        if qv is not None:
-                            if not isinstance(qv, str):
-                                raise ValueError(
-                                    f'测试哟管理数据解析失败，参数 config:request:proxies:requests:{qv} 不符合规范'
-                                )
-                elif k == 'httpx':
-                    for hk, hv in proxies.items():
-                        if hk not in ['http://', 'https://']:  # noqa
-                            raise ValueError('测试哟管理数据解析失败，参数 config:request:proxies:httpx 不符合规范')
-                        if hv is not None:
-                            if not isinstance(hv, str):
-                                raise ValueError(
-                                    f'测试哟管理数据解析失败，参数 config:request:proxies:requests:{hv} 不符合规范'
-                                )
-                else:
-                    raise ValueError('测试用例数据解析失败, 参数 config:request:proxies 不符合规范')
+                for k, v in proxies.items():
+                    if k not in ['http', 'https']:
+                        raise ValueError('测试哟管理数据解析失败，参数 config:request:proxies 不符合规范')
+                    if v is not None:
+                        if not isinstance(v, str):
+                            raise ValueError(
+                                f'测试哟管理数据解析失败，参数 config:request:proxies:{v} 不是有效的 str 类型'
+                            )
+                if self.request_engin == EnginType.requests:
+                    proxies = proxies
+                elif self.request_engin == EnginType.httpx:
+                    proxies = {'http://': proxies['http'], 'https://': proxies['https']}  # noqa
         except KeyError:
             proxies = None
         return proxies
@@ -148,6 +150,8 @@ class RequestDataParse:
         else:
             if module is None:
                 raise ValueError('测试用例数据解析失败, 参数 config:module 为空')
+            if not isinstance(module, str):
+                raise ValueError('测试用例数据解析失败, 参数 config:module 不是有效的 str 类型')
             return module
 
     @property
@@ -157,6 +161,8 @@ class RequestDataParse:
         except KeyError:
             raise ValueError('请求参数解析失败，缺少 test_steps 参数')
         else:
+            if not isinstance(test_steps, (dict, list)):
+                raise ValueError('测试用例数据解析失败, 参数 test_steps 不是有效的 dict / list 类型')
             return test_steps
 
     @property
@@ -168,6 +174,8 @@ class RequestDataParse:
         else:
             if name is None:
                 raise ValueError('测试用例数据解析失败, 参数 test_steps:name 为空')
+            if not isinstance(name, str):
+                raise ValueError('测试用例数据解析失败, 参数 test_steps:name 不是有效的 str 类型')
             return name
 
     @property
@@ -179,6 +187,8 @@ class RequestDataParse:
         else:
             if case_id is None:
                 raise ValueError('测试用例数据解析失败, 参数 test_steps:case_id 为空')
+            if not isinstance(case_id, str):
+                raise ValueError('测试用例数据解析失败, 参数 test_steps:case_id 不是有效的 str 类型')
             return case_id
 
     @property
@@ -198,7 +208,9 @@ class RequestDataParse:
             ...
         else:
             if is_run is not None:
-                if not is_run or str(is_run).lower() == 'false':
+                if not isinstance(is_run, bool):
+                    raise ValueError('测试用例数据解析失败, 参数 test_steps:is_run 不是有效的 bool 类型')
+                if not is_run:
                     allure.dynamic.title(
                         f"用例 module: {self.module};"
                         f"用例 case_id: {self.case_id}"
@@ -219,7 +231,7 @@ class RequestDataParse:
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 不是有效的 str 类型')
             if not any(_ == method.lower() for _ in ['get', 'post', 'put', 'delete', 'patch']):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 不是合法的请求类型')
-            return method
+            return method.upper()
 
     @property
     def url(self) -> str:
@@ -242,9 +254,9 @@ class RequestDataParse:
         else:
             if params is not None:
                 if isinstance(params, str):
-                    params = eval(params)
+                    params = eval(params)  # excel 数据处理
                 if not isinstance(params, dict):
-                    raise ValueError('请求数据解析失败, 缺少 test_steps:request:params 参数不符合规范')
+                    raise ValueError('请求数据解析失败, 参数 test_steps:request:params 不是有效的 dict 类型')
         return params
 
     @property
@@ -259,46 +271,66 @@ class RequestDataParse:
                     headers = self.request_data['config']['request']['headers']
                 except KeyError:
                     headers = None
-            if headers is not None:
+            else:
                 if isinstance(headers, str):
                     headers = eval(headers)
                 if not isinstance(headers, dict):
-                    raise ValueError('请求数据解析失败, 参数 headers 格式错误, 必须为 dict 类型')
+                    raise ValueError('请求数据解析失败, 参数 headers 不是有效的 dict 类型')
                 else:
                     if len(headers) == 0:
                         raise ValueError('请求数据解析失败, 参数 headers 内容为空')
             return headers
 
     @property
-    def data_type(self) -> Union[str, None]:
+    def body_type(self) -> Union[str, None]:
         try:
-            data_type = self.request_data['test_steps']['request']['data_type']
+            data_type = self.request_data['test_steps']['request']['body_type']
         except KeyError:
-            raise ValueError('请求数据解析失败, 缺少 test_steps:request:data_type 参数')
+            raise ValueError('请求数据解析失败, 缺少 test_steps:request:body_type 参数')
         else:
-            # todo 添加常规data_type
-            if not any(_ == data_type for _ in ['data', 'json', None]):
-                raise ValueError('请求参数解析失败, 参数 test_steps:request:data_type 不是合法类型')
-            if data_type is not None:
-                data_type = data_type.lower()
+            if data_type not in BodyType._value2member_map_:  # noqa
+                raise ValueError('请求参数解析失败, 参数 test_steps:request:body_type 不是合法类型')
         return data_type
 
     @property
-    def data(self) -> Union[dict, None]:
+    def body(self) -> Union[dict, None]:
         try:
-            data = self.request_data['test_steps']['request']['data']
+            body = self.request_data['test_steps']['request']['body']
         except KeyError:
-            raise ValueError('请求数据解析失败, 缺少 test_steps:request:data 参数')
+            raise ValueError('请求数据解析失败, 缺少 test_steps:request:body 参数')
         else:
-            if data is not None:
-                if isinstance(data, str):
-                    data = eval(data)
-                if self.data_type == 'json':
-                    try:
-                        data = json.dumps(data, ensure_ascii=False)
-                    except Exception:
-                        raise ValueError('请求数据解析失败, 请求参数 data 不是有效的 dict')
-        return data
+            if body is not None:
+                if isinstance(body, str):
+                    body = eval(body)
+                if self.body_type == BodyType.none.value:
+                    body = None
+                elif self.body_type == BodyType.form_data.value:
+                    body = body
+                elif self.body_type == BodyType.x_www_form_urlencoded.value:
+                    if "Content-Type" not in self.headers:
+                        self.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+                    else:
+                        self.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+                    body = body
+                elif self.body_type == BodyType.binary.value:
+                    body = None
+                elif self.body_type == BodyType.graphQL.value:
+                    body = json.loads(json.dumps(body, ensure_ascii=False))
+                elif self.body_type == BodyType.text.value:
+                    body = body
+                elif self.body_type == BodyType.javascript.value:
+                    body = body
+                elif self.body_type == BodyType.json.value:
+                    if "Content-Type" not in self.headers:
+                        self.headers['Content-Type'] = 'application/json; charset=UTF-8'
+                    else:
+                        self.headers.update({'Content-Type': 'application/json; charset=UTF-8'})
+                    body = json.loads(json.dumps(body, ensure_ascii=False))
+                elif self.body_type == BodyType.html.value:
+                    body = body
+                elif self.body_type == BodyType.xml.value:
+                    body = body
+        return body
 
     @property
     def files(self) -> Union[dict, list, None]:
@@ -477,7 +509,7 @@ class RequestDataParse:
                 else:
                     for v in hook:
                         if not isinstance(v, str):
-                            raise ValueError(f'请求参数解析失败，参数 test_steps:setup:hooks:{v} 不是有效的 str 类型')
+                            raise ValueError(f'请求参数解析失败，参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型')
         except KeyError:
             hook = None
         return hook
@@ -497,9 +529,9 @@ class RequestDataParse:
                             for k, v in i.items():
                                 if not isinstance(v, str):
                                     raise ValueError(
-                                        f'请求参数解析失败，参数 test_steps:setup:extract:{k} 不是有效的 str 类型')
+                                        f'请求参数解析失败，参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
                         else:
-                            raise ValueError(f'请求参数解析失败，参数 test_steps:setup:extract:{i} 不是合法数据')
+                            raise ValueError(f'请求参数解析失败，参数 test_steps:teardown:extract:{i} 不是合法数据')
         except KeyError:
             extract = None
         return extract
@@ -520,15 +552,6 @@ class RequestDataParse:
                     raise ValueError(
                         '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
                     )
-                try:
-                    if isinstance(assert_text, list):
-                        for text in assert_text:
-                            if isinstance(text, dict):
-                                text['value'] = eval(text['value'])
-                    elif isinstance(assert_text, dict):
-                        assert_text['value'] = eval(assert_text['value'])
-                except Exception:  # noqa
-                    pass
         return assert_text
 
     @property
@@ -545,29 +568,35 @@ class RequestDataParse:
         return time
 
     @property
-    def get_request_args_parsed(self) -> dict:
+    def get_request_data_parsed(self) -> dict:
         """
         获取解析后的请求参数
 
         :return:
         """
-        # todo 适配data_type
-        if self.data_type != 'json':
-            parsed_data = {
-                'method': self.method,
-                'url': self.url,
-                'params': self.params,
-                'headers': self.headers,
-                'data': self.data,
-                'files': self.files
-            }
-        else:
-            parsed_data = {
-                'method': self.method,
-                'url': self.url,
-                'params': self.params,
-                'headers': self.headers,
-                'json': self.data,
-                'files': self.files
-            }
+        parsed_data = {
+            'method': self.method,
+            'url': self.url,
+            'params': self.params,
+            'headers': self.headers,
+            'data': self.body,
+            'files': self.files
+        }
+        if self.request_engin == EnginType.requests:
+            if self.body_type != BodyType.json.value or self.body_type != BodyType.graphQL.value:
+                parsed_data = parsed_data
+            else:
+                parsed_data.pop('data')
+                parsed_data.update({'json': self.body})
+        elif self.request_engin == EnginType.httpx:
+            if any(_ == self.body_type for _ in [
+                BodyType.text.value, BodyType.javascript.value, BodyType.html.value, BodyType.xml.value
+            ]):
+                parsed_data.pop('data')
+                parsed_data.update({'content': self.body})
+            elif self.body_type == BodyType.json.value or self.body_type == BodyType.graphQL.value:
+                parsed_data.pop('data')
+                parsed_data.update({'json': self.body})
+            else:
+                parsed_data = parsed_data
         return parsed_data

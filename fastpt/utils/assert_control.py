@@ -5,7 +5,7 @@ from typing import Union
 from jsonpath import jsonpath
 
 from fastpt.common.log import log
-from fastpt.schema.assert_type import AssertType
+from fastpt.enums.assert_type import AssertType
 
 
 class Asserter:

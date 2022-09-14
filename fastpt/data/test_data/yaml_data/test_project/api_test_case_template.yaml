@@ -10,12 +10,8 @@ config:
     verify: False
     redirects: True
     proxies:
-      requests:
-        http:
-        https:
-  #      httpx:
-  #        http://:
-  #        https://:
+      http:
+      https:
   module: test
 
 test_steps:
@@ -28,8 +24,8 @@ test_steps:
       url: /posts/1
       params:
       headers:
-      data_type:
-      data:
+      body_type:
+      body:
       files:
     setup:
       testcase:
@@ -37,12 +33,6 @@ test_steps:
           key: rcode
           jsonpath: $.status_code
         - event_query_002
-      #      sql:
-      #        - key:
-      #          set_type:
-      #          sql:
-      #          jsonpath:
-      #        - select * from xxx where xxx=xxx
       hooks:
       wait_time: 0
     teardown:
@@ -53,10 +43,10 @@ test_steps:
           set_type: cache
           jsonpath: $.url
       assert:
-        - check: 检查响应状态码
-          value: ^rcode
-          type: eq
-          jsonpath: $.status_code
+        check: 检查响应状态码
+        value: ^rcode
+        type: eq
+        jsonpath: $.status_code
       wait_time: 0
 
   - name: 断言
@@ -69,8 +59,8 @@ test_steps:
       params:
         postId: 1
       headers:
-      data_type:
-      data:
+      body_type:
+      body:
       files:
     setup:
       testcase:
@@ -94,8 +84,8 @@ test_steps:
       params:
       headers:
         Content-type: application/json; charset=UTF-8
-      data_type: json
-      data:
+      body_type: json
+      body:
         title: foo
         body: this is a test
         userId: 1

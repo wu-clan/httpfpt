@@ -13,6 +13,8 @@ from requests import Response as RequestsResponse
 from fastpt.common.log import log
 from fastpt.core import get_conf
 from fastpt.db.mysql_db import DB
+from fastpt.enums.request.body import BodyType
+from fastpt.enums.request.engin import EnginType
 from fastpt.utils.allure_control import allure_attach_file
 from fastpt.utils.assert_control import Asserter
 from fastpt.utils.relate_testcase_executor import exec_setup_testcase
@@ -24,12 +26,6 @@ from fastpt.utils.time_control import get_current_time
 
 class SendRequests:
     """ 发送请求 """
-
-    def __init__(self, ):
-        self.__request_engin_list = [
-            'requests',
-            'httpx'
-        ]
 
     @property
     def init_response_meta_data(self) -> dict:
@@ -121,12 +117,12 @@ class SendRequests:
         :param log_data: 日志记录数据
         :return: response
         """
-        if request_engin not in self.__request_engin_list:
+        if request_engin not in EnginType._value2member_map_:  # noqa
             raise ValueError(f'请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
         log.info('开始解析请求数据')
-        parsed_data = RequestDataParse(request_data)
+        parsed_data = RequestDataParse(request_data, request_engin)
         log.info('请求数据解析完成')
 
         # 日志记录前置请求日志
@@ -166,16 +162,16 @@ class SendRequests:
         }
         response_data = self.init_response_meta_data
         response_data['stat']['execute_time'] = get_current_time()
-        if request_engin == 'requests':
+        if request_engin == EnginType.requests:
             response = self._requests_engin(
                 **request_conf,
-                **parsed_data.get_request_args_parsed,
+                **parsed_data.get_request_data_parsed,
                 **kwargs
             )
-        elif request_engin == 'httpx':
+        elif request_engin == EnginType.httpx:
             response = self._httpx_engin(
                 **request_conf,
-                **parsed_data.get_request_args_parsed,
+                **parsed_data.get_request_data_parsed,
                 **kwargs
             )
         else:
@@ -198,9 +194,6 @@ class SendRequests:
         # 日志记录响应
         if log_data:
             self.log_request_down(response_data)
-
-        # 日志记录后置请求日志
-        if log_data:
             self.log_request_teardown(parsed_data)
 
         # 后置处理
@@ -245,11 +238,11 @@ class SendRequests:
         log.info(f"请求 url: {parsed.url}")
         log.info(f"请求 params: {parsed.params}")
         log.info(f'请求 headers: {parsed.headers}')
-        log.info(f"请求 data_type：{parsed.data_type}")
-        if parsed.data_type != 'json':
-            log.info(f"请求 data：{parsed.data}")
+        log.info(f"请求 data_type：{parsed.body_type}")
+        if parsed.body_type != BodyType.json.value:
+            log.info(f"请求 data：{parsed.body}")
         else:
-            log.info(f"请求 json: {parsed.data}")
+            log.info(f"请求 json: {parsed.body}")
         log.info(f"请求 files: {parsed.files_no_parse}")
 
     @staticmethod

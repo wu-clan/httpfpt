@@ -17,8 +17,8 @@ test_steps:
       url: /upload
       params:
       headers:
-      data_type:
-      data:
+      body_type:
+      body:
       files:
         file: D:\\0000000000_test\\666.txt
     teardown:
