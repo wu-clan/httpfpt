@@ -113,8 +113,8 @@ class VarsExtractor:
                 else:
                     str_target = re.sub(self.relate_vars_re, value, str_target, 1)
 
-        # 清空关联用例临时变量，控制关联变量使用范围
-        VariableCache().cache.clear()
+            # 删除关联用例临时变量
+            VariableCache().delete(var_key)
 
         if isinstance(str_target, str):
             str_target = eval(str_target)
