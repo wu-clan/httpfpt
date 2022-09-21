@@ -125,9 +125,10 @@ class RequestDataParse:
             if proxies is not None:
                 if not isinstance(proxies, dict):
                     raise ValueError('测试用例数据解析失败, 参数 config:request:proxies 不是有效的 dict 类型')
+                keys = list(proxies.keys())
+                if 'http' not in keys or 'https' not in keys:
+                    raise ValueError('测试哟管理数据解析失败，参数 config:request:proxies 不符合规范')
                 for k, v in proxies.items():
-                    if k not in ['http', 'https']:
-                        raise ValueError('测试哟管理数据解析失败，参数 config:request:proxies 不符合规范')
                     if v is not None:
                         if not isinstance(v, str):
                             raise ValueError(

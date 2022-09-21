@@ -5,6 +5,7 @@ from typing import Union
 from jsonpath import jsonpath
 
 from fastpt.common.log import log
+from fastpt.db.mysql_db import DB
 from fastpt.enums.assert_type import AssertType
 
 
@@ -96,6 +97,34 @@ class Asserter:
         if response_value:
             log.info(f'执行断言：{assert_text}')
             self._exec_json_assert(assert_check, assert_value, assert_type, response_value[0])
+        else:
+            raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
+
+    def _sql_asserter(self, assert_text: dict):
+        """
+        **sql 提取断言器**
+
+        提取方法与 json 断言器相同
+
+        :param assert_text:
+        :return:
+        """
+        if not isinstance(assert_text, dict):
+            raise ValueError('断言内容格式错误, 请检查断言脚本是否为 dict 格式')
+        try:
+            assert_check = assert_text['check']
+            assert_value = assert_text['value']
+            assert_type = assert_text['type']
+            assert_sql = assert_text['sql']
+            assert_jsonpath = assert_text['jsonpath']
+        except KeyError as e:
+            raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
+        else:
+            sql_data = DB().exec_case_sql(assert_sql)
+            sql_value = jsonpath(sql_data, assert_jsonpath)
+        if sql_value:
+            log.info(f'执行断言：{assert_text}')
+            self._exec_json_assert(assert_check, assert_value, assert_type, sql_value[0])
         else:
             raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
 
@@ -206,7 +235,7 @@ class Asserter:
                             exec(format_assert_text)
 
     @staticmethod
-    def _exec_json_assert(assert_check: str, expected_value, assert_type: str, actual_value) -> None:
+    def _exec_json_assert(assert_check: Union[str, None], expected_value, assert_type: str, actual_value) -> None:
         """
         执行 jsonpath 断言
 
@@ -218,55 +247,55 @@ class Asserter:
         """
         if assert_type == AssertType.equal:
             assert expected_value == actual_value, \
-                f'{assert_check} -> expected {expected_value} equal to {actual_value}'
+                f'{assert_check}' or f'expected {expected_value} not equal to {actual_value}'
         elif assert_type == AssertType.not_equal:
             assert expected_value != actual_value, \
-                f'{assert_check} -> expected {expected_value} not equal to {actual_value}'
+                f'{assert_check}' or f'expected {expected_value} equal to {actual_value}'
         elif assert_type == AssertType.greater_than:
             assert expected_value > actual_value, \
-                f'{assert_check} -> expected {expected_value} greater than to {actual_value}'
+                f'{assert_check}' or f'expected {expected_value} not greater than to {actual_value}'
         elif assert_type == AssertType.greater_than_or_equal:
             assert expected_value >= actual_value, \
-                f'{assert_check} -> expected {expected_value} greater than or equal to {actual_value}'
+                f'{assert_check}' or f'expected {expected_value} not greater than or equal to {actual_value}'
         elif assert_type == AssertType.less_than:
             assert expected_value < actual_value, \
-                f'{assert_check} -> expected {expected_value} less than to {actual_value}'
+                f'{assert_check}' or f'expected {expected_value} not less than to {actual_value}'
         elif assert_type == AssertType.less_than_or_equal:
             assert expected_value <= actual_value, \
-                f'{assert_check} -> expected {expected_value} less than or equal to {actual_value}'
+                f'{assert_check}' or f'expected {expected_value} not less than or equal to {actual_value}'
         elif assert_type == AssertType.string_equal:
             assert str(expected_value) == str(actual_value), \
-                f'{assert_check} -> expected {str(expected_value)} equal to {str(actual_value)}'
+                f'{assert_check}' or f'expected {str(expected_value)} not equal to {str(actual_value)}'
         elif assert_type == AssertType.length_equal:
             assert len(str(expected_value)) == len(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} length equal to {str(actual_value)} length'
+                f'{assert_check}' or f'expected {str(expected_value)} length not equal to {str(actual_value)} length'
         elif assert_type == AssertType.not_length_equal:
             assert len(str(expected_value)) != len(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} length not equal to {str(actual_value)} length'
+                f'{assert_check}' or f'expected {str(expected_value)} length equal to {str(actual_value)} length'
         elif assert_type == AssertType.length_greater_than:
             assert len(str(expected_value)) > len(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} length greater than to {str(actual_value)} length'
+                f'{assert_check}' or f'expected {str(expected_value)} length not greater than to {str(actual_value)} length'
         elif assert_type == AssertType.length_greater_than_or_equal:
             assert len(str(expected_value)) >= len(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} length greater than or equal to {str(actual_value)} length'
+                f'{assert_check}' or f'expected {str(expected_value)} length not greater than or equal to {str(actual_value)} length'
         elif assert_type == AssertType.length_less_than:
             assert len(str(expected_value)) < len(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} length less than to {str(actual_value)} length'
+                f'{assert_check}' or f'expected {str(expected_value)} length not less than to {str(actual_value)} length'
         elif assert_type == AssertType.length_less_than_or_equal:
             assert len(str(expected_value)) <= len(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} length less than or equal to {str(actual_value)} length'
+                f'{assert_check}' or f'expected {str(expected_value)} length not less than or equal to {str(actual_value)} length'
         elif assert_type == AssertType.contains:
             assert str(expected_value) in str(actual_value), \
-                f'{assert_check} -> expected {str(expected_value)} contains {str(actual_value)}'
+                f'{assert_check}' or f'expected {str(expected_value)} not contains {str(actual_value)}'
         elif assert_type == AssertType.not_contains:
             assert str(expected_value) not in str(actual_value), \
-                f'{assert_check} -> expected {str(expected_value)} not contains {str(actual_value)}'
+                f'{assert_check}' or f'expected {str(expected_value)} contains {str(actual_value)}'
         elif assert_type == AssertType.startswith:
-            assert str(expected_value).startswith(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} starts with {str(actual_value)}'
+            assert str(actual_value).startswith(str(expected_value)), \
+                f'{assert_check}' or f'actual {str(actual_value)} not starts with {str(expected_value)}'
         elif assert_type == AssertType.endswith:
-            assert str(expected_value).endswith(str(actual_value)), \
-                f'{assert_check} -> expected {str(expected_value)} ends with {str(actual_value)}'
+            assert str(actual_value).endswith(str(expected_value)), \
+                f'{assert_check}' or f'expected {str(actual_value)} not ends with {str(expected_value)}'
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 
@@ -283,13 +312,19 @@ class Asserter:
         elif isinstance(assert_text, str):
             self._code_asserter(response, assert_text)
         elif isinstance(assert_text, dict):
-            self._json_asserter(response, assert_text)
+            if assert_text.get('sql') is None:
+                self._json_asserter(response, assert_text)
+            else:
+                self._sql_asserter(assert_text)
         elif isinstance(assert_text, list):
             for text in assert_text:
                 if isinstance(text, str):
                     self._code_asserter(response, text)
                 elif isinstance(text, dict):
-                    self._json_asserter(response, text)
+                    if text.get('sql') is None:
+                        self._json_asserter(response, text)
+                    else:
+                        self._sql_asserter(text)
                 else:
                     raise ValueError(f'断言表达式格式错误: {text}')
         else:

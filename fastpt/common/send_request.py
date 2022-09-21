@@ -132,20 +132,19 @@ class SendRequests:
         # 前置处理
         if parsed_data.is_setup:
             log.info('开始处理请求前置...')
-        setup_testcase = parsed_data.setup_testcase
-        if setup_testcase is not None:
-            exec_setup_testcase(parsed_data, setup_testcase)
-        setup_sql = parsed_data.setup_sql
-        if setup_sql is not None:
-            DB().exec_case_sql(setup_sql, parsed_data.env)
-        setup_hooks = parsed_data.setup_hooks
-        if setup_hooks is not None:
-            HookExecutor().exec_case_func(setup_hooks)
-        wait_time = parsed_data.setup_wait_time
-        if wait_time is not None:
-            log.info(f'执行请求前等待：{wait_time} s')
-            time.sleep(wait_time)
-        if parsed_data.is_setup:
+            setup_testcase = parsed_data.setup_testcase
+            if setup_testcase is not None:
+                exec_setup_testcase(parsed_data, setup_testcase)
+            setup_sql = parsed_data.setup_sql
+            if setup_sql is not None:
+                DB().exec_case_sql(setup_sql, parsed_data.env)
+            setup_hooks = parsed_data.setup_hooks
+            if setup_hooks is not None:
+                HookExecutor().exec_case_func(setup_hooks)
+            wait_time = parsed_data.setup_wait_time
+            if wait_time is not None:
+                log.info(f'执行请求前等待：{wait_time} s')
+                time.sleep(wait_time)
             log.info('请求前置处理完成')
 
         # 日志记录请求数据
@@ -199,23 +198,22 @@ class SendRequests:
         # 后置处理
         if parsed_data.is_teardown:
             log.info('开始处理请求后置...')
-        teardown_sql = parsed_data.teardown_sql
-        if teardown_sql is not None:
-            DB().exec_case_sql(teardown_sql, parsed_data.env)
-        teardown_hooks = parsed_data.teardown_hooks
-        if teardown_hooks is not None:
-            HookExecutor().exec_case_func(teardown_hooks)
-        teardown_extract = parsed_data.teardown_extract
-        if teardown_extract is not None:
-            VarsExtractor().teardown_var_extract(response_data, teardown_extract, parsed_data.env)
-        teardown_assert = parsed_data.teardown_assert
-        if teardown_assert is not None:
-            Asserter().exec_asserter(response_data, assert_text=teardown_assert)
-        wait_time = parsed_data.teardown_wait_time
-        if wait_time is not None:
-            log.info(f'执行请求后等待：{wait_time} s')
-            time.sleep(wait_time)
-        if parsed_data.is_setup:
+            teardown_sql = parsed_data.teardown_sql
+            if teardown_sql is not None:
+                DB().exec_case_sql(teardown_sql, parsed_data.env)
+            teardown_hooks = parsed_data.teardown_hooks
+            if teardown_hooks is not None:
+                HookExecutor().exec_case_func(teardown_hooks)
+            teardown_extract = parsed_data.teardown_extract
+            if teardown_extract is not None:
+                VarsExtractor().teardown_var_extract(response_data, teardown_extract, parsed_data.env)
+            teardown_assert = parsed_data.teardown_assert
+            if teardown_assert is not None:
+                Asserter().exec_asserter(response_data, assert_text=teardown_assert)
+            wait_time = parsed_data.teardown_wait_time
+            if wait_time is not None:
+                log.info(f'执行请求后等待：{wait_time} s')
+                time.sleep(wait_time)
             log.info('请求后置处理完成')
 
         return response_data

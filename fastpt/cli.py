@@ -113,14 +113,14 @@ def main(
             None,
             '--version',
             '-V',
-            help='获取当前版本',
+            help='获取当前框架版本号',
             callback=get_version
         ),
         _generate_test_cases: Optional[bool] = typer.Option(
             None,
             '--generate-test-cases',
             '-gtc',
-            help='生成测试用例',
+            help='自动生成测试用例',
             callback=generate_test_cases
         ),
         _import_openapi_data: Tuple[str, str] = typer.Option(
@@ -130,7 +130,7 @@ def main(
             '-isd',
             show_default=False,
             metavar='<swagger/openapi, project>',
-            help='导入 swagger / openapi 数据到 yaml 数据文件; 支持通过 json文件 / url链接 进行导入, project: 指定测试项目',
+            help='导入 openapi / swagger 数据到 yaml 数据文件; 支持通过 json文件 / url链接 进行导入, project: 指定测试项目',
             callback=import_openapi_data
         ),
         _import_apifox_data: Tuple[str, str] = typer.Option(
