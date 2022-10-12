@@ -53,7 +53,7 @@ def allure_attach_file(filepath: str, name=None, extension=None):
         filetype = 'URI_LIST'
     allure.attach.file(
         source=filepath,
-        name=filename if name is None else name,
+        name=name or filename,
         attachment_type=getattr(AttachmentType, filetype.upper(), None),
         extension=extension
     )

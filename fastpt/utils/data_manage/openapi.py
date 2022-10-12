@@ -116,7 +116,7 @@ class SwaggerParser:
                     write_yaml(
                         YAML_DATA_PATH,
                         os.sep.join([
-                            PROJECT_NAME if project is None else project,
+                            project or PROJECT_NAME,
                             k,
                             get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
                             f'openapi_{k}.yaml'
@@ -131,7 +131,7 @@ class SwaggerParser:
                     write_yaml(
                         YAML_DATA_PATH,
                         os.sep.join([
-                            PROJECT_NAME if project is None else project,
+                            project or PROJECT_NAME,
                             get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
                             f'openapi_{get_current_timestamp()}.yaml'
                         ]),

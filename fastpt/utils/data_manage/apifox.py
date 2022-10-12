@@ -67,7 +67,7 @@ class ApiFoxParser:
                     write_yaml(
                         YAML_DATA_PATH,
                         os.sep.join([
-                            PROJECT_NAME if project is None else project,
+                            project or PROJECT_NAME,
                             k,
                             get_file_property(source)[1] + '.yaml'
                         ]),
@@ -81,7 +81,7 @@ class ApiFoxParser:
                     write_yaml(
                         YAML_DATA_PATH,
                         os.sep.join([
-                            PROJECT_NAME if project is None else project,
+                            project or PROJECT_NAME,
                             get_file_property(source)[1] + '.yaml'
                         ]),
                         case_file_data,

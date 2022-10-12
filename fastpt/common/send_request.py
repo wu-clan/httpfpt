@@ -82,10 +82,10 @@ class SendRequests:
         :return:
         """
         try:
-            kwargs['timeout'] = get_conf.REQUEST_TIMEOUT if kwargs['timeout'] is None else kwargs['timeout']
-            verify = get_conf.REQUEST_VERIFY if kwargs['verify'] is None else kwargs['verify']
-            proxies = get_conf.REQUEST_PROXIES_HTTPX if kwargs['proxies'] is None else kwargs['proxies']
-            redirects = get_conf.REQUEST_REDIRECTS if kwargs['allow_redirects'] is None else kwargs['allow_redirects']
+            kwargs['timeout'] = kwargs['timeout'] or get_conf.REQUEST_TIMEOUT
+            verify = kwargs['verify'] or get_conf.REQUEST_VERIFY
+            proxies = kwargs['proxies'] or get_conf.REQUEST_PROXIES_HTTPX
+            redirects = kwargs['allow_redirects'] or get_conf.REQUEST_REDIRECTS
             del kwargs['verify']
             del kwargs['proxies']
             del kwargs['allow_redirects']
