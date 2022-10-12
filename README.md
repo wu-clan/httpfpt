@@ -243,7 +243,7 @@ assert:
 
 ```yaml
 assert:
-  - check: 断言说明, str
+  - check: 断言说明 / 错误信息, str / None，为空时，将展示内部定义信息
     value: 想要进行比较的值, Any
     type: 比较方式，str
     jsonpath: jsonpath 表达式, 数据依赖用例的请求返回数据集
@@ -253,7 +253,7 @@ assert:
 
 ```yaml
 assert:
-  - check: 断言说明, str
+  - check: 同上
     value: 想要进行比较的值, Any
     type: 比较方式，str
     sql: 执行 sql 查询，str
@@ -275,10 +275,10 @@ assert:
 - len_le: 预期结果长度小于等于实际结果
 - len_gt: 预期结果长度大于实际结果
 - len_ge: 预期结果长度大于等于实际结果
-- contains: 期望结果内容包含在实际结果中
-- not contains: 期望结果内容不包含在实际结果中
-- startswith: 响应内容的开头是否和预期结果内容的开头相等
-- endswith: 响应内容的结尾是否和预期结果内容相等
+- contains: 预期结果内容包含在实际结果中
+- not contains: 预期结果内容不包含在实际结果中
+- startswith: 实际结果的开头是预期结果
+- endswith: 实际结果的结尾是预期结果
    
 ### 变量和hooks的说明
 
@@ -344,7 +344,7 @@ assert:
 
 ### jsonpath 取值范围
 
-又称 response 数据集, 上层结构如下：
+又称 response 数据集, 根结构如下：
 
 ```json
 {

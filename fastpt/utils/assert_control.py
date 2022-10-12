@@ -247,55 +247,72 @@ class Asserter:
         """
         if assert_type == AssertType.equal:
             assert expected_value == actual_value, \
-                f'{assert_check}' or f'expected {expected_value} not equal to {actual_value}'
+                assert_check or \
+                f'预期结果: {expected_value} 不等于实际结果: {actual_value}'
         elif assert_type == AssertType.not_equal:
             assert expected_value != actual_value, \
-                f'{assert_check}' or f'expected {expected_value} equal to {actual_value}'
+                assert_check or \
+                f'预期结果: {expected_value} 等于实际结果: {actual_value}'
         elif assert_type == AssertType.greater_than:
             assert expected_value > actual_value, \
-                f'{assert_check}' or f'expected {expected_value} not greater than to {actual_value}'
+                assert_check or \
+                f'预期结果: {expected_value} 不大于实际结果: {actual_value}'
         elif assert_type == AssertType.greater_than_or_equal:
             assert expected_value >= actual_value, \
-                f'{assert_check}' or f'expected {expected_value} not greater than or equal to {actual_value}'
+                assert_check or \
+                f'预期结果: {expected_value} 不大于等于实际结果: {actual_value}'
         elif assert_type == AssertType.less_than:
             assert expected_value < actual_value, \
-                f'{assert_check}' or f'expected {expected_value} not less than to {actual_value}'
+                assert_check or \
+                f'预期结果: {expected_value} 不小于实际结果: {actual_value}'
         elif assert_type == AssertType.less_than_or_equal:
             assert expected_value <= actual_value, \
-                f'{assert_check}' or f'expected {expected_value} not less than or equal to {actual_value}'
+                assert_check or \
+                f'预期结果: {expected_value} 不小于等于实际结果: {actual_value}'
         elif assert_type == AssertType.string_equal:
             assert str(expected_value) == str(actual_value), \
-                f'{assert_check}' or f'expected {str(expected_value)} not equal to {str(actual_value)}'
+                assert_check or \
+                f'预期结果(str): {str(expected_value)} 不等于实际结果(str): {str(actual_value)}'
         elif assert_type == AssertType.length_equal:
             assert len(str(expected_value)) == len(str(actual_value)), \
-                f'{assert_check}' or f'expected {str(expected_value)} length not equal to {str(actual_value)} length'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 长度不等于实际结果: {str(actual_value)}'
         elif assert_type == AssertType.not_length_equal:
             assert len(str(expected_value)) != len(str(actual_value)), \
-                f'{assert_check}' or f'expected {str(expected_value)} length equal to {str(actual_value)} length'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 长度等于实际结果: {str(actual_value)}'
         elif assert_type == AssertType.length_greater_than:
             assert len(str(expected_value)) > len(str(actual_value)), \
-                f'{assert_check}' or f'expected {str(expected_value)} length not greater than to {str(actual_value)} length'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 长度不大于实际结果: {str(actual_value)}'
         elif assert_type == AssertType.length_greater_than_or_equal:
             assert len(str(expected_value)) >= len(str(actual_value)), \
-                f'{assert_check}' or f'expected {str(expected_value)} length not greater than or equal to {str(actual_value)} length'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 长度不大于等于实际结果: {str(actual_value)}'
         elif assert_type == AssertType.length_less_than:
             assert len(str(expected_value)) < len(str(actual_value)), \
-                f'{assert_check}' or f'expected {str(expected_value)} length not less than to {str(actual_value)} length'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 长度不小于实际结果: {str(actual_value)}'
         elif assert_type == AssertType.length_less_than_or_equal:
             assert len(str(expected_value)) <= len(str(actual_value)), \
-                f'{assert_check}' or f'expected {str(expected_value)} length not less than or equal to {str(actual_value)} length'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 长度不小于等于实际结果: {str(actual_value)}'
         elif assert_type == AssertType.contains:
             assert str(expected_value) in str(actual_value), \
-                f'{assert_check}' or f'expected {str(expected_value)} not contains {str(actual_value)}'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 不包含实际结果: {str(actual_value)}'
         elif assert_type == AssertType.not_contains:
             assert str(expected_value) not in str(actual_value), \
-                f'{assert_check}' or f'expected {str(expected_value)} contains {str(actual_value)}'
+                assert_check or \
+                f'预期结果: {str(expected_value)} 包含实际结果: {str(actual_value)}'
         elif assert_type == AssertType.startswith:
             assert str(actual_value).startswith(str(expected_value)), \
-                f'{assert_check}' or f'actual {str(actual_value)} not starts with {str(expected_value)}'
+                assert_check or \
+                f'实际结果: {str(actual_value)} 的开头不是预期结果: {str(expected_value)}'
         elif assert_type == AssertType.endswith:
             assert str(actual_value).endswith(str(expected_value)), \
-                f'{assert_check}' or f'expected {str(actual_value)} not ends with {str(expected_value)}'
+                assert_check or \
+                f'实际结果: {str(actual_value)} 的结尾不是预期结果: {str(expected_value)}'
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 

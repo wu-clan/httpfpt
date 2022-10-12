@@ -43,9 +43,9 @@ test_steps:
           set_type: cache
           jsonpath: $.url
       assert:
-        check: 检查响应状态码
+        check:
         value: ^rcode
-        type: eq
+        type: str_eq
         jsonpath: $.status_code
       wait_time: 0
 
