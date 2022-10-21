@@ -12,6 +12,8 @@ from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
 from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
+from fastpt.enums.request.method import MethodType
+from fastpt.utils.enum_control import get_enum_values
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
@@ -230,7 +232,7 @@ class RequestDataParse:
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 为空')
             if not isinstance(method, str):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 不是有效的 str 类型')
-            if not any(_ == method.lower() for _ in ['get', 'post', 'put', 'delete', 'patch']):
+            if method.upper() not in get_enum_values(MethodType):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:method 不是合法的请求类型')
             return method.upper()
 
@@ -289,7 +291,7 @@ class RequestDataParse:
         except KeyError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:body_type 参数')
         else:
-            if data_type not in BodyType._value2member_map_:  # noqa
+            if data_type not in get_enum_values(BodyType):
                 raise ValueError('请求参数解析失败, 参数 test_steps:request:body_type 不是合法类型')
         return data_type
 
@@ -303,33 +305,31 @@ class RequestDataParse:
             if body is not None:
                 if isinstance(body, str):
                     body = eval(body)
-                if self.body_type == BodyType.none.value:
+                body_type = self.body_type
+                if body_type == BodyType.none.value:
                     body = None
-                elif self.body_type == BodyType.form_data.value:
+                elif body_type == BodyType.form_data.value:
                     body = body
-                elif self.body_type == BodyType.x_www_form_urlencoded.value:
-                    if "Content-Type" not in self.headers:
-                        self.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-                    else:
-                        self.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+                elif body_type == BodyType.x_www_form_urlencoded.value:
+                    self.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
                     body = body
-                elif self.body_type == BodyType.binary.value:
-                    body = None
-                elif self.body_type == BodyType.graphQL.value:
+                elif body_type == BodyType.GraphQL.value:
+                    self.headers.update({'Content-Type': 'application/json; charset=uft-8'})
                     body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif self.body_type == BodyType.text.value:
+                elif body_type == BodyType.TEXT.value:
+                    self.headers.update({'Content-Type': 'text/plain'})
                     body = body
-                elif self.body_type == BodyType.javascript.value:
+                elif body_type == BodyType.JavaScript.value:
+                    self.headers.update({'Content-Type': 'application/javascript'})
                     body = body
-                elif self.body_type == BodyType.json.value:
-                    if "Content-Type" not in self.headers:
-                        self.headers['Content-Type'] = 'application/json; charset=UTF-8'
-                    else:
-                        self.headers.update({'Content-Type': 'application/json; charset=UTF-8'})
+                elif body_type == BodyType.JSON.value:
+                    self.headers.update({'Content-Type': 'application/json; charset=uft-8'})
                     body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif self.body_type == BodyType.html.value:
+                elif body_type == BodyType.HTML.value:
+                    self.headers.update({'Content-Type': 'text/html'})
                     body = body
-                elif self.body_type == BodyType.xml.value:
+                elif body_type == BodyType.XML.value:
+                    self.headers.update({'Content-Type': 'application/xml'})
                     body = body
         return body
 
@@ -583,21 +583,8 @@ class RequestDataParse:
             'data': self.body,
             'files': self.files
         }
-        if self.request_engin == EnginType.requests:
-            if self.body_type != BodyType.json.value or self.body_type != BodyType.graphQL.value:
-                parsed_data = parsed_data
-            else:
-                parsed_data.pop('data')
-                parsed_data.update({'json': self.body})
-        elif self.request_engin == EnginType.httpx:
-            if any(_ == self.body_type for _ in [
-                BodyType.text.value, BodyType.javascript.value, BodyType.html.value, BodyType.xml.value
-            ]):
-                parsed_data.pop('data')
-                parsed_data.update({'content': self.body})
-            elif self.body_type == BodyType.json.value or self.body_type == BodyType.graphQL.value:
-                parsed_data.pop('data')
-                parsed_data.update({'json': self.body})
-            else:
-                parsed_data = parsed_data
+        if self.body_type != BodyType.JSON.value or self.body_type != BodyType.GraphQL.value:
+            parsed_data.update({'json': parsed_data.pop('data')})
+        else:
+            parsed_data = parsed_data
         return parsed_data

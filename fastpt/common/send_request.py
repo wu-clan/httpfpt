@@ -17,6 +17,7 @@ from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
 from fastpt.utils.allure_control import allure_attach_file
 from fastpt.utils.assert_control import Asserter
+from fastpt.utils.enum_control import get_enum_values
 from fastpt.utils.relate_testcase_executor import exec_setup_testcase
 from fastpt.utils.request.hooks_executor import HookExecutor
 from fastpt.utils.request.request_data_parse import RequestDataParse
@@ -56,14 +57,10 @@ class SendRequests:
         :return:
         """
         try:
-            if kwargs['timeout'] is None:
-                kwargs['timeout'] = get_conf.REQUEST_TIMEOUT
-            if kwargs['verify'] is None:
-                kwargs['verify'] = get_conf.REQUEST_VERIFY
-            if kwargs['proxies'] is None:
-                kwargs['proxies'] = get_conf.REQUEST_PROXIES_REQUESTS
-            if kwargs['allow_redirects'] is None:
-                kwargs['allow_redirects'] = get_conf.REQUEST_REDIRECTS
+            kwargs['timeout'] = kwargs['timeout'] or get_conf.REQUEST_TIMEOUT
+            kwargs['verify'] = kwargs['verify'] or get_conf.REQUEST_VERIFY
+            kwargs['proxies'] = kwargs['proxies'] or get_conf.REQUEST_PROXIES_REQUESTS
+            kwargs['allow_redirects'] = kwargs['allow_redirects'] or get_conf.REQUEST_REDIRECTS
             # 消除安全警告
             requests.packages.urllib3.disable_warnings()  # noqa
             log.info('开始发送请求...')
@@ -117,7 +114,7 @@ class SendRequests:
         :param log_data: 日志记录数据
         :return: response
         """
-        if request_engin not in EnginType._value2member_map_:  # noqa
+        if request_engin not in get_enum_values(EnginType):
             raise ValueError(f'请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据

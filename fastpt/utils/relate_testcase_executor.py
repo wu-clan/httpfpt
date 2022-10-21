@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from jsonpath import jsonpath
 
 from fastpt.common.log import log
@@ -66,6 +65,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
             case_id_list.append(case_data_test_steps['case_id'])
         # 判断关联用例
         for testcase in setup_testcase:
+            # 用例中 testcase 参数为设置变量时
             if isinstance(testcase, dict):
                 relate_case_id = testcase['case_id']
                 if relate_case_id in str(case_id_list):
@@ -93,8 +93,8 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
                         }
                         case_data.update(new_data)
                         relate_testcase_set_var(case_data)
+            # 用例中 testcase 参数为直接关联测试用例时
             elif isinstance(testcase, str):
-                # testcase 就是 relate_case_id
                 if testcase in str(case_id_list):
                     if isinstance(case_data_test_steps, list):
                         for case_test_steps in case_data_test_steps:

@@ -3,6 +3,7 @@
 import glob
 import os.path
 import re
+from pathlib import Path
 from typing import Tuple
 
 from fastpt.core.get_conf import PROJECT_NAME
@@ -16,8 +17,9 @@ def get_file_property(filepath: str) -> Tuple[str, str, str]:
     :param filepath:
     :return:
     """
-    filename = re.split(r'/|\'|\\|\\\\', filepath)[-1]
-    file_root_name = '.'.join(filename.split('.')[:-1])
+    file = Path(filepath)
+    filename = file.name
+    file_root_name = file.stem
     filetype = filename.split('.')[-1]
     return filename, file_root_name, filetype
 

@@ -13,6 +13,8 @@ from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import write_yaml_vars
 from fastpt.core import get_conf
 from fastpt.core.path_conf import RUN_ENV_PATH
+from fastpt.enums.sql_type import SqlType
+from fastpt.utils.enum_control import get_enum_values
 
 
 class DB:
@@ -90,8 +92,8 @@ class DB:
         :param env:
         :return:
         """
-        rejected_sql_type = ['UPDATE', 'DELETE', 'INSERT', 'update', 'delete', 'insert']
-        if any(_ in sql for _ in rejected_sql_type):
+        sql_type = get_enum_values(SqlType)
+        if any(_.upper() in sql for _ in sql_type):
             raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 DQL 类型 sql 语句')
         else:
             data = {}
