@@ -21,9 +21,8 @@ request_ids = get_ids(request_data)
 class TestApiTestCaseTemplate:
 
     @allure.story(allure_text['story'])
-    # @pytest.mark.???
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def test_api_test_case_template(self, data):
-        """ {0} """.format(data['test_steps']['description'] or '未知')
+        """ api_test_case_template """
         send_request.send_request(data)
         

@@ -21,9 +21,8 @@ request_ids = get_ids(request_data)
 class TestUploadFile:
 
     @allure.story(allure_text['story'])
-    # @pytest.mark.???
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def test_upload_file(self, data):
-        """ {0} """.format(data['test_steps']['description'] or '未知')
+        """ upload_file """
         send_request.send_request(data)
         

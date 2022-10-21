@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import glob
 import os.path
-import re
 from pathlib import Path
 from typing import Tuple
 

@@ -29,8 +29,8 @@ def auto_generate_test_cases(rewrite: bool = False) -> None:
     yaml_filenames = []
     yaml_file_root_names = []
     for _ in yaml_datafiles:
-        yaml_filenames.append(_.rsplit(PROJECT_NAME)[1])
-        yaml_file_root_names.append(Path(_).stem)
+        yaml_filenames.append(get_file_property(_)[0])
+        yaml_file_root_names.append(get_file_property(_)[1])
 
     # 获取所有测试用例文件名
     testcase_filenames = []
@@ -39,12 +39,18 @@ def auto_generate_test_cases(rewrite: bool = False) -> None:
 
     # 获取需要创建的测试用例文件名
     create_file_root_names = []
-    for name in yaml_file_root_names:
+    for root_name in yaml_file_root_names:
         if not rewrite:
-            if ((name if name.startswith('test_') else 'test_' + name) + '.py') not in testcase_filenames:
-                create_file_root_names.append(name)
+            if (
+                    (
+                            root_name
+                            if root_name.startswith('test_')
+                            else 'test_' + root_name
+                    ) + '.py'
+            ) not in testcase_filenames:
+                create_file_root_names.append(root_name)
         else:
-            create_file_root_names.append(name)
+            create_file_root_names.append(root_name)
     if len(create_file_root_names) == 0:
         typer.secho('😝 用例已经很完善了, 添加新测试用例数据后再来生成吧~', fg='green', bold=True)
         return
@@ -53,7 +59,7 @@ def auto_generate_test_cases(rewrite: bool = False) -> None:
 
     for create_file_root_name in create_file_root_names:
         for yaml_filename in yaml_filenames:
-            if create_file_root_name == Path(yaml_filename).stem:
+            if create_file_root_name == get_file_property(yaml_filename)[1]:
                 testcase_class_name = ''.join(name.title() for name in create_file_root_name.split('_'))
                 testcase_func_name = create_file_root_name
                 if not create_file_root_name.startswith('test_'):
@@ -82,10 +88,9 @@ request_ids = get_ids(request_data)
 class {testcase_class_name}:
 
     @allure.story(allure_text['story'])
-    # @pytest.mark.???
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def {testcase_func_name}(self, data):
-        """ {{0}} """.format(data['test_steps']['description'] or '未知')
+        """ {create_file_root_name} """
         send_request.send_request(data)
         '''
                 # 创建测试用例文件
