@@ -234,7 +234,7 @@ class SendRequests:
         log.info(f"请求 params: {parsed.params}")
         log.info(f'请求 headers: {parsed.headers}')
         log.info(f"请求 data_type：{parsed.body_type}")
-        if parsed.body_type != BodyType.json.value:
+        if parsed.body_type != BodyType.JSON.value:
             log.info(f"请求 data：{parsed.body}")
         else:
             log.info(f"请求 json: {parsed.body}")
