@@ -13,7 +13,6 @@ from fastpt.utils.send_report.send_email import SendMail
 
 
 def run(
-        *args,
         log_level: str = '-v',
         # case path
         case_path: Optional[str] = None,
@@ -31,8 +30,9 @@ def run(
         n: Union[str, int] = 'auto',
         dist: str = 'loadscope',
         markers: bool = False,
-        captrue: bool = True,
-        disable_warings: bool = True,
+        capture: bool = True,
+        disable_warnings: bool = True,
+        *args,
         **kwargs,
 ):
     """
@@ -45,14 +45,14 @@ def run(
     :param allure: allure 测试报告, 默认关闭
     :param clear_allure: 清空 allure 报告历史记录, 默认开启
     :param allure_serve: 是否测试执行完成后自动打开 allure 测试报告服务, 如果已启用 allure 测试报告
-    :param reruns: 每个用例的运行次数, 兼容性差, 默认关闭, 不建议开启
+    :param reruns: 每个用例的运行次数, 兼容性差, 不建议使用
     :param maxfail: 大于0的正整数, 指定失败用例个数,到达数量上限后终止运行, 默认为0, 为0时表示此参数默认关闭
     :param x: 如果发生失败用例, 是否终止运行, 默认关闭
     :param n: 分布式运行,使用"auto"表示全核, 也可指定cpu内核数量, 大于0的正整数, 默认"auto"
-    :param dist: 分布式顺序运行方式, 默认"loadscope", 详情:https://pytest-xdist.readthedocs.io/en/latest/distribution.html#
+    :param dist: 分布式顺序运行方式, 默认"loadscope", 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
     :param markers: markers 严格模式,只允许使用用例中创建的 mark,并只运行 pytest.ini 中 markers 包含的 mark 用例, 默认关闭
-    :param captrue: 避免在使用输出模式为"v"和"s"时,html报告中的表格log为空的情况, 默认开启
-    :param disable_warings: 是否关闭控制台警告信息, 默认开启
+    :param capture: 避免在使用输出模式为"v"和"s"时,html报告中的表格log为空的情况, 默认开启
+    :param disable_warnings: 是否关闭控制台警告信息, 默认开启
     :return:
     """
     default_case_path = f"./test_case/{PROJECT_NAME}/"  # 默认执行指定项目下的所有测试用例
@@ -84,7 +84,7 @@ def run(
 
     is_clear_allure = f'--clean-alluredir' if is_allure and clear_allure else ''
 
-    is_reruns = f'--reruns {reruns}' if reruns != 0 else ''
+    is_reruns = f'--reruns {reruns}' if reruns != 0 else ''  # noqa
 
     is_maxfail = f'--maxfail={maxfail}' if maxfail != 0 else ''
 
@@ -96,15 +96,14 @@ def run(
 
     is_markers = '--strict-markers' if markers else ''
 
-    is_captrue = '--capture=tee-sys' if captrue else ''
+    is_capture = '--capture=tee-sys' if capture else ''
 
-    is_disable_warings = '--disable-warnings' if disable_warings else ''
+    is_disable_warnings = '--disable-warnings' if disable_warnings else ''
 
     kw = [f"{k}={v}" for k, v in kwargs.items()]
 
     pytest.main(
         [r for r in [
-            *args,
             f'{log_level}',
             f'{run_path}',
             f'{is_html_report_file}',
@@ -117,8 +116,9 @@ def run(
             f'{is_n}',
             f'{is_dist}',
             f'{is_markers}',
-            f'{is_captrue}',
-            f'{is_disable_warings}'
+            f'{is_capture}',
+            f'{is_disable_warnings}',
+            *args
         ] + kw if r.strip() != '']
     )
 
