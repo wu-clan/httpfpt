@@ -244,7 +244,10 @@ class RequestDataParse:
             raise ValueError('请求参数解析失败, 缺少 test_steps:request:url 参数')
         else:
             env_file = os.path.join(RUN_ENV_PATH, self.env)
-            host = get_env_dict(env_file)['host']
+            env_dict = get_env_dict(env_file)
+            host = env_dict.get('host') or env_dict.get('HOST')
+            if host is None:
+                raise ValueError('请求参数解析失败, 缺少 HOST 参数')
             url = host + str(url)
             return url
 

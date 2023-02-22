@@ -122,7 +122,7 @@ class VarsExtractor:
         return str_target
 
     @staticmethod
-    def teardown_var_extract(response: dict, extract: list, env=None):
+    def teardown_var_extract(response: dict, extract: list, env: str = None):
         """
         后置参数提取
 

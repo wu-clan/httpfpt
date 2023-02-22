@@ -31,7 +31,7 @@ def write_env_vars(filepath: str, filename: str, key: str, value: str):
     """
     _file = os.path.join(filepath, filename)
     try:
-        dotenv.set_key(_file, key, value)
+        dotenv.set_key(_file, key.upper(), value)
     except Exception as e:
         log.error(f'写入 {filename} 环境变量 {key}={value} 错误: {e}')
         raise e
