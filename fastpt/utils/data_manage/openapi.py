@@ -29,17 +29,18 @@ class SwaggerParser:
         self.version = version
         self.data = data
 
-    def import_openapi_to_yaml(self, openapi: str, project: Optional[str] = None):
+    def import_openapi_to_yaml(self, openapi_source: str, project: Optional[str] = None):
         """
         导入 openapi 数据到 yaml
 
-        :param openapi:
+        :param openapi_source:
         :param project:
         :return:
         """
         global warn_operationId  # noqa
-        self.get_swagger_data(openapi)
+        self.get_swagger_data(openapi_source)
         try:
+            # 测试用例数据配置项
             config = {}
             config.update({
                 'allure': {
@@ -52,24 +53,31 @@ class SwaggerParser:
                 },
                 'module': self.data['info']['title']
             })
+
+            # 测试用例数据
             case = {}
+            # 子目录
             tag = ''
+            # 子目录测试用例数据
             tag_case = {}
+            # 根目录测试用例数据
             root_case = {}
-            for p, v in self.data['paths'].items():
-                for m, vv in v.items():
-                    params = self.get_swagger_params(vv)
-                    headers = self.get_swagger_headers(vv)
+
+            for url, values in self.data['paths'].items():
+                for method, values_map in values.items():
+                    params = self.get_swagger_params(values_map)
+                    headers = self.get_swagger_headers(values_map)
                     if self.version == 2:
-                        data = self.get_swagger_request_data(vv) if m.lower() != 'get' else None
-                        files = self.get_swagger_request_files(vv) if m.lower() != 'get' else None
+                        data = self.get_swagger_request_data(values_map) if method.lower() != 'get' else None
+                        files = self.get_swagger_request_files(values_map) if method.lower() != 'get' else None
                     else:
                         try:
-                            schema = vv['requestBody']['content'][headers['Content-Type']]['schema']['$ref'].split(
-                                '/')[-1] if vv.get('requestBody') is not None else None
+                            schema = \
+                                values_map['requestBody']['content'][headers['Content-Type']]['schema']['$ref'].split(
+                                    '/')[-1] if values_map.get('requestBody') is not None else None
                         except KeyError:
-                            schema = vv['requestBody']['content'][headers['Content-Type']]['schema']
-                            warn_operationId = vv['operationId']
+                            schema = values_map['requestBody']['content'][headers['Content-Type']]['schema']
+                            warn_operationId = values_map['operationId']
                         data = self.get_swagger_request_data(schema) if schema is not None else None
                         files = self.get_swagger_request_files(schema) if schema is not None else None
                     data_type = None
@@ -77,13 +85,13 @@ class SwaggerParser:
                         data_type = 'json' if 'application/json' in headers else 'data'
                     case = copy.deepcopy(case)
                     case.update({
-                        'name': vv.get('summary'),
-                        'case_id': vv.get('operationId'),
-                        'description': vv.get('description'),
-                        'is_run': vv.get('deprecated', True),
+                        'name': values_map.get('summary'),
+                        'case_id': values_map.get('operationId'),
+                        'description': values_map.get('description'),
+                        'is_run': values_map.get('deprecated', True),
                         'request': {
-                            'method': m,
-                            'url': p,
+                            'method': method,
+                            'url': url,
                             'params': params,
                             'headers': headers,
                             'data_type': data_type,
@@ -92,74 +100,130 @@ class SwaggerParser:
                         }
                     })
                     # 按 tag 划分目录
-                    tag_ = vv.get('tags')
-                    if tag_ is not None:
-                        dtag = copy.deepcopy(tag)
-                        tag = tag_[0]
-                        if dtag != tag:
-                            tag_case.update({tag: [case]})
-                        else:
-                            tag_case[tag].append(case)
+                    _tag = values_map.get('tags')
+                    if _tag is not None:
+                        dp_tag = copy.deepcopy(tag)
+                        tag = _tag[0]
+                        tag_case.update({tag: [case]}) if dp_tag != tag else tag_case[tag].append(case)
                     else:
                         root_case = copy.deepcopy(root_case)
-                        if root_case.get('root') is None:
-                            root_case.update({'root': [case]})
-                        else:
-                            root_case['root'].append(case)
-            if (len(tag_case) or len(root_case)) > 0:
-                typer.secho('⏳ 奋力导入中...', fg='green', bold=True)
-            # 写入项目 tag 目录
-            if len(tag_case) > 0:
-                for k, v in tag_case.items():
-                    config['allure']['feature'] = config['module'] = k
-                    case_file_data = {'config': config, 'test_steps': v}
-                    write_yaml(
-                        YAML_DATA_PATH,
-                        os.sep.join([
+                        root_case.update({'root': [case]}) if not root_case.get('root') is None else root_case[
+                            'root'].append(case)
+            if len(tag_case) > 0 or len(root_case) > 0:
+                # 文件创建提醒
+                file_list = []
+                if len(tag_case) > 0:
+                    for k, v in tag_case.items():
+                        tag_filename = os.sep.join([
                             project or PROJECT_NAME,
                             k,
-                            get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
+                            get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith('http') else
                             f'openapi_{k}.yaml'
-                        ]),
-                        case_file_data,
-                        mode='w'
-                    )
-            # 写入项目根目录
-            if len(root_case) > 0:
-                for _, v in root_case.items():
-                    case_file_data = {'config': config, 'test_steps': v}
-                    write_yaml(
-                        YAML_DATA_PATH,
-                        os.sep.join([
+                        ])
+                        file_list.append(tag_filename)
+                if len(root_case) > 0:
+                    for _, v in root_case.items():
+                        root_filename = os.sep.join([
                             project or PROJECT_NAME,
-                            get_file_property(openapi)[1] + '.yaml' if not openapi.startswith('http') else
+                            get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith('http') else
                             f'openapi_{get_current_timestamp()}.yaml'
-                        ]),
-                        case_file_data,
-                        mode='w'
-                    )
+                        ])
+                        file_list.append(root_filename)
+                typer.secho('⚠️ 即将创建以下数据文件:', fg='yellow', bold=True)
+                for i in file_list:
+                    typer.secho(f'{i}', fg='cyan', bold=True)
+                is_force_write = typer.confirm(
+                    text='请检查是否存在同名文件, 此操作将强制覆盖写入所有数据文件, 是否继续执行? (此操作不可逆)',
+                    default=False
+                )
+                # 强制写入
+                if is_force_write:
+                    typer.secho('⏳ 奋力导入中...', fg='green', bold=True)
+                    # 写入项目 tag 目录
+                    if len(tag_case) > 0:
+                        for k, v in tag_case.items():
+                            config['allure']['feature'] = config['module'] = k
+                            case_file_data = {'config': config, 'test_steps': v}
+                            write_yaml(
+                                YAML_DATA_PATH,
+                                os.sep.join([
+                                    project or PROJECT_NAME,
+                                    k,
+                                    get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
+                                        'http') else f'openapi_{k}.yaml'
+                                ])
+                                ,
+                                case_file_data,
+                                mode='w'
+                            )
+                    # 写入项目根目录
+                    if len(root_case) > 0:
+                        for _, v in root_case.items():
+                            case_file_data = {'config': config, 'test_steps': v}
+                            write_yaml(
+                                YAML_DATA_PATH,
+                                os.sep.join([
+                                    project or PROJECT_NAME,
+                                    get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
+                                        'http') else f'openapi_{get_current_timestamp()}.yaml'
+                                ]),
+                                case_file_data,
+                                mode='w'
+                            )
+                # 选择写入
+                else:
+                    typer.secho('⚠️ 已取消强制覆写入所有数据文件', fg='yellow', bold=True)
+                    is_next = typer.confirm('是否进行逐一选择创建数据文件吗?', abort=True)
+                    if is_next:
+                        # 写入项目 tag 目录
+                        if len(tag_case) > 0:
+                            for k, v in tag_case.items():
+                                config['allure']['feature'] = config['module'] = k
+                                case_file_data = {'config': config, 'test_steps': v}
+                                tag_filename = os.sep.join([
+                                    project or PROJECT_NAME,
+                                    k,
+                                    get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
+                                        'http') else f'openapi_{k}.yaml'
+                                ])
+                                is_write = typer.confirm(text=f'是否需要创建 {tag_filename} 数据文件?', default=True)
+                                if is_write:
+                                    write_yaml(YAML_DATA_PATH, tag_filename, case_file_data, mode='w')
+                        # 写入项目根目录
+                        if len(root_case) > 0:
+                            for _, v in root_case.items():
+                                case_file_data = {'config': config, 'test_steps': v}
+                                root_filename = os.sep.join([
+                                    project or PROJECT_NAME,
+                                    get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
+                                        'http') else f'openapi_{get_current_timestamp()}.yaml'
+                                ])
+                                is_write = typer.confirm(text=f'是否需要创建 {root_filename} 数据文件?', default=True)
+                                if is_write:
+                                    write_yaml(YAML_DATA_PATH, root_filename, case_file_data, mode='w')
+
         except Exception as e:
             raise e
         else:
-            typer.secho('✅ 导入 openapi 数据成功')
+            typer.secho('✅ 导入 openapi 数据成功', fg='green', bold=True)
 
-    def get_swagger_data(self, source: str) -> None:
+    def get_swagger_data(self, openapi_source: str) -> None:
         """
         请求 swagger 数据
 
-        :param source:
+        :param openapi_source:
         :return:
         """
-        if source.startswith('http'):
+        if openapi_source.startswith('http'):
             request = requests.session()
             request.trust_env = False
-            data = request.get(source).json()
+            data = request.get(openapi_source).json()
             openapi = data.get('openapi')
             swagger = data.get('swagger')
             if not (openapi or swagger):
                 raise ValueError(f"请输入正确的 openapi 地址")
         else:
-            data = read_json_file(None, filename=source)
+            data = read_json_file(None, filename=openapi_source)
             openapi = data.get('openapi')
             swagger = data.get('swagger')
             if not (openapi or swagger):
