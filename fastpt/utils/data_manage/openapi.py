@@ -63,6 +63,7 @@ class SwaggerParser:
             # 根目录测试用例数据
             root_case = {}
 
+            is_tag = typer.confirm('是否按openapi标签划分数据存放目录?', default=True)
             for url, values in self.data['paths'].items():
                 for method, values_map in values.items():
                     params = self.get_swagger_params(values_map)
@@ -99,16 +100,27 @@ class SwaggerParser:
                             'files': files
                         }
                     })
+                    tags = values_map.get('tags')
                     # 按 tag 划分目录
-                    _tag = values_map.get('tags')
-                    if _tag is not None:
-                        dp_tag = copy.deepcopy(tag)
-                        tag = _tag[0]
-                        tag_case.update({tag: [case]}) if dp_tag != tag else tag_case[tag].append(case)
+                    if is_tag:
+                        if tags is not None:
+                            dp_tag = copy.deepcopy(tag)
+                            tag = tags[0]
+                            tag_case.update({tag: [case]}) if dp_tag != tag else tag_case[tag].append(case)
+                        else:
+                            root_case = copy.deepcopy(root_case)
+                            root_case.update({'root': [case]}) if root_case.get('root') is None else root_case[
+                                'root'].append(case)
+                    # 不按 tag 划分目录
                     else:
-                        root_case = copy.deepcopy(root_case)
-                        root_case.update({'root': [case]}) if not root_case.get('root') is None else root_case[
-                            'root'].append(case)
+                        if tags:
+                            dp_tag = copy.deepcopy(tag)
+                            tag = tags[0]
+                            root_case.update({tag: [case]}) if dp_tag != tag else root_case[tag].append(case)
+                        else:
+                            root_case = copy.deepcopy(root_case)
+                            root_case.update({'root': [case]}) if root_case.get('root') is None else root_case[
+                                'root'].append(case)
             if len(tag_case) > 0 or len(root_case) > 0:
                 # 文件创建提醒
                 file_list = []
@@ -122,12 +134,19 @@ class SwaggerParser:
                         ])
                         file_list.append(tag_filename)
                 if len(root_case) > 0:
-                    for _, v in root_case.items():
-                        root_filename = os.sep.join([
-                            project or PROJECT_NAME,
-                            get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith('http') else
-                            f'openapi_{get_current_timestamp()}.yaml'
-                        ])
+                    for k, v in root_case.items():
+                        if k == 'root':
+                            root_filename = os.sep.join([
+                                project or PROJECT_NAME,
+                                get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
+                                    'http') else f'openapi_{get_current_timestamp()}.yaml'
+                            ])
+                        else:
+                            root_filename = os.sep.join([
+                                project or PROJECT_NAME,
+                                get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
+                                    'http') else f'openapi_{k}.yaml'
+                            ])
                         file_list.append(root_filename)
                 typer.secho('⚠️ 即将创建以下数据文件:', fg='yellow', bold=True)
                 for i in file_list:
@@ -158,14 +177,21 @@ class SwaggerParser:
                             )
                     # 写入项目根目录
                     if len(root_case) > 0:
-                        for _, v in root_case.items():
+                        for k, v in root_case.items():
+                            if k == 'root':
+                                filename = get_file_property(openapi_source)[
+                                               1] + '.yaml' if not openapi_source.startswith(
+                                    'http') else f'openapi_{get_current_timestamp()}.yaml'
+                            else:
+                                filename = get_file_property(openapi_source)[
+                                               1] + '.yaml' if not openapi_source.startswith(
+                                    'http') else f'openapi_{k}.yaml'
                             case_file_data = {'config': config, 'test_steps': v}
                             write_yaml(
                                 YAML_DATA_PATH,
                                 os.sep.join([
                                     project or PROJECT_NAME,
-                                    get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
-                                        'http') else f'openapi_{get_current_timestamp()}.yaml'
+                                    filename
                                 ]),
                                 case_file_data,
                                 mode='w'
@@ -191,17 +217,27 @@ class SwaggerParser:
                                     write_yaml(YAML_DATA_PATH, tag_filename, case_file_data, mode='w')
                         # 写入项目根目录
                         if len(root_case) > 0:
-                            for _, v in root_case.items():
-                                case_file_data = {'config': config, 'test_steps': v}
-                                root_filename = os.sep.join([
-                                    project or PROJECT_NAME,
-                                    get_file_property(openapi_source)[1] + '.yaml' if not openapi_source.startswith(
+                            for k, v in root_case.items():
+                                if k == 'root':
+                                    root_filename = get_file_property(openapi_source)[
+                                                        1] + '.yaml' if not openapi_source.startswith(
                                         'http') else f'openapi_{get_current_timestamp()}.yaml'
-                                ])
+                                else:
+                                    root_filename = get_file_property(openapi_source)[
+                                                        1] + '.yaml' if not openapi_source.startswith(
+                                        'http') else f'openapi_{k}.yaml'
                                 is_write = typer.confirm(text=f'是否需要创建 {root_filename} 数据文件?', default=True)
                                 if is_write:
-                                    write_yaml(YAML_DATA_PATH, root_filename, case_file_data, mode='w')
-
+                                    case_file_data = {'config': config, 'test_steps': v}
+                                    write_yaml(
+                                        YAML_DATA_PATH,
+                                        os.sep.join([
+                                            project or PROJECT_NAME,
+                                            root_filename
+                                        ]),
+                                        case_file_data,
+                                        mode='w'
+                                    )
         except Exception as e:
             raise e
         else:
