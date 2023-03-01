@@ -68,11 +68,13 @@ class VarsExtractor:
                     try:
                         value = str(env_vars[f'{var_key}'])
                         str_target = re.sub(self.vars_re, value, str_target, 1)
+                        log.info(f'请求数据变量 {var_key} 替换完成')
                     except KeyError:
                         value = str(read_vars[f'{var_key}'])
                         str_target = re.sub(self.vars_re, value, str_target, 1)
+                        log.info(f'请求数据变量 {var_key} 替换完成')
                     except Exception as e:
-                        log.error('请求数据变量"{}"替换失败: {}'.format(var_key, e))
+                        log.error(f'请求数据变量 {var_key} 替换失败: {e}')
                         raise e
                 else:
                     str_target = re.sub(self.vars_re, value, str_target, 1)
@@ -112,6 +114,7 @@ class VarsExtractor:
                     raise ValueError(err_msg)
                 else:
                     str_target = re.sub(self.relate_vars_re, value, str_target, 1)
+                    log.info(f'请求数据关联变量 {var_key} 替换完成')
 
             # 删除关联用例临时变量
             VariableCache().delete(var_key)
