@@ -34,7 +34,7 @@ class VariableCache:
         """
         result = self.cache.set(key, value, **kwargs)
         if result:
-            log.info(f'设置临时变量 -> {key}: {value}')
+            log.info(f'设置临时变量 -> {key}={value}')
         return result
 
     def delete(self, key: str, **kwargs) -> bool:
