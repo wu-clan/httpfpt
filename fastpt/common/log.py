@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import logging
 import os
+import sys
 
 from loguru import logger
 
@@ -21,8 +23,30 @@ class Logger:
 
         log_file = os.path.join(LOG_PATH, 'api_test.log')
 
+        # 清除 logger 配置
+        logger.remove()
+
+        # # 控制台输出
+        # logger.add(
+        #     sys.stdout,
+        #     format="{time:YYYYMMDD HH:mm:ss.SSS} | <level>{level: <8}</level> | <level>{message}</level>",
+        # )
+
+        # 将 loguru 传播到 logging
+        class PropagateHandler(logging.Handler):
+            def emit(self, record):
+                logging.getLogger(record.name).handle(record)
+
+        logger.add(
+            PropagateHandler(),
+            format="| <level>{message}</level>",
+            level='DEBUG'
+        )
+
+        # 输出到文件
         logger.add(
             log_file,
+            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>",
             level='DEBUG',
             rotation='00:00',
             retention='7 days',
