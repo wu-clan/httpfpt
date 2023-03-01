@@ -26,6 +26,22 @@ user = '12345678@qq.com'
 password = '12345678'
 send_to = '87654321@qq.com'  # if more, use: [str]
 is_ssl = true
+is_send_report = false
+
+# 钉钉
+[ding_talk]
+webhook = ''
+proxies.http = ''
+proxies.https = ''
+is_send_report = false
+
+# 飞书
+[lark_talk]
+webhook = ''
+proxies.http = ''
+proxies.https = ''
+is_send_report = false
+
 
 # 请求发送
 [request]

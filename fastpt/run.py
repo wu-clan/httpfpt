@@ -7,7 +7,7 @@ from typing import Union, Optional
 
 import pytest
 
-from fastpt.core.get_conf import PROJECT_NAME
+from fastpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND
 from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH, ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE
 from fastpt.utils.send_report.send_email import SendMail
 
@@ -18,7 +18,6 @@ def run(
         case_path: Optional[str] = None,
         # html report
         html_report: bool = True,
-        send_report: bool = False,
         # allure
         allure: bool = True,
         clear_allure: bool = True,
@@ -41,15 +40,14 @@ def run(
     :param log_level: 控制台打印输出级别, 默认"-v"
     :param case_path: 可选参数, 指定测试用例函数, 默认为空，如果指定，则执行执行用例，否则执行全部
     :param html_report: 是否生成 HTML 测试报告, 默认开启
-    :param send_report: 是否发送测试报告, 默认发送, 如果已启用生成 html 测试报告
     :param allure: allure 测试报告, 默认关闭
     :param clear_allure: 清空 allure 报告历史记录, 默认开启
     :param allure_serve: 是否测试执行完成后自动打开 allure 测试报告服务, 如果已启用 allure 测试报告
     :param reruns: 每个用例的运行次数, 兼容性差, 不建议使用
     :param maxfail: 大于0的正整数, 指定失败用例个数,到达数量上限后终止运行, 默认为0, 为0时表示此参数默认关闭
     :param x: 如果发生失败用例, 是否终止运行, 默认关闭
-    :param n: 分布式运行,使用"auto"表示全核, 也可指定cpu内核数量, 大于0的正整数, 默认"auto"
-    :param dist: 分布式顺序运行方式, 默认"loadscope", 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
+    :param n: 分布式运行, 使用"auto"表示全核, 也可指定cpu内核数量, 大于0的正整数, 默认"auto"
+    :param dist: 分布式运行方式, 默认"loadscope", 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
     :param markers: markers 严格模式,只允许使用用例中创建的 mark,并只运行 pytest.ini 中 markers 包含的 mark 用例, 默认关闭
     :param capture: 避免在使用输出模式为"v"和"s"时,html报告中的表格log为空的情况, 默认开启
     :param disable_warnings: 是否关闭控制台警告信息, 默认开启
@@ -90,9 +88,9 @@ def run(
 
     is_x = '-x' if x else ''
 
-    is_n = f'-n={n}'
+    is_n = f'-n={n}'  # noqa
 
-    is_dist = f'--dist={dist}'
+    is_dist = f'--dist={dist}'  # noqa
 
     is_markers = '--strict-markers' if markers else ''
 
@@ -113,8 +111,8 @@ def run(
             # f'{is_reruns}',
             f'{is_maxfail}',
             f'{is_x}',
-            f'{is_n}',
-            f'{is_dist}',
+            # f'{is_n}',
+            # f'{is_dist}',
             f'{is_markers}',
             f'{is_capture}',
             f'{is_disable_warnings}',
@@ -122,11 +120,12 @@ def run(
         ] + kw if r.strip() != '']
     )
 
-    SendMail(is_html_report_file.split('=')[1]).send() if send_report and html_report else ...
+    SendMail(is_html_report_file.split('=')[1]).send() if EMAIL_REPORT_SEND and html_report else ...
 
     shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE) if allure else ... if not os.path.exists(
         ALLURE_REPORT_ENV_FILE) else ...
-    os.popen(f'allure serve {ALLURE_REPORT_PATH}') if allure_serve and allure else ...
+
+    os.popen(f'allure serve {ALLURE_REPORT_PATH}') if allure and allure_serve else ...
 
 
 if __name__ == '__main__':

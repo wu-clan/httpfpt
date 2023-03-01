@@ -1,27 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
+import time
 from datetime import datetime
 
 import pytest
-from _pytest.logging import LogCaptureFixture
 from filelock import FileLock
-from loguru import logger
 from py._xmlgen import html
 
 from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
-from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE
+from fastpt.common.yaml_handler import write_yaml_report
+from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE, DING_TALK_REPORT_SEND, \
+    LARK_TALK_REPORT_SEND
+from fastpt.utils.send_report.ding_talk import DingTalk
+from fastpt.utils.send_report.lark_talk import LarkTalk
 
 
 @pytest.fixture(scope='session', autouse=True)
 def session_fixture(tmp_path_factory, worker_id):
     # 避免分布式执行用例循环执行此fixture
-    # 例子: https://www.yuque.com/poloyy/nz6yd2/wq3mby#MXI0w
-    # 优化例子: https://www.yuque.com/poloyy/nz6yd2/wq3mby#UYgcL
     if worker_id == "master":
         return None
-
     root_tmp_dir = tmp_path_factory.getbasetemp().parent
     fn = root_tmp_dir / "data.json"
     with FileLock(str(fn) + ".lock"):
@@ -30,10 +29,13 @@ def session_fixture(tmp_path_factory, worker_id):
 
 @pytest.fixture(scope='package', autouse=True)
 def package_fixture():
+    log.info('START')
     yield
+    log.info('-------------------------------------------------------------------------')
+    log.info('测试用例执行结束')
     # 自动清理临时变量
     VariableCache().clear()
-    log.info('测试用例执行结束')
+    log.info('FINISH')
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -54,19 +56,6 @@ def function_fixture(request):
         log.info('end')
 
     request.addfinalizer(log_end)  # teardown终结函数 == yield后的代码
-
-
-@pytest.fixture
-def caplog(caplog: LogCaptureFixture):
-    """
-    将 pytest 的 caplog 夹具默认日志记录器改为 loguru,而非默认 logging
-
-    :param caplog:
-    :return:
-    """
-    handler_id = logger.add(caplog.handler, format="{message}")
-    yield caplog
-    logger.remove(handler_id)
 
 
 def pytest_configure(config):
@@ -91,7 +80,7 @@ def pytest_html_results_summary(prefix):
     :param prefix:
     :return:
     """
-    # 向html报告中的summary添加额外信息
+    # 向 html 报告中的 summary 添加额外信息
     # prefix.extend([html.p(f"Department:")])
     prefix.extend([html.p(f"Tester: {TESTER_NAME}")])
 
@@ -159,3 +148,33 @@ def pytest_collection_modifyitems(items) -> None:
         # 打开此注释可以解决控制台ids乱码问题,但是会影响报告中的ids参数乱码
         # 问题在这里: https://github.com/pytest-dev/pytest-html/issues/450
         # item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """
+    收集测试结果
+    """
+    total = terminalreporter._numcollected
+    passed = len(terminalreporter.stats.get('passed', []))
+    failed = len(terminalreporter.stats.get('failed', []))
+    error = len(terminalreporter.stats.get('error', []))
+    skipped = len(terminalreporter.stats.get('skipped', []))
+    started_time = terminalreporter._sessionstarttime
+    elapsed = time.time() - started_time
+    data = {
+        "result": "Success" if failed == 0 else "Failed",
+        "total": total,
+        "passed": passed,
+        "failed": failed,
+        "error": error,
+        "skipped": skipped,
+        "started_time": datetime.fromtimestamp(started_time).strftime("%Y-%m-%d %H:%M:%S"),
+        "elapsed": int(datetime.fromtimestamp(elapsed).strftime("%S")),
+    }
+    write_yaml_report(data=data, status="PASS")
+    # 钉钉测试报告通知
+    if DING_TALK_REPORT_SEND:
+        DingTalk(data).send()
+    # 飞书测试报告通知
+    if LARK_TALK_REPORT_SEND:
+        LarkTalk(data).send()

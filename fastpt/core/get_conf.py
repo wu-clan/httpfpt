@@ -29,6 +29,23 @@ EMAIL_USER = __config['email']['user']
 EMAIL_PASSWORD = __config['email']['password']
 EMAIL_SEND_TO = __config['email']['send_to']
 EMAIL_SSL = __config['email']['is_ssl']
+EMAIL_REPORT_SEND = __config['email']['is_send_report']
+
+# 钉钉
+DING_TALK_WEBHOOK = __config['ding_talk']['webhook']
+DING_TALK_PROXY = {
+    'http': __config['ding_talk']['proxies']['http'] if __config['ding_talk']['proxies']['http'] != '' else None,
+    'https': __config['ding_talk']['proxies']['https'] if __config['ding_talk']['proxies']['https'] != '' else None
+}
+DING_TALK_REPORT_SEND = __config['ding_talk']['is_send_report']
+
+# 飞书
+LARK_TALK_WEBHOOK = __config['lark_talk']['webhook']
+LARK_TALK_PROXY = {
+    'http': __config['lark_talk']['proxies']['http'] if __config['lark_talk']['proxies']['http'] != '' else None,
+    'https': __config['lark_talk']['proxies']['https'] if __config['lark_talk']['proxies']['https'] != '' else None
+}
+LARK_TALK_REPORT_SEND = __config['lark_talk']['is_send_report']
 
 # 请求发送
 REQUEST_TIMEOUT = __config['request']['timeout']
