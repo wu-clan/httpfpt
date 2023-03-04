@@ -8,7 +8,8 @@ from typing import Union, Optional
 import pytest
 
 from fastpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND
-from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH, ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE
+from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH, ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE, \
+    ALLURE_REPORT_HTML_PATH
 from fastpt.utils.send_report.send_email import SendMail
 
 
@@ -125,7 +126,8 @@ def run(
     shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE) if allure else ... if not os.path.exists(
         ALLURE_REPORT_ENV_FILE) else ...
 
-    os.popen(f'allure serve {ALLURE_REPORT_PATH}') if allure and allure_serve else ...
+    os.popen(f'allure generate {ALLURE_REPORT_PATH} -o {ALLURE_REPORT_HTML_PATH} --clean') and os.popen(
+        f'allure serve {ALLURE_REPORT_PATH}') if allure and allure_serve else ...
 
 
 if __name__ == '__main__':
