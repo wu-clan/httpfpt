@@ -15,12 +15,19 @@ TESTER_NAME = __config['report']['tester_name']
 # html 测试报告
 HTML_REPORT_TITLE = __config['report']['html']['title']
 
-# 数据库
-DB_HOST = __config['mysql']['host']
-DB_PORT = __config['mysql']['port']
-DB_USER = __config['mysql']['user']
-DB_PASSWORD = __config['mysql']['password']
-DB_DATABASE = __config['mysql']['database']
+# mysql 数据库
+MysqlDB_HOST = __config['mysql']['host']
+MysqlDB_PORT = __config['mysql']['port']
+MysqlDB_USER = __config['mysql']['user']
+MysqlDB_PASSWORD = __config['mysql']['password']
+MysqlDB_DATABASE = __config['mysql']['database']
+
+# redis 数据库
+REDIS_HOST = __config['redis']['host']
+REDIS_PORT = __config['redis']['port']
+REDIS_PASSWORD = __config['redis']['password']
+REDIS_DATABASE = __config['redis']['database']
+REDIS_TIMEOUT = __config['redis']['timeout']
 
 # 邮件
 EMAIL_SERVER = __config['email']['host_server']

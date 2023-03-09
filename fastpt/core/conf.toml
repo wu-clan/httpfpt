@@ -10,13 +10,21 @@ tester_name = '123'
 [report.html]
 title = "自动化测试报告"
 
-# 数据库
+# mysql 数据库
 [mysql]
 host = '127.0.0.1'
 port = 3306
 user = 'root'
 password = '123456'
 database = 'test'
+
+# redis 数据库
+[redis]
+host = '127.0.0.1'
+port = 6379
+password = ''
+database = 0
+timeout = 10
 
 # 邮件
 [email]

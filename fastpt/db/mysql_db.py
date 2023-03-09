@@ -25,14 +25,14 @@ class MysqlDB:
                 pymysql,
                 maxconnections=15,
                 blocking=True,  # 防止连接过多报错
-                host=get_conf.DB_HOST,
-                port=get_conf.DB_PORT,
-                user=get_conf.DB_USER,
-                password=get_conf.DB_PASSWORD,
-                database=get_conf.DB_DATABASE,
+                host=get_conf.MysqlDB_HOST,
+                port=get_conf.MysqlDB_PORT,
+                user=get_conf.MysqlDB_USER,
+                password=get_conf.MysqlDB_PASSWORD,
+                database=get_conf.MysqlDB_DATABASE,
             ).connection()
         except BaseException as e:
-            log.error(f'数据库连接失败: {e}')
+            log.error(f'数据库 mysql 连接失败: {e}')
         # 声明游标
         self.cursor = self.conn.cursor()
 
