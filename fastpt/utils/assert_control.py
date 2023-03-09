@@ -5,7 +5,7 @@ from typing import Union
 from jsonpath import jsonpath
 
 from fastpt.common.log import log
-from fastpt.db.mysql_db import DB
+from fastpt.db.mysql_db import MysqlDB
 from fastpt.enums.assert_type import AssertType
 
 
@@ -120,7 +120,7 @@ class Asserter:
         except KeyError as e:
             raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
         else:
-            sql_data = DB().exec_case_sql(assert_sql)
+            sql_data = MysqlDB().exec_case_sql(assert_sql)
             sql_value = jsonpath(sql_data, assert_jsonpath)
         if sql_value:
             log.info(f'执行断言：{assert_text}')

@@ -17,7 +17,7 @@ from fastpt.enums.sql_type import SqlType
 from fastpt.utils.enum_control import get_enum_values
 
 
-class DB:
+class MysqlDB:
 
     def __init__(self):
         try:

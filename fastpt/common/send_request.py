@@ -12,7 +12,7 @@ from requests import Response as RequestsResponse
 
 from fastpt.common.log import log
 from fastpt.core import get_conf
-from fastpt.db.mysql_db import DB
+from fastpt.db.mysql_db import MysqlDB
 from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
 from fastpt.utils.allure_control import allure_attach_file
@@ -134,7 +134,7 @@ class SendRequests:
                 exec_setup_testcase(parsed_data, setup_testcase)
             setup_sql = parsed_data.setup_sql
             if setup_sql is not None:
-                DB().exec_case_sql(setup_sql, parsed_data.env)
+                MysqlDB().exec_case_sql(setup_sql, parsed_data.env)
             setup_hooks = parsed_data.setup_hooks
             if setup_hooks is not None:
                 HookExecutor().exec_case_func(setup_hooks)
@@ -197,7 +197,7 @@ class SendRequests:
             log.info('开始处理请求后置...')
             teardown_sql = parsed_data.teardown_sql
             if teardown_sql is not None:
-                DB().exec_case_sql(teardown_sql, parsed_data.env)
+                MysqlDB().exec_case_sql(teardown_sql, parsed_data.env)
             teardown_hooks = parsed_data.teardown_hooks
             if teardown_hooks is not None:
                 HookExecutor().exec_case_func(teardown_hooks)
