@@ -10,6 +10,38 @@ from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
+def get_all_testcase_data() -> list:
+    """
+    获取所有测试用例数据
+
+    :return:
+    """
+    # todo: redis 先获取，有则直接返回，没有则读取文件
+    all_yaml_file = search_all_case_yaml_files()
+    all_case_data = []
+    for file in all_yaml_file:
+        read_data = read_yaml(None, filename=file)
+        all_case_data.append(read_data)
+    return all_case_data
+
+
+def get_all_testcase_id() -> list:
+    """
+    获取所有测试用例 id
+
+    :return:
+    """
+    # todo: redis 先获取，有则直接返回，没有则读取文件
+    case_data_list = get_all_testcase_data()
+    all_case_id = []
+    for case_data in case_data_list:
+        steps = case_data['test_steps']
+        if isinstance(steps, list):
+            for i in steps:
+                all_case_id.append(i['case_id'])
+    return all_case_id
+
+
 def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
     """
     执行前置关联测试用例
@@ -27,22 +59,10 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
             if testcase == parsed.case_id:
                 raise ValueError('执行关联测试用例失败，不能关联自身')
 
-    # 获取所有测试用例数据
-    all_yaml_file = search_all_case_yaml_files()
-    all_case_data = []
-    for file in all_yaml_file:
-        read_data = read_yaml(None, filename=file)
-        all_case_data.append(read_data)
+    all_case_data = get_all_testcase_data()
+    all_case_id = get_all_testcase_id()
 
-    # 判断是否含有关联测试用例
-    all_case_id = []
-    for case_data in all_case_data:
-        steps = case_data['test_steps']
-        if isinstance(steps, list):
-            for i in steps:
-                all_case_id.append(i['case_id'])
-        else:
-            all_case_id.append(steps['case_id'])
+    # 判断关联测试用例是否存在
     for testcase in setup_testcase:
         if isinstance(testcase, dict):
             relate_case_id = testcase['case_id']
