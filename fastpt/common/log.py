@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import logging
 import os
 
-from loguru import Logger as LoguruLogger
+import loguru
 from loguru import logger
 
 from fastpt.core.path_conf import LOG_PATH
@@ -12,7 +14,7 @@ from fastpt.core.path_conf import LOG_PATH
 class Logger:
 
     @staticmethod
-    def log() -> LoguruLogger:
+    def log() -> loguru.Logger:
         """
         日志记录器
 
