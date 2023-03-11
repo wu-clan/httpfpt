@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import NoReturn
+
 from jsonpath import jsonpath
 
 from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import read_yaml
+from fastpt.db.redis_db import RedisDB
 from fastpt.utils.file_control import search_all_case_yaml_files
 from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
-def get_all_testcase_data() -> list:
+def __old_get_all_testcase_data() -> list:
     """
     获取所有测试用例数据
 
     :return:
     """
-    # todo: redis 先获取，有则直接返回，没有则读取文件
     all_yaml_file = search_all_case_yaml_files()
     all_case_data = []
     for file in all_yaml_file:
@@ -25,24 +27,82 @@ def get_all_testcase_data() -> list:
     return all_case_data
 
 
-def get_all_testcase_id() -> list:
+def __old_get_all_testcase_id(case_data_list: list) -> list:
     """
     获取所有测试用例 id
 
+    :param case_data_list:
     :return:
     """
-    # todo: redis 先获取，有则直接返回，没有则读取文件
-    case_data_list = get_all_testcase_data()
     all_case_id = []
     for case_data in case_data_list:
         steps = case_data['test_steps']
+        if isinstance(steps, dict):
+            all_case_id.append(steps['case_id'])
         if isinstance(steps, list):
             for i in steps:
                 all_case_id.append(i['case_id'])
     return all_case_id
 
 
-def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
+def get_all_testcase_data() -> list:
+    """
+    获取所有测试用例数据
+
+    :return:
+    """
+    all_yaml_file = search_all_case_yaml_files()
+    redis_all_case_data = RedisDB().get('aap_all_case_data')
+    if redis_all_case_data:
+        redis_all_case_data_len = RedisDB().get('aap_all_case_data_len')
+        if redis_all_case_data_len is not None:
+            if int(redis_all_case_data_len) == len(all_yaml_file):
+                return eval(redis_all_case_data)
+        else:
+            RedisDB().set('aap_all_case_data_len', len(all_yaml_file))
+    all_case_data = []
+    for file in all_yaml_file:
+        read_data = read_yaml(None, filename=file)
+        all_case_data.append(read_data)
+    RedisDB().rset('aap_all_case_data', str(all_case_data))
+    return all_case_data
+
+
+def get_all_testcase_id(case_data_list: list) -> list:
+    """
+    获取所有测试用例 id
+
+    :param case_data_list:
+    :return:
+    """
+    all_case_id = []
+    case_id_len = 0
+    for case_data in case_data_list:
+        steps = case_data['test_steps']
+        if isinstance(steps, dict):
+            case_id_len += 1
+        if isinstance(steps, list):
+            for _ in steps:
+                case_id_len += 1
+    redis_case_id_len = RedisDB().get('aap_all_case_id_len')
+    if redis_case_id_len is not None:
+        if int(redis_case_id_len) == case_id_len:
+            redis_case_id = RedisDB().get('aap_all_case_id')
+            return eval(redis_case_id)
+    else:
+        RedisDB().set('aap_all_case_id_len', case_id_len)
+    for case_data in case_data_list:
+        steps = case_data['test_steps']
+        if isinstance(steps, dict):
+            all_case_id.append(steps['case_id'])
+        if isinstance(steps, list):
+            for i in steps:
+                all_case_id.append(i['case_id'])
+    RedisDB().rset('aap_all_case_id', str(all_case_id))
+    return all_case_id
+
+
+def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoReturn:
     """
     执行前置关联测试用例
 
@@ -59,8 +119,10 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
             if testcase == parsed.case_id:
                 raise ValueError('执行关联测试用例失败，不能关联自身')
 
+    # all_case_data = __old_get_all_testcase_data()
+    # all_case_id = __old_get_all_testcase_id(all_case_data)
     all_case_data = get_all_testcase_data()
-    all_case_id = get_all_testcase_id()
+    all_case_id = get_all_testcase_id(all_case_data)
 
     # 判断关联测试用例是否存在
     for testcase in setup_testcase:
@@ -133,7 +195,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> None:
     parsed.request_data = VarsExtractor().relate_vars_replace(parsed.request_data)
 
 
-def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
+def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoReturn:
     """
     判断是否循环关联
 
@@ -162,7 +224,7 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
                         )
 
 
-def relate_testcase_set_var(testcase_data: dict) -> None:
+def relate_testcase_set_var(testcase_data: dict) -> NoReturn:
     """
     关联测试用例设置变量
 
@@ -179,7 +241,7 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
         raise ValueError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
 
 
-def relate_testcase_exec(testcase_data: dict) -> None:
+def relate_testcase_exec(testcase_data: dict) -> NoReturn:
     """
     关联测试用例执行
 
