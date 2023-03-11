@@ -219,6 +219,9 @@ class SendRequests:
                 if wait_time is not None:
                     log.info(f'执行请求后等待：{wait_time} s')
                     time.sleep(wait_time)
+            except AssertionError as e:
+                log.error(f'断言失败: {e}')
+                raise e
             except Exception as e:
                 log.error(f'请求后置处理异常: {e}')
                 raise e
