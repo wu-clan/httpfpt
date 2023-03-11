@@ -10,6 +10,7 @@ import pytest
 from fastpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND
 from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH, ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE, \
     ALLURE_REPORT_HTML_PATH
+from fastpt.db.redis_db import RedisDB
 from fastpt.utils.send_report.send_email import SendMail
 
 
@@ -131,4 +132,5 @@ def run(
 
 
 if __name__ == '__main__':
+    RedisDB().init()
     run()
