@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os.path
 import re
-from typing import Union
+from typing import Union, NoReturn
 
 from jsonpath import jsonpath
 
@@ -84,7 +84,7 @@ class VarsExtractor:
 
         return str_target
 
-    def relate_vars_replace(self, target):
+    def relate_vars_replace(self, target) -> Union[dict, None]:
         """
         关联变量替换
 
@@ -125,7 +125,7 @@ class VarsExtractor:
         return str_target
 
     @staticmethod
-    def teardown_var_extract(response: dict, extract: list, env: str = None):
+    def teardown_var_extract(response: dict, extract: list, env: str = None) -> NoReturn:
         """
         后置参数提取
 

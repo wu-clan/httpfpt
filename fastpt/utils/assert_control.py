@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Union
+from typing import Union, NoReturn
 
 from jsonpath import jsonpath
 
@@ -11,7 +11,7 @@ from fastpt.enums.assert_type import AssertType
 
 class Asserter:
 
-    def _code_asserter(self, response: dict, assert_text: str) -> None:
+    def _code_asserter(self, response: dict, assert_text: str) -> NoReturn:
         """
         **代码断言器, 像 pytest 断言一样使用它**
 
@@ -60,7 +60,7 @@ class Asserter:
         log.info(f'执行断言：{assert_text}')
         self._exec_code_assert(response, assert_text)
 
-    def _json_asserter(self, response: dict, assert_text: dict) -> None:
+    def _json_asserter(self, response: dict, assert_text: dict) -> NoReturn:
         """
         **json 提取断言器**
 
@@ -100,7 +100,7 @@ class Asserter:
         else:
             raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
 
-    def _sql_asserter(self, assert_text: dict):
+    def _sql_asserter(self, assert_text: dict) -> NoReturn:
         """
         **sql 提取断言器**
 
@@ -129,7 +129,7 @@ class Asserter:
             raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
 
     @staticmethod
-    def _exec_code_assert(response: dict, assert_text: str) -> None:
+    def _exec_code_assert(response: dict, assert_text: str) -> NoReturn:
         """
         执行 code 断言
 
@@ -235,7 +235,7 @@ class Asserter:
                             exec(format_assert_text)
 
     @staticmethod
-    def _exec_json_assert(assert_check: Union[str, None], expected_value, assert_type: str, actual_value) -> None:
+    def _exec_json_assert(assert_check: Union[str, None], expected_value, assert_type: str, actual_value) -> NoReturn:
         """
         执行 jsonpath 断言
 
@@ -316,7 +316,7 @@ class Asserter:
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 
-    def exec_asserter(self, response: dict, assert_text: Union[str, list, dict, None]) -> None:
+    def exec_asserter(self, response: dict, assert_text: Union[str, list, dict, None]) -> NoReturn:
         """
         根据断言内容自动选择断言器执行
 

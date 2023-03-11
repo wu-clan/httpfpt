@@ -2,6 +2,7 @@
 # _*_ coding:utf-8 _*_
 import datetime
 import decimal
+from typing import NoReturn
 
 import pymysql
 from dbutils.pooled_db import PooledDB
@@ -58,7 +59,7 @@ class MysqlDB:
         finally:
             self.close()
 
-    def execute(self, sql: str):
+    def execute(self, sql: str) -> NoReturn:
         """
         执行 sql 操作
 
@@ -75,7 +76,7 @@ class MysqlDB:
         finally:
             self.close()
 
-    def close(self):
+    def close(self) -> NoReturn:
         """
         关闭游标和数据库连接
 

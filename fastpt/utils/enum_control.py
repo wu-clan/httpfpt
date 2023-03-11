@@ -3,7 +3,7 @@
 from enum import Enum
 
 
-def get_enum_values(enum_class):
+def get_enum_values(enum_class) -> list:
     if issubclass(enum_class, Enum):
         return list(map(lambda ec: ec.value, enum_class))
     else:

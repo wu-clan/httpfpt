@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os.path
 from pathlib import Path
+from typing import NoReturn
 
 import typer
 
@@ -10,7 +11,7 @@ from fastpt.core.path_conf import TEST_CASE_PATH
 from fastpt.utils.file_control import search_all_case_yaml_files, search_all_test_case_files, get_file_property
 
 
-def auto_generate_test_cases(rewrite: bool = False) -> None:
+def auto_generate_test_cases(rewrite: bool = False) -> NoReturn:
     """
     自动创建测试用例
 

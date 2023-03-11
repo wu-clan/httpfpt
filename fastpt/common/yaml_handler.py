@@ -3,7 +3,7 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Union, Optional
+from typing import List, Dict, Any, Union, Optional, NoReturn
 
 import yaml
 
@@ -40,7 +40,7 @@ def read_yaml(
         raise ValueError(f'数据文件 {filename} 没有数据! 请检查数据文件内容是否正确!')
 
 
-def write_yaml(filepath: str, filename: str, data=None, *, encoding: str = 'utf-8', mode: str = 'a'):
+def write_yaml(filepath: str, filename: str, data=None, *, encoding: str = 'utf-8', mode: str = 'a') -> NoReturn:
     """
     将数据写入包含 yaml 格式数据的文件
 
@@ -72,7 +72,7 @@ def write_yaml_report(
         encoding: str = 'utf-8',
         mode: str = 'a',
         status: str
-) -> None:
+) -> NoReturn:
     """
     写入 yaml 测试报告
 
@@ -99,7 +99,7 @@ def write_yaml_report(
         log.success(f'写入 {filename} 测试报告成功')
 
 
-def write_yaml_vars(data: dict):
+def write_yaml_vars(data: dict) -> NoReturn:
     """
     写入 yaml 全部变量
 

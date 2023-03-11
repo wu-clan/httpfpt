@@ -3,7 +3,7 @@
 import os
 import shutil
 from datetime import datetime
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Union, Optional, NoReturn
 
 import xlrd
 from openpyxl import load_workbook
@@ -62,7 +62,7 @@ def write_excel_report(
         row_num: int,
         status: str,
         extension: Union[str, None] = None
-) -> None:
+) -> NoReturn:
     """
     写入 excel 测试报告
 

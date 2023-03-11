@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
-import sys
 
+from loguru import Logger as LoguruLogger
 from loguru import logger
 
 from fastpt.core.path_conf import LOG_PATH
@@ -12,7 +12,7 @@ from fastpt.core.path_conf import LOG_PATH
 class Logger:
 
     @staticmethod
-    def log() -> logger:
+    def log() -> LoguruLogger:
         """
         日志记录器
 

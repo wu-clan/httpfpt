@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import NoReturn
 
 import allure
 from allure_commons.types import AttachmentType
@@ -17,7 +18,7 @@ def allure_step(title: str):
         ...
 
 
-def allure_attach(body=None, name=None, attachment_type: str = 'JSON', extension=None):
+def allure_attach(body=None, name=None, attachment_type: str = 'JSON', extension=None) -> NoReturn:
     """
     allure 报告上传附件
 
@@ -35,7 +36,7 @@ def allure_attach(body=None, name=None, attachment_type: str = 'JSON', extension
     )
 
 
-def allure_attach_file(filepath: str, name=None, extension=None):
+def allure_attach_file(filepath: str, name=None, extension=None) -> NoReturn:
     """
     allure 报告上传附件
 

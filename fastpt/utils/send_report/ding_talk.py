@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import NoReturn
+
 from fastpt.common.log import log
 from fastpt.core import get_conf
 
@@ -9,7 +11,7 @@ class DingTalk:
     def __init__(self, content: dict):
         self.content = content
 
-    def send(self):
+    def send(self) -> NoReturn:
         try:
             import requests
             headers = {'Content-Type': 'application/json; charset=utf-8', 'Connection': 'close'}

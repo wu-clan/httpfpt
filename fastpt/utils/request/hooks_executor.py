@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import re
-from typing import Any
+from typing import Any, NoReturn
 
 from fastpt.common.log import log
 
@@ -43,7 +43,7 @@ class HookExecutor:
         exec(f'result = {func}')
         return loc['result']
 
-    def exec_case_func(self, func_list: list) -> None:
+    def exec_case_func(self, func_list: list) -> NoReturn:
         """
         执行用例中的 hook 函数
 

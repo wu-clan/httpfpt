@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-from typing import Optional
+from typing import Optional, NoReturn
 
 from fastpt.common.log import log
 
 
-def read_json_file(filepath: Optional[str] = None, *, filename: str, **kwargs):
+def read_json_file(filepath: Optional[str] = None, *, filename: str, **kwargs) -> dict:
     """
     读取 json 文件
 
@@ -41,7 +41,7 @@ def write_json_file(
         encoding: str = 'utf-8',
         mode: str = 'a',
         **kwargs
-) -> None:
+) -> NoReturn:
     """
     写入 json 文件
 
@@ -61,7 +61,7 @@ def write_json_file(
         _file = filename
     try:
         with open(_file, encoding=encoding, mode=mode) as f:
-            json.dump(data, f, ensure_ascii=False)
+            json.dump(data, f, ensure_ascii=False, **kwargs)
     except Exception as e:
         log.error(f'写入文件 "{filename}" 错误: {e}')
         raise e

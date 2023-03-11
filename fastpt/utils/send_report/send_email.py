@@ -5,6 +5,7 @@ import smtplib
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import NoReturn
 
 from bs4 import BeautifulSoup
 
@@ -47,7 +48,7 @@ class SendMail:
 
         return msg
 
-    def send(self):
+    def send(self) -> NoReturn:
         """
         发送邮件
         """

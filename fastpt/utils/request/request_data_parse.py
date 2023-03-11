@@ -22,7 +22,7 @@ class RequestDataParse:
     def __init__(self, request_data: dict, request_engin: str):
         self.request_data = VarsExtractor().vars_replace(request_data)
         self.request_engin = request_engin
-        self._is_run()  # put down
+        self._is_run()  # put bottom
 
     @property
     def config(self) -> dict:

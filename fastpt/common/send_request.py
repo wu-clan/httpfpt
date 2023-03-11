@@ -3,6 +3,7 @@
 import json
 import time
 from json import JSONDecodeError
+from typing import NoReturn
 
 import allure
 import httpx
@@ -147,7 +148,9 @@ class SendRequests:
         # 日志记录请求数据
         if log_data:
             self.log_request_up(parsed_data)
-            self.allure_request_up(parsed_data)
+
+        # allure 记录请求数据
+        self.allure_request_up(parsed_data)
 
         # 发送请求
         request_conf = {
@@ -216,14 +219,14 @@ class SendRequests:
         return response_data
 
     @staticmethod
-    def log_request_setup(parsed: RequestDataParse):
+    def log_request_setup(parsed: RequestDataParse) -> NoReturn:
         log.info(f'请求 setup_testcase: {parsed.setup_testcase}')
         log.info(f"请求 setup_sql: {parsed.setup_sql}")
         log.info(f"请求 setup_hooks: {parsed.setup_hooks}")
         log.info(f"请求 setup_wait_time: {parsed.setup_wait_time}")
 
     @staticmethod
-    def log_request_up(parsed: RequestDataParse):
+    def log_request_up(parsed: RequestDataParse) -> NoReturn:
         log.info(f"用例 env: {parsed.env}")
         log.info(f"用例 module: {parsed.module}")
         log.info(f"用例 name: {parsed.name}")
@@ -241,14 +244,14 @@ class SendRequests:
         log.info(f"请求 files: {parsed.files_no_parse}")
 
     @staticmethod
-    def log_request_teardown(parsed: RequestDataParse):
+    def log_request_teardown(parsed: RequestDataParse) -> NoReturn:
         log.info(f"请求 teardown_sql: {parsed.teardown_sql}")
         log.info(f"请求 teardown_extract: {parsed.teardown_extract}")
         log.info(f"请求 teardown_assert: {parsed.teardown_assert}")
         log.info(f"请求 teardown_wait_time: {parsed.teardown_wait_time}")
 
     @staticmethod
-    def log_request_down(response_data: dict):
+    def log_request_down(response_data: dict) -> NoReturn:
         log.info(f"请求发送时间: {response_data['stat']['execute_time']}")
         str_status_code = str(response_data['status_code'])
         if str_status_code.startswith('4') or str_status_code.startswith('5'):
@@ -258,7 +261,7 @@ class SendRequests:
         log.info(f"响应时间: {response_data['elapsed']} ms")
 
     @staticmethod
-    def allure_request_up(parsed: RequestDataParse):
+    def allure_request_up(parsed: RequestDataParse) -> NoReturn:
         allure.dynamic.title(f"用例 case_id: {parsed.case_id}")
         allure.dynamic.description(parsed.description)
         allure.dynamic.link(parsed.url)
