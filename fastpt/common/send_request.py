@@ -276,6 +276,7 @@ class SendRequests:
         allure.dynamic.title(parsed.name)
         allure.dynamic.description(parsed.description)
         allure.dynamic.link(parsed.url)
+        allure.dynamic.severity(parsed.allure_severity)
         if parsed.files_no_parse is not None:
             for k, v in parsed.files_no_parse.items():
                 if isinstance(v, list):

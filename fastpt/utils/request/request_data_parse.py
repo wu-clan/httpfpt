@@ -10,6 +10,7 @@ from _pytest.outcomes import Skipped
 from fastpt.common.env_handler import get_env_dict
 from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
+from fastpt.enums.allure_severity import SeverityType
 from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
 from fastpt.enums.request.method import MethodType
@@ -73,6 +74,19 @@ class RequestDataParse:
             if not isinstance(story, str):
                 raise ValueError('测试用例数据解析失败, 参数 config:allure:story 不是有效的 str 类型')
             return story
+
+    @property
+    def allure_severity(self) -> Union[str, None]:
+        try:
+            severity = self.request_data['config']['allure']['severity']
+        except KeyError:
+            severity = None
+        else:
+            if not isinstance(severity, str):
+                raise ValueError('测试用例数据解析失败, 参数 config:allure:severity 不是有效的 str 类型')
+            if severity not in get_enum_values(SeverityType):
+                raise ValueError('测试用例数据解析失败, 参数 config:allure:severity 输入不合法')
+        return severity
 
     @property
     def env(self) -> str:

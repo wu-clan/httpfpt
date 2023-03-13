@@ -3,6 +3,7 @@ config:
     epic: demo接口
     feature: demo模块
     story: 文件上传测试
+    severity: normal
   request:
     env: pro.env
   module: test
