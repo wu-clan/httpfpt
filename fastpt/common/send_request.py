@@ -273,7 +273,7 @@ class SendRequests:
 
     @staticmethod
     def allure_request_up(parsed: RequestDataParse) -> NoReturn:
-        allure.dynamic.title(f"用例 case_id: {parsed.case_id}")
+        allure.dynamic.title(parsed.name)
         allure.dynamic.description(parsed.description)
         allure.dynamic.link(parsed.url)
         if parsed.files_no_parse is not None:
