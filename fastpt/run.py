@@ -127,9 +127,9 @@ def run(
 
     yaml_report_files = os.listdir(YAML_REPORT_PATH)
     yaml_report_files.sort()
-    test_result = read_yaml(None, filename=yaml_report_files[-1])
+    test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
 
-    SendMail(is_html_report_file.split('=')[1]).send() if EMAIL_REPORT_SEND and html_report else ...
+    SendMail(is_html_report_file.split('=')[1], test_result).send() if EMAIL_REPORT_SEND and html_report else ...
 
     DingTalk(test_result).send() if DING_TALK_REPORT_SEND else ...
 

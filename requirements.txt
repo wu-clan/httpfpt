@@ -8,7 +8,7 @@ pytest==6.2.3
 filelock==3.0.12
 pymysql==0.9.3
 dbutils==3.0.2
-py==1.10.0
+py==1.11.0
 httpx==0.23.0
 allure-pytest==2.9.45
 pytest-html==3.1.1
@@ -26,3 +26,4 @@ pydantic==1.9.2
 pytest-sugar==0.9.0
 pytest-loguru==0.2.0
 redis==4.1.1
+jinja2==3.1.2

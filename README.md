@@ -411,9 +411,9 @@ assert:
 
 - html：自动生成，检查 run 参数是否开启 html 报告创建, 默认开启
 
-- yaml：测试报告要手动写入，很少用到，未提供示例，调用方法请查看 yaml_handler.py 文件
+- yaml：自动生成，用于测试结果统计
 
-- ~~excel~~：当前 release 版本已不适用
+- ~~excel：当前 release 版本已不适用~~
 
 - [allure](https://www.yuque.com/poloyy/python/aiqlmi)：自动生成, 默认开启并自动打开浏览器访问, 前提已正确安装 allure 程序
 

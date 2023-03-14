@@ -31,6 +31,9 @@ EXCEL_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'excel_report')
 # HTML测试报告路径
 HTML_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'html_report')
 
+# HTML测试报告路径
+HTML_EMAIL_REPORT_PATH = os.path.join(BASE_DIR, 'templates')
+
 # YAML测试报告路径
 YAML_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'yaml_report')
 

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ test_title }} 自动化测试报告</title>
+</head>
+<body>
+    <div style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+        box-sizing: border-box;
+        display: inline-block;
+        font-size: 14px;
+        overflow: hidden;
+        border-radius: 7px;
+        margin: 0;
+        border: 1px solid #e9e9e9;
+        width: 50%;
+        background-color: #f5f9fc;">
+        <div style="font-size: 16px;
+            vertical-align: top;
+            color: #fff;
+            background-color: #57b9ff;
+            padding: 20px;">
+            <span style="margin-top:20px;display:block"> Fastpt Test Report </span>
+        </div>
+        <div style="margin: 30px 20px;">
+            <table style="font-size:14px;margin:0">
+                <tbody>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        👤 测试人员: {{ tester_name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        🤖 测试结果: {{ result }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        ✅ 通过用例: {{ passed }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        🔧 失败用例: {{ failed }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        ❌ 错误用例: {{ error }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        ⚠️ 跳过用例: {{ skipped }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        ⌛ 开始时间: {{ started_time }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 0 20px; width: 100%;">
+                        ⏱️ 执行耗时: {{ elapsed }} s
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

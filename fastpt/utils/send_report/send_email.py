@@ -7,17 +7,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import NoReturn
 
-from bs4 import BeautifulSoup
+from jinja2 import Template
 
 from fastpt.common.log import log
 from fastpt.core import get_conf
-from fastpt.core.path_conf import HTML_REPORT_PATH
+from fastpt.core.path_conf import HTML_REPORT_PATH, HTML_EMAIL_REPORT_PATH
 
 
 class SendMail:
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, content: dict):
         self.filename = filename
+        self.content = content
 
     def take_messages(self):
         """
@@ -27,18 +28,18 @@ class SendMail:
         msg['Subject'] = get_conf.PROJECT_NAME + ' 自动化测试报告'
         msg['From'] = get_conf.EMAIL_USER
         msg['date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
+        self.content.update({'test_title': get_conf.PROJECT_NAME})
+        self.content.update({'tester_name': get_conf.TESTER_NAME})
+
+        # 邮件正文
+        with open(os.path.join(HTML_EMAIL_REPORT_PATH, 'email_report.html'), 'r', encoding='utf-8') as f:
+            html = Template(f.read())
+
+        msg.attach(MIMEText(html.render(**self.content), _subtype='html', _charset='utf-8'))
 
         # 读取要发送的附件
         with open(os.path.join(HTML_REPORT_PATH, self.filename), 'rb') as f:
             mail_body = str(f.read())
-
-        # 邮件正文
-        html = BeautifulSoup(mail_body, 'html.parser')
-        result = []
-        for _ in html.find_all('span'):
-            result.append(_.text)
-        context = '<h3>测试结果:</h3>' + '<br>'.join(result)
-        msg.attach(MIMEText(context, _subtype='html', _charset='utf-8'))
 
         # 邮件附件
         att1 = MIMEText(mail_body, 'base64', 'utf-8')
