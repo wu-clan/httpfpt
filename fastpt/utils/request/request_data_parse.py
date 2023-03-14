@@ -10,7 +10,7 @@ from _pytest.outcomes import Skipped
 from fastpt.common.env_handler import get_env_dict
 from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
-from fastpt.enums.allure_severity import SeverityType
+from fastpt.enums.allure_severity_type import SeverityType
 from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
 from fastpt.enums.request.method import MethodType
