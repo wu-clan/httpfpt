@@ -10,10 +10,7 @@ from py._xmlgen import html
 from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import write_yaml_report
-from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE, DING_TALK_REPORT_SEND, \
-    LARK_TALK_REPORT_SEND
-from fastpt.utils.send_report.ding_talk import DingTalk
-from fastpt.utils.send_report.lark_talk import LarkTalk
+from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -169,12 +166,6 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         "error": error,
         "skipped": skipped,
         "started_time": datetime.fromtimestamp(started_time).strftime("%Y-%m-%d %H:%M:%S"),
-        "elapsed": int(datetime.fromtimestamp(elapsed).strftime("%S")),
+        "elapsed": datetime.fromtimestamp(elapsed).strftime("%S.%f")[:-3],
     }
     write_yaml_report(data=data, status="PASS")
-    # 钉钉测试报告通知
-    if DING_TALK_REPORT_SEND:
-        DingTalk(data).send()
-    # 飞书测试报告通知
-    if LARK_TALK_REPORT_SEND:
-        LarkTalk(data).send()

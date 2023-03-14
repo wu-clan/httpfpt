@@ -7,10 +7,13 @@ from typing import Union, Optional
 
 import pytest
 
-from fastpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND
+from fastpt.common.yaml_handler import read_yaml
+from fastpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND, DING_TALK_REPORT_SEND, LARK_TALK_REPORT_SEND
 from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH, ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE, \
-    ALLURE_REPORT_HTML_PATH
+    ALLURE_REPORT_HTML_PATH, YAML_REPORT_PATH
 from fastpt.db.redis_db import RedisDB
+from fastpt.utils.send_report.ding_talk import DingTalk
+from fastpt.utils.send_report.lark_talk import LarkTalk
 from fastpt.utils.send_report.send_email import SendMail
 
 
@@ -122,7 +125,15 @@ def run(
         ] + kw if r.strip() != '']
     )
 
+    yaml_report_files = os.listdir(YAML_REPORT_PATH)
+    yaml_report_files.sort()
+    test_result = read_yaml(None, filename=yaml_report_files[-1])
+
     SendMail(is_html_report_file.split('=')[1]).send() if EMAIL_REPORT_SEND and html_report else ...
+
+    DingTalk(test_result).send() if DING_TALK_REPORT_SEND else ...
+
+    LarkTalk(test_result).send() if LARK_TALK_REPORT_SEND else ...
 
     shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE) if allure else ... if not os.path.exists(
         ALLURE_REPORT_ENV_FILE) else ...
