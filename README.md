@@ -55,6 +55,7 @@ config:
     epic:
     feature:
     story:
+    severity:
   request:
     env:
     headers:
@@ -131,6 +132,7 @@ release 版本暂不支持使用，目前这种方式会被提前拦截，就针
 | ++ epic       |         str         | Y     | allure epic                                                              |
 | ++ feature    |         str         | Y     | allure feature                                                           |
 | ++ story      |         str         | Y     | allure story                                                             |
+| ++ severity   |         str         | N     | allure severity: severity、critical、normal、minor、trivial                  |
 | + request     |        dict         | Y     | 请求参数                                                                     |
 | ++ env        |         str         | Y     | 测试环境文件名, 位于 core/run_env/ 目录下                                            |
 | ++ headers    |     dict / null     | N     | 请求头                                                                      |
