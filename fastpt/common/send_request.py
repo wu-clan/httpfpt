@@ -16,7 +16,7 @@ from fastpt.core import get_conf
 from fastpt.db.mysql_db import MysqlDB
 from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
-from fastpt.utils.allure_control import allure_attach_file
+from fastpt.utils.allure_control import allure_attach_file, allure_step
 from fastpt.utils.assert_control import Asserter
 from fastpt.utils.enum_control import get_enum_values
 from fastpt.utils.relate_testcase_executor import exec_setup_testcase
@@ -105,6 +105,7 @@ class SendRequests:
             *,
             request_engin: str = 'requests',
             log_data: bool = True,
+            allure_data: bool = True,
             **kwargs
     ) -> dict:
         """
@@ -113,6 +114,7 @@ class SendRequests:
         :param request_data: 请求数据
         :param request_engin: 请求引擎
         :param log_data: 日志记录数据
+        :param allure_data: allure 记录数据
         :return: response
         """
         if request_engin not in get_enum_values(EnginType):
@@ -123,9 +125,11 @@ class SendRequests:
         parsed_data = RequestDataParse(request_data, request_engin)
         log.info('请求数据解析完成')
 
-        # 日志记录前置请求日志
+        # 记录请求前置数据
         if log_data:
             self.log_request_setup(parsed_data)
+        if allure_data:
+            self.allure_request_setup(parsed_data)
 
         # 前置处理
         if parsed_data.is_setup:
@@ -149,12 +153,14 @@ class SendRequests:
                 raise e
             log.info('请求前置处理完成')
 
-        # 日志记录请求数据
+        # 记录请求数据
         if log_data:
             self.log_request_up(parsed_data)
+        if allure_data:
+            self.allure_request_up(parsed_data)
 
-        # allure 记录请求数据
-        self.allure_request_up(parsed_data)
+        # allure 记录动态数据
+        self.allure_dynamic_data(parsed_data)
 
         # 发送请求
         request_conf = {
@@ -194,10 +200,13 @@ class SendRequests:
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
 
-        # 日志记录响应
+        # 记录响应数据
         if log_data:
             self.log_request_down(response_data)
             self.log_request_teardown(parsed_data)
+        if allure_data:
+            self.allure_request_down(response_data)
+            self.allure_request_teardown(parsed_data)
 
         # 后置处理
         if parsed_data.is_teardown:
@@ -272,11 +281,54 @@ class SendRequests:
         log.info(f"响应时间: {response_data['elapsed']} ms")
 
     @staticmethod
+    def allure_request_setup(parsed: RequestDataParse) -> NoReturn:
+        allure_step('请求前置', {
+            'setup_testcase': parsed.setup_testcase,
+            'setup_sql': parsed.setup_sql,
+            'setup_hooks': parsed.setup_hooks,
+            'setup_wait_time': parsed.setup_wait_time,
+        })
+
+    @staticmethod
     def allure_request_up(parsed: RequestDataParse) -> NoReturn:
+        allure_step('请求数据', {
+            'env': parsed.env,
+            'module': parsed.module,
+            'name': parsed.name,
+            'case_id': parsed.case_id,
+            'description': parsed.description,
+            'method': parsed.method,
+            'url': parsed.url,
+            'params': parsed.params,
+            'headers': parsed.headers,
+            'data_type': parsed.body_type,
+            'data': parsed.body,
+            'files': parsed.files_no_parse,
+        })
+
+    @staticmethod
+    def allure_request_teardown(parsed: RequestDataParse) -> NoReturn:
+        allure_step('请求后置', {
+            'teardown_sql': parsed.teardown_sql,
+            'teardown_extract': parsed.teardown_extract,
+            'teardown_assert': parsed.teardown_assert,
+            'teardown_wait_time': parsed.teardown_wait_time,
+        })
+
+    @staticmethod
+    def allure_request_down(response_data: dict) -> NoReturn:
+        allure_step('响应数据', {
+            'status_code': response_data['status_code'],
+            'elapsed': response_data['elapsed'],
+        })
+
+    @staticmethod
+    def allure_dynamic_data(parsed: RequestDataParse) -> NoReturn:
         allure.dynamic.title(parsed.name)
         allure.dynamic.description(parsed.description)
         allure.dynamic.link(parsed.url)
-        allure.dynamic.severity(parsed.allure_severity)
+        if parsed.allure_severity is not None:
+            allure.dynamic.severity(parsed.allure_severity)
         if parsed.files_no_parse is not None:
             for k, v in parsed.files_no_parse.items():
                 if isinstance(v, list):

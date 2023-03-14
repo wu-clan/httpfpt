@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn
+import json
+from typing import NoReturn, Union
 
 import allure
 from allure_commons.types import AttachmentType
@@ -8,14 +9,20 @@ from allure_commons.types import AttachmentType
 from fastpt.utils.file_control import get_file_property
 
 
-def allure_step(title: str):
+def allure_step(step: str, var: Union[str, dict]):
     """
     allure 操作步骤
 
+    :param step: 操作步骤
+    :param var: 操作步骤中的变量
     :return:
     """
-    with allure.step(title):
-        ...
+    with allure.step(step):
+        allure.attach(
+            body=json.dumps(var, ensure_ascii=False, indent=2) if isinstance(var, dict) else var,
+            name='JSON Serialize',
+            attachment_type=AttachmentType.JSON
+        )
 
 
 def allure_attach(body=None, name=None, attachment_type: str = 'JSON', extension=None) -> NoReturn:
