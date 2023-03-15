@@ -31,11 +31,21 @@ class HookExecutor:
 
     def hook_func_value_replace(self, target: dict) -> Any:
         """
-        执行 hook 函数并替换为返回值
+        执行除前后置 hooks 以外的所有 hook 函数并替换为它的返回值
 
         :param target:
         :return:
         """
+        # 临时解决方案：数据排除
+        setup = target.get('test_steps').get('setup')
+        teardown = target.get('test_steps').get('teardown')
+        setup_hooks = setup.get('hooks') if setup else None
+        teardown_hooks = teardown.get('hooks') if teardown else None
+        if setup_hooks:
+            del target['test_steps']['setup']['hooks']
+        if teardown_hooks:
+            del target['test_steps']['teardown']['hooks']
+
         str_target = str(target)
         exec('from fastpt.data.hooks import *')
         while re.findall(self.func_re, str_target):
@@ -53,6 +63,12 @@ class HookExecutor:
                 raise e
 
         dict_target = eval(str_target)
+
+        # 临时解决方案：数据还原
+        if setup_hooks:
+            dict_target['test_steps']['setup']['hooks'] = setup_hooks
+        if teardown_hooks:
+            dict_target['test_steps']['teardown']['hooks'] = teardown_hooks
 
         return dict_target
 
