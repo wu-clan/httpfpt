@@ -87,7 +87,7 @@ test_steps:
       body_type: json
       body:
         title: foo
-        body: this is a test
+        body: this is a test, sum(a+b)=${sum_a_b(1,2)}
         userId: 1
       files:
     setup:

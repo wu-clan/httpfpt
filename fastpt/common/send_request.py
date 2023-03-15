@@ -143,7 +143,7 @@ class SendRequests:
                     MysqlDB().exec_case_sql(setup_sql, parsed_data.env)
                 setup_hooks = parsed_data.setup_hooks
                 if setup_hooks is not None:
-                    HookExecutor().exec_case_func(setup_hooks)
+                    HookExecutor().exec_hook_func(setup_hooks)
                 wait_time = parsed_data.setup_wait_time
                 if wait_time is not None:
                     log.info(f'执行请求前等待：{wait_time} s')
@@ -217,7 +217,7 @@ class SendRequests:
                     MysqlDB().exec_case_sql(teardown_sql, parsed_data.env)
                 teardown_hooks = parsed_data.teardown_hooks
                 if teardown_hooks is not None:
-                    HookExecutor().exec_case_func(teardown_hooks)
+                    HookExecutor().exec_hook_func(teardown_hooks)
                 teardown_extract = parsed_data.teardown_extract
                 if teardown_extract is not None:
                     VarsExtractor().teardown_var_extract(response_data, teardown_extract, parsed_data.env)
@@ -266,6 +266,7 @@ class SendRequests:
     @staticmethod
     def log_request_teardown(parsed: RequestDataParse) -> NoReturn:
         log.info(f"请求 teardown_sql: {parsed.teardown_sql}")
+        log.info(f"请求 teardown_hooks: {parsed.teardown_hooks}")
         log.info(f"请求 teardown_extract: {parsed.teardown_extract}")
         log.info(f"请求 teardown_assert: {parsed.teardown_assert}")
         log.info(f"请求 teardown_wait_time: {parsed.teardown_wait_time}")
@@ -310,6 +311,7 @@ class SendRequests:
     def allure_request_teardown(parsed: RequestDataParse) -> NoReturn:
         allure_step('请求后置', {
             'teardown_sql': parsed.teardown_sql,
+            'teardown_hooks': parsed.teardown_hooks,
             'teardown_extract': parsed.teardown_extract,
             'teardown_assert': parsed.teardown_assert,
             'teardown_wait_time': parsed.teardown_wait_time,

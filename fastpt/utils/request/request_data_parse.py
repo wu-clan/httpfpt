@@ -15,13 +15,14 @@ from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
 from fastpt.enums.request.method import MethodType
 from fastpt.utils.enum_control import get_enum_values
+from fastpt.utils.request.hooks_executor import HookExecutor
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
 class RequestDataParse:
 
     def __init__(self, request_data: dict, request_engin: str):
-        self.request_data = VarsExtractor().vars_replace(request_data)
+        self.request_data = VarsExtractor().vars_replace(HookExecutor().hook_func_value_replace(request_data))
         self.request_engin = request_engin
         self._is_run()  # put bottom
 
@@ -228,10 +229,7 @@ class RequestDataParse:
                 if not isinstance(is_run, bool):
                     raise ValueError('测试用例数据解析失败, 参数 test_steps:is_run 不是有效的 bool 类型')
                 if not is_run:
-                    allure.dynamic.title(
-                        f"用例 module: {self.module};"
-                        f"用例 case_id: {self.case_id}"
-                    )
+                    allure.dynamic.title(self.name)
                     log.warning('此用例已设置跳过')
                     raise Skipped('此用例已设置跳过')
 
