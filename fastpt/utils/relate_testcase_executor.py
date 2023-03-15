@@ -8,6 +8,7 @@ from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import read_yaml
 from fastpt.db.redis_db import RedisDB
+from fastpt.utils.allure_control import allure_step
 from fastpt.utils.file_control import search_all_case_yaml_files
 from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.request.vars_extractor import VarsExtractor
@@ -232,7 +233,9 @@ def relate_testcase_set_var(testcase_data: dict) -> NoReturn:
     :return:
     """
     from fastpt.common.send_request import send_request
-    log.debug('执行变量提取关联测试用例：{}'.format(testcase_data['test_steps']['case_id']))
+    msg = '执行变量提取关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
+    log.debug(msg)
+    allure_step(msg)
     response = send_request.send_request(testcase_data, log_data=False)
     value = jsonpath(response, testcase_data['set_var_jsonpath'])
     if value:
@@ -249,5 +252,7 @@ def relate_testcase_exec(testcase_data: dict) -> NoReturn:
     :return:
     """
     from fastpt.common.send_request import send_request
-    log.debug('执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id']))
+    msg = '执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
+    log.debug(msg)
+    allure_step(msg)
     send_request.send_request(testcase_data, log_data=False)
