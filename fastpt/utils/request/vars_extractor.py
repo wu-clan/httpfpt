@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os.path
 import re
-from typing import Union, NoReturn
+from typing import NoReturn
 
 from jsonpath import jsonpath
 
@@ -23,7 +23,7 @@ class VarsExtractor:
         # 关联变量开头: a-zA-Z_
         self.relate_vars_re = r'\^([a-zA-Z_]\w*)|\^{([a-zA-Z_]\w*)\}'
 
-    def vars_replace(self, target) -> Union[dict, None]:
+    def vars_replace(self, target: dict) -> dict:
         """
         变量替换
 
@@ -50,12 +50,7 @@ class VarsExtractor:
         read_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
         # 获取变量
-        str_target = target
-        if str_target is None:
-            return str_target
-
-        if not isinstance(target, str):
-            str_target = str(target)
+        str_target = str(target)
 
         while re.findall(self.vars_re, str_target):
             key = re.search(self.vars_re, str_target)
@@ -79,12 +74,11 @@ class VarsExtractor:
                 else:
                     str_target = re.sub(self.vars_re, value, str_target, 1)
 
-        if isinstance(str_target, str):
-            str_target = eval(str_target)
+        dict_target = eval(str_target)
 
-        return str_target
+        return dict_target
 
-    def relate_vars_replace(self, target) -> Union[dict, None]:
+    def relate_vars_replace(self, target: dict) -> dict:
         """
         关联变量替换
 
@@ -95,12 +89,7 @@ class VarsExtractor:
         cache_vars = VariableCache()
 
         # 获取变量
-        str_target = target
-        if str_target is None:
-            return str_target
-
-        if not isinstance(target, str):
-            str_target = str(target)
+        str_target = str(target)
 
         while re.findall(self.relate_vars_re, str_target):
             key = re.search(self.relate_vars_re, str_target)
@@ -113,16 +102,19 @@ class VarsExtractor:
                     log.error(err_msg)
                     raise ValueError(err_msg)
                 else:
-                    str_target = re.sub(self.relate_vars_re, value, str_target, 1)
-                    log.info(f'请求数据关联变量 {var_key} 替换完成')
+                    try:
+                        str_target = re.sub(self.relate_vars_re, value, str_target, 1)
+                        log.info(f'请求数据关联变量 {var_key} 替换完成')
+                    except Exception as e:
+                        log.error(f'请求数据关联变量 {var_key} 替换失败: {e}')
+                        raise e
 
             # 删除关联用例临时变量
             VariableCache().delete(var_key)
 
-        if isinstance(str_target, str):
-            str_target = eval(str_target)
+        dict_target = eval(str_target)
 
-        return str_target
+        return dict_target
 
     @staticmethod
     def teardown_var_extract(response: dict, extract: list, env: str = None) -> NoReturn:
