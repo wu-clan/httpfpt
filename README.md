@@ -170,6 +170,34 @@ release 版本暂不支持使用，目前这种方式会被提前拦截，就针
 
 ### 参数附加说明
 
+#### is_run
+
+test_steps 中的 is_run 参数多种实现方式
+
+1： bool 类型值, True / False, 是否跳过执行
+
+```yaml
+is_run: True
+```
+
+2： dict 类型值, skip + reason, 可自定义跳过执行原因
+
+```yaml
+is_run:
+  skip: True
+  reason: 跳过执行原因
+```
+
+3： dict 类型值, skip_if + reason, 条件为真时跳过执行
+
+```yaml
+is_run:
+  skip_if:
+    - ${timeout} == None
+    - python 表达式
+  reason: 跳过执行原因
+```
+
 #### testcase
 
 setup 中的 testcase 参数支持两种功能
@@ -179,7 +207,7 @@ setup 中的 testcase 参数支持两种功能
 ```yaml
 testcase:
   - event_query_001
-  - event_query_002
+  - 用例 case_id
 ```
 
 2: 设置当前测试用例执行前的缓存变量, 且仅供当前测试用例使用

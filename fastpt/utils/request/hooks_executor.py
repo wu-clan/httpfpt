@@ -68,3 +68,16 @@ class HookExecutor:
         for func in func_list:
             log.info(f'执行 hook：{func}')
             exec(func)
+
+    @staticmethod
+    def exec_any_code(code: str) -> bool:
+        """
+        执行任何函数
+
+        :param code:
+        :return:
+        """
+        exec('import os')
+        exec('import sys')
+        result = eval(code)
+        return result
