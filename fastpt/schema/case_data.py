@@ -9,6 +9,7 @@ class ConfigAllureData(BaseModel):
     epic: str
     feature: str
     story: str
+    severity: Optional[str] = None
 
 
 class ConfigRequestData(BaseModel):
@@ -45,7 +46,7 @@ class SetupTestCaseData(BaseModel):
 
 class SetupSqlData(BaseModel):
     key: str
-    set_type: str
+    type: str
     sql: str
     jsonpath: str
 
@@ -59,7 +60,7 @@ class StepsSetUpData(BaseModel):
 
 class TeardownExtractData(BaseModel):
     key: str
-    set_type: str
+    type: str
     jsonpath: str
 
 
@@ -82,7 +83,7 @@ class Steps(BaseModel):
     name: str
     case_id: str
     description: str
-    is_run: Union[bool, str, None] = ...
+    is_run: Union[bool, dict, None] = ...
     request: StepsRequestData
     setup: Optional[StepsSetUpData] = None
     teardown: Optional[StepsTearDownData] = None

@@ -15,6 +15,7 @@ from fastpt.common.yaml_handler import write_yaml_vars
 from fastpt.core import get_conf
 from fastpt.core.path_conf import RUN_ENV_PATH
 from fastpt.enums.sql_type import SqlType
+from fastpt.enums.var_type import VarType
 from fastpt.utils.enum_control import get_enum_values
 
 
@@ -114,7 +115,7 @@ class MysqlDB:
                 if isinstance(s, dict):
                     log.info(f'执行变量提取 sql: {s["sql"]}')
                     key = s['key']
-                    set_type = s['set_type']
+                    set_type = s['type']
                     sql = s['sql']
                     json_path = s['jsonpath']
                     query_data = self.query(sql)
@@ -123,14 +124,16 @@ class MysqlDB:
                         value = value[0]
                     else:
                         raise ValueError(f'jsonpath 取值失败, 表达式: {json_path}')
-                    if set_type == 'cache':
+                    if set_type == VarType.CACHE:
                         VariableCache().set(key, value)
-                    elif set_type == 'env':
+                    elif set_type == VarType.ENV:
                         if env is None:
                             raise ValueError('写入环境变量准备失败, 缺少参数 env, 请检查传参')
                         write_env_vars(RUN_ENV_PATH, env, key, value)
-                    elif set_type == 'global':
+                    elif set_type == VarType.GLOBAL:
                         write_yaml_vars({key: value})
                     else:
-                        raise ValueError(f'前置 sql 设置变量失败, 用例参数 "set_type: {set_type}" 类型错误')
+                        raise ValueError(
+                            f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+                        )
             return data

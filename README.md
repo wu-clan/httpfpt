@@ -118,8 +118,8 @@ test_steps:
 
 ~~excel 数据：~~
 
-release 版本暂不支持使用，目前这种方式会被提前拦截，就针对 excel 数据提出了参考方案，但
-并未实现相关代码，感兴趣的话可以到文件 file_data_parse.py 中查看
+~~release 版本暂不支持使用，目前这种方式会被提前拦截，就针对 excel 数据提出了参考方案，但
+并未实现相关代码，感兴趣的话可以到文件 file_data_parse.py 中查看~~
 
 ### 参数说明
 
@@ -147,7 +147,7 @@ release 版本暂不支持使用，目前这种方式会被提前拦截，就针
 | + name        |         str         | Y     | 测试用例名称                                                                   |
 | + case_id     |         str         | Y     | 测试用例唯一id                                                                 |
 | + description |         str         | Y     | 测试用例描述                                                                   |
-| + is_run      |     bool / null     | Y     | 跳过执行此测试用例                                                                |
+| + is_run      | bool / dict / null  | Y     | 跳过执行此测试用例                                                                |
 | + request     |        dict         | Y     | 请求参数                                                                     |
 | ++ method     |         str         | Y     | 请求方式，支持大小写                                                               |
 | ++ url        |         str         | Y     | 请求链接，不包含域名，域名需在测试环境文件中配置                                                 |
@@ -174,168 +174,156 @@ release 版本暂不支持使用，目前这种方式会被提前拦截，就针
 
 test_steps 中的 is_run 参数多种实现方式
 
-1： bool 类型值, True / False, 是否跳过执行
+1. bool 类型值, True / False, 是否跳过执行
 
-```yaml
-is_run: True
-```
+    ```yaml
+    is_run: True
+    ```
 
-2： dict 类型值, skip + reason, 可自定义跳过执行原因
+2. dict 类型值, skip + reason, 可自定义跳过执行原因
 
-```yaml
-is_run:
-  skip: True
-  reason: 跳过执行原因
-```
+    ```yaml
+    is_run:
+      skip: True
+      reason: 跳过执行原因
+    ```
 
-3： dict 类型值, skip_if + reason, 条件为真时跳过执行
+3. dict 类型值, skip_if + reason, 条件为真时跳过执行
 
-```yaml
-is_run:
-  skip_if:
-    - ${timeout} == None
-    - python 表达式
-  reason: 跳过执行原因
-```
+    ```yaml
+    is_run:
+      skip_if:
+        - ${timeout} == None
+        - python 表达式
+      reason: 跳过执行原因
+    ```
 
 #### testcase
 
 setup 中的 testcase 参数支持两种功能
 
-1: 执行关联测试用例
+1. 执行关联测试用例
 
-```yaml
-testcase:
-  - event_query_001
-  - 用例 case_id
-```
+    ```yaml
+    testcase:
+      - event_query_001
+      - 用例 case_id
+    ```
 
-2: 设置当前测试用例执行前的缓存变量, 且仅供当前测试用例使用
+2. 设置当前测试用例执行前的缓存变量, 且仅供当前测试用例使用
 
-```yaml
-testcase:
-  - case_id: 关联测试用例的 case_id
-    key: 变量 key，str
-    jsonpath: 值 value, jsonpath 表达式, 数据依赖关联测试用例的请求返回数据集
-```
+    ```yaml
+    testcase:
+      - case_id: 关联测试用例的 case_id
+        key: 变量 key，str
+        jsonpath: 值 value, jsonpath 表达式, 数据依赖关联测试用例的请求返回数据集
+    ```
 
 #### sql
 
 setup / teardown 中的 sql 参数支持两种功能
 
-1: 执行 sql 语句
+1. 执行 sql 语句
 
-```yaml
-sql:
-  - select * from xxx where xxx=xxx
-  - select ...
-```
+    ```yaml
+    sql:
+      - select * from xxx where xxx=xxx
+      - select ...
+    ```
 
-2: 设置变量
+2. 变量提取
 
-```yaml
-sql:
-  - key: 变量 key，str
-    set_type: 变量类型：env / global / cache
-    sql: 执行 sql 查询，str
-    jsonpath: 值 value, jsonpath 表达式, 数据依赖 sql 查询结果
-```
+    ```yaml
+    sql:
+      - key: 变量 key，str
+        type: 变量类型：env / global / cache
+        sql: 执行 sql 查询，str
+        jsonpath: 值 value, jsonpath 表达式, 数据依赖 sql 查询结果
+    ```
 
 #### extract
 
-teardown 中的 extract 参数支持单种功能
+teardown 中的 extract 参数支持一种功能
 
-- 变量提取
+1. 变量提取
 
-```yaml
-extract:
-  - key: 变量 key，str
-    set_type: 变量类型：env / global / cache
-    jsonpath: 值 value, jsonpath 表达式, 数据依赖 response 数据集
-```
+    ```yaml
+    extract:
+      - key: 变量 key，str
+        type: 变量类型：env / global / cache
+        jsonpath: 值 value, jsonpath 表达式, 数据依赖 response 数据集
+    ```
 
 #### assert
 
-1: 常规断言：
+1. 常规断言：
 
-与正常 assert 的语法格式一致，但比较值受约束；
+   与正常 assert 的语法格式一致，但比较值受约束, 比较直从 response 数据集进行取值， 并且以 pm.response.get('') 开始取值，
+   后面可以继续 get()，也可以使用其他方法，但前提是 python 可执行代码，并且为了避免引号问题，**断言脚本请使用单引号处理**,
+   E.g:
 
-比较直从 response 数据集进行取值， 并且以 pm.response.get('') 开始取值，
-后面可以继续 get() 方法，也可以使用其他方法，但前提是 python 可执行代码，并且为了避免引号问题，断言脚本请使用单引号处理,
-E.g:
+    ```yaml
+    assert: assert xxx 条件 pm.response.get('xxx'), '错误说明'
+    ```
 
-str:
+    ```yaml
+    assert:
+      - assert xxx 条件 pm.response.get('xxx')
+      - assert xxx 条件 pm.response.get('xxx').get('xxx'), '错误说明'
+    ```
 
-```yaml
-assert: assert xxx 条件 pm.response.get('xxx'), '错误说明'
-```
+2. jsonpath 断言:
 
-list:
+   ```yaml
+   assert:
+     - check: 断言说明 / 错误信息, str / None，为空时，将展示内部定义信息
+       value: 想要进行比较的值, Any
+       type: 断言类型，str
+       jsonpath: jsonpath 表达式, 数据依赖用例的请求返回的数据集
+   ```
 
-```yaml
-assert:
-  - assert xxx 条件 pm.response.get('xxx')
-  - assert xxx 条件 pm.response.get('xxx').get('xxx'), '错误说明'
-```
+3. sql 断言:
 
-2: jsonpath 断言:
-
-使用 jsonpath 从 response 数据集进行取值比较
-
-```yaml
-assert:
-  - check: 断言说明 / 错误信息, str / None，为空时，将展示内部定义信息
-    value: 想要进行比较的值, Any
-    type: 断言类型，str
-    jsonpath: jsonpath 表达式, 数据依赖用例的请求返回数据集
-```
-
-3: sql 断言:
-
-使用 jsonpath 从 sql 查询结果中取值比较
-
-```yaml
-assert:
-  - check: 断言说明 / 错误信息, str / None，为空时，将展示内部定义信息
-    value: 想要进行比较的值, Any
-    type: 断言类型，str
-    sql: 执行 sql 查询，str
-    jsonpath: jsonpath 表达式, 数据依赖 sql 查询结果
-```
+   ```yaml
+   assert:
+     - check: 断言说明 / 错误信息, str / None，为空时，将展示内部定义信息
+       value: 想要进行比较的值, Any
+       type: 断言类型，str
+       sql: 执行 sql 查询，str
+       jsonpath: jsonpath 表达式, 数据依赖 sql 查询结果
+   ```
 
 ### 断言类型说明
 
-- eq: 预期结果与实际结果相等
-- not_eq: 预期结果不等于实际结果
-- gt: 预期结果大于实际结果
-- ge: 预期结果大于等于实际结果
-- lt: 预期结果小于实际结果
-- le: 预期结果小于等于实际结果
-- str_eq: 预期结果和实际结果字符串相等
-- len_eq: 预期结果长度等于实际结果
-- not_len_eq: 预期结果长度不等于实际结果
-- len_lt: 预期结果长度小于实际结果
-- len_le: 预期结果长度小于等于实际结果
-- len_gt: 预期结果长度大于实际结果
-- len_ge: 预期结果长度大于等于实际结果
-- contains: 预期结果内容包含在实际结果中
-- not contains: 预期结果内容不包含在实际结果中
-- startswith: 实际结果的开头是预期结果
-- endswith: 实际结果的结尾是预期结果
+- `eq`: 预期结果与实际结果相等
+- `not_eq`: 预期结果不等于实际结果
+- `gt`: 预期结果大于实际结果
+- `ge`: 预期结果大于等于实际结果
+- `lt`: 预期结果小于实际结果
+- `le`: 预期结果小于等于实际结果
+- `str_eq`: 预期结果和实际结果字符串相等
+- `len_eq`: 预期结果长度等于实际结果
+- `not_len_eq`: 预期结果长度不等于实际结果
+- `len_lt`: 预期结果长度小于实际结果
+- `len_le`: 预期结果长度小于等于实际结果
+- `len_gt`: 预期结果长度大于实际结果
+- `len_ge`: 预期结果长度大于等于实际结果
+- `contains`: 预期结果内容包含在实际结果中
+- `not contains`: 预期结果内容不包含在实际结果中
+- `startswith`: 实际结果的开头是预期结果
+- `endswith`: 实际结果的结尾是预期结果
 
 ### 变量和hooks说明
 
 #### 1. 变量
 
-变量除了在用例数据中进行提取定义外，还支持进行手动定义
-
-- 全局变量：仅在 data 目录下的 global_vars.yaml 文件中以键值对形式进行定义，请参考文件中示例
-- 环境变量：在测试用例依赖的环境文件中以键值对的形式进行定义，请参考文件中示例
-- 缓存变量：可以间接的通过 hook 函数定义，例如在 hook 方法中调用缓存变量写入方法实现定义
+- global: 全局变量, 仅在 data 目录下的 `global_vars.yaml` 文件中以键值对形式进行定义
+- env: 环境变量, 在测试用例依赖的环境文件中以键值对的形式进行定义
+- cache: 缓存变量, 在同一python包下运行测试用例时，在系统内存中定义，例如在 hooks 方法中调用缓存变量写入方法实现定义
 
 #### 2. hooks
 
-仅在 data 目录下的 hooks.py 文件中定义，根据定义结构在用例数据文件中使用，可参考文件中示例
+仅在 data 目录下的 hooks.py 文件中定义，根据定义结构在用例数据文件中使用
 
 ### 变量表达式
 
@@ -347,13 +335,13 @@ assert:
    ${var} 或 $var
    ```
 
-- 关联测试用例变量：只在测试用例中含有关联测试用例并需要引用关联测试用例设置的变量时，使用此方式
+- 关联测试用例变量：只在测试用例中含有关联测试用例提取并需要引用关联测试用例设置的变量时，使用此方式
 
    ```text
    ^{var} 或 ^var
    ```
 
-- hooks：仅在测试用例前后置 hooks 参数下配置时生效
+- hooks：全局可用，在测试用例前后置 hooks 参数下只执行代码, 在其他地方使用时, 将执行代码并替换为返回值
 
    ```text
    ${func()}

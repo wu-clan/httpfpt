@@ -11,6 +11,7 @@ from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import read_yaml, write_yaml_vars
 from fastpt.core.path_conf import TEST_DATA_PATH, RUN_ENV_PATH
+from fastpt.enums.var_type import VarType
 
 
 class VarsExtractor:
@@ -129,18 +130,20 @@ class VarsExtractor:
         for et in extract:
             log.info(f'执行变量提取：{et["key"]}')
             key = et['key']
-            set_type = et['set_type']
+            set_type = et['type']
             json_path = et['jsonpath']
             value = jsonpath(response, json_path)
             if value:
                 value = value[0]
             else:
                 raise ValueError(f'jsonpath 取值失败, 表达式: {json_path}')
-            if set_type == 'cache':
+            if set_type == VarType.CACHE:
                 VariableCache().set(key, value)
-            elif set_type == 'env':
+            elif set_type == VarType.ENV:
                 write_env_vars(RUN_ENV_PATH, env, key, value)
-            elif set_type == 'global':
+            elif set_type == VarType.GLOBAL:
                 write_yaml_vars({key: value})
             else:
-                raise ValueError(f'前置 sql 设置变量失败, 用例参数 "set_type: {set_type}" 类型错误')
+                raise ValueError(
+                    f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+                )
