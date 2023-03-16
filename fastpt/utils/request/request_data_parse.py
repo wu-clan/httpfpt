@@ -616,7 +616,7 @@ class RequestDataParse:
     @property
     def get_request_data_parsed(self) -> dict:
         """
-        获取解析后的请求参数
+        获取解析后的请求数据
 
         :return:
         """
@@ -628,8 +628,6 @@ class RequestDataParse:
             'data': self.body,
             'files': self.files
         }
-        if self.body_type != BodyType.JSON.value or self.body_type != BodyType.GraphQL.value:
+        if self.body_type == BodyType.JSON.value or self.body_type == BodyType.GraphQL.value:
             parsed_data.update({'json': parsed_data.pop('data')})
-        else:
-            parsed_data = parsed_data
         return parsed_data

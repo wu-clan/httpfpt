@@ -83,7 +83,6 @@ test_steps:
       url: /posts
       params:
       headers:
-        Content-type: application/json; charset=UTF-8
       body_type: json
       body:
         title: foo
