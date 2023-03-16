@@ -324,9 +324,9 @@ class RequestDataParse:
                     headers = eval(headers)
                 if not isinstance(headers, dict):
                     raise ValueError('请求数据解析失败, 参数 headers 不是有效的 dict 类型')
-                else:
-                    if len(headers) == 0:
-                        raise ValueError('请求数据解析失败, 参数 headers 内容为空')
+            if headers is not None:
+                if len(headers) == 0:
+                    raise ValueError('请求数据解析失败, 参数 headers 内容为空')
             return headers
 
     @property
