@@ -4,11 +4,8 @@ project = 'test_project'
 
 # 测试报告
 [report]
-tester_name = '123'
-
-# html 测试报告
-[report.html]
 title = "自动化测试报告"
+tester_name = '123'
 
 # mysql 数据库
 [mysql]

@@ -10,7 +10,7 @@ __config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
 PROJECT_NAME = __config['project']['project']
 
 # 测试报告
-TEST_REPORT_TITLE = __config['report']['html']['title']
+TEST_REPORT_TITLE = __config['report']['title']
 TESTER_NAME = __config['report']['tester_name']
 
 # mysql 数据库
