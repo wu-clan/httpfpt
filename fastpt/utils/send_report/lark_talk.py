@@ -21,7 +21,7 @@ class LarkTalk:
                 "content": {
                     "post": {
                         "zh_cn": {
-                            "title": f"{get_conf.PROJECT_NAME} 自动化测试报告",
+                            "title": get_conf.TEST_REPORT_TITLE,
                             "content": [
                                 [
                                     {

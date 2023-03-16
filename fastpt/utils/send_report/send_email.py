@@ -25,7 +25,7 @@ class SendMail:
         生成邮件内容，和html报告附件
         """
         msg = MIMEMultipart()
-        msg['Subject'] = get_conf.PROJECT_NAME + ' 自动化测试报告'
+        msg['Subject'] = get_conf.TEST_REPORT_TITLE
         msg['From'] = get_conf.EMAIL_USER
         msg['date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
         self.content.update({'test_title': get_conf.PROJECT_NAME})

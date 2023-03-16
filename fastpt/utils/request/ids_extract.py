@@ -6,7 +6,6 @@ def get_ids(request_data: list) -> list:
     """
     从请求数据获取数据驱动下的 ids 数据
 
-
     :param request_data: 请求数据
     :return:
     """

@@ -3,7 +3,7 @@
 import datetime
 from faker import Faker
 
-fk = Faker(locale='zh_CN')
+faker = Faker(locale='zh_CN')
 
 
 def current_time():
@@ -17,7 +17,7 @@ def random_phone():
     """
     :return: 随机手机号
     """
-    return fk.phone_number()
+    return faker.phone_number()
 
 
 def sum_a_b(a, b):

@@ -10,7 +10,7 @@ from py._xmlgen import html
 from fastpt.common.log import log
 from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import write_yaml_report
-from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, HTML_REPORT_TITLE
+from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, TEST_REPORT_TITLE
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -84,7 +84,7 @@ def pytest_html_results_summary(prefix):
 
 @pytest.mark.optionalhook
 def pytest_html_report_title(report):
-    report.title = f"{HTML_REPORT_TITLE}"
+    report.title = f"{TEST_REPORT_TITLE}"
 
 
 @pytest.mark.optionalhook

@@ -18,7 +18,7 @@ class DingTalk:
             data = {
                 "msgtype": "markdown",
                 "markdown": {
-                    "title": get_conf.PROJECT_NAME + "自动化测试报告",
+                    "title": get_conf.TEST_REPORT_TITLE,
                     "text": f"> ## {get_conf.PROJECT_NAME} 自动化测试报告\n\n"
                             f"> 👤 测试人员: {get_conf.TESTER_NAME}\n\n"
                             f"> 🤖 测试结果: {self.content['result']}\n\n"
