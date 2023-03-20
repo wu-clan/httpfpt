@@ -11,9 +11,11 @@ from fastpt.common.env_handler import get_env_dict
 from fastpt.common.log import log
 from fastpt.core.path_conf import RUN_ENV_PATH
 from fastpt.enums.allure_severity_type import SeverityType
+from fastpt.enums.request.auth import AuthType
 from fastpt.enums.request.body import BodyType
 from fastpt.enums.request.engin import EnginType
 from fastpt.enums.request.method import MethodType
+from fastpt.utils.auth_plugins import IS_AUTH, AUTH_TYPE, AuthPlugins
 from fastpt.utils.enum_control import get_enum_values
 from fastpt.utils.request.hooks_executor import HookExecutor
 from fastpt.utils.request.vars_extractor import VarsExtractor
@@ -327,6 +329,14 @@ class RequestDataParse:
             if headers is not None:
                 if len(headers) == 0:
                     raise ValueError('请求数据解析失败, 参数 headers 内容为空')
+            if IS_AUTH:
+                try:
+                    auth_return = getattr(AuthPlugins, AUTH_TYPE)
+                except AttributeError:
+                    raise ValueError('请求认证失败, 认证参数 auth_type 不是有效的 AuthType 类型')
+                if auth_return is not None:
+                    if AUTH_TYPE == AuthType.bearer_token:
+                        self.headers.update({'Authorization': f'Bearer {auth_return}'})
             return headers
 
     @property

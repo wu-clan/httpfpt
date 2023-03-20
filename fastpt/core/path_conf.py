@@ -48,3 +48,6 @@ RUN_ENV_PATH = os.path.join(BASE_DIR, 'core', 'run_env')
 
 # 测试用例路径
 TEST_CASE_PATH = os.path.join(BASE_DIR, 'test_case')
+
+# AUTH配置文件路径
+AUTH_CONF_PATH = os.path.join(BASE_DIR, 'core')
