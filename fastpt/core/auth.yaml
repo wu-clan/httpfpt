@@ -1,12 +1,16 @@
 # 是否启用全局自动认证
-is_auth: false
+is_auth: true
 # 认证类型，请填写为认证方式的键值，如：bearer_token
 auth_type: bearer_token
 # token认证
 bearer_token:
-  url:
-  username:
-  password:
+  url: https://api.pity.fun/auth/login
+  username: tester
+  password: tester
   headers:
-    Content-Type: application/x-www-form-urlencoded
-  timeout: 10
+    Content-Type: application/json
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36
+  # jsonpath表达式，用于从响应中提取token
+  token_key: $.data.token
+  # token有效期，单位秒
+  timeout: 100000

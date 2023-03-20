@@ -116,7 +116,7 @@ def run(
             # f'{is_reruns}',
             f'{is_maxfail}',
             f'{is_x}',
-            # f'{is_n}',
+            # f'{is_n}',  # 分布式运行存在诸多问题, 请谨慎使用
             # f'{is_dist}',
             f'{is_markers}',
             f'{is_capture}',

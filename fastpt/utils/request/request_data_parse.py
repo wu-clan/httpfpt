@@ -330,13 +330,10 @@ class RequestDataParse:
                 if len(headers) == 0:
                     raise ValueError('请求数据解析失败, 参数 headers 内容为空')
             if IS_AUTH:
-                try:
-                    auth_return = getattr(AuthPlugins, AUTH_TYPE)
-                except AttributeError:
-                    raise ValueError('请求认证失败, 认证参数 auth_type 不是有效的 AuthType 类型')
-                if auth_return is not None:
-                    if AUTH_TYPE == AuthType.bearer_token:
-                        self.headers.update({'Authorization': f'Bearer {auth_return}'})
+                if AUTH_TYPE == AuthType.bearer_token:
+                    token = AuthPlugins().bearer_token
+                    bearer_token = {'Authorization': f'Bearer {token}'}
+                    headers = headers.update(bearer_token) if headers else bearer_token
             return headers
 
     @property

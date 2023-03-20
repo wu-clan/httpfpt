@@ -40,7 +40,7 @@ test_steps:
       hooks:
       extract:
         - key: test
-          set_type: cache
+          type: cache
           jsonpath: $.url
       assert:
         check:
@@ -68,7 +68,7 @@ test_steps:
     teardown:
       extract:
         - key: test
-          set_type: env
+          type: env
           jsonpath: $.url
       assert:
         - assert 200 == pm.response.get('status_code')
@@ -97,7 +97,7 @@ test_steps:
         - ${random_phone()}
       extract:
         - key: test
-          set_type: global
+          type: global
           jsonpath: $.url
       assert: assert 200 == pm.response.get('status_code')
 
