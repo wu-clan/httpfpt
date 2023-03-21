@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
-from typing import NoReturn
+from typing import NoReturn, List, Dict, Union
 
 from jsonpath import jsonpath
 
@@ -10,7 +10,7 @@ from fastpt.common.variable_cache import VariableCache
 from fastpt.common.yaml_handler import read_yaml
 from fastpt.db.redis_db import RedisDB
 from fastpt.utils.allure_control import allure_step
-from fastpt.utils.file_control import search_all_case_yaml_files
+from fastpt.utils.file_control import search_all_case_yaml_files, get_file_property
 from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
@@ -22,16 +22,23 @@ def get_all_testcase_id(case_data_list: list) -> list:
     :param case_data_list:
     :return:
     """
-    all_case_id = []
+    all_case_id_dict: List[Dict[str, Union[str, list]]] = []
     for case_data in case_data_list:
         steps = case_data['test_steps']
         if isinstance(steps, dict):
-            all_case_id.append(steps['case_id'])
+            all_case_id_dict.append({f'{case_data["filename"]}': steps['case_id']})
         if isinstance(steps, list):
+            cl = []
             for i in steps:
-                all_case_id.append(i['case_id'])
+                cl.append(i['case_id'])
+            all_case_id_dict.append({f'{case_data["filename"]}': cl})
+    all_case_id = []
+    for case_id_dict in all_case_id_dict:
+        for case_id_values in case_id_dict.values():
+            for case_id in case_id_values:
+                all_case_id.append(case_id)
     set_all_case_id = set(all_case_id)
-    re_case_id_desc = []
+    all_re_case_id_desc = []
     if len(set_all_case_id) != len(all_case_id):
         for i in set_all_case_id:
             re_count = 0
@@ -39,14 +46,23 @@ def get_all_testcase_id(case_data_list: list) -> list:
                 if i == j:
                     re_count += 1
             if re_count > 1:
-                re_case_id_desc.append({'case_id': i, 'count': re_count})
-    if len(re_case_id_desc) > 0:
+                re_case_id_desc = {'case_id': i, 'count': re_count}
+                all_re_case_id_detail = []
+                for case_id_dict in all_case_id_dict:
+                    for key in case_id_dict.keys():
+                        if i in case_id_dict[key]:
+                            all_re_case_id_detail.append({'file': f'{key}', 'index': case_id_dict[key].index(i)})
+                re_case_id_desc.update({
+                    'detail': all_re_case_id_detail if len(all_re_case_id_detail) > 1 else all_re_case_id_detail[0],
+                })
+                all_re_case_id_desc.append(re_case_id_desc)
+    if len(all_re_case_id_desc) > 0:
         RedisDB().set('aap_is_re_case_id', 'true')
-        log.error(f'运行失败, 检测到用例数据使用重复id: {re_case_id_desc}')
+        log.error(f'运行失败, 检测到用例数据使用重复id: {all_re_case_id_desc}')
         sys.exit(1)
     else:
         RedisDB().delete('aap_is_re_case_id')
-        RedisDB().set('app_all_case_id', str(all_case_id))
+        RedisDB().rset('app_all_case_id', str(all_case_id))
     return all_case_id
 
 
@@ -69,6 +85,7 @@ def get_all_testcase_data() -> list:
     all_case_data = []
     for file in all_yaml_file:
         read_data = read_yaml(None, filename=file)
+        read_data.update({'filename': get_file_property(file)[0]})
         all_case_data.append(read_data)
     RedisDB().rset('aap_all_case_data', str(all_case_data))
     return all_case_data
