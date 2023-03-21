@@ -9,7 +9,7 @@
 - common/: 公共类
 - core/: 配置
 - data/: 测试数据
-- db/: 数据库相关
+- db/: 数据库
 - log/: 日志文件
 - report/: 测试报告存放
 - test_case/: 放置接口自动化测试项目和用例
@@ -88,7 +88,7 @@ test_steps:
         - event_query_001
       sql:
         - key:
-          set_type:
+          type:
           sql:
           jsonpath:
         - select * from xxx where xxx=xxx
@@ -99,7 +99,7 @@ test_steps:
       hooks:
       extract:
         - key:
-          set_type:
+          type:
           jsonpath:
       assert:
         - check:
@@ -112,7 +112,6 @@ test_steps:
           type:
           sql:
           jsonpath:
-
       wait_time:
 ```
 
@@ -258,7 +257,7 @@ teardown 中的 extract 参数支持一种功能
 
 1. 常规断言：
 
-   与正常 assert 的语法格式一致，但比较值受约束, 比较直从 response 数据集进行取值， 并且以 pm.response.get('') 开始取值，
+   与正常 assert 的语法格式一致，但比较值受约束, 比较值从 response 数据集进行取值， 并且以 pm.response.get('') 开始取值，
    后面可以继续 get()，也可以使用其他方法，但前提是 python 可执行代码，并且为了避免引号问题，**断言脚本请使用单引号处理**,
    E.g:
 
