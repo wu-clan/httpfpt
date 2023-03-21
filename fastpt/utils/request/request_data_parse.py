@@ -623,18 +623,44 @@ class RequestDataParse:
     @property
     def get_request_data_parsed(self) -> dict:
         """
-        获取解析后的请求数据
+        获取所有解析后的请求数据
 
         :return:
         """
-        parsed_data = {
+        all_data = {
+            'config': self.config,
+            'allure_epic': self.allure_epic,
+            'allure_feature': self.allure_feature,
+            'allure_story': self.allure_story,
+            'allure_severity': self.allure_severity,
+            'env': self.env,
+            'timeout': self.timeout,
+            'verify': self.verify,
+            'redirects': self.redirects,
+            'proxies': self.proxies,
+            'module': self.module,
+            'test_steps': self.test_steps,
+            'name': self.name,
+            'case_id': self.case_id,
+            'description': self.description,
             'method': self.method,
             'url': self.url,
             'params': self.params,
             'headers': self.headers,
-            'data': self.body,
-            'files': self.files
+            'body_type': self.body_type,
+            'body': self.body,
+            'files': self.files,
+            'files_no_parse': self.files_no_parse,
+            'is_setup': self.is_setup,
+            'setup_testcase': self.setup_testcase,
+            'setup_sql': self.setup_sql,
+            'setup_hooks': self.setup_hooks,
+            'setup_wait_time': self.setup_wait_time,
+            'is_teardown': self.is_teardown,
+            'teardown_sql': self.teardown_sql,
+            'teardown_hooks': self.teardown_hooks,
+            'teardown_extract': self.teardown_extract,
+            'teardown_assert': self.teardown_assert,
+            'teardown_wait_time': self.teardown_wait_time,
         }
-        if self.body_type == BodyType.JSON.value or self.body_type == BodyType.GraphQL.value:
-            parsed_data.update({'json': parsed_data.pop('data')})
-        return parsed_data
+        return all_data

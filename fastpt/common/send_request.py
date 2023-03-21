@@ -122,29 +122,33 @@ class SendRequests:
 
         # 获取解析后的请求数据
         log.info('开始解析请求数据')
-        parsed_data = RequestDataParse(request_data, request_engin)
+        request_data_parse = RequestDataParse(request_data, request_engin)
+        parsed_data = request_data_parse.get_request_data_parsed
         log.info('请求数据解析完成')
 
-        # 记录请求前置数据
+        # 记录请求前置数据; 请注意: 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         if log_data:
             self.log_request_setup(parsed_data)
         if allure_data:
             self.allure_request_setup(parsed_data)
 
         # 前置处理
-        if parsed_data.is_setup:
+        if parsed_data['is_setup']:
             log.info('开始处理请求前置...')
             try:
-                setup_testcase = parsed_data.setup_testcase
+                setup_testcase = parsed_data['setup_testcase']
                 if setup_testcase is not None:
-                    exec_setup_testcase(parsed_data, setup_testcase)
-                setup_sql = parsed_data.setup_sql
+                    new_parsed = exec_setup_testcase(request_data_parse, setup_testcase)
+                    if isinstance(new_parsed, RequestDataParse):
+                        # 对呀引用了关联测试用例变量的测试来讲, 这里可能造成微小的性能损耗
+                        parsed_data = request_data_parse.get_request_data_parsed
+                setup_sql = parsed_data['setup_sql']
                 if setup_sql is not None:
-                    MysqlDB().exec_case_sql(setup_sql, parsed_data.env)
-                setup_hooks = parsed_data.setup_hooks
+                    MysqlDB().exec_case_sql(setup_sql, parsed_data['env'])
+                setup_hooks = parsed_data['setup_hooks']
                 if setup_hooks is not None:
                     HookExecutor().exec_hook_func(setup_hooks)
-                wait_time = parsed_data.setup_wait_time
+                wait_time = parsed_data['setup_wait_time']
                 if wait_time is not None:
                     log.info(f'执行请求前等待：{wait_time} s')
                     time.sleep(wait_time)
@@ -164,23 +168,33 @@ class SendRequests:
 
         # 发送请求
         request_conf = {
-            'timeout': parsed_data.timeout,
-            'verify': parsed_data.verify,
-            'proxies': parsed_data.proxies,
-            'allow_redirects': parsed_data.redirects,
+            'timeout': parsed_data['timeout'],
+            'verify': parsed_data['verify'],
+            'proxies': parsed_data['proxies'],
+            'allow_redirects': parsed_data['redirects'],
         }
         response_data = self.init_response_meta_data
+        request_data_parsed = {
+            'method': parsed_data['method'],
+            'url': parsed_data['url'],
+            'params': parsed_data['params'],
+            'headers': parsed_data['headers'],
+            'data': parsed_data['body'],
+            'files': parsed_data['files']
+        }
+        if parsed_data['body_type'] == BodyType.JSON.value or parsed_data['body_type'] == BodyType.GraphQL.value:
+            request_data_parsed.update({'json': request_data_parsed.pop('data')})
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
             response = self._requests_engin(
                 **request_conf,
-                **parsed_data.get_request_data_parsed,
+                **request_data_parsed,
                 **kwargs
             )
         elif request_engin == EnginType.httpx:
             response = self._httpx_engin(
                 **request_conf,
-                **parsed_data.get_request_data_parsed,
+                **request_data_parsed,
                 **kwargs
             )
         else:
@@ -209,22 +223,22 @@ class SendRequests:
             self.allure_request_teardown(parsed_data)
 
         # 后置处理
-        if parsed_data.is_teardown:
+        if parsed_data['is_teardown']:
             log.info('开始处理请求后置...')
             try:
-                teardown_sql = parsed_data.teardown_sql
+                teardown_sql = parsed_data['teardown_sql']
                 if teardown_sql is not None:
-                    MysqlDB().exec_case_sql(teardown_sql, parsed_data.env)
-                teardown_hooks = parsed_data.teardown_hooks
+                    MysqlDB().exec_case_sql(teardown_sql, parsed_data['env'])
+                teardown_hooks = parsed_data['teardown_hooks']
                 if teardown_hooks is not None:
                     HookExecutor().exec_hook_func(teardown_hooks)
-                teardown_extract = parsed_data.teardown_extract
+                teardown_extract = parsed_data['teardown_extract']
                 if teardown_extract is not None:
-                    VarsExtractor().teardown_var_extract(response_data, teardown_extract, parsed_data.env)
-                teardown_assert = parsed_data.teardown_assert
+                    VarsExtractor().teardown_var_extract(response_data, teardown_extract, parsed_data['env'])
+                teardown_assert = parsed_data['teardown_assert']
                 if teardown_assert is not None:
                     Asserter().exec_asserter(response_data, assert_text=teardown_assert)
-                wait_time = parsed_data.teardown_wait_time
+                wait_time = parsed_data['teardown_wait_time']
                 if wait_time is not None:
                     log.info(f'执行请求后等待：{wait_time} s')
                     time.sleep(wait_time)
@@ -239,37 +253,37 @@ class SendRequests:
         return response_data
 
     @staticmethod
-    def log_request_setup(parsed: RequestDataParse) -> NoReturn:
-        log.info(f'请求 setup_testcase: {parsed.setup_testcase}')
-        log.info(f"请求 setup_sql: {parsed.setup_sql}")
-        log.info(f"请求 setup_hooks: {parsed.setup_hooks}")
-        log.info(f"请求 setup_wait_time: {parsed.setup_wait_time}")
+    def log_request_setup(parsed_data: dict) -> NoReturn:
+        log.info(f"请求 setup_testcase: {parsed_data['setup_testcase']}")
+        log.info(f"请求 setup_sql: {parsed_data['setup_sql']}")
+        log.info(f"请求 setup_hooks: {parsed_data['setup_hooks']}")
+        log.info(f"请求 setup_wait_time: {parsed_data['setup_wait_time']}")
 
     @staticmethod
-    def log_request_up(parsed: RequestDataParse) -> NoReturn:
-        log.info(f"用例 env: {parsed.env}")
-        log.info(f"用例 module: {parsed.module}")
-        log.info(f"用例 name: {parsed.name}")
-        log.info(f"用例 case_id: {parsed.case_id}")
-        log.info(f"用例 description: {parsed.description}")
-        log.info(f"请求 method: {parsed.method}")
-        log.info(f"请求 url: {parsed.url}")
-        log.info(f"请求 params: {parsed.params}")
-        log.info(f'请求 headers: {parsed.headers}')
-        log.info(f"请求 data_type：{parsed.body_type}")
-        if parsed.body_type != BodyType.JSON.value:
-            log.info(f"请求 data：{parsed.body}")
+    def log_request_up(parsed_data: dict) -> NoReturn:
+        log.info(f"用例 env: {parsed_data['env']}")
+        log.info(f"用例 module: {parsed_data['module']}")
+        log.info(f"用例 name: {parsed_data['name']}")
+        log.info(f"用例 case_id: {parsed_data['case_id']}")
+        log.info(f"用例 description: {parsed_data['description']}")
+        log.info(f"请求 method: {parsed_data['method']}")
+        log.info(f"请求 url: {parsed_data['url']}")
+        log.info(f"请求 params: {parsed_data['params']}")
+        log.info(f"请求 headers: {parsed_data['headers']}")
+        log.info(f"请求 data_type：{parsed_data['body_type']}")
+        if parsed_data['body_type'] != BodyType.JSON.value:
+            log.info(f"请求 data：{parsed_data['body']}")
         else:
-            log.info(f"请求 json: {parsed.body}")
-        log.info(f"请求 files: {parsed.files_no_parse}")
+            log.info(f"请求 json: {parsed_data['body']}")
+        log.info(f"请求 files: {parsed_data['files_no_parse']}")
 
     @staticmethod
-    def log_request_teardown(parsed: RequestDataParse) -> NoReturn:
-        log.info(f"请求 teardown_sql: {parsed.teardown_sql}")
-        log.info(f"请求 teardown_hooks: {parsed.teardown_hooks}")
-        log.info(f"请求 teardown_extract: {parsed.teardown_extract}")
-        log.info(f"请求 teardown_assert: {parsed.teardown_assert}")
-        log.info(f"请求 teardown_wait_time: {parsed.teardown_wait_time}")
+    def log_request_teardown(parsed_data: dict) -> NoReturn:
+        log.info(f"请求 teardown_sql: {parsed_data['teardown_sql']}")
+        log.info(f"请求 teardown_hooks: {parsed_data['teardown_hooks']}")
+        log.info(f"请求 teardown_extract: {parsed_data['teardown_extract']}")
+        log.info(f"请求 teardown_assert: {parsed_data['teardown_assert']}")
+        log.info(f"请求 teardown_wait_time: {parsed_data['teardown_wait_time']}")
 
     @staticmethod
     def log_request_down(response_data: dict) -> NoReturn:
@@ -282,39 +296,39 @@ class SendRequests:
         log.info(f"响应时间: {response_data['elapsed']} ms")
 
     @staticmethod
-    def allure_request_setup(parsed: RequestDataParse) -> NoReturn:
+    def allure_request_setup(parsed_data: dict) -> NoReturn:
         allure_step('请求前置', {
-            'setup_testcase': parsed.setup_testcase,
-            'setup_sql': parsed.setup_sql,
-            'setup_hooks': parsed.setup_hooks,
-            'setup_wait_time': parsed.setup_wait_time,
+            'setup_testcase': parsed_data['setup_testcase'],
+            'setup_sql': parsed_data['setup_sql'],
+            'setup_hooks': parsed_data['setup_hooks'],
+            'setup_wait_time': parsed_data['setup_wait_time'],
         })
 
     @staticmethod
-    def allure_request_up(parsed: RequestDataParse) -> NoReturn:
+    def allure_request_up(parsed_data: dict) -> NoReturn:
         allure_step('请求数据', {
-            'env': parsed.env,
-            'module': parsed.module,
-            'name': parsed.name,
-            'case_id': parsed.case_id,
-            'description': parsed.description,
-            'method': parsed.method,
-            'url': parsed.url,
-            'params': parsed.params,
-            'headers': parsed.headers,
-            'data_type': parsed.body_type,
-            'data': parsed.body,
-            'files': parsed.files_no_parse,
+            'env': parsed_data['env'],
+            'module': parsed_data['module'],
+            'name': parsed_data['name'],
+            'case_id': parsed_data['case_id'],
+            'description': parsed_data['description'],
+            'method': parsed_data['method'],
+            'url': parsed_data['url'],
+            'params': parsed_data['params'],
+            'headers': parsed_data['headers'],
+            'data_type': parsed_data['body_type'],
+            'data': parsed_data['body'],
+            'files': parsed_data['files_no_parse'],
         })
 
     @staticmethod
-    def allure_request_teardown(parsed: RequestDataParse) -> NoReturn:
+    def allure_request_teardown(parsed_data: dict) -> NoReturn:
         allure_step('请求后置', {
-            'teardown_sql': parsed.teardown_sql,
-            'teardown_hooks': parsed.teardown_hooks,
-            'teardown_extract': parsed.teardown_extract,
-            'teardown_assert': parsed.teardown_assert,
-            'teardown_wait_time': parsed.teardown_wait_time,
+            'teardown_sql': parsed_data['teardown_sql'],
+            'teardown_hooks': parsed_data['teardown_hooks'],
+            'teardown_extract': parsed_data['teardown_extract'],
+            'teardown_assert': parsed_data['teardown_assert'],
+            'teardown_wait_time': parsed_data['teardown_wait_time'],
         })
 
     @staticmethod
@@ -325,14 +339,14 @@ class SendRequests:
         })
 
     @staticmethod
-    def allure_dynamic_data(parsed: RequestDataParse) -> NoReturn:
-        allure.dynamic.title(parsed.name)
-        allure.dynamic.description(parsed.description)
-        allure.dynamic.link(parsed.url)
-        if parsed.allure_severity is not None:
-            allure.dynamic.severity(parsed.allure_severity)
-        if parsed.files_no_parse is not None:
-            for k, v in parsed.files_no_parse.items():
+    def allure_dynamic_data(parsed_data: dict) -> NoReturn:
+        allure.dynamic.title(parsed_data['name'])
+        allure.dynamic.description(parsed_data['description'])
+        allure.dynamic.link(parsed_data['url'])
+        if parsed_data['allure_severity'] is not None:
+            allure.dynamic.severity(parsed_data['allure_severity'])
+        if parsed_data['files_no_parse'] is not None:
+            for k, v in parsed_data['files_no_parse'].items():
                 if isinstance(v, list):
                     for path in v:
                         allure_attach_file(path)

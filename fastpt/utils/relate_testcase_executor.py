@@ -91,7 +91,7 @@ def get_all_testcase_data() -> list:
     return all_case_data
 
 
-def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoReturn:
+def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union['RequestDataParse', None]:
     """
     执行前置关联测试用例
 
@@ -99,13 +99,14 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoRet
     :param setup_testcase:
     :return:
     """
+    parsed_case_id = parsed.case_id
     # 判断是否关联用例自身
     for testcase in setup_testcase:
         if isinstance(testcase, dict):
-            if testcase['case_id'] == parsed.case_id:
+            if testcase['case_id'] == parsed_case_id:
                 raise ValueError('执行关联测试用例失败，不能关联自身')
         elif isinstance(testcase, str):
-            if testcase == parsed.case_id:
+            if testcase == parsed_case_id:
                 raise ValueError('执行关联测试用例失败，不能关联自身')
 
     all_case_data = get_all_testcase_data()
@@ -144,7 +145,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoRet
                                 # 使命名更清晰
                                 relate_case_steps = case_test_steps
                                 # 避免循环关联
-                                is_circular_relate(parsed.case_id, relate_case_steps)
+                                is_circular_relate(parsed_case_id, relate_case_steps)
                                 # 重新组合测试用例
                                 new_data = {
                                     'test_steps': relate_case_steps,
@@ -155,13 +156,19 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoRet
                                 relate_testcase_set_var(case_data)
                     else:
                         relate_case_steps = case_data_test_steps
-                        is_circular_relate(parsed.case_id, relate_case_steps)
+                        is_circular_relate(parsed_case_id, relate_case_steps)
                         new_data = {
                             'set_var_key': testcase['key'],
                             'set_var_jsonpath': testcase['jsonpath']
                         }
                         case_data.update(new_data)
                         relate_testcase_set_var(case_data)
+
+                # 再次解析请求数据，应用关联测试用例设置的变量到请求数据
+                parsed.request_data = VarsExtractor().relate_vars_replace(parsed.request_data)
+
+                return parsed
+
             # 用例中 testcase 参数为直接关联测试用例时
             elif isinstance(testcase, str):
                 if testcase in str(case_id_list):
@@ -169,17 +176,16 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoRet
                         for case_test_steps in case_data_test_steps:
                             if testcase == case_test_steps['case_id']:
                                 relate_case_steps = case_test_steps
-                                is_circular_relate(parsed.case_id, relate_case_steps)
+                                is_circular_relate(parsed_case_id, relate_case_steps)
                                 new_data = {'test_steps': relate_case_steps}
                                 case_data.update(new_data)
                                 relate_testcase_exec(case_data)
                     else:
                         relate_case_steps = case_data_test_steps
-                        is_circular_relate(parsed.case_id, relate_case_steps)
+                        is_circular_relate(parsed_case_id, relate_case_steps)
                         relate_testcase_exec(case_data)
 
-    # 再次解析请求数据，应用关联测试用例设置的变量到请求数据
-    parsed.request_data = VarsExtractor().relate_vars_replace(parsed.request_data)
+                return None
 
 
 def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoReturn:
