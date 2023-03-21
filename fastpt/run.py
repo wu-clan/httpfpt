@@ -12,6 +12,7 @@ from fastpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND, DING_TALK_REPO
 from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH, ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE, \
     ALLURE_REPORT_HTML_PATH, YAML_REPORT_PATH
 from fastpt.db.redis_db import RedisDB
+from fastpt.utils.relate_testcase_executor import get_all_testcase_id, get_all_testcase_data
 from fastpt.utils.send_report.ding_talk import DingTalk
 from fastpt.utils.send_report.lark_talk import LarkTalk
 from fastpt.utils.send_report.send_email import SendMail
@@ -143,5 +144,9 @@ def run(
 
 
 if __name__ == '__main__':
+    # 初始化 redis 数据库
     RedisDB().init()
+    # 用例数据唯一 case_id 检测
+    get_all_testcase_id(get_all_testcase_data())
+    # 执行程序
     run()

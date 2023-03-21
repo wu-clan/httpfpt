@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import sys
 from typing import NoReturn
 
 from jsonpath import jsonpath
@@ -14,21 +15,7 @@ from fastpt.utils.request.request_data_parse import RequestDataParse
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
 
-def __old_get_all_testcase_data() -> list:
-    """
-    获取所有测试用例数据
-
-    :return:
-    """
-    all_yaml_file = search_all_case_yaml_files()
-    all_case_data = []
-    for file in all_yaml_file:
-        read_data = read_yaml(None, filename=file)
-        all_case_data.append(read_data)
-    return all_case_data
-
-
-def __old_get_all_testcase_id(case_data_list: list) -> list:
+def get_all_testcase_id(case_data_list: list) -> list:
     """
     获取所有测试用例 id
 
@@ -43,6 +30,23 @@ def __old_get_all_testcase_id(case_data_list: list) -> list:
         if isinstance(steps, list):
             for i in steps:
                 all_case_id.append(i['case_id'])
+    set_all_case_id = set(all_case_id)
+    re_case_id_desc = []
+    if len(set_all_case_id) != len(all_case_id):
+        for i in set_all_case_id:
+            re_count = 0
+            for j in all_case_id:
+                if i == j:
+                    re_count += 1
+            if re_count > 1:
+                re_case_id_desc.append({'case_id': i, 'count': re_count})
+    if len(re_case_id_desc) > 0:
+        RedisDB().set('aap_is_re_case_id', 'true')
+        log.error(f'运行失败, 检测到用例数据使用重复id: {re_case_id_desc}')
+        sys.exit(1)
+    else:
+        RedisDB().delete('aap_is_re_case_id')
+        RedisDB().set('app_all_case_id', str(all_case_id))
     return all_case_id
 
 
@@ -53,54 +57,21 @@ def get_all_testcase_data() -> list:
     :return:
     """
     all_yaml_file = search_all_case_yaml_files()
-    redis_all_case_data = RedisDB().get('aap_all_case_data')
-    if redis_all_case_data:
-        redis_all_case_data_len = RedisDB().get('aap_all_case_data_len')
-        if redis_all_case_data_len is not None:
-            if int(redis_all_case_data_len) == len(all_yaml_file):
-                return eval(redis_all_case_data)
-        else:
-            RedisDB().set('aap_all_case_data_len', len(all_yaml_file))
+    if not RedisDB().redis.get('aap_is_re_case_id'):
+        redis_all_case_data = RedisDB().get('aap_all_case_data')
+        if redis_all_case_data:
+            redis_all_case_data_len = RedisDB().get('aap_all_case_data_len')
+            if redis_all_case_data_len is not None:
+                if int(redis_all_case_data_len) == len(all_yaml_file):
+                    return eval(redis_all_case_data)
+            else:
+                RedisDB().set('aap_all_case_data_len', len(all_yaml_file))
     all_case_data = []
     for file in all_yaml_file:
         read_data = read_yaml(None, filename=file)
         all_case_data.append(read_data)
     RedisDB().rset('aap_all_case_data', str(all_case_data))
     return all_case_data
-
-
-def get_all_testcase_id(case_data_list: list) -> list:
-    """
-    获取所有测试用例 id
-
-    :param case_data_list:
-    :return:
-    """
-    all_case_id = []
-    case_id_len = 0
-    for case_data in case_data_list:
-        steps = case_data['test_steps']
-        if isinstance(steps, dict):
-            case_id_len += 1
-        if isinstance(steps, list):
-            for _ in steps:
-                case_id_len += 1
-    redis_case_id_len = RedisDB().get('aap_all_case_id_len')
-    if redis_case_id_len is not None:
-        if int(redis_case_id_len) == case_id_len:
-            redis_case_id = RedisDB().get('aap_all_case_id')
-            return eval(redis_case_id)
-    else:
-        RedisDB().set('aap_all_case_id_len', case_id_len)
-    for case_data in case_data_list:
-        steps = case_data['test_steps']
-        if isinstance(steps, dict):
-            all_case_id.append(steps['case_id'])
-        if isinstance(steps, list):
-            for i in steps:
-                all_case_id.append(i['case_id'])
-    RedisDB().rset('aap_all_case_id', str(all_case_id))
-    return all_case_id
 
 
 def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoReturn:
@@ -120,10 +91,8 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> NoRet
             if testcase == parsed.case_id:
                 raise ValueError('执行关联测试用例失败，不能关联自身')
 
-    # all_case_data = __old_get_all_testcase_data()
-    # all_case_id = __old_get_all_testcase_id(all_case_data)
     all_case_data = get_all_testcase_data()
-    all_case_id = get_all_testcase_id(all_case_data)
+    all_case_id = RedisDB().get('app_all_case_id') or get_all_testcase_id(all_case_data)
 
     # 判断关联测试用例是否存在
     for testcase in setup_testcase:
