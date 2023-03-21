@@ -111,6 +111,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
 
     all_case_data = get_all_testcase_data()
     all_case_id = RedisDB().get('app_all_case_id') or get_all_testcase_id(all_case_data)
+    relate_count = 0
 
     # 判断关联测试用例是否存在
     for testcase in setup_testcase:
@@ -139,6 +140,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
             if isinstance(testcase, dict):
                 relate_case_id = testcase['case_id']
                 if relate_case_id in str(case_id_list):
+                    relate_count += 1
                     if isinstance(case_data_test_steps, list):
                         for case_test_steps in case_data_test_steps:
                             if relate_case_id == case_test_steps['case_id']:
@@ -164,11 +166,6 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
                         case_data.update(new_data)
                         relate_testcase_set_var(case_data)
 
-                # 再次解析请求数据，应用关联测试用例设置的变量到请求数据
-                parsed.request_data = VarsExtractor().relate_vars_replace(parsed.request_data)
-
-                return parsed
-
             # 用例中 testcase 参数为直接关联测试用例时
             elif isinstance(testcase, str):
                 if testcase in str(case_id_list):
@@ -185,7 +182,12 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
                         is_circular_relate(parsed_case_id, relate_case_steps)
                         relate_testcase_exec(case_data)
 
-                return None
+    if relate_count > 0:
+        # 再次解析请求数据，应用关联测试用例设置的变量到请求数据
+        parsed.request_data = VarsExtractor().relate_vars_replace(parsed.request_data)
+        return parsed
+    else:
+        return None
 
 
 def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoReturn:
