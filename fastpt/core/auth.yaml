@@ -1,5 +1,5 @@
 # 是否启用全局自动认证
-is_auth: true
+is_auth: false
 # 认证类型，请填写为认证方式的键值，如：bearer_token
 auth_type: bearer_token
 # token认证

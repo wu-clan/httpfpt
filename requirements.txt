@@ -4,11 +4,10 @@ rtoml==0.9.0
 pyyaml==5.4.1
 xlrd==1.2.0
 openpyxl==3.0.7
-pytest==6.2.3
+pytest==7.2.2
 filelock==3.0.12
 pymysql==0.9.3
 dbutils==3.0.2
-py==1.11.0
 httpx==0.23.0
 allure-pytest==2.9.45
 pytest-html==3.1.1
@@ -23,7 +22,7 @@ cache3==0.2.1
 python-dotenv==0.20.0
 typer[all]==0.6.1
 pydantic==1.9.2
-pytest-sugar==0.9.0
+pytest-pretty==1.1.0
 pytest-loguru==0.2.0
 redis==4.1.1
 jinja2==3.1.2
