@@ -47,7 +47,8 @@ pip install -r requirements.txt
 
 ### 数据结构展示
 
-yaml 数据：
+<details>
+<summary>yaml 数据</summary>
 
 ```yaml
 config:
@@ -115,10 +116,15 @@ test_steps:
       wait_time:
 ```
 
-~~excel 数据：~~
+</details>
+
+<details>
+<summary>excel 数据</summary>
 
 ~~release 版本暂不支持使用，目前这种方式会被提前拦截，就针对 excel 数据提出了参考方案，但
 并未实现相关代码，感兴趣的话可以到文件 file_data_parse.py 中查看~~
+
+</details>
 
 ### 参数说明
 
