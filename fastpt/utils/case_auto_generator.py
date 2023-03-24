@@ -76,7 +76,7 @@ import pytest
 from fastpt.common.send_request import send_request
 from fastpt.common.yaml_handler import read_yaml
 from fastpt.core.get_conf import PROJECT_NAME
-from fastpt.utils.request.file_data_parse import get_request_data
+from fastpt.utils.request.case_data_file_parse import get_request_data
 from fastpt.utils.request.ids_extract import get_ids
 
 request_data = get_request_data(read_yaml(filename=os.sep.join([PROJECT_NAME, '{yaml_filename}'])))
@@ -104,5 +104,6 @@ class {testcase_class_name}:
                     Path(case_path).parent.mkdir(parents=True, exist_ok=True)
                 with open(case_path, 'w', encoding='utf-8') as f:
                     f.write(case_code)
+                typer.secho(f'📄 Created: {get_file_property(case_path)[0]}', fg='green', bold=True)
 
     typer.secho('✅ 测试用例自动生成完成', fg='green', bold=True)
