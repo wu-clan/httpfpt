@@ -66,6 +66,7 @@ class SendRequests:
             requests.packages.urllib3.disable_warnings()  # noqa
             log.info('开始发送请求...')
             response = requests.session().request(**kwargs)
+            response.raise_for_status()
             return response
         except Exception as e:
             log.error(f'发送 requests 请求异常: {e}')
@@ -94,6 +95,7 @@ class SendRequests:
                     follow_redirects=redirects,
             ) as client:
                 response = client.request(**kwargs)
+                response.raise_for_status()
                 return response
         except Exception as e:
             log.error(f'发送 httpx 请求异常: {e}')
