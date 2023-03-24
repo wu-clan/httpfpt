@@ -337,6 +337,29 @@ class RequestDataParse:
             return headers
 
     @property
+    def headers_auto_fix(self) -> dict:
+        headers = self.headers
+        body_type = self.body_type
+        headers_format = headers or {}
+        if body_type == BodyType.form_data.value:
+            headers_format.update({'Content-Type': 'multipart/form-data'})
+        if body_type == BodyType.x_www_form_urlencoded.value:
+            headers_format.update({'Content-Type': 'application/x-www-form-urlencoded'})
+        elif body_type == BodyType.GraphQL.value:
+            headers_format.update({'Content-Type': 'application/json; charset=uft-8'})
+        elif body_type == BodyType.TEXT.value:
+            headers_format.update({'Content-Type': 'text/plain'})
+        elif body_type == BodyType.JavaScript.value:
+            headers_format.update({'Content-Type': 'application/javascript'})
+        elif body_type == BodyType.JSON.value:
+            headers_format.update({'Content-Type': 'application/json; charset=uft-8'})
+        elif body_type == BodyType.HTML.value:
+            headers_format.update({'Content-Type': 'text/html'})
+        elif body_type == BodyType.XML.value:
+            headers_format.update({'Content-Type': 'application/xml'})
+        return headers_format
+
+    @property
     def body_type(self) -> Union[str, None]:
         try:
             data_type = self.request_data['test_steps']['request']['body_type']
@@ -363,25 +386,18 @@ class RequestDataParse:
                 elif body_type == BodyType.form_data.value:
                     body = body
                 elif body_type == BodyType.x_www_form_urlencoded.value:
-                    self.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
                     body = body
                 elif body_type == BodyType.GraphQL.value:
-                    self.headers.update({'Content-Type': 'application/json; charset=uft-8'})
                     body = json.loads(json.dumps(body, ensure_ascii=False))
                 elif body_type == BodyType.TEXT.value:
-                    self.headers.update({'Content-Type': 'text/plain'})
                     body = body
                 elif body_type == BodyType.JavaScript.value:
-                    self.headers.update({'Content-Type': 'application/javascript'})
                     body = body
                 elif body_type == BodyType.JSON.value:
-                    self.headers.update({'Content-Type': 'application/json; charset=uft-8'})
                     body = json.loads(json.dumps(body, ensure_ascii=False))
                 elif body_type == BodyType.HTML.value:
-                    self.headers.update({'Content-Type': 'text/html'})
                     body = body
                 elif body_type == BodyType.XML.value:
-                    self.headers.update({'Content-Type': 'application/xml'})
                     body = body
         return body
 
@@ -646,7 +662,7 @@ class RequestDataParse:
             'method': self.method,
             'url': self.url,
             'params': self.params,
-            'headers': self.headers,
+            'headers': self.headers_auto_fix,
             'body_type': self.body_type,
             'body': self.body,
             'files': self.files,
