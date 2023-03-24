@@ -1,0 +1,31 @@
+config:
+  allure:
+    epic: demo跳过
+    feature: demo模块
+    story: 跳过测试
+  request:
+    env: dev.env
+  module:
+
+test_steps:
+  # 因为只是测试跳过用例，所以没写其他内容
+  - name: 跳过
+    case_id: event_create_004
+    description: 测试跳过
+    is_run: False
+
+  - name: 自定义跳过说明的跳过
+    case_id: event_create_005
+    description: 测试跳过
+    is_run:
+      skip: True
+      reason: 自定义跳过
+
+  - name: 条件判断时跳过
+    case_id: event_create_006
+    description: 测试跳过
+    is_run:
+      skip_if:
+        - ${random_phone()} == 2
+        - ${timeout} == None
+      reason: 条件判断为真跳过
