@@ -84,6 +84,7 @@ def import_apifox_test_data(apifox: tuple):
     """
     typer.secho(
         '\n'
+        'Beta: 此命令目前处于测试阶段, 请谨慎使用。\n'
         'Warning: 如果现有文件名与导入文件名相同, 此命令目前会覆盖写入用例数据, 请谨慎操作。\n',
         fg='bright_yellow',
         bold=True
@@ -102,13 +103,34 @@ def import_apifox_test_data(apifox: tuple):
         raise typer.Abort()
 
 
+def import_har_test_data(har: tuple):
+    """
+    导入 har 测试用例数据
+    """
+    pass
+
+
+def import_jmeter_test_data(jmeter: tuple):
+    """
+    导入 jmeter 测试用例数据
+    """
+    pass
+
+
+def import_postman_test_data(postman: tuple):
+    """
+    导入 postman 测试用例数据
+    """
+    pass
+
+
 @app.command(epilog='Made by :beating_heart: null')
 def main(
         _get_version: Optional[bool] = typer.Option(
             None,
             '--version',
             '-V',
-            help='获取当前框架版本号',
+            help='获取框架当前版本号',
             callback=get_version
         ),
         _generate_test_cases: Optional[bool] = typer.Option(
@@ -119,24 +141,48 @@ def main(
             callback=generate_test_cases
         ),
         _import_openapi_test_data: Tuple[str, str] = typer.Option(
-            (..., ...),
+            (None, None),
             '--import-openapi-test-data',
             '-io',
             '-is',
             show_default=False,
             metavar='<openapi json_file/url, project>',
-            help='导入 openapi / swagger 数据到 yaml 数据文件; 支持通过 json_file / url 进行导入; project: 指定项目名',
+            help='导入 openapi / swagger 数据到 yaml 数据文件; 通过 json_file / url 导入; project: 指定项目名',
             callback=import_openapi_test_data
         ),
         _import_apifox_test_data: Tuple[str, str] = typer.Option(
-            (..., ...),
+            (None, None),
             '--import-apifox-test-data',
             '-ia',
             show_default=False,
             metavar='<apifox json_file, project>',
-            help='导入 apifox 数据到 yaml 数据文件; 支持通过 json_file 进行导入; project: 指定项目名',
+            help='Beta: 导入 apifox 数据到 yaml 数据文件; 通过 json_file 导入; project: 指定项目名',
             callback=import_apifox_test_data
         ),
+        _import_har_test_data: Tuple[str, str] = typer.Option(
+            (None, None),
+            '--import-har-test-data',
+            '-ih',
+            show_default=False,
+            help='TODO: Not started yet',
+            callback=import_har_test_data
+        ),
+        _import_jmeter_test_data: Tuple[str, str] = typer.Option(
+            (None, None),
+            '--import-jmeter-test-data',
+            '-ij',
+            show_default=False,
+            help='TODO: Not started yet',
+            callback=import_jmeter_test_data
+        ),
+        _import_postman_test_data: Tuple[str, str] = typer.Option(
+            (None, None),
+            '--import-postman-test-data',
+            '-ipm',
+            show_default=False,
+            help='TODO: Not started yet',
+            callback=import_postman_test_data
+        )
 ):
     print('\n使用 --help 查看使用方法.\n')
     raise typer.Exit()
