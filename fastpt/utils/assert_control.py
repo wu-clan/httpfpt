@@ -182,8 +182,11 @@ class Asserter:
                         exec('from dirty_equals import *')
                         exec(format_assert_text)
             else:
-                if assert_split[2] not in ['==', '!=', '>', '<', '>=', '<=', 'in', 'not']:
-                    raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}')
+                assert_expr_type = ['==', '!=', '>', '<', '>=', '<=', 'in', 'not']
+                if assert_split[2] not in assert_expr_type:
+                    raise ValueError(
+                        f'断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}, 仅支持: {assert_expr_type}'
+                    )
                 else:
                     if assert_split[2] == 'not':
                         if assert_split[3] != 'in':

@@ -314,7 +314,7 @@ teardown 中的 extract 参数支持一种功能
 - `len_gt`: 预期结果长度大于实际结果
 - `len_ge`: 预期结果长度大于等于实际结果
 - `contains`: 预期结果内容包含在实际结果中
-- `not contains`: 预期结果内容不包含在实际结果中
+- `not_contains`: 预期结果内容不包含在实际结果中
 - `startswith`: 实际结果的开头是预期结果
 - `endswith`: 实际结果的结尾是预期结果
 

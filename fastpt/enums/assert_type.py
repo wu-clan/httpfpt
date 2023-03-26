@@ -19,6 +19,6 @@ class AssertType(str, Enum):
     length_greater_than = "len_gt"
     length_greater_than_or_equal = 'len_ge'
     contains = "contains"
-    not_contains = 'not contains'
+    not_contains = 'not_contains'
     startswith = 'startswith'
     endswith = 'endswith'
