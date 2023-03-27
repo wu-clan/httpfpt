@@ -19,6 +19,7 @@ from fastpt.utils.send_report.send_email import SendMail
 
 
 def run(
+        # log level
         log_level: str = '-v',
         # case path
         case_path: Optional[str] = None,
@@ -26,7 +27,7 @@ def run(
         html_report: bool = True,
         # allure
         allure: bool = True,
-        clear_allure: bool = True,
+        allure_clear: bool = True,
         allure_serve: bool = True,
         # extra
         reruns: int = 0,
@@ -47,7 +48,7 @@ def run(
     :param case_path: 可选参数, 指定测试用例函数, 默认为空，如果指定，则执行执行用例，否则执行全部
     :param html_report: 是否生成 HTML 测试报告, 默认开启
     :param allure: allure 测试报告, 默认关闭
-    :param clear_allure: 清空 allure 报告历史记录, 默认开启
+    :param allure_clear: 清空 allure 报告历史记录, 默认开启
     :param allure_serve: 是否测试执行完成后自动打开 allure 测试报告服务, 如果已启用 allure 测试报告
     :param reruns: 每个用例的运行次数, 兼容性差, 不建议使用
     :param maxfail: 大于0的正整数, 指定失败用例个数,到达数量上限后终止运行, 默认为0, 为0时表示此参数默认关闭
@@ -80,13 +81,13 @@ def run(
             os.makedirs(HTML_REPORT_PATH)
 
     is_html_report_file = f'''--html={HTML_REPORT_PATH}\\{PROJECT_NAME}_{datetime.datetime.now().strftime(
-        "%Y-%m-%d %H_%M_%S")}.html''' if html_report else ''
+        "%Y-%m-%d-%H_%M_%S")}.html''' if html_report else ''
 
     is_html_report_self = '--self-contained-html' if html_report else ''
 
     is_allure = f'--alluredir={ALLURE_REPORT_PATH}' if allure else ''
 
-    is_clear_allure = f'--clean-alluredir' if is_allure and clear_allure else ''
+    is_clear_allure = f'--clean-alluredir' if is_allure and allure_clear else ''
 
     is_reruns = f'--reruns {reruns}' if reruns != 0 else ''  # noqa
 
@@ -106,25 +107,37 @@ def run(
 
     kw = [f"{k}={v}" for k, v in kwargs.items()]
 
-    pytest.main(
-        [r for r in [
-            f'{log_level}',
-            f'{run_path}',
-            f'{is_html_report_file}',
-            f'{is_html_report_self}',
-            f'{is_allure}',
-            f'{is_clear_allure}'
-            # f'{is_reruns}',
-            f'{is_maxfail}',
-            f'{is_x}',
-            # f'{is_n}',  # 分布式运行存在诸多问题, 请谨慎使用
-            # f'{is_dist}',
-            f'{is_strict_markers}',
-            f'{is_capture}',
-            f'{is_disable_warnings}',
-            *args
-        ] + kw if r.strip() != '']
-    )
+    run_args = [arg for arg in [
+        f'{log_level}',
+        f'{run_path}',
+        f'{is_html_report_file}',
+        f'{is_html_report_self}',
+        f'{is_allure}',
+        f'{is_clear_allure}'
+        # f'{is_reruns}',
+        f'{is_maxfail}',
+        f'{is_x}',
+        # f'{is_n}',  # 分布式运行存在诸多问题, 请谨慎使用
+        # f'{is_dist}',
+        f'{is_strict_markers}',
+        f'{is_capture}',
+        f'{is_disable_warnings}',
+        *args
+    ] + kw if arg.strip() != '']
+
+    format_run_args = []
+    for i in run_args:
+        if '=' in i:
+            i_split = i.split('=')
+            new_i = i.replace(i_split[1], '"' + f'{i_split[1]}' + '"')
+            format_run_args.append(new_i)
+        else:
+            format_run_args.append(i)
+    format_run_args_to_pytest_command = ' '.join(_ for _ in format_run_args)
+
+    print(f'\n运行参数:\n{run_args}')
+    print(f'\nPytest cli:\npytest {format_run_args_to_pytest_command}\n')
+    pytest.main(run_args)
 
     yaml_report_files = os.listdir(YAML_REPORT_PATH)
     yaml_report_files.sort()
