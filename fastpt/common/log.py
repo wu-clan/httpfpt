@@ -41,7 +41,7 @@ class Logger:
 
         logger.add(
             PropagateHandler(),
-            format="| <level>{message}</level>",
+            format="<level>{message}</level>",
             level='DEBUG'
         )
 
