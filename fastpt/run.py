@@ -34,7 +34,7 @@ def run(
         x: bool = False,
         n: Union[str, int] = 'auto',
         dist: str = 'loadscope',
-        markers: bool = False,
+        strict_markers: bool = False,
         capture: bool = True,
         disable_warnings: bool = True,
         *args,
@@ -54,7 +54,7 @@ def run(
     :param x: 如果发生失败用例, 是否终止运行, 默认关闭
     :param n: 分布式运行, 使用"auto"表示全核, 也可指定cpu内核数量, 大于0的正整数, 默认"auto"
     :param dist: 分布式运行方式, 默认"loadscope", 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
-    :param markers: markers 严格模式,只允许使用用例中创建的 mark,并只运行 pytest.ini 中 markers 包含的 mark 用例, 默认关闭
+    :param strict_markers: markers 严格模式, 对于使用了自定义 marker 的用例, 如果 marker 未在 pytest.ini 注册, 用例将报错
     :param capture: 避免在使用输出模式为"v"和"s"时,html报告中的表格log为空的情况, 默认开启
     :param disable_warnings: 是否关闭控制台警告信息, 默认开启
     :return:
@@ -98,7 +98,7 @@ def run(
 
     is_dist = f'--dist={dist}'  # noqa
 
-    is_markers = '--strict-markers' if markers else ''
+    is_strict_markers = '--strict-markers' if strict_markers else ''
 
     is_capture = '--capture=tee-sys' if capture else ''
 
@@ -119,7 +119,7 @@ def run(
             f'{is_x}',
             # f'{is_n}',  # 分布式运行存在诸多问题, 请谨慎使用
             # f'{is_dist}',
-            f'{is_markers}',
+            f'{is_strict_markers}',
             f'{is_capture}',
             f'{is_disable_warnings}',
             *args
