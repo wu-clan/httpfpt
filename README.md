@@ -161,15 +161,15 @@ test_steps:
 | ++ body_type  |     str / null      | Y     | 请求数据类型: None、form、x_form、binary、graphQL、text、js、json、html、xml            |
 | ++ body       | dict / bytes / null | Y     | 请求体                                                                      |
 | ++ files      |     dict / null     | Y     | 请求文件上传                                                                   |
-| + setup       |        dict         | N     | 请求前置                                                                     |
+| + setup       |     dict / null     | N     | 请求前置                                                                     |
 | ++ testcase   |     list / null     | N     | 前置 testcase，当执行测试用例时，格式应为 List\[str]，当设置当前测试执行过程中的缓存变量时，格式应为 List\[dict] |  
 | ++ sql        |     list / null     | N     | 前置 sql，当为执行 sql 时，格式为 List\[str]，当为设置变量时，格式为 List\[dict]                 |                                                              |
 | ++ hooks      |     list / null     | N     | 前置函数，调用钩子函数，格式为 List\[str]                                               |
 | ++ wait_time  |     int / null      | N     | 请求前等待时间                                                                  |
-| + teardown    |        dict         | N     | 请求后置                                                                     |
+| + teardown    |     dict / null     | N     | 请求后置                                                                     |
 | ++ sql        |     list / null     | N     | 后置 sql，同前置                                                               |
 | ++ hooks      |     list / null     | N     | 后置函数，同前置                                                                 |
-| ++ extract    |        list         | N     | 变量提取, 格式为 List\[dict]                                                    |
+| ++ extract    |     list / null     | N     | 变量提取, 格式为 List\[dict]                                                    |
 | ++ assert     |  list / str / null  | N     | 断言                                                                       |                                                        |
 | ++ wait_time  |     int / null      | N     | 请求后等待时间                                                                  |
 

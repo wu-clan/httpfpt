@@ -15,11 +15,13 @@ class ConfigAllureData(BaseModel):
 class ConfigRequestData(BaseModel):
     env: str
     headers: Optional[dict] = None
-    timeout: Optional[int] = None
+    timeout: Optional[int] = Field(None, ge=0)
     verify: Optional[bool] = None
     redirects: Optional[bool] = None
-    proxies: Union[Dict[Union[Literal['requests', 'httpx']], Dict[
-        Literal['http', 'https', 'http://', 'https://'], Union[AnyHttpUrl, None]]]] = None  # noqa
+    proxies: Optional[Union[Dict[
+        Literal['http', 'https', 'http://', 'https://'],
+        Union[AnyHttpUrl, None]
+    ]]] = None
 
 
 class Config(BaseModel):
@@ -33,8 +35,8 @@ class StepsRequestData(BaseModel):
     url: str
     params: Union[dict, bytes, None] = ...
     headers: Optional[dict] = ...
-    data_type: Optional[str] = ...
-    data: Union[dict, bytes, Tuple[list], None] = ...
+    body_type: Optional[str] = ...
+    body: Union[dict, bytes, Tuple[list], None] = ...
     files: Union[Dict[str, Union[List[str], str]], None] = ...
 
 
@@ -52,8 +54,8 @@ class SetupSqlData(BaseModel):
 
 
 class StepsSetUpData(BaseModel):
-    testcase: Union[List[Union[SetupTestCaseData, str]], None] = None
-    sql: Union[List[Union[SetupSqlData, str]], None] = None
+    testcase: Optional[Union[List[Union[SetupTestCaseData, str]], None]] = None
+    sql: Optional[Union[List[Union[SetupSqlData, str]], None]] = None
     hooks: Optional[List[str]] = None
     wait_time: Optional[int] = None
 
@@ -72,10 +74,10 @@ class TeardownAssertData(BaseModel):
 
 
 class StepsTearDownData(BaseModel):
-    sql: Union[List[Union[SetupSqlData, str]], None] = None
+    sql: Optional[Union[List[Union[SetupSqlData, str]], None]] = None
     hooks: Optional[List[str]] = None
     extract: Optional[List[TeardownExtractData]] = None
-    assert_: Union[List[Union[TeardownAssertData, str]], str, None] = Field(None, alias='assert')
+    _assert: Optional[Union[List[Union[TeardownAssertData, str]], str, None]] = Field(None, alias='assert')
     wait_time: Optional[int] = None
 
 
@@ -91,4 +93,4 @@ class Steps(BaseModel):
 
 class CaseData(BaseModel):
     config: Config
-    test_steps: Steps
+    test_steps: Union[List[Steps], Steps]
