@@ -137,7 +137,7 @@ test_steps:
 | ++ epic       |         str         | Y     | allure epic                                                              |
 | ++ feature    |         str         | Y     | allure feature                                                           |
 | ++ story      |         str         | Y     | allure story                                                             |
-| ++ severity   |         str         | N     | allure severity: severity、critical、normal、minor、trivial                  |
+| ++ severity   |     str / null      | N     | allure severity: severity、critical、normal、minor、trivial                  |
 | + request     |        dict         | Y     | 请求参数                                                                     |
 | ++ env        |         str         | Y     | 测试环境文件名, 位于 core/run_env/ 目录下                                            |
 | ++ headers    |     dict / null     | N     | 请求头                                                                      |

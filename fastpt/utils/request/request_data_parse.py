@@ -20,6 +20,8 @@ from fastpt.utils.enum_control import get_enum_values
 from fastpt.utils.request.hooks_executor import HookExecutor
 from fastpt.utils.request.vars_extractor import VarsExtractor
 
+RequestParamGetError = (KeyError, TypeError)
+
 
 class RequestDataParse:
 
@@ -32,7 +34,7 @@ class RequestDataParse:
     def config(self) -> dict:
         try:
             config = self.request_data['config']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('测试用例数据解析失败，缺少 config 参数')
         if not isinstance(config, dict):
             raise ValueError('测试用例数据解析失败, 参数 config 不是有效的 dict 类型')
@@ -43,8 +45,8 @@ class RequestDataParse:
     def allure_epic(self) -> str:
         try:
             epic = self.request_data['config']['allure']['epic']
-        except KeyError:
-            raise KeyError('测试用例数据解析失败, 缺少 config:allure:epic 参数')
+        except RequestParamGetError:
+            raise ValueError('测试用例数据解析失败, 缺少 config:allure:epic 参数')
         else:
             if epic is None:
                 raise ValueError('测试用例数据解析失败, 参数 config:allure:epic 为空')
@@ -56,7 +58,7 @@ class RequestDataParse:
     def allure_feature(self) -> str:
         try:
             feature = self.request_data['config']['allure']['feature']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('测试用例数据解析失败, 缺少 config:allure:feature 参数')
         else:
             if feature is None:
@@ -69,7 +71,7 @@ class RequestDataParse:
     def allure_story(self) -> str:
         try:
             story = self.request_data['config']['allure']['story']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('测试用例数据解析失败, 缺少 config:allure:story 参数')
         else:
             if story is None:
@@ -82,20 +84,21 @@ class RequestDataParse:
     def allure_severity(self) -> Union[str, None]:
         try:
             severity = self.request_data['config']['allure']['severity']
-        except KeyError:
+        except RequestParamGetError:
             severity = None
         else:
-            if not isinstance(severity, str):
-                raise ValueError('测试用例数据解析失败, 参数 config:allure:severity 不是有效的 str 类型')
-            if severity not in get_enum_values(SeverityType):
-                raise ValueError('测试用例数据解析失败, 参数 config:allure:severity 输入不合法')
+            if severity is not None:
+                if not isinstance(severity, str):
+                    raise ValueError('测试用例数据解析失败, 参数 config:allure:severity 不是有效的 str 类型')
+                if severity not in get_enum_values(SeverityType):
+                    raise ValueError('测试用例数据解析失败, 参数 config:allure:severity 输入不合法')
         return severity
 
     @property
     def env(self) -> str:
         try:
             env = self.request_data['config']['request']['env']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('测试用例数据解析失败, 缺少 config:request:env 参数')
         else:
             if env is None:
@@ -110,9 +113,10 @@ class RequestDataParse:
     def timeout(self) -> Union[int, None]:
         try:
             timeout = self.request_data['config']['request']['timeout']
-            if not isinstance(timeout, int):
-                raise ValueError('测试用例数据解析失败, 参数 config:request:timeout 不是有效的 int 类型')
-        except KeyError:
+            if timeout is not None:
+                if not isinstance(timeout, int):
+                    raise ValueError('测试用例数据解析失败, 参数 config:request:timeout 不是有效的 int 类型')
+        except RequestParamGetError:
             timeout = None
         return timeout
 
@@ -120,10 +124,11 @@ class RequestDataParse:
     def verify(self) -> Union[bool, str, None]:
         try:
             verify = self.request_data['config']['request']['verify']
-            if not isinstance(verify, bool):
-                if not isinstance(verify, str):
-                    raise ValueError('测试用例数据解析失败, 参数 config:request:verify 不是有效的 bool / str 类型')
-        except KeyError:
+            if verify is not None:
+                if not isinstance(verify, bool):
+                    if not isinstance(verify, str):
+                        raise ValueError('测试用例数据解析失败, 参数 config:request:verify 不是有效的 bool / str 类型')
+        except RequestParamGetError:
             verify = None
         return verify
 
@@ -131,9 +136,10 @@ class RequestDataParse:
     def redirects(self) -> Union[bool, None]:
         try:
             redirects = self.request_data['config']['request']['redirects']
-            if not isinstance(redirects, bool):
-                raise ValueError('测试用例数据解析失败, 参数 config:request:redirects 不是有效的 bool 类型')
-        except KeyError:
+            if redirects is not None:
+                if not isinstance(redirects, bool):
+                    raise ValueError('测试用例数据解析失败, 参数 config:request:redirects 不是有效的 bool 类型')
+        except RequestParamGetError:
             redirects = None
         return redirects
 
@@ -157,7 +163,7 @@ class RequestDataParse:
                     proxies = proxies
                 elif self.request_engin == EnginType.httpx:
                     proxies = {'http://': proxies['http'], 'https://': proxies['https']}  # noqa
-        except KeyError:
+        except RequestParamGetError:
             proxies = None
         return proxies
 
@@ -165,7 +171,7 @@ class RequestDataParse:
     def module(self) -> str:
         try:
             module = self.request_data['config']['module']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('测试用例数据解析失败, 缺少 config:module 参数')
         else:
             if module is None:
@@ -178,7 +184,7 @@ class RequestDataParse:
     def test_steps(self) -> dict:
         try:
             test_steps = self.request_data['test_steps']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求参数解析失败，缺少 test_steps 参数')
         else:
             if not isinstance(test_steps, (dict, list)):
@@ -189,7 +195,7 @@ class RequestDataParse:
     def name(self) -> str:
         try:
             name = self.request_data['test_steps']['name']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('测试用例数据解析失败, 缺少 test_steps:name 参数')
         else:
             if name is None:
@@ -202,7 +208,7 @@ class RequestDataParse:
     def case_id(self) -> str:
         try:
             case_id = self.request_data['test_steps']['case_id']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('测试用例数据解析失败, 缺少 test_steps:case_id 参数')
         else:
             if case_id is None:
@@ -217,14 +223,14 @@ class RequestDataParse:
             description = self.request_data['test_steps']['description']
             if not isinstance(description, str):
                 raise ValueError('测试用例数据解析失败, 参数 test_steps:description 不是有效的 str 类型')
-        except KeyError:
+        except RequestParamGetError:
             description = None
         return description
 
     def _is_run(self) -> NoReturn:
         try:
             is_run = self.request_data['test_steps']['is_run']
-        except KeyError:
+        except RequestParamGetError:
             ...
         else:
             if is_run is not None:
@@ -269,7 +275,7 @@ class RequestDataParse:
     def method(self) -> str:
         try:
             method = self.request_data['test_steps']['request']['method']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求参数解析失败, 缺少 test_steps:request:method 参数')
         else:
             if method is None:
@@ -284,7 +290,7 @@ class RequestDataParse:
     def url(self) -> str:
         try:
             url = self.request_data['test_steps']['request']['url']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求参数解析失败, 缺少 test_steps:request:url 参数')
         else:
             env_file = os.path.join(RUN_ENV_PATH, self.env)
@@ -299,7 +305,7 @@ class RequestDataParse:
     def params(self) -> Union[dict, bytes, None]:
         try:
             params = self.request_data['test_steps']['request']['params']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:params 参数')
         else:
             if params is not None:  # excel 数据处理
@@ -311,13 +317,13 @@ class RequestDataParse:
     def headers(self) -> Union[dict, None]:
         try:
             headers = self.request_data['test_steps']['request']['headers']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:headers 参数')
         else:
             if headers is None:
                 try:
                     headers = self.request_data['config']['request']['headers']
-                except KeyError:
+                except RequestParamGetError:
                     headers = None
             else:
                 if not isinstance(headers, dict):
@@ -359,18 +365,19 @@ class RequestDataParse:
     def body_type(self) -> Union[str, None]:
         try:
             data_type = self.request_data['test_steps']['request']['body_type']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:body_type 参数')
         else:
-            if data_type not in get_enum_values(BodyType):
-                raise ValueError('请求参数解析失败, 参数 test_steps:request:body_type 不是合法类型')
+            if data_type is not None:
+                if data_type not in get_enum_values(BodyType):
+                    raise ValueError('请求参数解析失败, 参数 test_steps:request:body_type 不是合法类型')
         return data_type
 
     @property
     def body(self) -> Union[dict, None]:
         try:
             body = self.request_data['test_steps']['request']['body']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:body 参数')
         else:
             if body is not None:
@@ -399,7 +406,7 @@ class RequestDataParse:
     def files(self) -> Union[dict, list, None]:
         try:
             files = self.request_data['test_steps']['request']['files']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:files 参数')
         else:
             if files is not None:
@@ -418,7 +425,7 @@ class RequestDataParse:
     def files_no_parse(self) -> Union[dict, None]:
         try:
             files = self.request_data['test_steps']['request']['files']
-        except KeyError:
+        except RequestParamGetError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:files 参数')
         else:
             if files is not None:
@@ -430,7 +437,7 @@ class RequestDataParse:
     def is_setup(self) -> bool:
         try:
             setup = self.request_data['test_steps']['setup']
-        except KeyError:
+        except RequestParamGetError:
             return False
         else:
             if setup is not None:
@@ -458,7 +465,7 @@ class RequestDataParse:
                                 raise ValueError(
                                     f'请求数据解析失败, 参数 test_steps:setup:testcase:{i} 不是有效的 str 类型'
                                 )
-        except KeyError:
+        except RequestParamGetError:
             testcase = None
         return testcase
 
@@ -480,7 +487,7 @@ class RequestDataParse:
                         else:
                             if not isinstance(i, str):
                                 raise ValueError(f'请求数据解析失败, 参数 test_steps:setup:sql:{i} 不是有效的 str 类型')
-        except KeyError:
+        except RequestParamGetError:
             sql = None
         return sql
 
@@ -495,7 +502,7 @@ class RequestDataParse:
                     for v in hook:
                         if not isinstance(v, str):
                             raise ValueError(f'请求参数解析失败，参数 test_steps:setup:hooks:{v} 不是有效的 str 类型')
-        except KeyError:
+        except RequestParamGetError:
             hook = None
         return hook
 
@@ -506,7 +513,7 @@ class RequestDataParse:
             if time is not None:
                 if not isinstance(time, int):
                     raise ValueError('请求数据解析失败, 参数 test_steps:setup:wait_time 不是有效的 int 类型')
-        except KeyError:
+        except RequestParamGetError:
             time = None
         return time
 
@@ -514,7 +521,7 @@ class RequestDataParse:
     def is_teardown(self) -> bool:
         try:
             teardown = self.request_data['test_steps']['setup']
-        except KeyError:
+        except RequestParamGetError:
             return False
         else:
             if teardown is not None:
@@ -542,7 +549,7 @@ class RequestDataParse:
                                 raise ValueError(
                                     f'请求数据解析失败, 参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'
                                 )
-        except KeyError:
+        except RequestParamGetError:
             sql = None
         return sql
 
@@ -557,7 +564,7 @@ class RequestDataParse:
                     for v in hook:
                         if not isinstance(v, str):
                             raise ValueError(f'请求参数解析失败，参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型')
-        except KeyError:
+        except RequestParamGetError:
             hook = None
         return hook
 
@@ -577,7 +584,7 @@ class RequestDataParse:
                                         f'请求参数解析失败，参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
                         else:
                             raise ValueError(f'请求参数解析失败，参数 test_steps:teardown:extract:{i} 不是合法数据')
-        except KeyError:
+        except RequestParamGetError:
             extract = None
         return extract
 
@@ -585,7 +592,7 @@ class RequestDataParse:
     def teardown_assert(self) -> Union[str, list, dict, None]:
         try:
             assert_text = self.request_data['test_steps']['teardown']['assert']
-        except KeyError:
+        except RequestParamGetError:
             assert_text = None
         if assert_text is not None:
             if not any([
@@ -605,7 +612,7 @@ class RequestDataParse:
             if time is not None:
                 if not isinstance(time, int):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:wait_time 不是有效的 int 类型')
-        except KeyError:
+        except RequestParamGetError:
             time = None
         return time
 
