@@ -6,6 +6,7 @@ config:
     severity: normal
   request:
     env: pro.env
+    timeout: 3
   module: test
 
 test_steps:
