@@ -302,9 +302,7 @@ class RequestDataParse:
         except KeyError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:params 参数')
         else:
-            if params is not None:
-                if isinstance(params, str):
-                    params = eval(params)  # excel 数据处理
+            if params is not None:  # excel 数据处理
                 if not isinstance(params, dict):
                     raise ValueError('请求数据解析失败, 参数 test_steps:request:params 不是有效的 dict 类型')
         return params
@@ -322,8 +320,6 @@ class RequestDataParse:
                 except KeyError:
                     headers = None
             else:
-                if isinstance(headers, str):
-                    headers = eval(headers)
                 if not isinstance(headers, dict):
                     raise ValueError('请求数据解析失败, 参数 headers 不是有效的 dict 类型')
             if headers is not None:
@@ -378,8 +374,6 @@ class RequestDataParse:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:body 参数')
         else:
             if body is not None:
-                if isinstance(body, str):
-                    body = eval(body)
                 body_type = self.body_type
                 if body_type == BodyType.none.value:
                     body = None
@@ -409,8 +403,6 @@ class RequestDataParse:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:files 参数')
         else:
             if files is not None:
-                if isinstance(files, str):
-                    files = eval(files)
                 if not isinstance(files, dict):
                     raise ValueError('请求数据解析失败, 参数 test_steps:request:files 不是有效的 dict 类型')
                 for k, v in files.items():
@@ -430,8 +422,6 @@ class RequestDataParse:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:files 参数')
         else:
             if files is not None:
-                if isinstance(files, str):
-                    files = eval(files)
                 if not isinstance(files, dict):
                     raise ValueError('请求数据解析失败, 参数 test_steps:request:files 不是有效的 dict 类型')
         return files
@@ -453,8 +443,6 @@ class RequestDataParse:
         try:
             testcase = self.request_data['test_steps']['setup']['testcase']
             if testcase is not None:
-                if isinstance(testcase, str):
-                    testcase = eval(testcase)
                 if not isinstance(testcase, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:setup:testcase 不是有效的 list 类型')
                 else:
@@ -479,8 +467,6 @@ class RequestDataParse:
         try:
             sql = self.request_data['test_steps']['setup']['sql']
             if sql is not None:
-                if isinstance(sql, str):
-                    sql = eval(sql)
                 if not isinstance(sql, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:setup:sql 不是有效的 list 类型')
                 else:
@@ -503,8 +489,6 @@ class RequestDataParse:
         try:
             hook = self.request_data['test_steps']['setup']['hooks']
             if hook is not None:
-                if isinstance(hook, str):
-                    hook = eval(hook)
                 if not isinstance(hook, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:setup:hook 不是有效的 list 类型')
                 else:
@@ -520,8 +504,6 @@ class RequestDataParse:
         try:
             time = self.request_data['test_steps']['setup']['wait_time']
             if time is not None:
-                if isinstance(time, str):
-                    time = eval(time)
                 if not isinstance(time, int):
                     raise ValueError('请求数据解析失败, 参数 test_steps:setup:wait_time 不是有效的 int 类型')
         except KeyError:
@@ -545,8 +527,6 @@ class RequestDataParse:
         try:
             sql = self.request_data['test_steps']['teardown']['sql']
             if sql is not None:
-                if isinstance(sql, str):
-                    sql = eval(sql)
                 if not isinstance(sql, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:sql 不是有效的 list 类型')
                 else:
@@ -571,8 +551,6 @@ class RequestDataParse:
         try:
             hook = self.request_data['test_steps']['teardown']['hooks']
             if hook is not None:
-                if isinstance(hook, str):
-                    hook = eval(hook)
                 if not isinstance(hook, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:hook 不是有效的 list 类型')
                 else:
@@ -588,8 +566,6 @@ class RequestDataParse:
         try:
             extract = self.request_data['test_steps']['teardown']['extract']
             if extract is not None:
-                if isinstance(extract, str):
-                    extract = eval(extract)
                 if not isinstance(extract, list):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:extract 不是有效的 list 类型')
                 else:
@@ -612,15 +588,10 @@ class RequestDataParse:
         except KeyError:
             assert_text = None
         if assert_text is not None:
-            if isinstance(assert_text, str):
-                # 单条 code 断言时, 跳过处理
-                if not assert_text.startswith('assert'):
-                    assert_text = eval(assert_text)
-            else:
-                if not any([isinstance(assert_text, list), isinstance(assert_text, dict)]):
-                    raise ValueError(
-                        '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
-                    )
+            if not any([isinstance(assert_text, list), isinstance(assert_text, dict)]):
+                raise ValueError(
+                    '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
+                )
         return assert_text
 
     @property
@@ -628,8 +599,6 @@ class RequestDataParse:
         try:
             time = self.request_data['test_steps']['teardown']['wait_time']
             if time is not None:
-                if isinstance(time, str):
-                    time = eval(time)
                 if not isinstance(time, int):
                     raise ValueError('请求数据解析失败, 参数 test_steps:teardown:wait_time 不是有效的 int 类型')
         except KeyError:

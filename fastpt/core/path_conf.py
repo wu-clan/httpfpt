@@ -10,9 +10,6 @@ LOG_PATH = os.path.join(BASE_DIR, 'log')
 # 测试数据路径
 TEST_DATA_PATH = os.path.join(BASE_DIR, 'data')
 
-# Excel测试数据路径
-EXCEL_DATA_PATH = os.path.join(TEST_DATA_PATH, 'test_data', 'excel_data')
-
 # Yaml测试数据路径
 YAML_DATA_PATH = os.path.join(TEST_DATA_PATH, 'test_data', 'yaml_data')
 
@@ -24,9 +21,6 @@ ALLURE_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'allure_report')
 
 # allure html测试报告路径
 ALLURE_REPORT_HTML_PATH = os.path.join(ALLURE_REPORT_PATH, 'html')
-
-# EXCEL测试报告路径
-EXCEL_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'excel_report')
 
 # HTML测试报告路径
 HTML_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'html_report')

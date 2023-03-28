@@ -90,10 +90,5 @@ class Steps(BaseModel):
 
 
 class CaseData(BaseModel):
-    """
-    暂不使用此类直接对请求参数做快速校验, 考虑到后期是否对 excel 数据提供支持,
-    如果提供, 那么使用此校验器将会造成 excel 数据错误判断, 除非在 excel 请求数据转化时直接格式化参数请求格式,
-    同时更新和移除请求参数解析中不必要的对 excel 请求数据的二次解析(在此校验器发生之前专门为 excel 请求数据提供的设计)
-    """
     config: Config
     test_steps: Steps
