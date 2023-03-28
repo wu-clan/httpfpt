@@ -79,8 +79,11 @@ from fastpt.core.get_conf import PROJECT_NAME
 from fastpt.utils.request.case_data_file_parse import get_request_data
 from fastpt.utils.request.ids_extract import get_ids
 
-request_data = get_request_data(read_yaml(filename=os.sep.join([PROJECT_NAME, '{yaml_filename}'])))
-allure_text = request_data[0]['config']['allure']
+request_data = get_request_data(
+    file_data=read_yaml(filename=os.sep.join([PROJECT_NAME, '{yaml_filename}'])),
+    use_pydantic_verify=False
+)
+allure_text = request_data[0]['config']['allure']  # noqa
 request_ids = get_ids(request_data)
 
 
