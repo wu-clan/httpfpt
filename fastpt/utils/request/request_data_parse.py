@@ -588,7 +588,11 @@ class RequestDataParse:
         except KeyError:
             assert_text = None
         if assert_text is not None:
-            if not any([isinstance(assert_text, list), isinstance(assert_text, dict)]):
+            if not any([
+                isinstance(assert_text, str),
+                isinstance(assert_text, dict),
+                isinstance(assert_text, list)
+            ]):
                 raise ValueError(
                     '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
                 )
