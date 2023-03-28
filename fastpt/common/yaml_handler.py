@@ -15,7 +15,7 @@ def read_yaml(
         filepath: Optional[str] = YAML_DATA_PATH,
         *,
         filename: str
-) -> Union[List[Dict[str, Optional[Any]]], dict]:
+) -> Dict[str, Union[str, int, float, bool, List[Any], Dict[str, Any], None]]:
     """
     读取 yaml 文件
 
