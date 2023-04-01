@@ -3,6 +3,7 @@
 import os
 import smtplib
 import time
+from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import NoReturn
@@ -11,7 +12,8 @@ from jinja2 import Template
 
 from fastpt.common.log import log
 from fastpt.core import get_conf
-from fastpt.core.path_conf import HTML_REPORT_PATH, HTML_EMAIL_REPORT_PATH
+from fastpt.core.path_conf import HTML_EMAIL_REPORT_PATH
+from fastpt.utils.file_control import get_file_property
 
 
 class SendMail:
@@ -35,16 +37,17 @@ class SendMail:
         with open(os.path.join(HTML_EMAIL_REPORT_PATH, 'email_report.html'), 'r', encoding='utf-8') as f:
             html = Template(f.read())
 
-        msg.attach(MIMEText(html.render(**self.content), _subtype='html', _charset='utf-8'))
+        mail_body = MIMEText(html.render(**self.content), _subtype='html', _charset='utf-8')
+        msg.attach(mail_body)
 
         # 读取要发送的附件
-        with open(os.path.join(HTML_REPORT_PATH, self.filename), 'rb') as f:
-            mail_body = str(f.read())
+        with open(self.filename, 'rb') as f:
+            annex_body = f.read()
 
         # 邮件附件
-        att1 = MIMEText(mail_body, 'base64', 'utf-8')
+        att1 = MIMEApplication(annex_body)
         att1["Content-Type"] = 'application/octet-stream'
-        att1["Content-Disposition"] = f'attachment; filename={self.filename}'
+        att1["Content-Disposition"] = f'attachment; filename={get_file_property(self.filename)[0]}'
         msg.attach(att1)
 
         return msg
