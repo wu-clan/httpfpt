@@ -9,6 +9,9 @@ from rich import print  # noqa
 
 sys.path.append('..')
 
+from fastpt.common.yaml_handler import read_yaml  # noqa
+from fastpt.schemas.case_data import CaseData  # noqa
+from fastpt.utils.file_control import search_all_case_yaml_files  # noqa
 from fastpt.utils.case_auto_generator import auto_generate_test_cases  # noqa
 from fastpt.utils.data_manage.openapi import SwaggerParser  # noqa
 from fastpt.utils.data_manage.apifox import ApiFoxParser  # noqa
@@ -28,6 +31,29 @@ def get_version(version: bool):
             raise typer.Exit()
         else:
             raise RuntimeError("Unable to find version string")
+
+
+def test_data_schema_verify(verify: str = None):
+    """
+    测试数据架构验证
+    """
+    try:
+        if verify == 'All':
+            typer.secho('🔥 开始验证所有测试数据结构...', fg='cyan', bold=True)
+            file_list = search_all_case_yaml_files()
+            for file in file_list:
+                file_data = read_yaml(None, filename=file)
+                CaseData(**file_data).dict(by_alias=True)
+        else:
+            typer.secho(f'🔥 开始验证 {verify} 测试数据结构...', fg='cyan', bold=True)
+            file_data = read_yaml(None, filename=verify)
+            CaseData(**file_data).dict(by_alias=True)
+    except Exception as e:
+        typer.secho(f'❌ 验证测试数据 {verify} 结构失败: {e}', fg='red', bold=True)
+        raise typer.Exit(1)
+    else:
+        typer.secho('✅ 验证测试数据结构成功', fg='green', bold=True)
+        raise typer.Exit()
 
 
 def generate_test_cases(generate: bool):
@@ -133,6 +159,15 @@ def main(
             help='获取框架当前版本号',
             callback=get_version
         ),
+        _test_data_schema_verify: Optional[str] = typer.Option(
+            None,
+            '--test-data-schema-verify',
+            '-sv',
+            metavar='<FILENAME / All>',
+            show_default=False,
+            help='验证测试数据结构, 当指定文件名时, 验证指定文件, 否则验证所有测试数据文件',
+            callback=test_data_schema_verify
+        ),
         _generate_test_cases: Optional[bool] = typer.Option(
             None,
             '--generate-test-cases',
@@ -146,7 +181,7 @@ def main(
             '-io',
             '-is',
             show_default=False,
-            metavar='<openapi json_file/url, project>',
+            metavar='<OPENAPI JSONFILE / URL, PROJECT>',
             help='导入 openapi / swagger 数据到 yaml 数据文件; 通过 json_file / url 导入; project: 指定项目名',
             callback=import_openapi_test_data
         ),
@@ -155,7 +190,7 @@ def main(
             '--import-apifox-test-data',
             '-ia',
             show_default=False,
-            metavar='<apifox json_file, project>',
+            metavar='<APIFOX JSONFILE, PROJECT>',
             help='Beta: 导入 apifox 数据到 yaml 数据文件; 通过 json_file 导入; project: 指定项目名',
             callback=import_apifox_test_data
         ),
