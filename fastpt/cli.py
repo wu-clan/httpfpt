@@ -15,6 +15,8 @@ from fastpt.utils.file_control import search_all_case_yaml_files  # noqa
 from fastpt.utils.case_auto_generator import auto_generate_test_cases  # noqa
 from fastpt.utils.data_manage.openapi import SwaggerParser  # noqa
 from fastpt.utils.data_manage.apifox import ApiFoxParser  # noqa
+from fastpt.utils.data_manage.git_repo import GitRepoPaser  # noqa
+
 
 app = typer.Typer(rich_markup_mode='rich')
 
@@ -150,6 +152,24 @@ def import_postman_test_data(postman: tuple):
     pass
 
 
+def import_git_case_data(src: str):
+    """
+    导入 git 仓库测试数据
+
+    :param src:
+    :return:
+    """
+    typer.secho(f'正在导入 git 仓库测试数据到本地: {src}', fg='bright_yellow', bold=True)
+    typer.secho('🔥 开始导入 git 仓库测试数据...', fg='cyan', bold=True)
+    try:
+        GitRepoPaser.import_git_to_local(src)
+    except Exception as e:
+        typer.secho(f'❌ 导入 git 仓库测试数据失败: {e}', fg='red', bold=True)
+        raise e
+    else:
+        raise typer.Exit()
+
+
 @app.command(epilog='Made by :beating_heart: null')
 def main(
         _get_version: Optional[bool] = typer.Option(
@@ -217,6 +237,14 @@ def main(
             show_default=False,
             help='TODO: Not started yet',
             callback=import_postman_test_data
+        ),
+        _import_git_repo_case_data: str = typer.Option(
+            ...,
+            '--import-git-repo-case-data',
+            '-igr',
+            show_default=False,
+            help='导入 git 仓库测试数据到本地',
+            callback=import_git_case_data
         )
 ):
     print('\n使用 --help 查看使用方法.\n')

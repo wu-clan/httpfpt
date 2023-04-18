@@ -76,3 +76,6 @@ fastpt/log/
 
 # idea
 .idea/
+
+# online case data
+fastpt/data/online/
