@@ -59,7 +59,7 @@ def run(
     :param capture: 避免在使用输出模式为"v"和"s"时,html报告中的表格log为空的情况, 默认开启
     :param disable_warnings: 是否关闭控制台警告信息, 默认开启
     :return:
-    """
+    """  # noqa: E501
     default_case_path = f"./test_case/{PROJECT_NAME}/"  # 默认执行指定项目下的所有测试用例
     if case_path is None:
         run_path = default_case_path

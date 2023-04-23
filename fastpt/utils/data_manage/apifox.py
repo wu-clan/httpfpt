@@ -43,7 +43,6 @@ class ApiFoxParser:
                 },
                 'module': data['info']['name']
             })
-            tag = ''
             tag_case = {}
             root_case = {}
             for i in data['apiCollection'][0]['items']:

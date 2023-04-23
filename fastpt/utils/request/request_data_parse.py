@@ -563,7 +563,9 @@ class RequestDataParse:
                 else:
                     for v in hook:
                         if not isinstance(v, str):
-                            raise ValueError(f'请求参数解析失败，参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型')
+                            raise ValueError(
+                                f'请求参数解析失败, 参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型'
+                            )
         except RequestParamGetError:
             hook = None
         return hook
@@ -581,7 +583,8 @@ class RequestDataParse:
                             for k, v in i.items():
                                 if not isinstance(v, str):
                                     raise ValueError(
-                                        f'请求参数解析失败，参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
+                                        f'请求参数解析失败，参数 test_steps:teardown:extract:{k} 不是有效的 str 类型'
+                                    )
                         else:
                             raise ValueError(f'请求参数解析失败，参数 test_steps:teardown:extract:{i} 不是合法数据')
         except RequestParamGetError:

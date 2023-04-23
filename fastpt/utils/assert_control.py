@@ -56,7 +56,7 @@ class Asserter:
         :param response:
         :param assert_text:
         :return:
-        """
+        """  # noqa: E501
         log.info(f'执行断言：{assert_text}')
         self._exec_code_assert(response, assert_text)
 

@@ -22,7 +22,7 @@ def read_excel(filepath: str, *, filename: str, sheet: str = 'Sheet1') -> List[D
     table = data.sheet_by_name(sheet)
     # 获取总行,列数
     rows = table.nrows
-    cols = table.ncols
+    cols = table.ncols  # noqa F841
     if rows > 1:
         # 获取第一行内容, 通常为列说明
         keys = table.row_values(0)

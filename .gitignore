@@ -79,3 +79,6 @@ fastpt/log/
 
 # online case data
 fastpt/data/online/
+
+# ruff
+fastpt/.ruff_cache/
