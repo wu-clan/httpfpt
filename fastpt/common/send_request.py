@@ -120,7 +120,7 @@ class SendRequests:
         :return: response
         """
         if request_engin not in get_enum_values(EnginType):
-            raise ValueError(f'请求发起失败，请使用合法的请求引擎')
+            raise ValueError('请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
         log.info('开始解析请求数据')
@@ -200,7 +200,7 @@ class SendRequests:
                 **kwargs
             )
         else:
-            raise ValueError(f'请求发起失败，使用了不合法的请求引擎')
+            raise ValueError('请求发起失败，使用了不合法的请求引擎')
 
         # 记录响应数据
         response_data['url'] = str(response.url)

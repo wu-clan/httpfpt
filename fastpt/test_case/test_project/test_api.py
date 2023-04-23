@@ -25,5 +25,5 @@ class TestDemo:
     @pytest.mark.test_mark
     def test_002(self):
         """ 测试002 """
-        log.info(f"这是一个框架xfail修饰测试")
+        log.info("这是一个框架xfail修饰测试")
         assert 1 == IsInt

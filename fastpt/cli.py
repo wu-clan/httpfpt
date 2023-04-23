@@ -17,7 +17,6 @@ from fastpt.utils.data_manage.openapi import SwaggerParser  # noqa
 from fastpt.utils.data_manage.apifox import ApiFoxParser  # noqa
 from fastpt.utils.data_manage.git_repo import GitRepoPaser  # noqa
 
-
 app = typer.Typer(rich_markup_mode='rich')
 
 

@@ -257,13 +257,13 @@ class SwaggerParser:
             openapi = data.get('openapi')
             swagger = data.get('swagger')
             if not (openapi or swagger):
-                raise ValueError(f"请输入正确的 openapi 地址")
+                raise ValueError("请输入正确的 openapi 地址")
         else:
             data = read_json_file(None, filename=openapi_source)
             openapi = data.get('openapi')
             swagger = data.get('swagger')
             if not (openapi or swagger):
-                raise ValueError(f"获取 openapi 数据失败，请使用合法的 openapi 文件")
+                raise ValueError("获取 openapi 数据失败，请使用合法的 openapi 文件")
         if openapi is not None and int(openapi.split('.')[0]) == 3:
             self.version = 3
         elif swagger == '2.0':

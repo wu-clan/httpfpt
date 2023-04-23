@@ -87,7 +87,7 @@ def run(
 
     is_allure = f'--alluredir={ALLURE_REPORT_PATH}' if allure else ''
 
-    is_clear_allure = f'--clean-alluredir' if is_allure and allure_clear else ''
+    is_clear_allure = '--clean-alluredir' if is_allure and allure_clear else ''
 
     is_reruns = f'--reruns {reruns}' if reruns != 0 else ''  # noqa
 

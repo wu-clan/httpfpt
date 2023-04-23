@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
+
 from faker import Faker
 
 faker = Faker(locale='zh_CN')
