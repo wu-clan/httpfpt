@@ -10,7 +10,6 @@ from fastpt.core import get_conf
 
 
 class RedisDB:
-
     def __init__(self):
         self.redis = Redis(
             host=get_conf.REDIS_HOST,
@@ -18,23 +17,23 @@ class RedisDB:
             password=get_conf.REDIS_PASSWORD,
             db=get_conf.REDIS_DATABASE,
             socket_timeout=get_conf.REDIS_TIMEOUT,
-            decode_responses=True  # 转码 utf-8
+            decode_responses=True,  # 转码 utf-8
         )
 
     def init(self):
         try:
             self.redis.ping()
         except TimeoutError:
-            log.error("❌ 数据库 redis 连接超时")
+            log.error('❌ 数据库 redis 连接超时')
             sys.exit(1)
         except AuthenticationError:
-            log.error("❌ 数据库 redis 授权认证错误")
+            log.error('❌ 数据库 redis 授权认证错误')
             sys.exit(1)
         except Exception as e:
             log.error(f'❌ 数据库 redis 连接异常: {e}')
             sys.exit(1)
         else:
-            log.info("✅ 数据库 redis 连接成功")
+            log.info('✅ 数据库 redis 连接成功')
 
     def get(self, key: Any) -> Any:
         """

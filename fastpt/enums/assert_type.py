@@ -5,20 +5,20 @@ from enum import Enum, unique
 
 @unique
 class AssertType(str, Enum):
-    equal = "eq"
-    not_equal = "not_eq"
-    greater_than = "gt"
-    greater_than_or_equal = "ge"
-    less_than = "lt"
-    less_than_or_equal = "le"
-    string_equal = "str_eq"
-    length_equal = "len_eq"
-    not_length_equal = "not_len_eq"
-    length_less_than = "len_lt"
+    equal = 'eq'
+    not_equal = 'not_eq'
+    greater_than = 'gt'
+    greater_than_or_equal = 'ge'
+    less_than = 'lt'
+    less_than_or_equal = 'le'
+    string_equal = 'str_eq'
+    length_equal = 'len_eq'
+    not_length_equal = 'not_len_eq'
+    length_less_than = 'len_lt'
     length_less_than_or_equal = 'len_le'
-    length_greater_than = "len_gt"
+    length_greater_than = 'len_gt'
     length_greater_than_or_equal = 'len_ge'
-    contains = "contains"
+    contains = 'contains'
     not_contains = 'not_contains'
     startswith = 'startswith'
     endswith = 'endswith'

@@ -21,7 +21,7 @@ def allure_step(step: str, var: Union[str, dict]):
         allure.attach(
             body=json.dumps(var, ensure_ascii=False, indent=2) if isinstance(var, dict) else var,
             name='JSON Serialize',
-            attachment_type=AttachmentType.JSON
+            attachment_type=AttachmentType.JSON,
         )
 
 
@@ -39,7 +39,7 @@ def allure_attach(body=None, name=None, attachment_type: str = 'JSON', extension
         body=body,
         name=name,
         attachment_type=getattr(AttachmentType, attachment_type.upper(), None),
-        extension=extension
+        extension=extension,
     )
 
 
@@ -63,5 +63,5 @@ def allure_attach_file(filepath: str, name=None, extension=None) -> NoReturn:
         source=filepath,
         name=name or filename,
         attachment_type=getattr(AttachmentType, filetype.upper(), None),
-        extension=extension
+        extension=extension,
     )

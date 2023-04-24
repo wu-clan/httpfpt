@@ -43,11 +43,7 @@ def auto_generate_test_cases(rewrite: bool = False) -> NoReturn:
     for root_name in yaml_file_root_names:
         if not rewrite:
             if (
-                    (
-                            root_name
-                            if root_name.startswith('test_')
-                            else 'test_' + root_name
-                    ) + '.py'
+                (root_name if root_name.startswith('test_') else 'test_' + root_name) + '.py'
             ) not in testcase_filenames:
                 create_file_root_names.append(root_name)
         else:

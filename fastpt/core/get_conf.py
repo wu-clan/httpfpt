@@ -40,7 +40,7 @@ EMAIL_REPORT_SEND = __config['email']['is_send_report']
 DING_TALK_WEBHOOK = __config['ding_talk']['webhook']
 DING_TALK_PROXY = {
     'http': __config['ding_talk']['proxies']['http'] if __config['ding_talk']['proxies']['http'] != '' else None,
-    'https': __config['ding_talk']['proxies']['https'] if __config['ding_talk']['proxies']['https'] != '' else None
+    'https': __config['ding_talk']['proxies']['https'] if __config['ding_talk']['proxies']['https'] != '' else None,
 }
 DING_TALK_REPORT_SEND = __config['ding_talk']['is_send_report']
 
@@ -48,7 +48,7 @@ DING_TALK_REPORT_SEND = __config['ding_talk']['is_send_report']
 LARK_TALK_WEBHOOK = __config['lark_talk']['webhook']
 LARK_TALK_PROXY = {
     'http': __config['lark_talk']['proxies']['http'] if __config['lark_talk']['proxies']['http'] != '' else None,
-    'https': __config['lark_talk']['proxies']['https'] if __config['lark_talk']['proxies']['https'] != '' else None
+    'https': __config['lark_talk']['proxies']['https'] if __config['lark_talk']['proxies']['https'] != '' else None,
 }
 LARK_TALK_REPORT_SEND = __config['lark_talk']['is_send_report']
 
@@ -58,9 +58,9 @@ REQUEST_VERIFY = __config['request']['verify']
 REQUEST_REDIRECTS = __config['request']['redirects']
 REQUEST_PROXIES_REQUESTS = {
     'http': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,
-    'https': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None
+    'https': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None,
 }
 REQUEST_PROXIES_HTTPX = {
-    'http://': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,  # noqa
-    'https://': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None
+    'http://': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,
+    'https://': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None,
 }

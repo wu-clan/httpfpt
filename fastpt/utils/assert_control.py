@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from decimal import Decimal
 from typing import Union, NoReturn
 
 from jsonpath import jsonpath
@@ -10,7 +11,6 @@ from fastpt.enums.assert_type import AssertType
 
 
 class Asserter:
-
     def _code_asserter(self, response: dict, assert_text: str) -> NoReturn:
         """
         **代码断言器, 像 pytest 断言一样使用它**
@@ -142,9 +142,7 @@ class Asserter:
             raise ValueError('code 断言内容语法错误, 请查看是否为 str / list 类型, 并检查断言语法是否规范')
         if not assert_text.startswith('assert '):
             raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
-        if len(assert_split) < 4:
-            raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
-        elif len(assert_split) > 6:
+        if len(assert_split) < 4 or len(assert_split) > 6:
             raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
         else:
             # 是否 dirty-equals 断言表达式
@@ -184,18 +182,14 @@ class Asserter:
             else:
                 assert_expr_type = ['==', '!=', '>', '<', '>=', '<=', 'in', 'not']
                 if assert_split[2] not in assert_expr_type:
-                    raise ValueError(
-                        f'断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}, 仅支持: {assert_expr_type}'
-                    )
+                    raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}, 仅支持: {assert_expr_type}')  # noqa: E501
                 else:
                     if assert_split[2] == 'not':
                         if assert_split[3] != 'in':
                             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {" ".join(assert_split[2:4])}')
                         else:
                             if 'pm.response.get' not in assert_split[4]:
-                                raise ValueError(
-                                    f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}'
-                                )
+                                raise ValueError(f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}')
                             # 如果包含自定义错误信息
                             if len(assert_split) == 6:
                                 pm_code = assert_split[4].replace(',', '')
@@ -204,9 +198,7 @@ class Asserter:
                     else:
                         # 非 dirty-equals 或 not in 断言表达式
                         if 'pm.response.get' not in assert_split[3]:
-                            raise ValueError(
-                                f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}'
-                            )
+                            raise ValueError(f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}')
                         if len(assert_split) == 5:
                             pm_code = assert_split[3].replace(',', '')
                         else:
@@ -249,73 +241,92 @@ class Asserter:
         :return:
         """
         if assert_type == AssertType.equal:
-            assert expected_value == actual_value, \
-                assert_check or \
-                f'预期结果: {expected_value} 不等于实际结果: {actual_value}'
+            assert expected_value == actual_value, (
+                assert_check or f'预期结果: {Decimal(str(expected_value))} 不等于实际结果: {Decimal(str(actual_value))}'
+            )
+
         elif assert_type == AssertType.not_equal:
-            assert expected_value != actual_value, \
-                assert_check or \
-                f'预期结果: {expected_value} 等于实际结果: {actual_value}'
+            assert expected_value != actual_value, (
+                assert_check or f'预期结果: {Decimal(str(expected_value))} 等于实际结果: {Decimal(str(actual_value))}'
+            )
+
         elif assert_type == AssertType.greater_than:
-            assert expected_value > actual_value, \
-                assert_check or \
-                f'预期结果: {expected_value} 不大于实际结果: {actual_value}'
+            assert expected_value > actual_value, (
+                assert_check or f'预期结果: {Decimal(str(expected_value))} 不大于实际结果: {Decimal(str(actual_value))}'
+            )
+
         elif assert_type == AssertType.greater_than_or_equal:
-            assert expected_value >= actual_value, \
-                assert_check or \
-                f'预期结果: {expected_value} 不大于等于实际结果: {actual_value}'
+            assert expected_value >= actual_value, (
+                assert_check
+                or f'预期结果: {Decimal(str(expected_value))} 不大于等于实际结果: {Decimal(str(actual_value))}'  # noqa: E501
+            )
+
         elif assert_type == AssertType.less_than:
-            assert expected_value < actual_value, \
-                assert_check or \
-                f'预期结果: {expected_value} 不小于实际结果: {actual_value}'
+            assert expected_value < actual_value, (
+                assert_check or f'预期结果: {Decimal(str(expected_value))} 不小于实际结果: {Decimal(str(actual_value))}'
+            )
+
         elif assert_type == AssertType.less_than_or_equal:
-            assert expected_value <= actual_value, \
-                assert_check or \
-                f'预期结果: {expected_value} 不小于等于实际结果: {actual_value}'
+            assert expected_value <= actual_value, (
+                assert_check
+                or f'预期结果: {Decimal(str(expected_value))} 不小于等于实际结果: {Decimal(str(actual_value))}'  # noqa: E501
+            )
+
         elif assert_type == AssertType.string_equal:
-            assert str(expected_value) == str(actual_value), \
-                assert_check or \
-                f'预期结果(str): {str(expected_value)} 不等于实际结果(str): {str(actual_value)}'
+            assert str(expected_value) == str(actual_value), (
+                assert_check or f'预期结果(str): {str(expected_value)} 不等于实际结果(str): {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.length_equal:
-            assert len(str(expected_value)) == len(str(actual_value)), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 长度不等于实际结果: {str(actual_value)}'
+            assert len(str(expected_value)) == len(str(actual_value)), (
+                assert_check or f'预期结果: {str(expected_value)} 长度不等于实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.not_length_equal:
-            assert len(str(expected_value)) != len(str(actual_value)), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 长度等于实际结果: {str(actual_value)}'
+            assert len(str(expected_value)) != len(str(actual_value)), (
+                assert_check or f'预期结果: {str(expected_value)} 长度等于实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.length_greater_than:
-            assert len(str(expected_value)) > len(str(actual_value)), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 长度不大于实际结果: {str(actual_value)}'
+            assert len(str(expected_value)) > len(str(actual_value)), (
+                assert_check or f'预期结果: {str(expected_value)} 长度不大于实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.length_greater_than_or_equal:
-            assert len(str(expected_value)) >= len(str(actual_value)), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 长度不大于等于实际结果: {str(actual_value)}'
+            assert len(str(expected_value)) >= len(str(actual_value)), (
+                assert_check or f'预期结果: {str(expected_value)} 长度不大于等于实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.length_less_than:
-            assert len(str(expected_value)) < len(str(actual_value)), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 长度不小于实际结果: {str(actual_value)}'
+            assert len(str(expected_value)) < len(str(actual_value)), (
+                assert_check or f'预期结果: {str(expected_value)} 长度不小于实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.length_less_than_or_equal:
-            assert len(str(expected_value)) <= len(str(actual_value)), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 长度不小于等于实际结果: {str(actual_value)}'
+            assert len(str(expected_value)) <= len(str(actual_value)), (
+                assert_check or f'预期结果: {str(expected_value)} 长度不小于等于实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.contains:
-            assert str(expected_value) in str(actual_value), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 不包含实际结果: {str(actual_value)}'
+            assert str(expected_value) in str(actual_value), (
+                assert_check or f'预期结果: {str(expected_value)} 不包含实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.not_contains:
-            assert str(expected_value) not in str(actual_value), \
-                assert_check or \
-                f'预期结果: {str(expected_value)} 包含实际结果: {str(actual_value)}'
+            assert str(expected_value) not in str(actual_value), (
+                assert_check or f'预期结果: {str(expected_value)} 包含实际结果: {str(actual_value)}'
+            )
+
         elif assert_type == AssertType.startswith:
-            assert str(actual_value).startswith(str(expected_value)), \
-                assert_check or \
-                f'实际结果: {str(actual_value)} 的开头不是预期结果: {str(expected_value)}'
+            assert str(actual_value).startswith(str(expected_value)), (
+                assert_check or f'实际结果: {str(actual_value)} 的开头不是预期结果: {str(expected_value)}'
+            )
+
         elif assert_type == AssertType.endswith:
-            assert str(actual_value).endswith(str(expected_value)), \
-                assert_check or \
-                f'实际结果: {str(actual_value)} 的结尾不是预期结果: {str(expected_value)}'
+            assert str(actual_value).endswith(str(expected_value)), (
+                assert_check or f'实际结果: {str(actual_value)} 的结尾不是预期结果: {str(expected_value)}'
+            )
+
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 

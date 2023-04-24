@@ -6,7 +6,6 @@ from fastpt.common.log import log
 
 
 class VariableCache:
-
     def __init__(self, cache=SafeCache()):
         self.cache = cache
 
@@ -58,7 +57,7 @@ class VariableCache:
         :param kwargs:
         :return:
         """
-        result = self.cache.has_key(key, **kwargs)  # noqa
+        result = self.cache.has_key(key, **kwargs)
         if result:
             log.info(f'存在临时变量: {key}')
         return result

@@ -11,7 +11,7 @@ def format_value(value_type: str):
     """
     if value_type == 'string':
         v = ''
-    elif value_type == 'integer':
+    elif value_type == 'integer':  # noqa: SIM114
         v = 0
     elif value_type == 'number':
         v = 0
@@ -24,5 +24,5 @@ def format_value(value_type: str):
     elif value_type == 'arrayString':
         v = []
     else:
-        raise Exception(f"存在不支持的类型：{value_type}")
+        raise Exception(f'存在不支持的类型：{value_type}')
     return v

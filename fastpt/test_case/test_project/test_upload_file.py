@@ -12,19 +12,17 @@ from fastpt.utils.request.case_data_file_parse import get_request_data
 from fastpt.utils.request.ids_extract import get_ids
 
 request_data = get_request_data(
-    file_data=read_yaml(filename=os.sep.join([PROJECT_NAME, 'upload_file.yaml'])),
-    use_pydantic_verify=True
+    file_data=read_yaml(filename=os.sep.join([PROJECT_NAME, 'upload_file.yaml'])), use_pydantic_verify=True
 )
-allure_text = request_data[0]['config']['allure']  # noqa
+allure_text = request_data[0]['config']['allure']
 request_ids = get_ids(request_data)
 
 
 @allure.epic(allure_text['epic'])
 @allure.feature(allure_text['feature'])
 class TestUploadFile:
-
     @allure.story(allure_text['story'])
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def test_upload_file(self, data):
-        """ upload_file """
+        """upload_file"""
         send_request.send_request(data)

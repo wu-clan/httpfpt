@@ -18,10 +18,7 @@ class ConfigRequestData(BaseModel):
     timeout: Optional[int] = Field(None, ge=0)
     verify: Optional[bool] = None
     redirects: Optional[bool] = None
-    proxies: Optional[Union[Dict[
-        Literal['http', 'https', 'http://', 'https://'],
-        Union[AnyHttpUrl, None]
-    ]]] = None
+    proxies: Optional[Union[Dict[Literal['http', 'https', 'http://', 'https://'], Union[AnyHttpUrl, None]]]] = None
 
 
 class Config(BaseModel):

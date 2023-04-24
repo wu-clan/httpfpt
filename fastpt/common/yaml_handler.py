@@ -12,9 +12,7 @@ from fastpt.core.path_conf import YAML_DATA_PATH, YAML_REPORT_PATH, TEST_DATA_PA
 
 
 def read_yaml(
-        filepath: Optional[str] = YAML_DATA_PATH,
-        *,
-        filename: str
+    filepath: Optional[str] = YAML_DATA_PATH, *, filename: str
 ) -> Dict[str, Union[str, int, float, bool, List[Any], Dict[str, Any], None]]:
     """
     读取 yaml 文件
@@ -66,12 +64,12 @@ def write_yaml(filepath: str, filename: str, data=None, *, encoding: str = 'utf-
 
 
 def write_yaml_report(
-        filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.yaml',
-        *,
-        data: Any,
-        encoding: str = 'utf-8',
-        mode: str = 'a',
-        status: str
+    filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.yaml',
+    *,
+    data: Any,
+    encoding: str = 'utf-8',
+    mode: str = 'a',
+    status: str,
 ) -> NoReturn:
     """
     写入 yaml 测试报告

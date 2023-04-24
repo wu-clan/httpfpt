@@ -30,7 +30,8 @@ def search_all_case_yaml_files() -> list:
     :return:
     """
     files = glob.glob(os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', '*.yaml'), recursive=True) + glob.glob(
-        os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', '*.yml'), recursive=True)
+        os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}', '**', '*.yml'), recursive=True
+    )
     return files
 
 

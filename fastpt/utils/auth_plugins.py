@@ -15,7 +15,6 @@ AUTH_TYPE = auth_data['auth_type']
 
 
 class AuthPlugins:
-
     def __init__(self):
         self.auth_type = AUTH_TYPE
         if not getattr(AuthType, self.auth_type, None):
@@ -37,7 +36,7 @@ class AuthPlugins:
                 'url': url,
                 'data': {'username': username, 'password': password},
                 'headers': headers,
-                'proxies': {'http': None, 'https': None},  # noqa
+                'proxies': {'http': None, 'https': None},
             }
             if 'json' in str(headers):
                 request_data.update({'json': request_data.pop('data')})

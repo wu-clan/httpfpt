@@ -15,7 +15,6 @@ from fastpt.utils.file_control import get_file_property
 
 
 class ApiFoxParser:
-
     def import_apifox_to_yaml(self, source: str, project: Optional[str] = None):
         """
         导入 apifox 数据到 yaml
@@ -27,22 +26,22 @@ class ApiFoxParser:
         data = read_json_file(None, filename=source)
         apifox = data.get('apifoxProject')
         if not apifox:
-            raise ValueError("获取 apifox 数据失败，请使用合法的 apifox 文件")
+            raise ValueError('获取 apifox 数据失败，请使用合法的 apifox 文件')
         if apifox != '1.0.0':
             raise Exception('不受支持的 apifox 版本')
         try:
             config = {}
-            config.update({
-                'allure': {
-                    'epic': data['info']['name'],
-                    'feature': data['tags'][0]['name'] if data.get('tags') is not None else '未知',
-                    'story': data['info']['description']
-                },
-                'request': {
-                    'env': 'dev.env'
-                },
-                'module': data['info']['name']
-            })
+            config.update(
+                {
+                    'allure': {
+                        'epic': data['info']['name'],
+                        'feature': data['tags'][0]['name'] if data.get('tags') is not None else '未知',
+                        'story': data['info']['description'],
+                    },
+                    'request': {'env': 'dev.env'},
+                    'module': data['info']['name'],
+                }
+            )
             tag_case = {}
             root_case = {}
             for i in data['apiCollection'][0]['items']:
@@ -65,13 +64,9 @@ class ApiFoxParser:
                     case_file_data = {'config': config, 'test_steps': v}
                     write_yaml(
                         YAML_DATA_PATH,
-                        os.sep.join([
-                            project or PROJECT_NAME,
-                            k,
-                            get_file_property(source)[1] + '.yaml'
-                        ]),
+                        os.sep.join([project or PROJECT_NAME, k, get_file_property(source)[1] + '.yaml']),
                         case_file_data,
-                        mode='w'
+                        mode='w',
                     )
             # 写入项目根目录
             if len(root_case) > 0:
@@ -79,12 +74,9 @@ class ApiFoxParser:
                     case_file_data = {'config': config, 'test_steps': v}
                     write_yaml(
                         YAML_DATA_PATH,
-                        os.sep.join([
-                            project or PROJECT_NAME,
-                            get_file_property(source)[1] + '.yaml'
-                        ]),
+                        os.sep.join([project or PROJECT_NAME, get_file_property(source)[1] + '.yaml']),
                         case_file_data,
-                        mode='w'
+                        mode='w',
                     )
         except Exception as e:
             raise e
@@ -179,7 +171,7 @@ class ApiFoxParser:
                 'headers': headers,
                 'data_type': data_type,
                 'data': data,
-                'files': files
-            }
+                'files': files,
+            },
         }
         return case

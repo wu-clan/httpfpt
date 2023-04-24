@@ -20,7 +20,6 @@ from fastpt.utils.enum_control import get_enum_values
 
 
 class MysqlDB:
-
     def __init__(self):
         try:
             self.conn = PooledDB(
@@ -38,7 +37,7 @@ class MysqlDB:
         # 声明游标
         self.cursor = self.conn.cursor()
 
-    def query(self, sql: str, fetch: str = "all"):
+    def query(self, sql: str, fetch: str = 'all'):
         """
         数据库查询
 
@@ -134,6 +133,6 @@ class MysqlDB:
                         write_yaml_vars({key: value})
                     else:
                         raise ValueError(
-                            f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+                            f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'  # noqa: E501
                         )
             return data

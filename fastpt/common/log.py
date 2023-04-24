@@ -12,7 +12,6 @@ from fastpt.core.path_conf import LOG_PATH
 
 
 class Logger:
-
     @staticmethod
     def log() -> loguru.Logger:
         """
@@ -39,16 +38,12 @@ class Logger:
             def emit(self, record):
                 logging.getLogger(record.name).handle(record)
 
-        logger.add(
-            PropagateHandler(),
-            format="<level>{message}</level>",
-            level='DEBUG'
-        )
+        logger.add(PropagateHandler(), format='<level>{message}</level>', level='DEBUG')
 
         # 输出到文件
         logger.add(
             log_file,
-            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>",
+            format='<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>',
             level='DEBUG',
             rotation='00:00',
             retention='7 days',
@@ -56,7 +51,7 @@ class Logger:
             enqueue=True,
             backtrace=True,
             diagnose=False,
-            catch=True
+            catch=True,
         )
 
         return logger

@@ -34,13 +34,7 @@ def read_json_file(filepath: Optional[str] = None, *, filename: str, **kwargs) -
 
 
 def write_json_file(
-        filepath: Optional[str] = None,
-        *,
-        filename: str,
-        data=None,
-        encoding: str = 'utf-8',
-        mode: str = 'a',
-        **kwargs
+    filepath: Optional[str] = None, *, filename: str, data=None, encoding: str = 'utf-8', mode: str = 'a', **kwargs
 ) -> NoReturn:
     """
     写入 json 文件

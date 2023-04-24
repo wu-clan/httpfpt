@@ -16,11 +16,11 @@ from fastpt.core.get_conf import TESTER_NAME, PROJECT_NAME, TEST_REPORT_TITLE
 @pytest.fixture(scope='session', autouse=True)
 def session_fixture(tmp_path_factory, worker_id):
     # 避免分布式执行用例循环执行此fixture
-    if worker_id == "master":
+    if worker_id == 'master':
         return None
     root_tmp_dir = tmp_path_factory.getbasetemp().parent
-    fn = root_tmp_dir / "data.json"
-    with FileLock(str(fn) + ".lock"):
+    fn = root_tmp_dir / 'data.json'
+    with FileLock(str(fn) + '.lock'):
         pass
 
 
@@ -63,11 +63,11 @@ def pytest_configure(config):
     :return:
     """
     # 添加接口地址与项目名称
-    config._metadata["Project Name"] = PROJECT_NAME
+    config._metadata['Project Name'] = PROJECT_NAME
     # config._metadata.pop("JAVA_HOME")
-    config._metadata.pop("Packages")
-    config._metadata.pop("Platform")
-    config._metadata.pop("Plugins")
+    config._metadata.pop('Packages')
+    config._metadata.pop('Platform')
+    config._metadata.pop('Plugins')
 
 
 def pytest_html_results_summary(prefix):
@@ -79,12 +79,12 @@ def pytest_html_results_summary(prefix):
     """
     # 向 html 报告中的 summary 添加额外信息
     # prefix.extend([html.p(f"Department:")])
-    prefix.extend([html.p(f"Tester: {TESTER_NAME}")])
+    prefix.extend([html.p(f'Tester: {TESTER_NAME}')])
 
 
 @pytest.mark.optionalhook
 def pytest_html_report_title(report):
-    report.title = f"{TEST_REPORT_TITLE}"
+    report.title = f'{TEST_REPORT_TITLE}'
 
 
 @pytest.mark.optionalhook
@@ -141,7 +141,7 @@ def pytest_collection_modifyitems(items) -> None:
     """
     # item表示每个用例
     for item in items:
-        item.name = item.name.encode("utf-8").decode("unicode_escape")
+        item.name = item.name.encode('utf-8').decode('unicode_escape')
         # 打开此注释可以解决控制台ids乱码问题,但是会影响报告中的ids参数乱码
         # 问题在这里: https://github.com/pytest-dev/pytest-html/issues/450
         # item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")
@@ -159,13 +159,13 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     started_time = terminalreporter._sessionstarttime
     elapsed = time.time() - started_time
     data = {
-        "result": "Success" if failed == 0 else "Failed",
-        "total": total,
-        "passed": passed,
-        "failed": failed,
-        "error": error,
-        "skipped": skipped,
-        "started_time": datetime.fromtimestamp(started_time).strftime("%Y-%m-%d %H:%M:%S"),
-        "elapsed": float(datetime.fromtimestamp(elapsed).strftime("%S.%f")[:-3]),
+        'result': 'Success' if failed == 0 else 'Failed',
+        'total': total,
+        'passed': passed,
+        'failed': failed,
+        'error': error,
+        'skipped': skipped,
+        'started_time': datetime.fromtimestamp(started_time).strftime('%Y-%m-%d %H:%M:%S'),
+        'elapsed': float(datetime.fromtimestamp(elapsed).strftime('%S.%f')[:-3]),
     }
-    write_yaml_report(data=data, status="PASS")
+    write_yaml_report(data=data, status='PASS')

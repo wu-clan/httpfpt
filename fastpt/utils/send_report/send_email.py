@@ -17,7 +17,6 @@ from fastpt.utils.file_control import get_file_property
 
 
 class SendMail:
-
     def __init__(self, filename: str, content: dict):
         self.filename = filename
         self.content = content
@@ -46,8 +45,8 @@ class SendMail:
 
         # 邮件附件
         att1 = MIMEApplication(annex_body)
-        att1["Content-Type"] = 'application/octet-stream'
-        att1["Content-Disposition"] = f'attachment; filename={get_file_property(self.filename)[0]}'
+        att1['Content-Type'] = 'application/octet-stream'
+        att1['Content-Disposition'] = f'attachment; filename={get_file_property(self.filename)[0]}'
         msg.attach(att1)
 
         return msg
@@ -67,4 +66,4 @@ class SendMail:
         except Exception as e:
             log.error(f'测试报告邮件发送失败: {e}')
         else:
-            log.success("测试报告邮件发送成功")
+            log.success('测试报告邮件发送成功')

@@ -52,9 +52,11 @@ def get_all_testcase_id(case_data_list: list) -> list:
                     for key in case_id_dict.keys():
                         if i in case_id_dict[key]:
                             all_re_case_id_detail.append({'file': f'{key}', 'index': case_id_dict[key].index(i)})
-                re_case_id_desc.update({
-                    'detail': all_re_case_id_detail if len(all_re_case_id_detail) > 1 else all_re_case_id_detail[0],
-                })
+                re_case_id_desc.update(
+                    {
+                        'detail': all_re_case_id_detail if len(all_re_case_id_detail) > 1 else all_re_case_id_detail[0],
+                    }
+                )
                 all_re_case_id_desc.append(re_case_id_desc)
     if len(all_re_case_id_desc) > 0:
         RedisDB().set('aap_is_re_case_id', 'true')
@@ -152,17 +154,14 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
                                 new_data = {
                                     'test_steps': relate_case_steps,
                                     'set_var_key': testcase['key'],
-                                    'set_var_jsonpath': testcase['jsonpath']
+                                    'set_var_jsonpath': testcase['jsonpath'],
                                 }
                                 case_data.update(new_data)
                                 relate_testcase_set_var(case_data)
                     else:
                         relate_case_steps = case_data_test_steps
                         is_circular_relate(parsed_case_id, relate_case_steps)
-                        new_data = {
-                            'set_var_key': testcase['key'],
-                            'set_var_jsonpath': testcase['jsonpath']
-                        }
+                        new_data = {'set_var_key': testcase['key'], 'set_var_jsonpath': testcase['jsonpath']}
                         case_data.update(new_data)
                         relate_testcase_set_var(case_data)
 
@@ -207,16 +206,10 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoRetur
             for relate_testcase in relate_case_setup_testcase:
                 if isinstance(relate_testcase, dict):
                     if current_case_id == relate_testcase['case_id']:
-                        raise ValueError(
-                            '关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有'
-                            '当前正在执行的测试用例，导致了循环引用，触发此异常'
-                        )
+                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
                 else:
                     if current_case_id == relate_testcase:
-                        raise ValueError(
-                            '关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有'
-                            '当前正在执行的测试用例，导致了循环引用，触发此异常'
-                        )
+                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
 
 
 def relate_testcase_set_var(testcase_data: dict) -> NoReturn:
@@ -227,6 +220,7 @@ def relate_testcase_set_var(testcase_data: dict) -> NoReturn:
     :return:
     """
     from fastpt.common.send_request import send_request
+
     msg = '执行变量提取关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
     log.debug(msg)
     allure_step(msg, '此文件为空')
@@ -246,6 +240,7 @@ def relate_testcase_exec(testcase_data: dict) -> NoReturn:
     :return:
     """
     from fastpt.common.send_request import send_request
+
     msg = '执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
     log.debug(msg)
     allure_step(msg, '此文件为空')

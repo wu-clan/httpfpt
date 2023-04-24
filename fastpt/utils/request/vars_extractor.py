@@ -15,7 +15,6 @@ from fastpt.enums.var_type import VarType
 
 
 class VarsExtractor:
-
     def __init__(self):
         # 变量表达: ${var} 或 $var
         # 变量开头: a-zA-Z_
@@ -144,6 +143,4 @@ class VarsExtractor:
             elif set_type == VarType.GLOBAL:
                 write_yaml_vars({key: value})
             else:
-                raise ValueError(
-                    f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
-                )
+                raise ValueError(f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global')  # noqa: E501

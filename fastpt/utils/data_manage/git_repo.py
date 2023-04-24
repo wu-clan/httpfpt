@@ -7,7 +7,6 @@ import typer
 
 
 class GitRepoPaser:
-
     @staticmethod
     def import_git_to_local(src: str):
         """

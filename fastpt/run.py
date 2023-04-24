@@ -9,8 +9,14 @@ import pytest
 
 from fastpt.common.yaml_handler import read_yaml
 from fastpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND, DING_TALK_REPORT_SEND, LARK_TALK_REPORT_SEND
-from fastpt.core.path_conf import HTML_REPORT_PATH, ALLURE_REPORT_PATH, ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE, \
-    ALLURE_REPORT_HTML_PATH, YAML_REPORT_PATH
+from fastpt.core.path_conf import (
+    HTML_REPORT_PATH,
+    ALLURE_REPORT_PATH,
+    ALLURE_ENV_FILE,
+    ALLURE_REPORT_ENV_FILE,
+    ALLURE_REPORT_HTML_PATH,
+    YAML_REPORT_PATH,
+)
 from fastpt.db.redis_db import RedisDB
 from fastpt.utils.relate_testcase_executor import get_all_testcase_id, get_all_testcase_data
 from fastpt.utils.send_report.ding_talk import DingTalk
@@ -19,27 +25,27 @@ from fastpt.utils.send_report.send_email import SendMail
 
 
 def run(
-        # log level
-        log_level: str = '-v',
-        # case path
-        case_path: Optional[str] = None,
-        # html report
-        html_report: bool = True,
-        # allure
-        allure: bool = True,
-        allure_clear: bool = True,
-        allure_serve: bool = True,
-        # extra
-        reruns: int = 0,
-        maxfail: int = 0,
-        x: bool = False,
-        n: Union[str, int] = 'auto',
-        dist: str = 'loadscope',
-        strict_markers: bool = False,
-        capture: bool = True,
-        disable_warnings: bool = True,
-        *args,
-        **kwargs,
+    # log level
+    log_level: str = '-v',
+    # case path
+    case_path: Optional[str] = None,
+    # html report
+    html_report: bool = True,
+    # allure
+    allure: bool = True,
+    allure_clear: bool = True,
+    allure_serve: bool = True,
+    # extra
+    reruns: int = 0,
+    maxfail: int = 0,
+    x: bool = False,
+    n: Union[str, int] = 'auto',
+    dist: str = 'loadscope',
+    strict_markers: bool = False,
+    capture: bool = True,
+    disable_warnings: bool = True,
+    *args,
+    **kwargs,
 ):
     """
     运行入口
@@ -60,7 +66,7 @@ def run(
     :param disable_warnings: 是否关闭控制台警告信息, 默认开启
     :return:
     """  # noqa: E501
-    default_case_path = f"./test_case/{PROJECT_NAME}/"  # 默认执行指定项目下的所有测试用例
+    default_case_path = f'./test_case/{PROJECT_NAME}/'  # 默认执行指定项目下的所有测试用例
     if case_path is None:
         run_path = default_case_path
     else:
@@ -80,8 +86,12 @@ def run(
         if not os.path.exists(HTML_REPORT_PATH):
             os.makedirs(HTML_REPORT_PATH)
 
-    is_html_report_file = f'''--html={HTML_REPORT_PATH}\\{PROJECT_NAME}_{datetime.datetime.now().strftime(
-        "%Y-%m-%d-%H_%M_%S")}.html''' if html_report else ''
+    is_html_report_file = (
+        f'''--html={HTML_REPORT_PATH}\\{PROJECT_NAME}_{datetime.datetime.now().strftime(
+        "%Y-%m-%d-%H_%M_%S")}.html'''
+        if html_report
+        else ''
+    )
 
     is_html_report_self = '--self-contained-html' if html_report else ''
 
@@ -89,15 +99,15 @@ def run(
 
     is_clear_allure = '--clean-alluredir' if is_allure and allure_clear else ''
 
-    is_reruns = f'--reruns {reruns}' if reruns != 0 else ''  # noqa
+    is_reruns = f'--reruns {reruns}' if reruns != 0 else ''  # noqa: F841
 
     is_maxfail = f'--maxfail={maxfail}' if maxfail != 0 else ''
 
     is_x = '-x' if x else ''
 
-    is_n = f'-n={n}'  # noqa
+    is_n = f'-n={n}'  # noqa: F841
 
-    is_dist = f'--dist={dist}'  # noqa
+    is_dist = f'--dist={dist}'  # noqa: F841
 
     is_strict_markers = '--strict-markers' if strict_markers else ''
 
@@ -105,25 +115,30 @@ def run(
 
     is_disable_warnings = '--disable-warnings' if disable_warnings else ''
 
-    kw = [f"{k}={v}" for k, v in kwargs.items()]
+    kw = [f'{k}={v}' for k, v in kwargs.items()]
 
-    run_args = [arg for arg in [
-        f'{log_level}',
-        f'{run_path}',
-        f'{is_html_report_file}',
-        f'{is_html_report_self}',
-        f'{is_allure}',
-        f'{is_clear_allure}'
-        # f'{is_reruns}',
-        f'{is_maxfail}',
-        f'{is_x}',
-        # f'{is_n}',  # 分布式运行存在诸多问题, 请谨慎使用
-        # f'{is_dist}',
-        f'{is_strict_markers}',
-        f'{is_capture}',
-        f'{is_disable_warnings}',
-        *args
-    ] + kw if arg.strip() != '']
+    run_args = [
+        arg
+        for arg in [
+            f'{log_level}',
+            f'{run_path}',
+            f'{is_html_report_file}',
+            f'{is_html_report_self}',
+            f'{is_allure}',
+            f'{is_clear_allure}'
+            # f'{is_reruns}',
+            f'{is_maxfail}',
+            f'{is_x}',
+            # f'{is_n}',  # 分布式运行存在诸多问题, 请谨慎使用
+            # f'{is_dist}',
+            f'{is_strict_markers}',
+            f'{is_capture}',
+            f'{is_disable_warnings}',
+            *args,
+        ]
+        + kw
+        if arg.strip() != ''
+    ]
 
     format_run_args = []
     for i in run_args:
@@ -150,10 +165,12 @@ def run(
     LarkTalk(test_result).send() if LARK_TALK_REPORT_SEND else ...
 
     shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE) if allure else ... if not os.path.exists(
-        ALLURE_REPORT_ENV_FILE) else ...
+        ALLURE_REPORT_ENV_FILE
+    ) else ...
 
     os.popen(f'allure generate {ALLURE_REPORT_PATH} -o {ALLURE_REPORT_HTML_PATH} --clean') and os.popen(
-        f'allure serve {ALLURE_REPORT_PATH}') if allure and allure_serve else ...
+        f'allure serve {ALLURE_REPORT_PATH}'
+    ) if allure and allure_serve else ...
 
 
 if __name__ == '__main__':

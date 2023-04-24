@@ -24,7 +24,6 @@ RequestParamGetError = (KeyError, TypeError)
 
 
 class RequestDataParse:
-
     def __init__(self, request_data: dict, request_engin: str):
         self.request_data = VarsExtractor().vars_replace(HookExecutor().hook_func_value_replace(request_data))
         self.request_engin = request_engin
@@ -156,13 +155,11 @@ class RequestDataParse:
                 for k, v in proxies.items():
                     if v is not None:
                         if not isinstance(v, str):
-                            raise ValueError(
-                                f'测试用例数据解析失败，参数 config:request:proxies:{v} 不是有效的 str 类型'
-                            )
+                            raise ValueError(f'测试用例数据解析失败，参数 config:request:proxies:{v} 不是有效的 str 类型')  # noqa: E501
                 if self.request_engin == EnginType.requests:
                     proxies = proxies
                 elif self.request_engin == EnginType.httpx:
-                    proxies = {'http://': proxies['http'], 'https://': proxies['https']}  # noqa
+                    proxies = {'http://': proxies['http'], 'https://': proxies['https']}
         except RequestParamGetError:
             proxies = None
         return proxies
@@ -259,7 +256,7 @@ class RequestDataParse:
                             for v in is_run['skip_if']:
                                 if not isinstance(v, str):
                                     raise ValueError(
-                                        f'测试用例数据解析失败, 参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值'
+                                        f'测试用例数据解析失败, 参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值'  # noqa: E501
                                     )
                                 if HookExecutor().exec_any_code(v):
                                     allure.dynamic.title(self.request_data['test_steps']['name'])
@@ -384,19 +381,19 @@ class RequestDataParse:
                 body_type = self.body_type
                 if body_type == BodyType.none.value:
                     body = None
-                elif body_type == BodyType.form_data.value:
+                elif body_type == BodyType.form_data.value:  # noqa: SIM114
                     body = body
                 elif body_type == BodyType.x_www_form_urlencoded.value:
                     body = body
                 elif body_type == BodyType.GraphQL.value:
                     body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif body_type == BodyType.TEXT.value:
+                elif body_type == BodyType.TEXT.value:  # noqa: SIM114
                     body = body
                 elif body_type == BodyType.JavaScript.value:
                     body = body
                 elif body_type == BodyType.JSON.value:
                     body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif body_type == BodyType.HTML.value:
+                elif body_type == BodyType.HTML.value:  # noqa: SIM114
                     body = body
                 elif body_type == BodyType.XML.value:
                     body = body
@@ -418,7 +415,7 @@ class RequestDataParse:
                         files = [(f'{k}', open(_, 'rb')) for _ in v]
                     # 单文件
                     else:
-                        files = {f'{k}': open(v, "rb")}
+                        files = {f'{k}': open(v, 'rb')}
         return files
 
     @property
@@ -458,12 +455,12 @@ class RequestDataParse:
                             for k, v in i.items():
                                 if not isinstance(v, str):
                                     raise ValueError(
-                                        f'请求参数解析失败，参数 test_steps:setup:testcase:{k} 不是有效的 str 类型'
+                                        f'请求参数解析失败，参数 test_steps:setup:testcase:{k} 不是有效的 str 类型'  # noqa: E501
                                     )
                         else:
                             if not isinstance(i, str):
                                 raise ValueError(
-                                    f'请求数据解析失败, 参数 test_steps:setup:testcase:{i} 不是有效的 str 类型'
+                                    f'请求数据解析失败, 参数 test_steps:setup:testcase:{i} 不是有效的 str 类型'  # noqa: E501
                                 )
         except RequestParamGetError:
             testcase = None
@@ -481,9 +478,7 @@ class RequestDataParse:
                         if isinstance(i, dict):
                             for k, v in i.items():
                                 if not isinstance(v, str):
-                                    raise ValueError(
-                                        f'请求参数解析失败，参数 test_steps:setup:sql:{k} 不是有效的 str 类型'
-                                    )
+                                    raise ValueError(f'请求参数解析失败，参数 test_steps:setup:sql:{k} 不是有效的 str 类型')  # noqa: E501
                         else:
                             if not isinstance(i, str):
                                 raise ValueError(f'请求数据解析失败, 参数 test_steps:setup:sql:{i} 不是有效的 str 类型')
@@ -542,13 +537,11 @@ class RequestDataParse:
                             for k, v in i.items():
                                 if not isinstance(v, str):
                                     raise ValueError(
-                                        f'请求参数解析失败，参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'
+                                        f'请求参数解析失败，参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'  # noqa: E501
                                     )
                         else:
                             if not isinstance(i, str):
-                                raise ValueError(
-                                    f'请求数据解析失败, 参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'
-                                )
+                                raise ValueError(f'请求数据解析失败, 参数 test_steps:teardown:sql:{i} 不是有效的 str 类型')  # noqa: E501
         except RequestParamGetError:
             sql = None
         return sql
@@ -563,9 +556,7 @@ class RequestDataParse:
                 else:
                     for v in hook:
                         if not isinstance(v, str):
-                            raise ValueError(
-                                f'请求参数解析失败, 参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型'
-                            )
+                            raise ValueError(f'请求参数解析失败, 参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型')  # noqa: E501
         except RequestParamGetError:
             hook = None
         return hook
@@ -583,7 +574,7 @@ class RequestDataParse:
                             for k, v in i.items():
                                 if not isinstance(v, str):
                                     raise ValueError(
-                                        f'请求参数解析失败，参数 test_steps:teardown:extract:{k} 不是有效的 str 类型'
+                                        f'请求参数解析失败，参数 test_steps:teardown:extract:{k} 不是有效的 str 类型'  # noqa: E501
                                     )
                         else:
                             raise ValueError(f'请求参数解析失败，参数 test_steps:teardown:extract:{i} 不是合法数据')
@@ -598,14 +589,8 @@ class RequestDataParse:
         except RequestParamGetError:
             assert_text = None
         if assert_text is not None:
-            if not any([
-                isinstance(assert_text, str),
-                isinstance(assert_text, dict),
-                isinstance(assert_text, list)
-            ]):
-                raise ValueError(
-                    '请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型'
-                )
+            if not any([isinstance(assert_text, str), isinstance(assert_text, dict), isinstance(assert_text, list)]):
+                raise ValueError('请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型')
         return assert_text
 
     @property

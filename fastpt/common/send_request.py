@@ -27,7 +27,7 @@ from fastpt.utils.time_control import get_current_time
 
 
 class SendRequests:
-    """ 发送请求 """
+    """发送请求"""
 
     @property
     def init_response_meta_data(self) -> dict:
@@ -35,17 +35,17 @@ class SendRequests:
         :return: 响应元数据
         """
         response_meta_data = {
-            "url": None,
-            "status_code": 200,
-            "elapsed": 0,
-            "headers": None,
-            "cookies": None,
-            "json": None,
-            "content": None,
-            "text": None,
-            "stat": {
-                "execute_time": None,
-            }
+            'url': None,
+            'status_code': 200,
+            'elapsed': 0,
+            'headers': None,
+            'cookies': None,
+            'json': None,
+            'content': None,
+            'text': None,
+            'stat': {
+                'execute_time': None,
+            },
         }
         return response_meta_data
 
@@ -63,7 +63,7 @@ class SendRequests:
             kwargs['proxies'] = kwargs['proxies'] or get_conf.REQUEST_PROXIES_REQUESTS
             kwargs['allow_redirects'] = kwargs['allow_redirects'] or get_conf.REQUEST_REDIRECTS
             # 消除安全警告
-            requests.packages.urllib3.disable_warnings()  # noqa
+            requests.packages.urllib3.disable_warnings()
             log.info('开始发送请求...')
             response = requests.session().request(**kwargs)
             response.raise_for_status()
@@ -90,9 +90,9 @@ class SendRequests:
             del kwargs['allow_redirects']
             log.info('开始发送请求...')
             with httpx.Client(
-                    verify=verify,
-                    proxies=proxies,
-                    follow_redirects=redirects,
+                verify=verify,
+                proxies=proxies,
+                follow_redirects=redirects,
             ) as client:
                 response = client.request(**kwargs)
                 response.raise_for_status()
@@ -102,13 +102,13 @@ class SendRequests:
             raise e
 
     def send_request(
-            self,
-            request_data: dict,
-            *,
-            request_engin: str = 'requests',
-            log_data: bool = True,
-            allure_data: bool = True,
-            **kwargs
+        self,
+        request_data: dict,
+        *,
+        request_engin: str = 'requests',
+        log_data: bool = True,
+        allure_data: bool = True,
+        **kwargs,
     ) -> dict:
         """
         发送请求
@@ -182,23 +182,15 @@ class SendRequests:
             'params': parsed_data['params'],
             'headers': parsed_data['headers'],
             'data': parsed_data['body'],
-            'files': parsed_data['files']
+            'files': parsed_data['files'],
         }
         if parsed_data['body_type'] == BodyType.JSON.value or parsed_data['body_type'] == BodyType.GraphQL.value:
             request_data_parsed.update({'json': request_data_parsed.pop('data')})
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
-            response = self._requests_engin(
-                **request_conf,
-                **request_data_parsed,
-                **kwargs
-            )
+            response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
         elif request_engin == EnginType.httpx:
-            response = self._httpx_engin(
-                **request_conf,
-                **request_data_parsed,
-                **kwargs
-            )
+            response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
         else:
             raise ValueError('请求发起失败，使用了不合法的请求引擎')
 
@@ -299,46 +291,58 @@ class SendRequests:
 
     @staticmethod
     def allure_request_setup(parsed_data: dict) -> NoReturn:
-        allure_step('请求前置', {
-            'setup_testcase': parsed_data['setup_testcase'],
-            'setup_sql': parsed_data['setup_sql'],
-            'setup_hooks': parsed_data['setup_hooks'],
-            'setup_wait_time': parsed_data['setup_wait_time'],
-        })
+        allure_step(
+            '请求前置',
+            {
+                'setup_testcase': parsed_data['setup_testcase'],
+                'setup_sql': parsed_data['setup_sql'],
+                'setup_hooks': parsed_data['setup_hooks'],
+                'setup_wait_time': parsed_data['setup_wait_time'],
+            },
+        )
 
     @staticmethod
     def allure_request_up(parsed_data: dict) -> NoReturn:
-        allure_step('请求数据', {
-            'env': parsed_data['env'],
-            'module': parsed_data['module'],
-            'name': parsed_data['name'],
-            'case_id': parsed_data['case_id'],
-            'description': parsed_data['description'],
-            'method': parsed_data['method'],
-            'url': parsed_data['url'],
-            'params': parsed_data['params'],
-            'headers': parsed_data['headers'],
-            'data_type': parsed_data['body_type'],
-            'data': parsed_data['body'],
-            'files': parsed_data['files_no_parse'],
-        })
+        allure_step(
+            '请求数据',
+            {
+                'env': parsed_data['env'],
+                'module': parsed_data['module'],
+                'name': parsed_data['name'],
+                'case_id': parsed_data['case_id'],
+                'description': parsed_data['description'],
+                'method': parsed_data['method'],
+                'url': parsed_data['url'],
+                'params': parsed_data['params'],
+                'headers': parsed_data['headers'],
+                'data_type': parsed_data['body_type'],
+                'data': parsed_data['body'],
+                'files': parsed_data['files_no_parse'],
+            },
+        )
 
     @staticmethod
     def allure_request_teardown(parsed_data: dict) -> NoReturn:
-        allure_step('请求后置', {
-            'teardown_sql': parsed_data['teardown_sql'],
-            'teardown_hooks': parsed_data['teardown_hooks'],
-            'teardown_extract': parsed_data['teardown_extract'],
-            'teardown_assert': parsed_data['teardown_assert'],
-            'teardown_wait_time': parsed_data['teardown_wait_time'],
-        })
+        allure_step(
+            '请求后置',
+            {
+                'teardown_sql': parsed_data['teardown_sql'],
+                'teardown_hooks': parsed_data['teardown_hooks'],
+                'teardown_extract': parsed_data['teardown_extract'],
+                'teardown_assert': parsed_data['teardown_assert'],
+                'teardown_wait_time': parsed_data['teardown_wait_time'],
+            },
+        )
 
     @staticmethod
     def allure_request_down(response_data: dict) -> NoReturn:
-        allure_step('响应数据', {
-            'status_code': response_data['status_code'],
-            'elapsed': response_data['elapsed'],
-        })
+        allure_step(
+            '响应数据',
+            {
+                'status_code': response_data['status_code'],
+                'elapsed': response_data['elapsed'],
+            },
+        )
 
     @staticmethod
     def allure_dynamic_data(parsed_data: dict) -> NoReturn:
