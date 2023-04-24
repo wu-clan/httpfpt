@@ -21,6 +21,8 @@ request_ids = get_ids(request_data)
 @allure.epic(allure_text['epic'])
 @allure.feature(allure_text['feature'])
 class TestApiTestCaseTemplate:
+    """ApiCaseTemplate"""
+
     @allure.story(allure_text['story'])
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def test_api_test_case_template(self, data):

@@ -21,6 +21,8 @@ request_ids = get_ids(request_data)
 @allure.epic(allure_text['epic'])
 @allure.feature(allure_text['feature'])
 class TestUploadFile:
+    """UploadFile"""
+
     @allure.story(allure_text['story'])
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def test_upload_file(self, data):

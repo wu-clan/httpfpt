@@ -76,21 +76,21 @@ from fastpt.utils.request.case_data_file_parse import get_request_data
 from fastpt.utils.request.ids_extract import get_ids
 
 request_data = get_request_data(
-    file_data=read_yaml(filename=os.sep.join([PROJECT_NAME, '{yaml_filename}'])),
-    use_pydantic_verify=False
+    file_data=read_yaml(filename=os.sep.join([PROJECT_NAME, '{yaml_filename}'])), use_pydantic_verify=False
 )
-allure_text = request_data[0]['config']['allure']  # noqa
+allure_text = request_data[0]['config']['allure']
 request_ids = get_ids(request_data)
 
 
 @allure.epic(allure_text['epic'])
 @allure.feature(allure_text['feature'])
 class {testcase_class_name}:
+    ”“”{testcase_class_name.replace('Test', '')}”“”
 
     @allure.story(allure_text['story'])
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
     def {testcase_func_name}(self, data):
-        """ {create_file_root_name} """
+        """{create_file_root_name}"""
         send_request.send_request(data)
         '''
                 # 创建测试用例文件
