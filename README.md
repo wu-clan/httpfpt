@@ -18,6 +18,23 @@
 - 自动测试结果通知，飞书，钉钉，~~企业微信~~，邮箱
 - ......
 
-## 文档
+## 帮助
 
-See [documentation](https://wu-clan.github.io/automated_api_pytest_docs) for more details.
+有关更多详细信息，请参阅 [文档](https://wu-clan.github.io/automated_api_pytest_docs)
+
+
+## 贡献
+
+欢迎加入，如果你有好的想法，可以提 issue 或者 pr
+
+对于 PR:
+1. Fork 仓库
+2. git clone 你的仓库
+3. 创建虚拟环境 `python3 -m venv venv`
+4. 激活虚拟环境 `source venv/bin/activate`
+5. 创建分支 `git checkout -b my-new-feature`
+6. 提交修改到分支 `git commit -am 'Add some feature'`
+7. 执行 ruff 检查并修复 `ruff check . --fix`
+8. 执行 pre-commit 检查并修复 `pre-commit run --all-files --verbose`
+9. 提交分支 `git push origin my-new-feature`
+10. 创建 PR
