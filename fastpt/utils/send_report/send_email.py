@@ -21,7 +21,7 @@ class SendMail:
         self.filename = filename
         self.content = content
 
-    def take_messages(self):
+    def take_messages(self) -> MIMEMultipart:
         """
         生成邮件内容，和html报告附件
         """

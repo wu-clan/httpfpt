@@ -28,7 +28,7 @@ class SwaggerParser:
         self.version = version
         self.data = data
 
-    def import_openapi_to_yaml(self, openapi_source: str, project: Optional[str] = None):
+    def import_openapi_to_yaml(self, openapi_source: str, project: Optional[str] = None) -> None:
         """
         导入 openapi 数据到 yaml
 

@@ -2,6 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-def import_jmeter_file():
+def import_jmeter_file() -> None:
     ...
     # todo

@@ -7,7 +7,7 @@ from fastpt.common.log import log
 
 
 class HookExecutor:
-    def __init__(self):
+    def __init__(self) -> None:
         # hooks 表达: ${func()} 或 ${func(1, 2)}
         # hooks 开头: a-zA-Z_
         self.func_re = r'\${([a-zA-Z_]\w*\([\$\w\.\-/\s=,]*\))}'

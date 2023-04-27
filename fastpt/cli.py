@@ -20,7 +20,7 @@ from fastpt.utils.data_manage.git_repo import GitRepoPaser  # noqa: E402
 app = typer.Typer(rich_markup_mode='rich')
 
 
-def get_version(version: bool):
+def get_version(version: bool) -> None:
     """
     获取版本号
     """
@@ -34,7 +34,7 @@ def get_version(version: bool):
             raise RuntimeError('Unable to find version string')
 
 
-def test_data_schema_verify(verify: str = None):
+def test_data_schema_verify(verify: str = None) -> None:
     """
     测试数据架构验证
     """
@@ -57,7 +57,7 @@ def test_data_schema_verify(verify: str = None):
         raise typer.Exit()
 
 
-def generate_test_cases(generate: bool):
+def generate_test_cases(generate: bool) -> None:
     """
     生成测试用例
     """
@@ -86,7 +86,7 @@ def generate_test_cases(generate: bool):
             raise typer.Exit()
 
 
-def import_openapi_test_data(openapi: tuple):
+def import_openapi_test_data(openapi: tuple) -> None:
     """
     导入 openapi 测试用例数据
     """
@@ -105,7 +105,7 @@ def import_openapi_test_data(openapi: tuple):
         raise typer.Abort()
 
 
-def import_apifox_test_data(apifox: tuple):
+def import_apifox_test_data(apifox: tuple) -> None:
     """
     导入 apifox 测试用例数据
     """
@@ -128,28 +128,28 @@ def import_apifox_test_data(apifox: tuple):
         raise typer.Abort()
 
 
-def import_har_test_data(har: tuple):
+def import_har_test_data(har: tuple) -> None:
     """
     导入 har 测试用例数据
     """
     pass
 
 
-def import_jmeter_test_data(jmeter: tuple):
+def import_jmeter_test_data(jmeter: tuple) -> None:
     """
     导入 jmeter 测试用例数据
     """
     pass
 
 
-def import_postman_test_data(postman: tuple):
+def import_postman_test_data(postman: tuple) -> None:
     """
     导入 postman 测试用例数据
     """
     pass
 
 
-def import_git_case_data(src: str):
+def import_git_case_data(src: str) -> None:
     """
     导入 git 仓库测试数据
 
@@ -233,7 +233,7 @@ def main(
         help='导入 git 仓库测试数据到本地',
         callback=import_git_case_data,
     ),
-):
+) -> None:
     print('\n使用 --help 查看使用方法.\n')
     raise typer.Exit()
 

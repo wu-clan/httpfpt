@@ -9,12 +9,20 @@ select = [
     "PGH004",
     "PLE1142",
     "RUF100",
+    "ANN001",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ANN205",
+    "ANN206",
+    "TCH"
 ]
 ignore = ["F401"]
 line-length = 120
 format = "grouped"
 target-version = "py38"
 cache-dir = "./fastpt/.ruff_cache"
+extend-exclude = ["fastpt/conftest.py"]
 
 [flake8-pytest-style]
 mark-parentheses = false
@@ -34,3 +42,9 @@ ignore-variadic-names = true
 [isort]
 lines-between-types = 1
 order-by-type = true
+
+[flake8-annotations]
+mypy-init-return = true
+
+[per-file-ignores]
+"fastpt/test_case/*.py" = ["ANN001", "ANN201"]

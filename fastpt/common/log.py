@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import logging
 import os
+from typing import TYPE_CHECKING
 
-import loguru
 from loguru import logger
 
 from fastpt.core.path_conf import LOG_PATH
+
+if TYPE_CHECKING:
+    import loguru
 
 
 class Logger:
@@ -35,7 +38,7 @@ class Logger:
 
         # 将 loguru 传播到 logging
         class PropagateHandler(logging.Handler):
-            def emit(self, record):
+            def emit(self, record) -> None:  # noqa: ANN001
                 logging.getLogger(record.name).handle(record)
 
         logger.add(PropagateHandler(), format='<level>{message}</level>', level='DEBUG')

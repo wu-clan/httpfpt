@@ -8,7 +8,7 @@ import typer
 
 class GitRepoPaser:
     @staticmethod
-    def import_git_to_local(src: str):
+    def import_git_to_local(src: str) -> None:
         """
         导入 git 仓库测试数据
 

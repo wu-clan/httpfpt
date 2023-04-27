@@ -2,6 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-def import_har_file():
+def import_har_file() -> None:
     ...
     # todo
