@@ -15,7 +15,7 @@ from fastpt.enums.var_type import VarType
 
 
 class VarsExtractor:
-    def __init__(self):
+    def __init__(self) -> None:
         # 变量表达: ${var} 或 $var
         # 变量开头: a-zA-Z_
         self.vars_re = r'\$([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)\}'

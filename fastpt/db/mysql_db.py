@@ -2,7 +2,7 @@
 # _*_ coding:utf-8 _*_
 import datetime
 import decimal
-from typing import NoReturn
+from typing import NoReturn, Any
 
 import pymysql
 from dbutils.pooled_db import PooledDB
@@ -20,7 +20,7 @@ from fastpt.utils.enum_control import get_enum_values
 
 
 class MysqlDB:
-    def __init__(self):
+    def __init__(self) -> None:
         try:
             self.conn = PooledDB(
                 pymysql,
@@ -37,7 +37,7 @@ class MysqlDB:
         # 声明游标
         self.cursor = self.conn.cursor()
 
-    def query(self, sql: str, fetch: str = 'all'):
+    def query(self, sql: str, fetch: str = 'all') -> Any:
         """
         数据库查询
 

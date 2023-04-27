@@ -15,7 +15,7 @@ from fastpt.utils.file_control import get_file_property
 
 
 class ApiFoxParser:
-    def import_apifox_to_yaml(self, source: str, project: Optional[str] = None):
+    def import_apifox_to_yaml(self, source: str, project: Optional[str] = None) -> None:
         """
         导入 apifox 数据到 yaml
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from decimal import Decimal
-from typing import Union, NoReturn
+from typing import Union, NoReturn, Any
 
 from jsonpath import jsonpath
 
@@ -230,7 +230,9 @@ class Asserter:
                             exec(format_assert_text)
 
     @staticmethod
-    def _exec_json_assert(assert_check: Union[str, None], expected_value, assert_type: str, actual_value) -> NoReturn:
+    def _exec_json_assert(
+        assert_check: Union[str, None], expected_value: Any, assert_type: str, actual_value: Any
+    ) -> NoReturn:
         """
         执行 jsonpath 断言
 

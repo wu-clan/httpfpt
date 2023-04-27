@@ -15,13 +15,13 @@ AUTH_TYPE = auth_data['auth_type']
 
 
 class AuthPlugins:
-    def __init__(self):
+    def __init__(self) -> None:
         self.auth_type = AUTH_TYPE
         if not getattr(AuthType, self.auth_type, None):
             raise ValueError(f'认证类型错误, 仅允许 {get_enum_values(AuthType)} 其中之一, 请检查认证配置文件')
 
     @property
-    def bearer_token(self):
+    def bearer_token(self) -> str:
         url = auth_data[f'{self.auth_type}']['url']
         username = auth_data[f'{self.auth_type}']['username']
         password = auth_data[f'{self.auth_type}']['password']

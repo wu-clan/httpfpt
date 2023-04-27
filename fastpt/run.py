@@ -46,7 +46,7 @@ def run(
     disable_warnings: bool = True,
     *args,
     **kwargs,
-):
+) -> None:
     """
     运行入口
 
@@ -88,7 +88,7 @@ def run(
 
     is_html_report_file = (
         f'''--html={HTML_REPORT_PATH}\\{PROJECT_NAME}_{datetime.datetime.now().strftime(
-        "%Y-%m-%d-%H_%M_%S")}.html'''
+            "%Y-%m-%d-%H_%M_%S")}.html'''
         if html_report
         else ''
     )

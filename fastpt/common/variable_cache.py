@@ -6,7 +6,7 @@ from fastpt.common.log import log
 
 
 class VariableCache:
-    def __init__(self, cache=SafeCache()):
+    def __init__(self, cache: SafeCache = SafeCache()) -> None:
         self.cache = cache
 
     def get(self, key: str, **kwargs) -> Any:
@@ -62,7 +62,7 @@ class VariableCache:
             log.info(f'存在临时变量: {key}')
         return result
 
-    def incr(self, key, **kwargs) -> Union[int, float]:
+    def incr(self, key: str, **kwargs) -> Union[int, float]:
         """
         是否存在缓存值, 当不存在时触发 ValueError
 

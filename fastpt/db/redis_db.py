@@ -10,7 +10,7 @@ from fastpt.core import get_conf
 
 
 class RedisDB:
-    def __init__(self):
+    def __init__(self) -> None:
         self.redis = Redis(
             host=get_conf.REDIS_HOST,
             port=get_conf.REDIS_PORT,
@@ -20,7 +20,7 @@ class RedisDB:
             decode_responses=True,  # 转码 utf-8
         )
 
-    def init(self):
+    def init(self) -> None:
         try:
             self.redis.ping()
         except TimeoutError:

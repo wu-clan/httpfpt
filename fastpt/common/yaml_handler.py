@@ -38,7 +38,7 @@ def read_yaml(
         raise ValueError(f'数据文件 {filename} 没有数据! 请检查数据文件内容是否正确!')
 
 
-def write_yaml(filepath: str, filename: str, data=None, *, encoding: str = 'utf-8', mode: str = 'a') -> NoReturn:
+def write_yaml(filepath: str, filename: str, data: Any = None, *, encoding: str = 'utf-8', mode: str = 'a') -> NoReturn:
     """
     将数据写入包含 yaml 格式数据的文件
 
