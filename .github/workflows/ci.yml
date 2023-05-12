@@ -6,16 +6,46 @@ on:
       - master
     tags:
       - '**'
+  pull_request:
 
 jobs:
-  check:
-    name: checks
+  #  check_version:
+  #    name: check vesion
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #      - name: check GITHUB_REF matches package version
+  #        uses: samuelcolvin/check-python-version@v3.2
+  #        with:
+  #          version_file_path: fastpt/__init__.py
+  lint:
     runs-on: ubuntu-latest
-    env:
-      SKIP: true
+    name: lint
+    strategy:
+      matrix:
+        python-version: ['3.8']
+      fail-fast: false
     steps:
-      - name: check GITHUB_REF matches package version
-        uses: samuelcolvin/check-python-version@v3.2
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          version_file_path: fastpt/__init__.py
-    if: ${{ env.SKIP }} == 'true'
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Dependencies
+        run: pip install ruff==0.0.262 pre-commit==3.2.2
+
+      - name: ruff check
+        uses: chartboost/ruff-action@v1
+        with:
+          args: '--config .ruff.toml'
+
+      - name: black formatter
+        uses: psf/black@stable
+        with:
+          options: '--skip-string-normalization --line-length 120'
+
+      - name: pre-commit
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files --verbose
