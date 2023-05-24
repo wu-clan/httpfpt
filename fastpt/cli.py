@@ -9,13 +9,13 @@ from rich import print
 
 sys.path.append('..')
 
-from fastpt.common.yaml_handler import read_yaml  # noqa: E402
-from fastpt.schemas.case_data import CaseData  # noqa: E402
-from fastpt.utils.file_control import search_all_case_yaml_files  # noqa: E402
-from fastpt.utils.case_auto_generator import auto_generate_test_cases  # noqa: E402
-from fastpt.utils.data_manage.openapi import SwaggerParser  # noqa: E402
-from fastpt.utils.data_manage.apifox import ApiFoxParser  # noqa: E402
-from fastpt.utils.data_manage.git_repo import GitRepoPaser  # noqa: E402
+from fastpt.common.yaml_handler import read_yaml
+from fastpt.schemas.case_data import CaseData
+from fastpt.utils.file_control import search_all_case_yaml_files
+from fastpt.utils.case_auto_generator import auto_generate_test_cases
+from fastpt.utils.data_manage.openapi import SwaggerParser
+from fastpt.utils.data_manage.apifox import ApiFoxParser
+from fastpt.utils.data_manage.git_repo import GitRepoPaser
 
 app = typer.Typer(rich_markup_mode='rich')
 
@@ -34,9 +34,9 @@ def get_version(version: bool) -> None:
             raise RuntimeError('Unable to find version string')
 
 
-def test_data_schema_verify(verify: str = None) -> None:
+def data_schema_verify(verify: str = None) -> None:
     """
-    测试数据架构验证
+    数据架构验证
     """
     try:
         if verify == 'All':
@@ -110,7 +110,10 @@ def import_apifox_test_data(apifox: tuple) -> None:
     导入 apifox 测试用例数据
     """
     typer.secho(
-        '\n' 'Beta: 此命令目前处于测试阶段, 请谨慎使用。\n' 'Warning: 如果现有文件名与导入文件名相同, 此命令目前会覆盖写入用例数据, 请谨慎操作。\n',  # noqa: E501
+        """
+        Beta: 此命令目前处于测试阶段, 请谨慎使用。
+        Warning: 如果现有文件名与导入文件名相同, 此命令目前会覆盖写入用例数据, 请谨慎操作。
+        """,
         fg='bright_yellow',
         bold=True,
     )
@@ -170,14 +173,14 @@ def import_git_case_data(src: str) -> None:
 @app.command(epilog='Made by :beating_heart: null')
 def main(
     _get_version: Optional[bool] = typer.Option(None, '--version', '-V', help='打印版本号', callback=get_version),
-    _test_data_schema_verify: Optional[str] = typer.Option(
-        None,
-        '--test-data-schema-verify',
-        '-sv',
+    _data_schema_verify: str = typer.Option(
+        ...,
+        '--data-schema-verify',
+        '-dsv',
         metavar='<FILENAME / All>',
         show_default=False,
         help='验证测试数据结构, 当指定文件名时, 验证指定文件, 否则验证所有测试数据文件',
-        callback=test_data_schema_verify,
+        callback=data_schema_verify,
     ),
     _generate_test_cases: Optional[bool] = typer.Option(
         None, '--generate-test-cases', '-gtc', help='自动生成测试用例', callback=generate_test_cases
@@ -235,7 +238,6 @@ def main(
     ),
 ) -> None:
     print('\n使用 --help 查看使用方法.\n')
-    raise typer.Exit()
 
 
 if __name__ == '__main__':

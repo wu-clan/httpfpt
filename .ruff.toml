@@ -49,3 +49,4 @@ mypy-init-return = true
 [per-file-ignores]
 "fastpt/test_case/test_*.py" = ["ANN001", "ANN201"]
 "fastpt/conftest.py" = ["ANN001", "ANN201"]
+"fastpt/cli.py" = ["E402"]
