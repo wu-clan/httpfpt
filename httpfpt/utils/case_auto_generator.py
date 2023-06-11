@@ -69,11 +69,11 @@ import os
 import allure
 import pytest
 
-from fastpt.common.send_request import send_request
-from fastpt.common.yaml_handler import read_yaml
-from fastpt.core.get_conf import PROJECT_NAME
-from fastpt.utils.request.case_data_file_parse import get_request_data
-from fastpt.utils.request.ids_extract import get_ids
+from httpfpt.common.send_request import send_request
+from httpfpt.common.yaml_handler import read_yaml
+from httpfpt.core.get_conf import PROJECT_NAME
+from httpfpt.utils.request.case_data_file_parse import get_request_data
+from httpfpt.utils.request.ids_extract import get_ids
 
 request_data = get_request_data(
     file_data=read_yaml(filename=os.sep.join([PROJECT_NAME, '{yaml_filename}'])), use_pydantic_verify=False
