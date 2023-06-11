@@ -1,6 +1,12 @@
-# Automated Api Pytest
+# HttpFpt
 
 基于数据驱动的接口自动化测试框架
+
+Http: http 请求，
+
+F：fast，
+
+pt：pytest
 
 ## 功能点
 
@@ -20,14 +26,14 @@
 
 ## 帮助
 
-有关更多详细信息，请参阅 [文档](https://wu-clan.github.io/automated_api_pytest_docs)
-
+有关更多详细信息，请参阅 [文档](https://wu-clan.github.io/httpfpt_docs)
 
 ## 贡献
 
-欢迎加入，如果你有好的想法，可以提 issue 或者 pr
+欢迎加入，如果你有好的想法，可以提交 issues 或 pr
 
 对于 PR:
+
 1. Fork 仓库
 2. git clone 你的仓库
 3. 创建虚拟环境 `python3 -m venv venv`

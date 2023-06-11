@@ -16,7 +16,7 @@ jobs:
   #      - name: check GITHUB_REF matches package version
   #        uses: samuelcolvin/check-python-version@v3.2
   #        with:
-  #          version_file_path: fastpt/__init__.py
+  #          version_file_path: httpfpt/__init__.py
   lint:
     runs-on: ubuntu-latest
     name: lint
