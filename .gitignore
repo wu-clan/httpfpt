@@ -71,14 +71,14 @@ dmypy.json
 .pyre/
 
 # test report
-fastpt/report/
-fastpt/log/
+httpfpt/report/
+httpfpt/log/
 
 # idea
 .idea/
 
 # online case data
-fastpt/data/online/
+httpfpt/data/online/
 
 # ruff
-fastpt/.ruff_cache/
+httpfpt/.ruff_cache/
