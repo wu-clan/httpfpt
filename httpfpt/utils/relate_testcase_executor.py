@@ -4,6 +4,7 @@ import sys
 from typing import NoReturn, List, Dict, Union
 
 from jsonpath import jsonpath
+from pydantic import ValidationError
 
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import VariableCache
@@ -12,6 +13,7 @@ from httpfpt.db.redis_db import redis_client
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.file_control import search_all_case_yaml_files, get_file_property
+from httpfpt.utils.pydantic_error_parse import parse_error
 from httpfpt.utils.request.request_data_parse import RequestDataParse
 from httpfpt.utils.request.vars_extractor import VarsExtractor
 
@@ -93,7 +95,13 @@ def get_all_testcase_data(pydantic_verify: bool = False) -> list:
         all_case_data.append(read_data)
     if pydantic_verify:
         for case_data in all_case_data:
-            CaseData.model_validate(case_data, strict=True)
+            try:
+                count: int = 0
+                CaseData.model_validate(case_data, strict=True)
+            except ValidationError as e:
+                count = parse_error(e)
+            if count > 0:
+                raise ValueError(f'用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
     redis_client.rset('aap_all_case_data', str(all_case_data))
     return all_case_data
 

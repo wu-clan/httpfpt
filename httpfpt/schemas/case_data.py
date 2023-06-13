@@ -64,7 +64,8 @@ class TeardownExtractData(BaseModel):
 
 
 class TeardownAssertData(BaseModel):
-    check: Optional[str] = None
+    # check: Optional[str] = None
+    check: str
     value: Any
     type: str
     jsonpath: str
