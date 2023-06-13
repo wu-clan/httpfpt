@@ -219,12 +219,10 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoRetur
             for relate_testcase in relate_case_setup_testcase:
                 if isinstance(relate_testcase, dict):
                     if current_case_id == relate_testcase['case_id']:
-                        raise ValueError(
-                            '关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
+                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
                 else:
                     if current_case_id == relate_testcase:
-                        raise ValueError(
-                            '关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
+                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
 
 
 def relate_testcase_set_var(testcase_data: dict) -> NoReturn:
