@@ -74,7 +74,7 @@ class StepsTearDownData(BaseModel):
     sql: Optional[Union[List[Union[SetupSqlData, str]], None]] = None
     hooks: Optional[List[str]] = None
     extract: Optional[List[TeardownExtractData]] = None
-    _assert: Optional[Union[List[Union[TeardownAssertData, str]], str, None]] = Field(None, alias='assert')
+    assert_: Optional[Union[List[Union[TeardownAssertData, str]], str, None]] = Field(None, alias='assert')
     wait_time: Optional[int] = None
 
 

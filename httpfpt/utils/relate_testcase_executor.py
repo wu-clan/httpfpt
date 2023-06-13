@@ -8,7 +8,7 @@ from jsonpath import jsonpath
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import VariableCache
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.db.redis_db import RedisDB
+from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.file_control import search_all_case_yaml_files, get_file_property
 from httpfpt.utils.request.request_data_parse import RequestDataParse
@@ -59,12 +59,12 @@ def get_all_testcase_id(case_data_list: list) -> list:
                 )
                 all_re_case_id_desc.append(re_case_id_desc)
     if len(all_re_case_id_desc) > 0:
-        RedisDB().set('aap_is_re_case_id', 'true')
+        redis_client.set('aap_is_re_case_id', 'true')
         log.error(f'运行失败, 检测到用例数据使用重复id: {all_re_case_id_desc}')
         sys.exit(1)
     else:
-        RedisDB().delete('aap_is_re_case_id')
-        RedisDB().rset('app_all_case_id', str(all_case_id))
+        redis_client.delete('aap_is_re_case_id')
+        redis_client.rset('app_all_case_id', str(all_case_id))
     return all_case_id
 
 
@@ -75,21 +75,21 @@ def get_all_testcase_data() -> list:
     :return:
     """
     all_yaml_file = search_all_case_yaml_files()
-    if not RedisDB().redis.get('aap_is_re_case_id'):
-        redis_all_case_data = RedisDB().get('aap_all_case_data')
+    if not redis_client.redis.get('aap_is_re_case_id'):
+        redis_all_case_data = redis_client.get('aap_all_case_data')
         if redis_all_case_data:
-            redis_all_case_data_len = RedisDB().get('aap_all_case_data_len')
+            redis_all_case_data_len = redis_client.get('aap_all_case_data_len')
             if redis_all_case_data_len is not None:
                 if int(redis_all_case_data_len) == len(all_yaml_file):
                     return eval(redis_all_case_data)
             else:
-                RedisDB().set('aap_all_case_data_len', len(all_yaml_file))
+                redis_client.set('aap_all_case_data_len', len(all_yaml_file))
     all_case_data = []
     for file in all_yaml_file:
         read_data = read_yaml(None, filename=file)
         read_data.update({'filename': get_file_property(file)[0]})
         all_case_data.append(read_data)
-    RedisDB().rset('aap_all_case_data', str(all_case_data))
+    redis_client.rset('aap_all_case_data', str(all_case_data))
     return all_case_data
 
 
@@ -112,7 +112,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
                 raise ValueError('执行关联测试用例失败，不能关联自身')
 
     all_case_data = get_all_testcase_data()
-    all_case_id = RedisDB().get('app_all_case_id') or get_all_testcase_id(all_case_data)
+    all_case_id = redis_client.get('app_all_case_id') or get_all_testcase_id(all_case_data)
     relate_count = 0
 
     # 判断关联测试用例是否存在

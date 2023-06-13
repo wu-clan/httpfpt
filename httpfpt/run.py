@@ -17,7 +17,7 @@ from httpfpt.core.path_conf import (
     ALLURE_REPORT_HTML_PATH,
     YAML_REPORT_PATH,
 )
-from httpfpt.db.redis_db import RedisDB
+from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.relate_testcase_executor import get_all_testcase_id, get_all_testcase_data
 from httpfpt.utils.send_report.ding_talk import DingTalk
 from httpfpt.utils.send_report.lark_talk import LarkTalk
@@ -175,7 +175,7 @@ def run(
 
 if __name__ == '__main__':
     # 初始化 redis 数据库
-    RedisDB().init()
+    redis_client.init()
     # 用例数据唯一 case_id 检测
     get_all_testcase_id(get_all_testcase_data())
     # 执行程序
