@@ -344,11 +344,6 @@ class Asserter:
             ...
         elif isinstance(assert_text, str):
             self._code_asserter(response, assert_text)
-        elif isinstance(assert_text, dict):
-            if assert_text.get('sql') is None:
-                self._json_asserter(response, assert_text)
-            else:
-                self._sql_asserter(assert_text)
         elif isinstance(assert_text, list):
             for text in assert_text:
                 if isinstance(text, str):

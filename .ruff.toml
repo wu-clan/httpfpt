@@ -17,7 +17,6 @@ select = [
     "ANN206",
     "TCH"
 ]
-ignore = ["F401"]
 line-length = 120
 format = "grouped"
 target-version = "py38"

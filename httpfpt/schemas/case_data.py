@@ -34,7 +34,7 @@ class StepsRequestData(BaseModel):
     headers: Optional[dict] = ...
     body_type: Optional[str] = ...
     body: Union[dict, bytes, Tuple[list], None] = ...
-    files: Union[Dict[str, Union[List[str], str]], None] = ...
+    files: Union[Dict[str, Union[str, List[str]]], None] = ...
 
 
 class SetupTestCaseData(BaseModel):
@@ -51,8 +51,8 @@ class SetupSqlData(BaseModel):
 
 
 class StepsSetUpData(BaseModel):
-    testcase: Optional[Union[List[Union[SetupTestCaseData, str]], None]] = None
-    sql: Optional[Union[List[Union[SetupSqlData, str]], None]] = None
+    testcase: Optional[Union[List[Union[str, SetupTestCaseData]]]] = None
+    sql: Optional[Union[List[Union[str, SetupSqlData]]]] = None
     hooks: Optional[List[str]] = None
     wait_time: Optional[int] = None
 
@@ -64,17 +64,17 @@ class TeardownExtractData(BaseModel):
 
 
 class TeardownAssertData(BaseModel):
-    check: str
+    check: Optional[str] = None
     value: Any
     type: str
     jsonpath: str
 
 
 class StepsTearDownData(BaseModel):
-    sql: Optional[Union[List[Union[SetupSqlData, str]], None]] = None
+    sql: Optional[Union[List[Union[str, SetupSqlData]]]] = None
     hooks: Optional[List[str]] = None
     extract: Optional[List[TeardownExtractData]] = None
-    _assert: Optional[Union[List[Union[TeardownAssertData, str]], str, None]] = Field(None, alias='assert')
+    assert_: Optional[Union[str, List[str], List[TeardownAssertData]]] = Field(None, alias='assert')
     wait_time: Optional[int] = None
 
 
@@ -90,4 +90,4 @@ class Steps(BaseModel):
 
 class CaseData(BaseModel):
     config: Config
-    test_steps: Union[List[Steps], Steps]
+    test_steps: Union[Steps, List[Steps]]

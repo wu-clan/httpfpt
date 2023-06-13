@@ -5,7 +5,7 @@ from jsonpath import jsonpath
 
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.path_conf import AUTH_CONF_PATH
-from httpfpt.db.redis_db import RedisDB
+from httpfpt.db.redis_db import redis_client
 from httpfpt.enums.request.auth import AuthType
 from httpfpt.utils.enum_control import get_enum_values
 
@@ -28,7 +28,7 @@ class AuthPlugins:
         headers = auth_data[f'{self.auth_type}']['headers']
         headers.update({'Connection': 'close'})
         timeout = auth_data[f'{self.auth_type}']['timeout'] or 86400
-        aap_bearer_token = RedisDB().redis.get('aap_bearer_token')
+        aap_bearer_token = redis_client.redis.get('aap_bearer_token')
         if aap_bearer_token:
             token = aap_bearer_token
         else:
@@ -42,5 +42,5 @@ class AuthPlugins:
                 request_data.update({'json': request_data.pop('data')})
             response = requests.session().post(**request_data)
             token = jsonpath(response.json(), auth_data[f'{self.auth_type}']['token_key'])[0]
-            RedisDB().set('aap_bearer_token', token, ex=timeout)
+            redis_client.set('aap_bearer_token', token, ex=timeout)
         return token

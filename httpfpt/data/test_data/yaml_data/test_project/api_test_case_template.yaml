@@ -43,10 +43,10 @@ test_steps:
           type: cache
           jsonpath: $.url
       assert:
-        check:
-        value: ^rcode
-        type: str_eq
-        jsonpath: $.status_code
+        - check:
+          value: ^rcode
+          type: str_eq
+          jsonpath: $.status_code
       wait_time: 0
 
   - name: 断言
@@ -75,7 +75,7 @@ test_steps:
         - assert 'postId' not in str(pm.response.get('content')), '没有返回content'
 
   - name: hooks
-    case_id: event_create_003
+    case_id: event_create_001
     description: 测试hooks
     is_run:
     request:

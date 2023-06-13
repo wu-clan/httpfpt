@@ -120,3 +120,6 @@ class RedisDB:
         self.redis.delete(key)
         self.redis.rpush(key, *value)
         log.info(f'删除原数据并重新从左侧插入 redis 数据 {key} 成功')
+
+
+redis_client = RedisDB()

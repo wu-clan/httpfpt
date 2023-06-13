@@ -5,6 +5,7 @@ import sys
 from typing import Optional, Tuple
 
 import typer
+from pydantic import ValidationError
 from rich import print
 
 sys.path.append('..')
@@ -38,19 +39,27 @@ def data_schema_verify(verify: str = None) -> None:
     """
     数据架构验证
     """
+    msg: str = ''
     try:
+        count: int = 0
         if verify == 'All':
             typer.secho('🔥 开始验证所有测试数据结构...', fg='cyan', bold=True)
             file_list = search_all_case_yaml_files()
             for file in file_list:
                 file_data = read_yaml(None, filename=file)
-                CaseData(**file_data).dict(by_alias=True)
+                CaseData.model_validate(file_data, strict=True)
         else:
             typer.secho(f'🔥 开始验证 {verify} 测试数据结构...', fg='cyan', bold=True)
             file_data = read_yaml(None, filename=verify)
-            CaseData(**file_data).dict(by_alias=True)
+            CaseData.model_validate(file_data, strict=True)
+    except ValidationError as e:
+        count = e.error_count()
+        msg += str(e)
     except Exception as e:
         typer.secho(f'❌ 验证测试数据 {verify} 结构失败: {e}', fg='red', bold=True)
+        raise typer.Exit(1)
+    if count > 0:
+        typer.secho(f'❌ 验证测试数据 {verify} 结构失败: {msg}', fg='red', bold=True)
         raise typer.Exit(1)
     else:
         typer.secho('✅ 验证测试数据结构成功', fg='green', bold=True)
