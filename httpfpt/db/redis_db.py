@@ -19,6 +19,7 @@ class RedisDB:
             socket_timeout=get_conf.REDIS_TIMEOUT,
             decode_responses=True,  # 转码 utf-8
         )
+        self.prefix = 'httpfpt'
 
     def init(self) -> None:
         try:
