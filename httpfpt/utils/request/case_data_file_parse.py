@@ -28,7 +28,7 @@ def get_request_data(*, file_data: dict, use_pydantic_verify: bool = False) -> L
         raise ValueError('请求测试用例数据缺少 test_steps 内容, 轻简查测试用例文件内容')
     if isinstance(cases, dict):
         if use_pydantic_verify:
-            return [CaseData(**file_data).dict(by_alias=True)]
+            return [CaseData(**file_data).model_dump(by_alias=True)]
         else:
             return [file_data]
     elif isinstance(cases, list):
@@ -39,7 +39,7 @@ def get_request_data(*, file_data: dict, use_pydantic_verify: bool = False) -> L
                 data = copy.deepcopy(file_data)
                 data.update(test_steps)
                 if use_pydantic_verify:
-                    case_list.append(CaseData(**data).dict(by_alias=True))
+                    case_list.append(CaseData(**data).model_dump(by_alias=True))
                 else:
                     case_list.append(data)
             else:
