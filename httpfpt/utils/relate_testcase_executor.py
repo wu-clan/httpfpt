@@ -9,6 +9,7 @@ from httpfpt.common.log import log
 from httpfpt.common.variable_cache import VariableCache
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.db.redis_db import redis_client
+from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.file_control import search_all_case_yaml_files, get_file_property
 from httpfpt.utils.request.request_data_parse import RequestDataParse
@@ -68,10 +69,11 @@ def get_all_testcase_id(case_data_list: list) -> list:
     return all_case_id
 
 
-def get_all_testcase_data() -> list:
+def get_all_testcase_data(pydantic_verify: bool = False) -> list:
     """
     获取所有测试用例数据
 
+    :param pydantic_verify:
     :return:
     """
     all_yaml_file = search_all_case_yaml_files()
@@ -89,6 +91,9 @@ def get_all_testcase_data() -> list:
         read_data = read_yaml(None, filename=file)
         read_data.update({'filename': get_file_property(file)[0]})
         all_case_data.append(read_data)
+    if pydantic_verify:
+        for case_data in all_case_data:
+            CaseData.model_validate(case_data, strict=True)
     redis_client.rset('aap_all_case_data', str(all_case_data))
     return all_case_data
 
@@ -206,10 +211,12 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoRetur
             for relate_testcase in relate_case_setup_testcase:
                 if isinstance(relate_testcase, dict):
                     if current_case_id == relate_testcase['case_id']:
-                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
+                        raise ValueError(
+                            '关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
                 else:
                     if current_case_id == relate_testcase:
-                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
+                        raise ValueError(
+                            '关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
 
 
 def relate_testcase_set_var(testcase_data: dict) -> NoReturn:

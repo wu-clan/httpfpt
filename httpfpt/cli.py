@@ -44,11 +44,11 @@ def data_schema_verify(verify: str = None) -> None:
             file_list = search_all_case_yaml_files()
             for file in file_list:
                 file_data = read_yaml(None, filename=file)
-                CaseData(**file_data).dict(by_alias=True)
+                CaseData.model_validate(file_data, strict=True)
         else:
             typer.secho(f'🔥 开始验证 {verify} 测试数据结构...', fg='cyan', bold=True)
             file_data = read_yaml(None, filename=verify)
-            CaseData(**file_data).dict(by_alias=True)
+            CaseData.model_validate(file_data, strict=True)
     except Exception as e:
         typer.secho(f'❌ 验证测试数据 {verify} 结构失败: {e}', fg='red', bold=True)
         raise typer.Exit(1)

@@ -32,7 +32,7 @@ def run(
     # html report
     html_report: bool = True,
     # allure
-    allure: bool = True,
+    allure: bool = False,
     allure_clear: bool = True,
     allure_serve: bool = True,
     # extra
@@ -174,9 +174,11 @@ def run(
 
 
 if __name__ == '__main__':
-    # 初始化 redis 数据库
+    # 初始化 redis 数据库 (必选)
     redis_client.init()
-    # 用例数据唯一 case_id 检测
+    # 用例数据唯一 case_id 检测（可选）
     get_all_testcase_id(get_all_testcase_data())
-    # 执行程序
+    # 用例数据 pydantic 检测（可选）
+    get_all_testcase_data(pydantic_verify=True)
+    # 执行程序 (必选)
     run()
