@@ -25,11 +25,11 @@ class GitRepoPaser:
             if os.path.exists(online_dir):
                 shutil.rmtree(online_dir)
             os.makedirs(online_dir)
-            c = os.system(f'cd {online_dir} && git clone {src}')
+            result = os.system(f'cd {online_dir} && git clone {src}')
         except Exception as e:
-            raise RuntimeError(f'git 苍鹭测试数据拉取失败：{e}')
+            raise RuntimeError(f'❌ git 苍鹭测试数据拉取失败：{e}')
         else:
-            if c == 0:
+            if result == 0:
                 typer.secho('✅ git 仓库数据文件拉取成功')
             else:
                 raise RuntimeError('❌ git 仓库测试数据拉取失败')

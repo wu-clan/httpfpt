@@ -28,7 +28,7 @@ class AuthPlugins:
         headers = auth_data[f'{self.auth_type}']['headers']
         headers.update({'Connection': 'close'})
         timeout = auth_data[f'{self.auth_type}']['timeout'] or 86400
-        aap_bearer_token = redis_client.redis.get('aap_bearer_token')
+        aap_bearer_token = redis_client.redis.get(f'{redis_client.prefix}:bearer_token')
         if aap_bearer_token:
             token = aap_bearer_token
         else:
@@ -42,5 +42,5 @@ class AuthPlugins:
                 request_data.update({'json': request_data.pop('data')})
             response = requests.session().post(**request_data)
             token = jsonpath(response.json(), auth_data[f'{self.auth_type}']['token_key'])[0]
-            redis_client.set('aap_bearer_token', token, ex=timeout)
+            redis_client.set(f'{redis_client.prefix}:bearer_token', token, ex=timeout)
         return token
