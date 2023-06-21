@@ -36,7 +36,7 @@ def search_all_case_yaml_files(filepath: Optional[str] = None) -> list:
     return files
 
 
-def search_all_test_case_files() -> list:
+def search_all_testcase_files() -> list:
     """
     搜索指定项目目录下(包括子目录)所有测试用例文件
 
