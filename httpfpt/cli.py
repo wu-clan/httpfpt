@@ -13,7 +13,7 @@ sys.path.append('..')
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.file_control import search_all_case_yaml_files
-from httpfpt.utils.case_auto_generator import auto_generate_test_cases
+from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.data_manage.openapi import SwaggerParser
 from httpfpt.utils.data_manage.apifox import ApiFoxParser
 from httpfpt.utils.data_manage.git_repo import GitRepoPaser
@@ -66,7 +66,7 @@ def data_schema_verify(verify: str = None) -> None:
         raise typer.Exit()
 
 
-def generate_test_cases(generate: bool) -> None:
+def generate_testcases(generate: bool) -> None:
     """
     生成测试用例
     """
@@ -84,10 +84,10 @@ def generate_test_cases(generate: bool) -> None:
         try:
             if result:
                 typer.secho('🔥 开始重新生成所有测试用例...', fg='cyan', bold=True)
-                auto_generate_test_cases(rewrite=True)
+                auto_generate_testcases(rewrite=True)
             else:
                 typer.secho('🔥 开始生成新测试用例...', fg='cyan', bold=True)
-                auto_generate_test_cases()
+                auto_generate_testcases()
         except Exception as e:
             typer.secho(f'❌ 自动生成测试用例失败: {e}', fg='red', bold=True)
             raise typer.Exit(1)
@@ -191,8 +191,8 @@ def main(
         help='验证测试数据结构, 当指定文件名时, 验证指定文件, 否则验证所有测试数据文件',
         callback=data_schema_verify,
     ),
-    _generate_test_cases: Optional[bool] = typer.Option(
-        None, '--generate-test-cases', '-gtc', help='自动生成测试用例', callback=generate_test_cases
+    _generate_testcases: Optional[bool] = typer.Option(
+        None, '--generate-test-cases', '-gtc', help='自动生成测试用例', callback=generate_testcases
     ),
     _import_openapi_test_data: Tuple[str, str] = typer.Option(
         (None, None),

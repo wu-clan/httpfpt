@@ -22,7 +22,7 @@ test_steps:
       reason: 自定义跳过
 
   - name: 条件判断时跳过
-    case_id: event_skip_002
+    case_id: event_skip_003
     description: 测试跳过
     is_run:
       skip_if:

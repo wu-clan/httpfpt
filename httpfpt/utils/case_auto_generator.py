@@ -8,10 +8,10 @@ import typer
 
 from httpfpt.core.get_conf import PROJECT_NAME
 from httpfpt.core.path_conf import TEST_CASE_PATH
-from httpfpt.utils.file_control import search_all_case_yaml_files, search_all_test_case_files, get_file_property
+from httpfpt.utils.file_control import search_all_case_yaml_files, search_all_testcase_files, get_file_property
 
 
-def auto_generate_test_cases(rewrite: bool = False) -> NoReturn:
+def auto_generate_testcases(rewrite: bool = False) -> NoReturn:
     """
     自动创建测试用例
 
@@ -24,7 +24,7 @@ def auto_generate_test_cases(rewrite: bool = False) -> NoReturn:
         raise ValueError('自动生成用例失败，未在指定项目下找到测试用例数据文件，请检查项目目录是否正确')
 
     # 获取所有测试用例文件
-    testcase_files = search_all_test_case_files()
+    testcase_files = search_all_testcase_files()
 
     # 获取所有用例文件名
     yaml_filenames = []
@@ -85,7 +85,7 @@ request_ids = get_ids(request_data)
 @allure.epic(allure_text['epic'])
 @allure.feature(allure_text['feature'])
 class {testcase_class_name}:
-    ”“”{testcase_class_name.replace('Test', '')}”“”
+    """{testcase_class_name.replace('Test', '')}"""
 
     @allure.story(allure_text['story'])
     @pytest.mark.parametrize('data', request_data, ids=request_ids)
