@@ -32,9 +32,9 @@ def run(
     # html report
     html_report: bool = True,
     # allure
-    allure: bool = False,
+    allure: bool = True,
     allure_clear: bool = True,
-    allure_serve: bool = True,
+    allure_serve: bool = False,
     # extra
     reruns: int = 0,
     maxfail: int = 0,
@@ -51,19 +51,19 @@ def run(
     运行入口
 
     :param log_level: 控制台打印输出级别, 默认"-v"
-    :param case_path: 可选参数, 指定测试用例函数, 默认为空，如果指定，则执行执行用例，否则执行全部
-    :param html_report: 是否生成 HTML 测试报告, 默认开启
-    :param allure: allure 测试报告, 默认关闭
+    :param case_path: 指定测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
+    :param html_report: 生成 HTML 测试报告, 默认开启
+    :param allure: 生成 allure 测试报告, 默认开启
     :param allure_clear: 清空 allure 报告历史记录, 默认开启
-    :param allure_serve: 是否测试执行完成后自动打开 allure 测试报告服务, 如果已启用 allure 测试报告
-    :param reruns: 每个用例的运行次数, 兼容性差, 不建议使用
-    :param maxfail: 大于0的正整数, 指定失败用例个数,到达数量上限后终止运行, 默认为0, 为0时表示此参数默认关闭
-    :param x: 如果发生失败用例, 是否终止运行, 默认关闭
-    :param n: 分布式运行, 使用"auto"表示全核, 也可指定cpu内核数量, 大于0的正整数, 默认"auto"
+    :param allure_serve: 自动打开 allure 测试报告服务， 默认关闭
+    :param reruns: 用例运行失败重试次数, 兼容性差, 默认不开启使用
+    :param maxfail: 用例运行失败数量，到达数量上限后终止运行，默认为 0，即不终止
+    :param x: 用例运行失败, 终止运行, 默认关闭
+    :param n: 分布式运行, 默认 "auto"
     :param dist: 分布式运行方式, 默认"loadscope", 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
     :param strict_markers: markers 严格模式, 对于使用了自定义 marker 的用例, 如果 marker 未在 pytest.ini 注册, 用例将报错
-    :param capture: 避免在使用输出模式为"v"和"s"时,html报告中的表格log为空的情况, 默认开启
-    :param disable_warnings: 是否关闭控制台警告信息, 默认开启
+    :param capture: 避免在使用输出模式为"v"和"s"时，html报告中的表格日志为空的情况, 默认开启
+    :param disable_warnings: 关闭控制台警告信息, 默认开启
     :return:
     """  # noqa: E501
     default_case_path = f'./test_case/{PROJECT_NAME}/'  # 默认执行指定项目下的所有测试用例
