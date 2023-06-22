@@ -28,4 +28,3 @@ class TestOnlySkip:
     def test_only_skip(self, data):
         """only_skip"""
         send_request.send_request(data)
-        

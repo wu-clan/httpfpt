@@ -152,31 +152,37 @@ def import_git_case_data(src: str) -> None:
 
 @app.callback(name='version')
 def callback(
-        _get_version: Optional[bool] = typer.Option(None, '--version', '-V', help='打印版本号', callback=get_version),
+    _get_version: Optional[bool] = typer.Option(None, '--version', '-V', help='打印版本号', callback=get_version),
 ) -> None:
     pass
 
 
 @app.command('testcase', help='测试用例相关操作')
 def testcase(
-        _testcase_date_verify: Annotated[str, typer.Option(
+    _testcase_date_verify: Annotated[
+        str,
+        typer.Option(
             '--testcase-date-verify',
             '-tdv',
             metavar='<FILENAME / ALL>',
             show_default=False,
             help='验证测试数据结构, 当指定文件名时, 验证指定文件, 当指定 "all" 时, 验证所有文件',
             callback=testcase_date_verify,
-        )],
-        _generate_testcases: Annotated[Optional[bool], typer.Option(
-            '--generate-testcases', '-gt', help='自动生成测试用例', callback=generate_testcases
-        )] = None,
+        ),
+    ],
+    _generate_testcases: Annotated[
+        Optional[bool],
+        typer.Option('--generate-testcases', '-gt', help='自动生成测试用例', callback=generate_testcases),
+    ] = None,
 ) -> None:
     pass
 
 
 @app.command('import', help='导入测试用例数据')
 def import_testcase_data(
-        _import_openapi_testcase_data: Annotated[Tuple[str, str], typer.Option(
+    _import_openapi_testcase_data: Annotated[
+        Tuple[str, str],
+        typer.Option(
             '--import-openapi-testcase-data',
             '-io',
             '-is',
@@ -184,43 +190,59 @@ def import_testcase_data(
             metavar='<OPENAPI JSONFILE / URL, PROJECT>',
             help='导入 openapi / swagger 数据到 yaml 数据文件; 通过 json_file / url 导入; project: 指定项目名',
             callback=import_openapi_test_data,
-        )],
-        _import_apifox_testcase_data: Annotated[Tuple[str, str], typer.Option(
+        ),
+    ],
+    _import_apifox_testcase_data: Annotated[
+        Tuple[str, str],
+        typer.Option(
             '--import-apifox-testcase-data',
             '-ia',
             show_default=False,
             metavar='<APIFOX JSONFILE, PROJECT>',
             help='Beta: 导入 apifox 数据到 yaml 数据文件; 通过 json_file 导入; project: 指定项目名',
             callback=import_apifox_test_data,
-        )],
-        _import_har_testcase_data: Annotated[Tuple[str, str], typer.Option(
+        ),
+    ],
+    _import_har_testcase_data: Annotated[
+        Tuple[str, str],
+        typer.Option(
             '--import-har-testcase-data',
             '-ih',
             show_default=False,
             help='TODO: Not started yet',
             callback=import_har_test_data,
-        )],
-        _import_jmeter_testcase_data: Annotated[Tuple[str, str], typer.Option(
+        ),
+    ],
+    _import_jmeter_testcase_data: Annotated[
+        Tuple[str, str],
+        typer.Option(
             '--import-jmeter-testcase-data',
             '-ij',
             show_default=False,
             help='TODO: Not started yet',
             callback=import_jmeter_test_data,
-        )],
-        _import_postman_testcase_data: Annotated[Tuple[str, str], typer.Option(
+        ),
+    ],
+    _import_postman_testcase_data: Annotated[
+        Tuple[str, str],
+        typer.Option(
             '--import-postman-testcase-data',
             '-ipm',
             show_default=False,
             help='TODO: Not started yet',
             callback=import_postman_test_data,
-        )],
-        _import_git_repo_testcase_data: Annotated[str, typer.Option(
+        ),
+    ],
+    _import_git_repo_testcase_data: Annotated[
+        str,
+        typer.Option(
             '--import-git-repo-testcase-data',
             '-igr',
             show_default=False,
             help='导入 git 仓库测试数据到本地',
             callback=import_git_case_data,
-        )],
+        ),
+    ],
 ) -> None:
     pass
 

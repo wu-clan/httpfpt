@@ -28,4 +28,3 @@ class TestApiTestcaseTemplate:
     def test_api_testcase_template(self, data):
         """api_testcase_template"""
         send_request.send_request(data)
-        
