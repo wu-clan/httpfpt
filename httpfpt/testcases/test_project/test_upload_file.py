@@ -28,4 +28,3 @@ class TestUploadFile:
     def test_upload_file(self, data):
         """upload_file"""
         send_request.send_request(data)
-        
