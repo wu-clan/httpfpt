@@ -60,6 +60,7 @@ def testcase_date_verify(verify: str) -> None:
         raise typer.Exit(1)
     else:
         typer.secho('✅ 验证测试数据结构成功', fg='green', bold=True)
+        raise typer.Exit()
 
 
 def generate_testcases(generate: bool) -> None:
@@ -85,6 +86,8 @@ def generate_testcases(generate: bool) -> None:
         except Exception as e:
             typer.secho(f'❌ 自动生成测试用例失败: {e}', fg='red', bold=True)
             raise typer.Exit(1)
+        else:
+            raise typer.Exit()
 
 
 def import_openapi_test_data(openapi: tuple) -> None:
@@ -98,6 +101,8 @@ def import_openapi_test_data(openapi: tuple) -> None:
         except Exception as e:
             typer.secho('❌ 导入 openapi 数据失败', fg='red', bold=True)
             raise e
+        else:
+            raise typer.Exit()
     else:
         raise typer.Abort()
 
@@ -120,6 +125,8 @@ def import_apifox_test_data(apifox: tuple) -> None:
         except Exception as e:
             typer.secho('❌ 导入 apifox 数据失败:', fg='red', bold=True)
             raise e
+        else:
+            raise typer.Exit()
     else:
         raise typer.Abort()
 
@@ -148,6 +155,8 @@ def import_git_case_data(src: str) -> None:
     except Exception as e:
         typer.secho(f'❌ 导入 git 仓库测试数据失败: {e}', fg='red', bold=True)
         raise e
+    else:
+        raise typer.Exit()
 
 
 @app.callback(name='version')
