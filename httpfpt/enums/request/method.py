@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from enum import Enum, unique
+from enum import unique
+
+from httpfpt.enums import StrEnum
 
 
 @unique
-class MethodType(str, Enum):
+class MethodType(StrEnum):
     get = 'GET'
     post = 'POST'
     put = 'PUT'

@@ -30,11 +30,11 @@ class SendRequests:
     """发送请求"""
 
     @property
-    def init_response_meta_data(self) -> dict:
+    def init_response_metadata(self) -> dict:
         """
         :return: 响应元数据
         """
-        response_meta_data = {
+        response_metadata = {
             'url': None,
             'status_code': 200,
             'elapsed': 0,
@@ -47,7 +47,7 @@ class SendRequests:
                 'execute_time': None,
             },
         }
-        return response_meta_data
+        return response_metadata
 
     @staticmethod
     def _requests_engin(**kwargs) -> RequestsResponse:
@@ -63,7 +63,7 @@ class SendRequests:
             kwargs['proxies'] = kwargs['proxies'] or get_conf.REQUEST_PROXIES_REQUESTS
             kwargs['allow_redirects'] = kwargs['allow_redirects'] or get_conf.REQUEST_REDIRECTS
             # 消除安全警告
-            requests.packages.urllib3.disable_warnings()
+            requests.packages.urllib3.disable_warnings()  # type: ignore
             log.info('开始发送请求...')
             response = requests.session().request(**kwargs)
             response.raise_for_status()
@@ -175,7 +175,7 @@ class SendRequests:
             'proxies': parsed_data['proxies'],
             'allow_redirects': parsed_data['redirects'],
         }
-        response_data = self.init_response_meta_data
+        response_data = self.init_response_metadata
         request_data_parsed = {
             'method': parsed_data['method'],
             'url': parsed_data['url'],
@@ -184,7 +184,7 @@ class SendRequests:
             'data': parsed_data['body'],
             'files': parsed_data['files'],
         }
-        if parsed_data['body_type'] == BodyType.JSON.value or parsed_data['body_type'] == BodyType.GraphQL.value:
+        if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
             request_data_parsed.update({'json': request_data_parsed.pop('data')})
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
@@ -265,7 +265,7 @@ class SendRequests:
         log.info(f"请求 params: {parsed_data['params']}")
         log.info(f"请求 headers: {parsed_data['headers']}")
         log.info(f"请求 data_type：{parsed_data['body_type']}")
-        if parsed_data['body_type'] != BodyType.JSON.value:
+        if parsed_data['body_type'] != BodyType.JSON:
             log.info(f"请求 data：{parsed_data['body']}")
         else:
             log.info(f"请求 json: {parsed_data['body']}")

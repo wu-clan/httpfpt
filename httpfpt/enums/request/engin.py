@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from enum import Enum
+from httpfpt.enums import StrEnum
 
 
-class EnginType(str, Enum):
+class EnginType(StrEnum):
     requests = 'requests'
     httpx = 'httpx'
