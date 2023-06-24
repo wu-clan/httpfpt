@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from enum import Enum
+from httpfpt.enums import StrEnum
 
 
-class BodyType(Enum):
-    none = None
+class BodyType(StrEnum):
     form_data = 'form'
     x_www_form_urlencoded = 'x_form'
     # binary = 'binary'

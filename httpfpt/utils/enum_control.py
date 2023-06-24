@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import TypeVar
 
-SubEnum = TypeVar('SubEnum', bound=Enum)
+SubEnum = TypeVar('SubEnum')
 
 
 def get_enum_values(enum_class: SubEnum) -> list:

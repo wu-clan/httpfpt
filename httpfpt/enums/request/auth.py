@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from enum import Enum, unique
+from httpfpt.enums import StrEnum
 
 
-@unique
-class AuthType(str, Enum):
+class AuthType(StrEnum):
     bearer_token = 'bearer_token'

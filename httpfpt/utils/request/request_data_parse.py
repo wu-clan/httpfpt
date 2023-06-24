@@ -340,21 +340,21 @@ class RequestDataParse:
         headers = self.headers
         body_type = self.body_type
         headers_format = headers or {}
-        if body_type == BodyType.form_data.value:
+        if body_type == BodyType.form_data:
             headers_format.update({'Content-Type': 'multipart/form-data'})
-        if body_type == BodyType.x_www_form_urlencoded.value:
+        if body_type == BodyType.x_www_form_urlencoded:
             headers_format.update({'Content-Type': 'application/x-www-form-urlencoded'})
-        elif body_type == BodyType.GraphQL.value:
+        elif body_type == BodyType.GraphQL:
             headers_format.update({'Content-Type': 'application/json; charset=uft-8'})
-        elif body_type == BodyType.TEXT.value:
+        elif body_type == BodyType.TEXT:
             headers_format.update({'Content-Type': 'text/plain'})
-        elif body_type == BodyType.JavaScript.value:
+        elif body_type == BodyType.JavaScript:
             headers_format.update({'Content-Type': 'application/javascript'})
-        elif body_type == BodyType.JSON.value:
+        elif body_type == BodyType.JSON:
             headers_format.update({'Content-Type': 'application/json; charset=uft-8'})
-        elif body_type == BodyType.HTML.value:
+        elif body_type == BodyType.HTML:
             headers_format.update({'Content-Type': 'text/html'})
-        elif body_type == BodyType.XML.value:
+        elif body_type == BodyType.XML:
             headers_format.update({'Content-Type': 'application/xml'})
         return headers_format
 
@@ -379,23 +379,23 @@ class RequestDataParse:
         else:
             if body is not None:
                 body_type = self.body_type
-                if body_type == BodyType.none.value:
+                if body_type is None:
                     body = None
-                elif body_type == BodyType.form_data.value:  # noqa: SIM114
+                elif body_type == BodyType.form_data:  # noqa: SIM114
                     body = body
-                elif body_type == BodyType.x_www_form_urlencoded.value:
+                elif body_type == BodyType.x_www_form_urlencoded:
                     body = body
-                elif body_type == BodyType.GraphQL.value:
+                elif body_type == BodyType.GraphQL:
                     body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif body_type == BodyType.TEXT.value:  # noqa: SIM114
+                elif body_type == BodyType.TEXT:  # noqa: SIM114
                     body = body
-                elif body_type == BodyType.JavaScript.value:
+                elif body_type == BodyType.JavaScript:
                     body = body
-                elif body_type == BodyType.JSON.value:
+                elif body_type == BodyType.JSON:
                     body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif body_type == BodyType.HTML.value:  # noqa: SIM114
+                elif body_type == BodyType.HTML:  # noqa: SIM114
                     body = body
-                elif body_type == BodyType.XML.value:
+                elif body_type == BodyType.XML:
                     body = body
         return body
 

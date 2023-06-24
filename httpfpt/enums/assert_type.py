@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from enum import Enum, unique
+from enum import unique
+
+from httpfpt.enums import StrEnum
 
 
 @unique
-class AssertType(str, Enum):
+class AssertType(StrEnum):
     equal = 'eq'
     not_equal = 'not_eq'
     greater_than = 'gt'
