@@ -92,8 +92,7 @@ class {testcase_class_name}:
     def {testcase_func_name}(self, data):
         """{create_file_root_name}"""
         send_request.send_request(data)
-        
-        '''
+'''
                 # 创建测试用例文件
                 tag = str(Path(yaml_filename).parent)[1:]
                 if tag != '':

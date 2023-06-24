@@ -23,22 +23,22 @@ class GitRepoPaser:
         """
 
         if 'https' not in src:
-            raise ValueError('git 仓库克隆地址错误, 请使用 https 地址')
+            raise ValueError('❌ git 仓库克隆地址错误, 请使用 https 地址')
 
         try:
-            online_dir_path = os.path.join(os.path.abspath('./data/test_data'), 'online_yaml_data')
+            online_dir_path = os.path.join(os.path.abspath('./data/test_data'), 'online_test_data')
             typer.echo(online_dir_path)
             if os.path.exists(online_dir_path):
                 shutil.rmtree(online_dir_path)
             os.makedirs(online_dir_path)
             result = os.system(f'cd {online_dir_path} && git clone {src}')
         except Exception as e:
-            raise RuntimeError(f'git 苍鹭测试数据拉取失败：{e}')
+            raise RuntimeError(f'❌ git 仓库测试数据拉取失败：{e}')
         else:
             if result == 0:
                 typer.secho('✅ git 仓库数据文件拉取成功')
             else:
-                raise RuntimeError('git 仓库测试数据拉取失败')
+                raise RuntimeError('❌ git 仓库测试数据拉取失败')
 
         all_yaml_file = search_all_case_yaml_files(online_dir_path)
         all_case_data = []
