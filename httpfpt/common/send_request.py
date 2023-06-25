@@ -3,7 +3,6 @@
 import json
 import time
 from json import JSONDecodeError
-from typing import NoReturn
 
 import allure
 import httpx
@@ -91,7 +90,7 @@ class SendRequests:
             log.info('开始发送请求...')
             with httpx.Client(
                 verify=verify,
-                proxies=proxies,
+                proxies=proxies,  # type: ignore
                 follow_redirects=redirects,
             ) as client:
                 response = client.request(**kwargs)
@@ -247,14 +246,14 @@ class SendRequests:
         return response_data
 
     @staticmethod
-    def log_request_setup(parsed_data: dict) -> NoReturn:
+    def log_request_setup(parsed_data: dict) -> None:
         log.info(f"请求 setup_testcase: {parsed_data['setup_testcase']}")
         log.info(f"请求 setup_sql: {parsed_data['setup_sql']}")
         log.info(f"请求 setup_hooks: {parsed_data['setup_hooks']}")
         log.info(f"请求 setup_wait_time: {parsed_data['setup_wait_time']}")
 
     @staticmethod
-    def log_request_up(parsed_data: dict) -> NoReturn:
+    def log_request_up(parsed_data: dict) -> None:
         log.info(f"用例 env: {parsed_data['env']}")
         log.info(f"用例 module: {parsed_data['module']}")
         log.info(f"用例 name: {parsed_data['name']}")
@@ -272,7 +271,7 @@ class SendRequests:
         log.info(f"请求 files: {parsed_data['files_no_parse']}")
 
     @staticmethod
-    def log_request_teardown(parsed_data: dict) -> NoReturn:
+    def log_request_teardown(parsed_data: dict) -> None:
         log.info(f"请求 teardown_sql: {parsed_data['teardown_sql']}")
         log.info(f"请求 teardown_hooks: {parsed_data['teardown_hooks']}")
         log.info(f"请求 teardown_extract: {parsed_data['teardown_extract']}")
@@ -280,7 +279,7 @@ class SendRequests:
         log.info(f"请求 teardown_wait_time: {parsed_data['teardown_wait_time']}")
 
     @staticmethod
-    def log_request_down(response_data: dict) -> NoReturn:
+    def log_request_down(response_data: dict) -> None:
         log.info(f"请求发送时间: {response_data['stat']['execute_time']}")
         str_status_code = str(response_data['status_code'])
         if str_status_code.startswith('4') or str_status_code.startswith('5'):
@@ -290,7 +289,7 @@ class SendRequests:
         log.info(f"响应时间: {response_data['elapsed']} ms")
 
     @staticmethod
-    def allure_request_setup(parsed_data: dict) -> NoReturn:
+    def allure_request_setup(parsed_data: dict) -> None:
         allure_step(
             '请求前置',
             {
@@ -302,7 +301,7 @@ class SendRequests:
         )
 
     @staticmethod
-    def allure_request_up(parsed_data: dict) -> NoReturn:
+    def allure_request_up(parsed_data: dict) -> None:
         allure_step(
             '请求数据',
             {
@@ -322,7 +321,7 @@ class SendRequests:
         )
 
     @staticmethod
-    def allure_request_teardown(parsed_data: dict) -> NoReturn:
+    def allure_request_teardown(parsed_data: dict) -> None:
         allure_step(
             '请求后置',
             {
@@ -335,7 +334,7 @@ class SendRequests:
         )
 
     @staticmethod
-    def allure_request_down(response_data: dict) -> NoReturn:
+    def allure_request_down(response_data: dict) -> None:
         allure_step(
             '响应数据',
             {
@@ -345,7 +344,7 @@ class SendRequests:
         )
 
     @staticmethod
-    def allure_dynamic_data(parsed_data: dict) -> NoReturn:
+    def allure_dynamic_data(parsed_data: dict) -> None:
         allure.dynamic.title(parsed_data['name'])
         allure.dynamic.description(parsed_data['description'])
         allure.dynamic.link(parsed_data['url'])

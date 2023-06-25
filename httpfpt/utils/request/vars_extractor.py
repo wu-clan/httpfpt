@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import os.path
 import re
-from typing import NoReturn
 
 from jsonpath import jsonpath
 
@@ -117,7 +116,7 @@ class VarsExtractor:
         return dict_target
 
     @staticmethod
-    def teardown_var_extract(response: dict, extract: list, env: str = None) -> NoReturn:
+    def teardown_var_extract(response: dict, extract: list, env: str) -> None:
         """
         后置参数提取
 

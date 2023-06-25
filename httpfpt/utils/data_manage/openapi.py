@@ -18,7 +18,7 @@ from httpfpt.utils.time_control import get_current_timestamp
 
 
 class SwaggerParser:
-    def __init__(self, version: int = None, data: dict = None):
+    def __init__(self, version: Optional[int] = None, data: Optional[dict] = None):
         """
         初始化参数
 
@@ -349,7 +349,7 @@ class SwaggerParser:
             data = self.data.get('components').get('schemas').get(name)
         return data
 
-    def get_swagger_request_data(self, value: Union[str, dict]) -> Union[dict, None]:
+    def get_swagger_request_data(self, value: Union[dict, str]) -> Union[dict, None]:
         """
         获取请求 data
 
@@ -396,7 +396,7 @@ class SwaggerParser:
         if self.version == 2:
             for v in value['parameters']:
                 if v.get('type') == 'file':
-                    files[v['name']] = format_value('object')
+                    files[v.get('name')] = format_value('object')
             return files if len(files) > 0 else None
         else:
             if not isinstance(value, dict):

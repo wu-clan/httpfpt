@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn
 
 from httpfpt.common.log import log
 from httpfpt.core import get_conf
@@ -10,7 +9,7 @@ class LarkTalk:
     def __init__(self, content: dict):
         self.content = content
 
-    def send(self) -> NoReturn:
+    def send(self) -> None:
         # 发送飞书消息
         try:
             import requests
@@ -38,7 +37,7 @@ class LarkTalk:
                 },
             }
             response = requests.session().post(
-                url=get_conf.LARK_TALK_WEBHOOK, json=data, headers=headers, proxies=get_conf.LARK_TALK_PROXY
+                url=get_conf.LARK_TALK_WEBHOOK, json=data, headers=headers, proxies=get_conf.LARK_TALK_PROXY  # type: ignore  # noqa: E501
             )
             response.raise_for_status()
         except Exception as e:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import copy
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
 from pydantic import ValidationError
 
@@ -9,12 +9,12 @@ from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.pydantic_error_parse import parse_error
 
 
-def get_request_data(*, file_data: dict, use_pydantic_verify: bool = False) -> List[Dict[str, Dict[str, Any]]]:
+def get_request_data(*, file_data: dict, use_pydantic_verify: bool = False) -> Union[List[Dict[str, Any]], None]:
     """
     通过解析读取的测试用例文件数据, 获取用于数据驱动的请求数据
 
     :param file_data: 从测试用例数据文件读取的测试用例数据
-    :param use_pydantic_verify: 是否将数据转换为 pydantic 模型
+    :param use_pydantic_verify: pydantic 数据验证开关
     :return:
     """
     try:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-from typing import Optional, NoReturn, Any
+from typing import Optional, Any
 
 from httpfpt.common.log import log
 
@@ -41,7 +41,7 @@ def write_json_file(
     encoding: str = 'utf-8',
     mode: str = 'a',
     **kwargs,
-) -> NoReturn:
+) -> None:
     """
     写入 json 文件
 
@@ -53,12 +53,15 @@ def write_json_file(
     :param kwargs:
     :return:
     """
-    if not os.path.exists(filepath):
-        os.makedirs(filepath)
     if filepath is not None:
+        if not os.path.exists(filepath):
+            os.makedirs(filepath)
         _file = os.path.join(filepath, filename)
     else:
         _file = filename
+    if not _file:
+        log.warning('写入 json 文件失败，文件名为空')
+        raise ValueError('写入 json 文件失败，文件名为空')
     try:
         with open(_file, encoding=encoding, mode=mode) as f:
             json.dump(data, f, ensure_ascii=False, **kwargs)

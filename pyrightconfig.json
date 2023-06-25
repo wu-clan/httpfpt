@@ -1,0 +1,17 @@
+{
+  "exclude": [
+    "**/__pycache__",
+    "**/.*",
+    "venv/**",
+    "httpfpt/testcases/**",
+    "httpfpt/utils/data_manage/**.py"
+  ],
+  "ignore": [
+    "httpfpt/utils/auth_plugins.py",
+    "httpfpt/conftest.py"
+  ],
+  "reportUnusedImport": "error",
+  "reportOptionalMemberAccess": false,
+  "reportOptionalSubscript": false,
+  "pythonVersion": "3.8"
+}

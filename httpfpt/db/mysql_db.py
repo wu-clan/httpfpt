@@ -2,7 +2,7 @@
 # _*_ coding:utf-8 _*_
 import datetime
 import decimal
-from typing import NoReturn, Any
+from typing import Any, Optional
 
 import pymysql
 from dbutils.pooled_db import PooledDB
@@ -59,7 +59,7 @@ class MysqlDB:
         finally:
             self.close()
 
-    def execute(self, sql: str) -> NoReturn:
+    def execute(self, sql: str) -> None:
         """
         执行 sql 操作
 
@@ -76,7 +76,7 @@ class MysqlDB:
         finally:
             self.close()
 
-    def close(self) -> NoReturn:
+    def close(self) -> None:
         """
         关闭游标和数据库连接
 
@@ -85,7 +85,7 @@ class MysqlDB:
         self.cursor.close()
         self.conn.close()
 
-    def exec_case_sql(self, sql: list, env: str = None) -> dict:
+    def exec_case_sql(self, sql: list, env: Optional[str] = None) -> dict:
         """
         执行用例 sql
 
@@ -115,9 +115,9 @@ class MysqlDB:
                     log.info(f'执行变量提取 sql: {s["sql"]}')
                     key = s['key']
                     set_type = s['type']
-                    sql = s['sql']
+                    sql_text = s['sql']
                     json_path = s['jsonpath']
-                    query_data = self.query(sql)
+                    query_data = self.query(sql_text)
                     value = jsonpath(query_data, json_path)
                     if value:
                         value = value[0]

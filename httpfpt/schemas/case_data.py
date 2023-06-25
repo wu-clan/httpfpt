@@ -18,7 +18,7 @@ class ConfigRequestData(BaseModel):
     timeout: Optional[int] = Field(None, ge=0)
     verify: Optional[bool] = None
     redirects: Optional[bool] = None
-    proxies: Optional[Union[Dict[Literal['http', 'https', 'http://', 'https://'], Union[AnyHttpUrl, None]]]] = None
+    proxies: Optional[Dict[Literal['http', 'https', 'http://', 'https://'], Union[AnyHttpUrl, None]]] = None
 
 
 class Config(BaseModel):
@@ -30,11 +30,11 @@ class Config(BaseModel):
 class StepsRequestData(BaseModel):
     method: str
     url: str
-    params: Union[dict, bytes, None] = ...
-    headers: Optional[dict] = ...
-    body_type: Optional[str] = ...
-    body: Union[dict, bytes, Tuple[list], None] = ...
-    files: Union[Dict[str, Union[str, List[str]]], None] = ...
+    params: Union[dict, bytes, None]
+    headers: Optional[dict]
+    body_type: Optional[str]
+    body: Union[dict, bytes, Tuple[list], None]
+    files: Union[Dict[str, Union[str, List[str]]], None]
 
 
 class SetupTestCaseData(BaseModel):
@@ -51,8 +51,8 @@ class SetupSqlData(BaseModel):
 
 
 class StepsSetUpData(BaseModel):
-    testcase: Optional[Union[List[Union[str, SetupTestCaseData]]]] = None
-    sql: Optional[Union[List[Union[str, SetupSqlData]]]] = None
+    testcase: Optional[List[Union[str, SetupTestCaseData]]] = None
+    sql: Optional[List[Union[str, SetupSqlData]]] = None
     hooks: Optional[List[str]] = None
     wait_time: Optional[int] = None
 
@@ -71,7 +71,7 @@ class TeardownAssertData(BaseModel):
 
 
 class StepsTearDownData(BaseModel):
-    sql: Optional[Union[List[Union[str, SetupSqlData]]]] = None
+    sql: Optional[List[Union[str, SetupSqlData]]] = None
     hooks: Optional[List[str]] = None
     extract: Optional[List[TeardownExtractData]] = None
     assert_: Optional[Union[str, List[str], List[TeardownAssertData]]] = Field(None, alias='assert')
@@ -82,7 +82,7 @@ class Steps(BaseModel):
     name: str
     case_id: str
     description: str
-    is_run: Union[bool, dict, None] = ...
+    is_run: Union[bool, dict, None] = None
     request: StepsRequestData
     setup: Optional[StepsSetUpData] = None
     teardown: Optional[StepsTearDownData] = None

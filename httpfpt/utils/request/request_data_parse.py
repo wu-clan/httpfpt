@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-from typing import Union, NoReturn
+from typing import Union
 
 import allure
 from _pytest.outcomes import Skipped
@@ -178,7 +178,7 @@ class RequestDataParse:
             return module
 
     @property
-    def test_steps(self) -> dict:
+    def test_steps(self) -> Union[dict, list]:
         try:
             test_steps = self.request_data['test_steps']
         except RequestParamGetError:
@@ -224,11 +224,11 @@ class RequestDataParse:
             description = None
         return description
 
-    def _is_run(self) -> NoReturn:
+    def _is_run(self) -> None:
         try:
             is_run = self.request_data['test_steps']['is_run']
         except RequestParamGetError:
-            ...
+            pass
         else:
             if is_run is not None:
                 if isinstance(is_run, bool):

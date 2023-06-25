@@ -44,7 +44,7 @@ def write_toml(filepath: str, filename: str, data: dict, encoding: str = 'utf-8'
     _file = os.path.join(filepath, filename)
     try:
         with open(_file, encoding=encoding, mode=mode) as f:
-            result = rtoml.dump(data, f)
+            result = rtoml.dump(data, f)  # type: ignore
     except ValueError as e:
         log.error(f'写入文件 "{filename}" 错误 \n {e}')
         raise e
