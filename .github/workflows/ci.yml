@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff black pre-commit pyright
+          pip install -r requirements.txt
 
       - name: pre-commit
         uses: pre-commit/action@v3.0.0
@@ -47,4 +47,4 @@ jobs:
         uses: jakebailey/pyright-action@v1
         with:
           project: .
-          extra_args: --verbose
+          verbose: true
