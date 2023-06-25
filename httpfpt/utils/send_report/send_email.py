@@ -6,7 +6,6 @@ import time
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import NoReturn
 
 from jinja2 import Template
 
@@ -51,7 +50,7 @@ class SendMail:
 
         return msg
 
-    def send(self) -> NoReturn:
+    def send(self) -> None:
         """
         发送邮件
         """

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
-from typing import Any, NoReturn
+from typing import Any
 
 from redis import Redis, AuthenticationError
 
@@ -50,7 +50,7 @@ class RedisDB:
             log.warning(f'获取 redis 数据 {key} 失败, 此数据不存在')
         return data
 
-    def set(self, key: Any, value: Any, **kwargs) -> NoReturn:
+    def set(self, key: Any, value: Any, **kwargs) -> None:
         """
         设置 redis 数据
 
@@ -61,7 +61,7 @@ class RedisDB:
         self.redis.set(key, value, **kwargs)
         log.info(f'设置 redis 数据 {key} 成功')
 
-    def rset(self, key: Any, value: Any, **kwargs) -> NoReturn:
+    def rset(self, key: Any, value: Any, **kwargs) -> None:
         """
         重置设置 redis 数据
 
@@ -74,7 +74,7 @@ class RedisDB:
         self.redis.set(key, value, **kwargs)
         log.info(f'重置 redis 数据 {key} 成功')
 
-    def delete(self, *key: Any) -> NoReturn:
+    def delete(self, *key: Any) -> None:
         """
         删除 redis 数据
 
@@ -99,7 +99,7 @@ class RedisDB:
             log.warning(f'判断 redis 数据 {key} 不存在')
         return num
 
-    def lpush(self, key: Any, *value: Any) -> NoReturn:
+    def lpush(self, key: Any, *value: Any) -> None:
         """
         从左侧插入列表数据
 
@@ -110,7 +110,7 @@ class RedisDB:
         self.redis.lpush(key, *value)
         log.info(f'从左侧插入 redis 数据 {key} 成功')
 
-    def relpush(self, key: Any, *value: Any) -> NoReturn:
+    def relpush(self, key: Any, *value: Any) -> None:
         """
         删除原数据并重新从左侧插入列表数据
 

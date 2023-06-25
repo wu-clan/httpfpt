@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
-from typing import NoReturn, List, Dict, Union
+from typing import List, Dict, Union
 
 from jsonpath import jsonpath
 from pydantic import ValidationError
@@ -202,7 +202,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
         return None
 
 
-def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoReturn:
+def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
     """
     判断是否循环关联
 
@@ -225,7 +225,7 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> NoRetur
                         raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有' '当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
 
 
-def relate_testcase_set_var(testcase_data: dict) -> NoReturn:
+def relate_testcase_set_var(testcase_data: dict) -> None:
     """
     关联测试用例设置变量
 
@@ -245,7 +245,7 @@ def relate_testcase_set_var(testcase_data: dict) -> NoReturn:
         raise ValueError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
 
 
-def relate_testcase_exec(testcase_data: dict) -> NoReturn:
+def relate_testcase_exec(testcase_data: dict) -> None:
     """
     关联测试用例执行
 

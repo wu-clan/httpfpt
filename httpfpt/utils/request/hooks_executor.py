@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import re
-from typing import Any, NoReturn, Union
+from typing import Any, Union
 
 from httpfpt.common.log import log
 
@@ -71,7 +71,7 @@ class HookExecutor:
 
         return dict_target
 
-    def exec_hook_func(self, func_list: list) -> NoReturn:
+    def exec_hook_func(self, func_list: list) -> None:
         """
         执行 hook 函数不返回任何值
 

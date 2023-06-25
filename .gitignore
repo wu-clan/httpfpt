@@ -78,7 +78,7 @@ httpfpt/log/
 .idea/
 
 # online case data
-httpfpt/data/online/
+httpfpt/data/online*/
 
 # ruff
 httpfpt/.ruff_cache/

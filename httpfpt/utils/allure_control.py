@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import json
-from typing import NoReturn, Union, Any
+from typing import Union, Any, Optional
 
 import allure
 from allure_commons.types import AttachmentType
@@ -9,7 +9,7 @@ from allure_commons.types import AttachmentType
 from httpfpt.utils.file_control import get_file_property
 
 
-def allure_step(step: str, var: Union[str, dict]) -> NoReturn:
+def allure_step(step: str, var: Union[str, dict]) -> None:
     """
     allure 操作步骤
 
@@ -25,7 +25,9 @@ def allure_step(step: str, var: Union[str, dict]) -> NoReturn:
         )
 
 
-def allure_attach(body: Any = None, name: str = None, attachment_type: str = 'JSON', extension: Any = None) -> NoReturn:
+def allure_attach(
+    body: Any = None, name: Optional[str] = None, attachment_type: str = 'JSON', extension: Any = None
+) -> None:
     """
     allure 报告上传附件
 
@@ -43,7 +45,7 @@ def allure_attach(body: Any = None, name: str = None, attachment_type: str = 'JS
     )
 
 
-def allure_attach_file(filepath: str, name: str = None, extension: Any = None) -> NoReturn:
+def allure_attach_file(filepath: str, name: Optional[str] = None, extension: Any = None) -> None:
     """
     allure 报告上传附件
 

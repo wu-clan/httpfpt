@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import NoReturn
 
 from httpfpt.common.log import log
 from httpfpt.core import get_conf
@@ -10,7 +9,7 @@ class DingTalk:
     def __init__(self, content: dict):
         self.content = content
 
-    def send(self) -> NoReturn:
+    def send(self) -> None:
         try:
             import requests
 
@@ -32,7 +31,7 @@ class DingTalk:
                 },
             }
             response = requests.session().post(
-                url=get_conf.DING_TALK_WEBHOOK, json=data, headers=headers, proxies=get_conf.DING_TALK_PROXY
+                url=get_conf.DING_TALK_WEBHOOK, json=data, headers=headers, proxies=get_conf.DING_TALK_PROXY  # type: ignore  # noqa: E501
             )
             response.raise_for_status()
         except Exception as e:

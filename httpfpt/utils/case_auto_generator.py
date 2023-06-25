@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import os.path
 from pathlib import Path
-from typing import NoReturn
 
 import typer
 
@@ -11,7 +10,7 @@ from httpfpt.core.path_conf import TEST_CASE_PATH
 from httpfpt.utils.file_control import search_all_case_yaml_files, search_all_testcase_files, get_file_property
 
 
-def auto_generate_testcases(rewrite: bool = False) -> NoReturn:
+def auto_generate_testcases(rewrite: bool = False) -> None:
     """
     自动创建测试用例
 

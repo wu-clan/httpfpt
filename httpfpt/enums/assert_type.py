@@ -22,5 +22,5 @@ class AssertType(StrEnum):
     length_greater_than_or_equal = 'len_ge'
     contains = 'contains'
     not_contains = 'not_contains'
-    startswith = 'startswith'
-    endswith = 'endswith'
+    startswith = 'startswith'  # type: ignore
+    endswith = 'endswith'  # type: ignore

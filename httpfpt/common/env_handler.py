@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-from typing import NoReturn
 
 import dotenv
 
@@ -20,7 +19,7 @@ def get_env_dict(filepath: str) -> dict:
     return env_dict
 
 
-def write_env_vars(filepath: str, filename: str, key: str, value: str) -> NoReturn:
+def write_env_vars(filepath: str, filename: str, key: str, value: str) -> None:
     """
     写入 env 信息
 
