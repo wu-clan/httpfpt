@@ -24,3 +24,10 @@ repos:
           - '--skip-string-normalization'
           - '--line-length'
           - '120'
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.315
+    hooks:
+      - id: pyright
+        args:
+          - '-p'
+          - '.'
