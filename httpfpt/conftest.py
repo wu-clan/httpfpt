@@ -66,6 +66,7 @@ def pytest_configure(config):
     metadata = config.pluginmanager.getplugin("metadata")
     if metadata:
         from pytest_metadata.plugin import metadata_key
+
         config.stash[metadata_key]['Project Name'] = PROJECT_NAME
         del config.stash[metadata_key]['Packages']
         del config.stash[metadata_key]['Platform']
