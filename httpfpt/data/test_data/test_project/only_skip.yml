@@ -5,7 +5,7 @@ config:
     story: 跳过测试
   request:
     env: dev.env
-  module:
+  module: test
 
 test_steps:
   # 因为只是测试跳过用例，所以没写其他内容
@@ -13,6 +13,14 @@ test_steps:
     case_id: event_skip_001
     description: 测试跳过
     is_run: False
+    request:
+      method:
+      url:
+      params:
+      headers:
+      body_type:
+      body:
+      files:
 
   - name: 自定义跳过说明的跳过
     case_id: event_skip_002
@@ -20,6 +28,14 @@ test_steps:
     is_run:
       skip: True
       reason: 自定义跳过
+    request:
+      method:
+      url:
+      params:
+      headers:
+      body_type:
+      body:
+      files:
 
   - name: 条件判断时跳过
     case_id: event_skip_003
@@ -29,3 +45,11 @@ test_steps:
         - ${random_phone()} == 2
         - ${timeout} == None
       reason: 条件判断为真跳过
+    request:
+      method:
+      url:
+      params:
+      headers:
+      body_type:
+      body:
+      files:
