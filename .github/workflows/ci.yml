@@ -22,7 +22,7 @@ jobs:
     name: lint ${{ matrix.python-version }}
     strategy:
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.10']
       fail-fast: false
     steps:
       - uses: actions/checkout@v3

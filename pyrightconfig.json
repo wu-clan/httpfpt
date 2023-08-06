@@ -13,5 +13,5 @@
   "reportUnusedImport": "error",
   "reportOptionalMemberAccess": false,
   "reportOptionalSubscript": false,
-  "pythonVersion": "3.8"
+  "pythonVersion": "3.10"
 }
