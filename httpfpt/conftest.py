@@ -57,17 +57,20 @@ def function_fixture(request):
 
 def pytest_configure(config):
     """
-    html报告环境信息配置
+    pytest配置
 
     :param config:
     :return:
     """
-    # 添加接口地址与项目名称
-    config._metadata['Project Name'] = PROJECT_NAME
-    # config._metadata.pop("JAVA_HOME")
-    config._metadata.pop('Packages')
-    config._metadata.pop('Platform')
-    config._metadata.pop('Plugins')
+    # 元信息配置
+    metadata = config.pluginmanager.getplugin("metadata")
+    if metadata:
+        from pytest_metadata.plugin import metadata_key
+
+        config.stash[metadata_key]['Project Name'] = PROJECT_NAME
+        del config.stash[metadata_key]['Packages']
+        del config.stash[metadata_key]['Platform']
+        del config.stash[metadata_key]['Plugins']
 
 
 def pytest_html_results_summary(prefix):
@@ -96,7 +99,7 @@ def pytest_html_results_table_header(cells):
     :return:
     """
     cells.insert(1, html.th('Description'))
-    cells.insert(3, html.th('Execute Time', class_='sortable time', col='time'))
+    cells.insert(3, html.th('Start Time', class_='sortable time', col='time'))
     cells.pop()
 
 
@@ -110,7 +113,7 @@ def pytest_html_results_table_row(report, cells):
     :return:
     """
     cells.insert(1, html.td(getattr(report, 'description', None)))
-    cells.insert(3, html.td(datetime.utcnow(), class_='col-time'))
+    cells.insert(3, html.td(datetime.now(), class_='col-time'))
     cells.pop()
 
 
@@ -142,9 +145,7 @@ def pytest_collection_modifyitems(items) -> None:
     # item表示每个用例
     for item in items:
         item.name = item.name.encode('utf-8').decode('unicode_escape')
-        # 打开此注释可以解决控制台ids乱码问题,但是会影响报告中的ids参数乱码
-        # 问题在这里: https://github.com/pytest-dev/pytest-html/issues/450
-        # item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")
+        item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
