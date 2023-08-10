@@ -38,8 +38,11 @@ def get_all_testcase_id(case_data_list: list) -> list:
     all_case_id = []
     for case_id_dict in all_case_id_dict:
         for case_id_values in case_id_dict.values():
-            for case_id in case_id_values:
-                all_case_id.append(case_id)
+            if isinstance(case_id_values, str):
+                all_case_id.append(case_id_values)
+            else:
+                for case_id in case_id_values:
+                    all_case_id.append(case_id)
     set_all_case_id = set(all_case_id)
     all_re_case_id_desc = []
     if len(set_all_case_id) != len(all_case_id):
