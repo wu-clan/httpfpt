@@ -237,6 +237,7 @@ class RequestDataParse:
                         allure.dynamic.description(self.description)
                         log.warning('此用例已设置跳过')
                         raise Skipped('此用例已设置跳过')
+                    return
                 if isinstance(is_run, dict):
                     if 'skip' in is_run.keys():
                         if 'reason' not in is_run.keys():
