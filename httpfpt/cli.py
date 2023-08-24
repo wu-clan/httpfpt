@@ -44,11 +44,11 @@ def testcase_date_verify(verify: str) -> None:
             file_list = search_all_case_yaml_files()
             for file in file_list:
                 file_data = read_yaml(None, filename=file)
-                CaseData.model_validate(file_data, strict=True)
+                CaseData.model_validate(file_data)
         else:
             typer.secho(f'🔥 开始验证 {verify} 测试数据结构...', fg='cyan', bold=True)
             file_data = read_yaml(None, filename=verify)
-            CaseData.model_validate(file_data, strict=True)
+            CaseData.model_validate(file_data)
     except ValidationError as e:
         count = e.error_count()
         msg += str(e)

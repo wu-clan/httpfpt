@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 from typing import Optional, Union, Tuple, List, Dict, Any, Literal
 
-from pydantic import BaseModel, Field, AnyHttpUrl
+from pydantic import BaseModel, Field, AnyHttpUrl, ConfigDict
+
+__all__ = ['CaseData']
 
 
 class ConfigAllureData(BaseModel):
@@ -89,5 +91,8 @@ class Steps(BaseModel):
 
 
 class CaseData(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True)
+
     config: Config
     test_steps: Union[Steps, List[Steps]]
+    filename: Optional[str] = None
