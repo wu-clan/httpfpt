@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.file_control import search_all_case_yaml_files
-from httpfpt.utils.pydantic_error_parse import parse_error
+from httpfpt.utils.pydantic_parser import parse_error
 
 
 class GitRepoPaser:
@@ -48,8 +48,8 @@ class GitRepoPaser:
         for case_data in all_case_data:
             try:
                 count: int = 0
-                CaseData.model_validate(case_data, strict=True)
+                CaseData.model_validate(case_data)
             except ValidationError as e:
                 count = parse_error(e)
             if count > 0:
-                raise ValueError(f'用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
+                raise ValueError(f'导入 Git 用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')

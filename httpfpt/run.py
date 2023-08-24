@@ -3,7 +3,7 @@
 import datetime
 import os
 import shutil
-from typing import Union, Optional
+from typing import Union, Optional, Literal
 
 import pytest
 
@@ -26,7 +26,7 @@ from httpfpt.utils.send_report.send_email import SendMail
 
 def run(
     # log level
-    log_level: str = '-v',
+    log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
     # case path
     case_path: Optional[str] = None,
     # html report
@@ -39,8 +39,8 @@ def run(
     reruns: int = 0,
     maxfail: int = 0,
     x: bool = False,
-    n: Union[str, int] = 'auto',
-    dist: str = 'loadscope',
+    n: Union[Literal['auto', 'logical'], int] = 'auto',
+    dist: Literal['load', 'loadscope', 'loadfile', 'loadgroup', 'worksteal', 'no'] = 'loadscope',
     strict_markers: bool = False,
     capture: bool = True,
     disable_warnings: bool = True,
@@ -176,9 +176,12 @@ def run(
 if __name__ == '__main__':
     # 初始化 redis 数据库 (必选)
     redis_client.init()
+
     # 用例数据唯一 case_id 检测（可选）
     get_all_testcase_id(get_all_testcase_data())
-    # 用例数据 pydantic 检测（可选）
+
+    # 用例数据完整架构 pydantic 快速检测（可选）
     get_all_testcase_data(pydantic_verify=True)
+
     # 执行程序 (必选)
     run()
