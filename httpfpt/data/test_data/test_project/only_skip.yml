@@ -14,8 +14,8 @@ test_steps:
     description: 测试跳过
     is_run: False
     request:
-      method:
-      url:
+      method: GET
+      url: /skip
       params:
       headers:
       body_type:
@@ -29,8 +29,8 @@ test_steps:
       skip: True
       reason: 自定义跳过
     request:
-      method:
-      url:
+      method: GET
+      url: /skip
       params:
       headers:
       body_type:
@@ -46,8 +46,8 @@ test_steps:
         - ${timeout} == None
       reason: 条件判断为真跳过
     request:
-      method:
-      url:
+      method: GET
+      url: /skip
       params:
       headers:
       body_type:
