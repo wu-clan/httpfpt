@@ -13,7 +13,7 @@ from httpfpt.db.redis_db import redis_client
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.file_control import search_all_case_yaml_files, get_file_property
-from httpfpt.utils.pydantic_error_parse import parse_error
+from httpfpt.utils.pydantic_parser import parse_error
 from httpfpt.utils.request.request_data_parse import RequestDataParse
 from httpfpt.utils.request.vars_extractor import VarsExtractor
 
@@ -82,30 +82,31 @@ def get_all_testcase_data(pydantic_verify: bool = False) -> list:
     :return:
     """
     all_yaml_file = search_all_case_yaml_files()
+    all_case_data = []
     if not redis_client.redis.get(f'{redis_client.prefix}:is_re_case_id'):
         redis_all_case_data = redis_client.get(f'{redis_client.prefix}:all_case_data')
         if redis_all_case_data:
             redis_all_case_data_len = redis_client.get(f'{redis_client.prefix}:all_case_data_len')
             if redis_all_case_data_len is not None:
                 if int(redis_all_case_data_len) == len(all_yaml_file):
-                    return eval(redis_all_case_data)
+                    all_case_data = eval(redis_all_case_data)
             else:
                 redis_client.set(f'{redis_client.prefix}:all_case_data_len', len(all_yaml_file))
-    all_case_data = []
-    for file in all_yaml_file:
-        read_data = read_yaml(None, filename=file)
-        read_data.update({'filename': get_file_property(file)[0]})
-        all_case_data.append(read_data)
+    if len(all_case_data) == 0:
+        for file in all_yaml_file:
+            read_data = read_yaml(None, filename=file)
+            read_data.update({'filename': get_file_property(file)[0]})
+            all_case_data.append(read_data)
+        redis_client.rset(f'{redis_client.prefix}:all_case_data', str(all_case_data))
     if pydantic_verify:
         for case_data in all_case_data:
             try:
                 count: int = 0
-                CaseData.model_validate(case_data, strict=True)
+                CaseData.model_validate(case_data)
             except ValidationError as e:
                 count = parse_error(e)
             if count > 0:
-                raise ValueError(f'用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
-    redis_client.rset(f'{redis_client.prefix}:all_case_data', str(all_case_data))
+                raise ValueError(f'测试用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
     return all_case_data
 
 
