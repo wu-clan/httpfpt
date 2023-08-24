@@ -13,7 +13,7 @@ from httpfpt.db.redis_db import redis_client
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.file_control import search_all_case_yaml_files, get_file_property
-from httpfpt.utils.pydantic_parser import parse_error
+from httpfpt.utils.pydantic_error_parse import parse_error
 from httpfpt.utils.request.request_data_parse import RequestDataParse
 from httpfpt.utils.request.vars_extractor import VarsExtractor
 
