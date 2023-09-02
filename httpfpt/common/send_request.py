@@ -191,13 +191,12 @@ class SendRequests:
         if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
             request_data_parsed.update({'json': request_data_parsed.pop('data')})
         response_data['stat']['execute_time'] = get_current_time()
-        match request_engin:
-            case EnginType.requests:
-                response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
-            case EnginType.httpx:
-                response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
-            case _:
-                raise ValueError('请求发起失败，请使用合法的请求引擎')
+        if request_engin == EnginType.requests:
+            response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
+        elif request_engin == EnginType.httpx:
+            response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
+        else:
+            raise ValueError('请求发起失败，请使用合法的请求引擎')
 
         # 记录响应数据
         response_data['url'] = str(response.url)
