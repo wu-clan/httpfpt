@@ -26,13 +26,13 @@ def session_fixture(tmp_path_factory, worker_id):
 
 @pytest.fixture(scope='package', autouse=True)
 def package_fixture():
-    log.info('START')
+    log.info('🚀 START')
     yield
-    log.info('-------------------------------------------------------------------------')
-    log.info('测试用例执行结束')
-    # 自动清理临时变量
+    log.info('')  # 预留空行
+    log.info('🏁 FINISH')
+
+    # 清理临时变量
     VariableCache().clear()
-    log.info('FINISH')
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -47,12 +47,14 @@ def class_fixture():
 
 @pytest.fixture(scope='function', autouse=True)
 def function_fixture(request):
-    log.info(f'----------------- Running case func: {request.function.__name__} -----------------')
+    log.info('')  # 预留空行
+    log.info(f'🔥 Running: {request.function.__name__}')
 
-    def log_end():
-        log.info('end')
+    def testcase_end():
+        log.info('🔚 End')
 
-    request.addfinalizer(log_end)  # teardown终结函数 == yield后的代码
+    # teardown终结函数 == yield后的代码
+    request.addfinalizer(testcase_end)
 
 
 def pytest_configure(config):
@@ -81,7 +83,6 @@ def pytest_html_results_summary(prefix):
     :return:
     """
     # 向 html 报告中的 summary 添加额外信息
-    # prefix.extend([html.p(f"Department:")])
     prefix.extend([html.p(f'Tester: {TESTER_NAME}')])
 
 

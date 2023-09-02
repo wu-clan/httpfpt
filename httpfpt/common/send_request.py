@@ -107,6 +107,7 @@ class SendRequests:
         request_engin: str = 'requests',
         log_data: bool = True,
         allure_data: bool = True,
+        relate_testcase: bool = False,
         **kwargs,
     ) -> dict:
         """
@@ -116,6 +117,7 @@ class SendRequests:
         :param request_engin: 请求引擎
         :param log_data: 日志记录数据
         :param allure_data: allure 记录数据
+        :param relate_testcase: 关联测试用例
         :return: response
         """
         if request_engin not in get_enum_values(EnginType):
@@ -126,6 +128,8 @@ class SendRequests:
         request_data_parse = RequestDataParse(request_data, request_engin)
         parsed_data = request_data_parse.get_request_data_parsed
         log.info('请求数据解析完成')
+        if not relate_testcase:
+            log.info(f'🏷️ Case ID: {parsed_data["case_id"]}')
 
         # 记录请求前置数据; 请注意: 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         if log_data:
@@ -257,7 +261,6 @@ class SendRequests:
         log.info(f"用例 env: {parsed_data['env']}")
         log.info(f"用例 module: {parsed_data['module']}")
         log.info(f"用例 name: {parsed_data['name']}")
-        log.info(f"用例 case_id: {parsed_data['case_id']}")
         log.info(f"用例 description: {parsed_data['description']}")
         log.info(f"请求 method: {parsed_data['method']}")
         log.info(f"请求 url: {parsed_data['url']}")
