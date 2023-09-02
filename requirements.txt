@@ -12,8 +12,8 @@ pre-commit==3.2.2
 pydantic==2.3.0
 pymysql==0.9.3
 pyright==1.1.315
-pytest==7.2.2
-pytest-html==4.0.0rc6
+pytest==7.4.1
+pytest-html==4.0.0
 pytest-loguru==0.2.0
 pytest-metadata==3.0.0
 pytest-pretty==1.2.0
