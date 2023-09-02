@@ -3,6 +3,7 @@
 import json
 import time
 from json import JSONDecodeError
+from typing import Literal
 
 import allure
 import httpx
@@ -104,7 +105,7 @@ class SendRequests:
         self,
         request_data: dict,
         *,
-        request_engin: str = 'requests',
+        request_engin: Literal['requests', 'httpx'] = 'requests',
         log_data: bool = True,
         allure_data: bool = True,
         relate_testcase: bool = False,
@@ -190,12 +191,13 @@ class SendRequests:
         if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
             request_data_parsed.update({'json': request_data_parsed.pop('data')})
         response_data['stat']['execute_time'] = get_current_time()
-        if request_engin == EnginType.requests:
-            response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
-        elif request_engin == EnginType.httpx:
-            response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
-        else:
-            raise ValueError('请求发起失败，使用了不合法的请求引擎')
+        match request_engin:
+            case EnginType.requests:
+                response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
+            case EnginType.httpx:
+                response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
+            case _:
+                raise ValueError('请求发起失败，请使用合法的请求引擎')
 
         # 记录响应数据
         response_data['url'] = str(response.url)
@@ -206,6 +208,7 @@ class SendRequests:
         try:
             json_data = response.json()
         except JSONDecodeError:
+            log.warning('响应数据解析失败，响应数据不是有效的 json 格式')
             json_data = {}
         response_data['json'] = json.dumps(json_data)
         response_data['content'] = response.content.decode('utf-8')
