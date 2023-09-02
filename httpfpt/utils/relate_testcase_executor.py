@@ -238,10 +238,10 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     """
     from httpfpt.common.send_request import send_request
 
-    msg = '执行变量提取关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
+    msg = '🔗 执行关联测试用例变量提取：{}'.format(testcase_data['test_steps']['case_id'])
     log.debug(msg)
     allure_step(msg, '此文件为空')
-    response = send_request.send_request(testcase_data, log_data=False)
+    response = send_request.send_request(testcase_data, log_data=False, relate_testcase=True)
     value = jsonpath(response, testcase_data['set_var_jsonpath'])
     if value:
         VariableCache().set(testcase_data['set_var_key'], value[0])
@@ -258,7 +258,7 @@ def relate_testcase_exec(testcase_data: dict) -> None:
     """
     from httpfpt.common.send_request import send_request
 
-    msg = '执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
+    msg = '🔗 执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
     log.debug(msg)
     allure_step(msg, '此文件为空')
-    send_request.send_request(testcase_data, log_data=False)
+    send_request.send_request(testcase_data, log_data=False, relate_testcase=True)

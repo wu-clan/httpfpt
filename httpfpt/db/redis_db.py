@@ -25,16 +25,16 @@ class RedisDB:
         try:
             self.redis.ping()
         except TimeoutError:
-            log.error('❌ 数据库 redis 连接超时')
+            log.error('数据库 redis 连接超时')
             sys.exit(1)
         except AuthenticationError:
-            log.error('❌ 数据库 redis 授权认证错误')
+            log.error('数据库 redis 授权认证错误')
             sys.exit(1)
         except Exception as e:
-            log.error(f'❌ 数据库 redis 连接异常: {e}')
+            log.error(f'数据库 redis 连接异常: {e}')
             sys.exit(1)
         else:
-            log.info('✅ 数据库 redis 连接成功')
+            log.info('数据库 redis 连接成功')
 
     def get(self, key: Any) -> Any:
         """
