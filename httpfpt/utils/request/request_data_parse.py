@@ -402,21 +402,18 @@ class RequestDataParse:
 
     @property
     def files(self) -> Union[dict, list, None]:
-        try:
-            files = self.request_data['test_steps']['request']['files']
-        except RequestParamGetError:
-            raise ValueError('请求数据解析失败, 缺少 test_steps:request:files 参数')
-        else:
-            if files is not None:
-                if not isinstance(files, dict):
-                    raise ValueError('请求数据解析失败, 参数 test_steps:request:files 不是有效的 dict 类型')
-                for k, v in files.items():
+        files = self.files_no_parse
+        if files is not None:
+            for k, v in files.items():
+                try:
                     # 多文件
                     if isinstance(v, list):
                         files = [(f'{k}', open(_, 'rb')) for _ in v]
                     # 单文件
                     else:
                         files = {f'{k}': open(v, 'rb')}
+                except FileNotFoundError:
+                    raise ValueError(f'请求数据解析失败, 文件 {v} 不存在')
         return files
 
     @property
@@ -590,8 +587,8 @@ class RequestDataParse:
         except RequestParamGetError:
             assert_text = None
         if assert_text is not None:
-            if not any([isinstance(assert_text, str), isinstance(assert_text, dict), isinstance(assert_text, list)]):
-                raise ValueError('请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / dict / list 类型')
+            if not any([isinstance(assert_text, str), isinstance(assert_text, list)]):
+                raise ValueError('请求参数解析失败, 参数 test_steps:teardown:assert 不是有效的 str / list 类型')
         return assert_text
 
     @property
