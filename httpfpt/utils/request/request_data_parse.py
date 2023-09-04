@@ -6,6 +6,7 @@ from typing import Union
 
 import allure
 from _pytest.outcomes import Skipped
+from dirty_equals import IsUrl
 
 from httpfpt.common.env_handler import get_env_dict
 from httpfpt.common.log import log
@@ -293,11 +294,15 @@ class RequestDataParse:
         except RequestParamGetError:
             raise ValueError('请求参数解析失败, 缺少 test_steps:request:url 参数')
         else:
-            env_file = os.path.join(RUN_ENV_PATH, self.env)
-            env_dict = get_env_dict(env_file)
+            env = self.env
+            try:
+                env_file = os.path.join(RUN_ENV_PATH, env)
+                env_dict = get_env_dict(env_file)
+            except Exception as e:
+                raise ValueError(f'环境变量 {env} 读取失败: {e}')
             host = env_dict.get('host') or env_dict.get('HOST')
             if host is None:
-                raise ValueError('请求参数解析失败, 缺少 HOST 参数')
+                raise ValueError(f'环境变量 {env_file} 读取失败, 缺少 HOST 参数')
             url = host + str(url)
             return url
 
@@ -327,10 +332,10 @@ class RequestDataParse:
                     headers = None
             else:
                 if not isinstance(headers, dict):
-                    raise ValueError('请求数据解析失败, 参数 headers 不是有效的 dict 类型')
+                    raise ValueError('请求数据解析失败, 参数 test_steps:request:headers 不是有效的 dict 类型')
             if headers is not None:
                 if len(headers) == 0:
-                    raise ValueError('请求数据解析失败, 参数 headers 内容为空')
+                    raise ValueError('请求数据解析失败, 参数 test_steps:request:headers 为空')
             if IS_AUTH:
                 if AUTH_TYPE == AuthType.bearer_token:
                     token = AuthPlugins().bearer_token
@@ -345,8 +350,10 @@ class RequestDataParse:
         headers_format = headers or {}
         if body_type == BodyType.form_data:
             headers_format.update({'Content-Type': 'multipart/form-data'})
-        if body_type == BodyType.x_www_form_urlencoded:
+        elif body_type == BodyType.x_www_form_urlencoded:
             headers_format.update({'Content-Type': 'application/x-www-form-urlencoded'})
+        elif body_type == BodyType.binary:
+            headers_format.update({'Content-Type': 'application/octet-stream'})
         elif body_type == BodyType.GraphQL:
             headers_format.update({'Content-Type': 'application/json; charset=uft-8'})
         elif body_type == BodyType.TEXT:
@@ -374,32 +381,46 @@ class RequestDataParse:
         return data_type
 
     @property
-    def body(self) -> Union[dict, None]:
+    def body(self) -> Union[dict, bytes, str, None]:
         try:
             body = self.request_data['test_steps']['request']['body']
         except RequestParamGetError:
             raise ValueError('请求数据解析失败, 缺少 test_steps:request:body 参数')
         else:
-            if body is not None:
-                body_type = self.body_type
-                if body_type is None:
-                    body = None
-                elif body_type == BodyType.form_data:  # noqa: SIM114
-                    body = body
-                elif body_type == BodyType.x_www_form_urlencoded:
-                    body = body
-                elif body_type == BodyType.GraphQL:
-                    body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif body_type == BodyType.TEXT:  # noqa: SIM114
-                    body = body
-                elif body_type == BodyType.JavaScript:
-                    body = body
-                elif body_type == BodyType.JSON:
-                    body = json.loads(json.dumps(body, ensure_ascii=False))
-                elif body_type == BodyType.HTML:  # noqa: SIM114
-                    body = body
-                elif body_type == BodyType.XML:
-                    body = body
+            try:
+                if body is not None:
+                    body_type = self.body_type
+                    if body_type is None:
+                        raise ValueError('缺少 test_steps:request:body_type 参数')
+                    elif body_type == BodyType.form_data:  # noqa: SIM114
+                        body = body
+                    elif body_type == BodyType.x_www_form_urlencoded:
+                        body = body
+                    elif body_type == BodyType.binary:
+                        if isinstance(body, bytes):
+                            body = bytes(body)
+                        elif isinstance(body, str):
+                            assert body == IsUrl(file_url=True)
+                            if not os.path.exists(body):
+                                raise ValueError(f'读取 {body} 失败，文件不存在')
+                            with open(body, 'rb') as f:
+                                body = f.read()
+                        else:
+                            raise ValueError('不是合法类型')
+                    elif body_type == BodyType.GraphQL:
+                        body = json.loads(json.dumps(body, ensure_ascii=False))
+                    elif body_type == BodyType.TEXT:  # noqa: SIM114
+                        body = body
+                    elif body_type == BodyType.JavaScript:
+                        body = body
+                    elif body_type == BodyType.JSON:
+                        body = json.loads(json.dumps(body, ensure_ascii=False))
+                    elif body_type == BodyType.HTML:  # noqa: SIM114
+                        body = body
+                    elif body_type == BodyType.XML:
+                        body = body
+            except Exception as e:
+                raise ValueError(f'请求数据解析失败, 参数 test_steps:request:body 解析失败: {e}')
         return body
 
     @property
@@ -415,7 +436,7 @@ class RequestDataParse:
                     else:
                         files = {f'{k}': open(v, 'rb')}
                 except FileNotFoundError:
-                    raise ValueError(f'请求数据解析失败, 文件 {v} 不存在')
+                    raise ValueError(f'请求数据解析失败, 参数 test_steps:request:files:{k} 文件不存在')
         return files
 
     @property

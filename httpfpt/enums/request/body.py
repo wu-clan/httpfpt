@@ -6,7 +6,7 @@ from httpfpt.enums import StrEnum
 class BodyType(StrEnum):
     form_data = 'form'
     x_www_form_urlencoded = 'x_form'
-    # binary = 'binary'
+    binary = 'binary'
     GraphQL = 'GraphQL'
     TEXT = 'text'
     JavaScript = 'js'
