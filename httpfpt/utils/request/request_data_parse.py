@@ -233,26 +233,27 @@ class RequestDataParse:
             if is_run is not None:
                 if isinstance(is_run, bool):
                     if not is_run:
+                        log.info(f'🏷️ Case ID: {self.case_id}')
                         allure.dynamic.title(self.name)
                         allure.dynamic.description(self.description)
-                        log.warning('此用例已设置跳过')
-                        raise Skipped('此用例已设置跳过')
+                        log.warning('此用例已设置跳过执行')
+                        raise Skipped('此用例已设置跳过执行')
                     return
                 if isinstance(is_run, dict):
+                    if 'reason' not in is_run.keys():
+                        raise ValueError('测试用例数据解析失败, 参数 test_steps:is_run:skip 未设置 reason 参数')
+                    reason = is_run['reason'] or '未设置跳过原因'
                     if 'skip' in is_run.keys():
-                        if 'reason' not in is_run.keys():
-                            raise ValueError('测试用例数据解析失败, 参数 test_steps:is_run:skip 未设置 reason 参数')
                         if isinstance(is_run['skip'], bool):
                             if is_run['skip']:
-                                allure.dynamic.title(self.request_data['test_steps']['name'])
-                                allure.dynamic.description(self.request_data['test_steps']['description'])
-                                log.warning('此用例已设置跳过')
-                                raise Skipped(is_run['reason'])
+                                log.info(f'🏷️ Case ID: {self.case_id}')
+                                allure.dynamic.title(self.name)
+                                allure.dynamic.description(self.description)
+                                log.warning(f'此用例已设置跳过执行: {reason}')
+                                raise Skipped(f'此用例已设置跳过执行: {reason}')
                         else:
                             raise ValueError('测试用例数据解析失败, 参数 test_steps:is_run:skip 不是有效的 bool 类型')
                     elif 'skip_if' in is_run.keys():
-                        if 'reason' not in is_run.keys():
-                            raise ValueError('测试用例数据解析失败, 参数 test_steps:is_run:skip 未设置 reason 参数')
                         if isinstance(is_run['skip_if'], list):
                             for v in is_run['skip_if']:
                                 if not isinstance(v, str):
@@ -260,10 +261,11 @@ class RequestDataParse:
                                         f'测试用例数据解析失败, 参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值'  # noqa: E501
                                     )
                                 if HookExecutor().exec_any_code(v):
-                                    allure.dynamic.title(self.request_data['test_steps']['name'])
-                                    allure.dynamic.description(self.request_data['test_steps']['description'])
-                                    log.warning('此用例已设置跳过')
-                                    raise Skipped(is_run['reason'])
+                                    log.info(f'🏷️ Case ID: {self.case_id}')
+                                    allure.dynamic.title(self.name)
+                                    allure.dynamic.description(self.description)
+                                    log.warning(f'此用例已设置跳过执行: {reason}')
+                                    raise Skipped(f'此用例已设置跳过执行: {reason}')
                     else:
                         raise ValueError('测试用例数据解析失败, 参数 test_steps:is_run 缺少 skip / skip_if 参数')
                 else:
