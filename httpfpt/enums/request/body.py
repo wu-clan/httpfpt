@@ -7,7 +7,7 @@ class BodyType(StrEnum):
     form_data = 'form'
     x_www_form_urlencoded = 'x_form'
     # binary = 'binary'
-    GraphQL = 'graphQL'
+    GraphQL = 'GraphQL'
     TEXT = 'text'
     JavaScript = 'js'
     JSON = 'json'
