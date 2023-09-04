@@ -190,6 +190,9 @@ class SendRequests:
         }
         if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
             request_data_parsed.update({'json': request_data_parsed.pop('data')})
+        elif parsed_data['body_type'] == BodyType.binary:
+            if request_engin == EnginType.httpx:
+                request_data_parsed.update({'content': request_data_parsed.pop('data')})
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
             response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
