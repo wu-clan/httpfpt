@@ -498,8 +498,11 @@ class RequestDataParse:
                     for i in sql:
                         if isinstance(i, dict):
                             for k, v in i.items():
-                                if not isinstance(v, str):
-                                    raise ValueError(f'请求参数解析失败，参数 test_steps:setup:sql:{k} 不是有效的 str 类型')  # noqa: E501
+                                if k != 'value':
+                                    if not isinstance(v, str):
+                                        raise ValueError(
+                                            f'请求参数解析失败，参数 test_steps:setup:sql:{k} 不是有效的 str 类型'  # noqa: E501
+                                        )
                         else:
                             if not isinstance(i, str):
                                 raise ValueError(f'请求数据解析失败, 参数 test_steps:setup:sql:{i} 不是有效的 str 类型')
@@ -556,10 +559,11 @@ class RequestDataParse:
                     for i in sql:
                         if isinstance(i, dict):
                             for k, v in i.items():
-                                if not isinstance(v, str):
-                                    raise ValueError(
-                                        f'请求参数解析失败，参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'  # noqa: E501
-                                    )
+                                if k != 'value':
+                                    if not isinstance(v, str):
+                                        raise ValueError(
+                                            f'请求参数解析失败，参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'  # noqa: E501
+                                        )
                         else:
                             if not isinstance(i, str):
                                 raise ValueError(f'请求数据解析失败, 参数 test_steps:teardown:sql:{i} 不是有效的 str 类型')  # noqa: E501

@@ -19,6 +19,7 @@ MysqlDB_PORT = __config['mysql']['port']
 MysqlDB_USER = __config['mysql']['user']
 MysqlDB_PASSWORD = __config['mysql']['password']
 MysqlDB_DATABASE = __config['mysql']['database']
+MysqlDB_CHARSET = __config['mysql']['charset']
 
 # redis 数据库
 REDIS_HOST = __config['redis']['host']
