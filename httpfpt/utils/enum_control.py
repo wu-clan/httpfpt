@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from enum import Enum
-from typing import Any
+from typing import Type
 
 
-def get_enum_values(enum_class: Any) -> list:
+def get_enum_values(enum_class: Type[Enum]) -> list:
     if issubclass(enum_class, Enum):
         return list(map(lambda ec: ec.value, enum_class))
     else:

@@ -2,7 +2,7 @@
 # _*_ coding:utf-8 _*_
 import datetime
 import decimal
-from typing import Any, Optional
+from typing import Optional
 
 import pymysql
 from dbutils.pooled_db import PooledDB
@@ -14,6 +14,7 @@ from httpfpt.common.variable_cache import VariableCache
 from httpfpt.common.yaml_handler import write_yaml_vars
 from httpfpt.core import get_conf
 from httpfpt.core.path_conf import RUN_ENV_PATH
+from httpfpt.enums.query_fetch import QueryFetchType
 from httpfpt.enums.sql_type import SqlType
 from httpfpt.enums.var_type import VarType
 from httpfpt.utils.enum_control import get_enum_values
@@ -21,60 +22,20 @@ from httpfpt.utils.enum_control import get_enum_values
 
 class MysqlDB:
     def __init__(self) -> None:
-        try:
-            self.conn = PooledDB(
-                pymysql,
-                maxconnections=15,
-                blocking=True,  # 防止连接过多报错
-                host=get_conf.MysqlDB_HOST,
-                port=get_conf.MysqlDB_PORT,
-                user=get_conf.MysqlDB_USER,
-                password=get_conf.MysqlDB_PASSWORD,
-                database=get_conf.MysqlDB_DATABASE,
-            ).connection()
-        except BaseException as e:
-            log.error(f'数据库 mysql 连接失败: {e}')
-        # 声明游标
-        self.cursor = self.conn.cursor()
-
-    def query(self, sql: str, fetch: str = 'all') -> Any:
-        """
-        数据库查询
-
-        :param sql:
-        :param fetch: 查询条件; all / 任意内容（单条记录）
-        :return:
-        """
-        try:
-            self.cursor.execute(sql)
-            if fetch == 'all':
-                query_data = self.cursor.fetchall()
-            else:
-                query_data = self.cursor.fetchone()
-        except Exception as e:
-            log.error(f'执行 {sql} 失败: {e}')
-        else:
-            log.info(f'执行 {sql} 成功')
-            return query_data
-        finally:
-            self.close()
-
-    def execute(self, sql: str) -> None:
-        """
-        执行 sql 操作
-
-        :return:
-        """
-        try:
-            self.cursor.execute(sql)
-            self.conn.commit()
-        except Exception as e:
-            self.conn.rollback()
-            log.error(f'执行 {sql} 失败: {e}')
-        else:
-            log.info(f'执行 {sql} 成功')
-        finally:
-            self.close()
+        self._pool = PooledDB(
+            pymysql,
+            host=get_conf.MysqlDB_HOST,
+            port=get_conf.MysqlDB_PORT,
+            user=get_conf.MysqlDB_USER,
+            password=get_conf.MysqlDB_PASSWORD,
+            database=get_conf.MysqlDB_DATABASE,
+            charset=get_conf.MysqlDB_CHARSET,
+            maxconnections=15,
+            blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待
+            autocommit=False,  # 是否自动提交
+        )
+        self.conn = self._pool.connection()
+        self.cursor = self.conn.cursor(cursor=pymysql.cursors.DictCursor)  # type: ignore
 
     def close(self) -> None:
         """
@@ -85,7 +46,65 @@ class MysqlDB:
         self.cursor.close()
         self.conn.close()
 
-    def exec_case_sql(self, sql: list, env: Optional[str] = None) -> dict:
+    def query(self, sql: str, fetch: str = 'all') -> dict:
+        """
+        数据库查询
+
+        :param sql:
+        :param fetch: 查询条件; one: 查询一条数据; all: 查询所有数据
+        :return:
+        """
+        data = {}
+        try:
+            self.cursor.execute(sql)
+            if fetch == QueryFetchType.ONE:
+                query_data = self.cursor.fetchone()
+            elif fetch == QueryFetchType.ALL:
+                query_data = self.cursor.fetchall()
+            else:
+                raise ValueError(f'查询条件 {fetch} 错误, 请使用 one / all')
+        except Exception as e:
+            log.error(f'执行 {sql} 失败: {e}')
+            raise e
+        else:
+            log.info(f'执行 {sql} 成功')
+            try:
+                for k, v in query_data.items():
+                    if isinstance(v, decimal.Decimal):
+                        if v % 1 == 0:
+                            data[k] = int(v)
+                        data[k] = float(v)
+                    elif isinstance(v, datetime.datetime):
+                        data[k] = str(v)
+                    else:
+                        data[k] = v
+            except Exception as e:
+                log.error(f'序列化 {sql} 查询结果失败: {e}')
+                raise e
+            return data
+        finally:
+            self.close()
+
+    def execute(self, sql: str) -> int:
+        """
+        执行 sql 操作
+
+        :return:
+        """
+        try:
+            rowcount = self.cursor.execute(sql)
+            self.conn.commit()
+        except Exception as e:
+            self.conn.rollback()
+            log.error(f'执行 {sql} 失败: {e}')
+            raise e
+        else:
+            log.info(f'执行 {sql} 成功')
+            return rowcount
+        finally:
+            self.close()
+
+    def exec_case_sql(self, sql: str | list, env: Optional[str] = None) -> None:
         """
         执行用例 sql
 
@@ -97,19 +116,17 @@ class MysqlDB:
         if any(_.upper() in sql for _ in sql_type):
             raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 DQL 类型 sql 语句')
         else:
-            data = {}
+            if isinstance(sql, str):
+                log.info(f'执行 sql: {sql}')
+                self.query(sql)
             for s in sql:
                 # 获取返回数据
                 if isinstance(s, str):
                     log.info(f'执行 sql: {s}')
-                    query_data = self.query(s)
-                    for k, v in query_data.items():
-                        if isinstance(v, decimal.Decimal):
-                            data[k] = float(v)
-                        elif isinstance(v, datetime.datetime):
-                            data[k] = str(v)
-                        else:
-                            data[k] = v
+                    if SqlType.select in s:
+                        self.query(s)
+                    else:
+                        self.execute(s)
                 # 设置变量
                 if isinstance(s, dict):
                     log.info(f'执行变量提取 sql: {s["sql"]}')
@@ -135,4 +152,3 @@ class MysqlDB:
                         raise ValueError(
                             f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'  # noqa: E501
                         )
-            return data
