@@ -114,7 +114,7 @@ class MysqlDB:
         """
         sql_type = get_enum_values(SqlType)
         if any(_.upper() in sql for _ in sql_type):
-            raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 DQL 类型 sql 语句')
+            raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 {sql_type} 类型 sql 语句')
         else:
             if isinstance(sql, str):
                 log.info(f'执行 sql: {sql}')
