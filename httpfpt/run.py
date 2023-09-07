@@ -25,6 +25,7 @@ from httpfpt.utils.send_report.send_email import SendMail
 
 
 def run(
+    *args,
     # log level
     log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
     # case path
@@ -44,7 +45,6 @@ def run(
     strict_markers: bool = False,
     capture: bool = True,
     disable_warnings: bool = True,
-    *args,
     **kwargs,
 ) -> None:
     """
@@ -139,6 +139,7 @@ def run(
         + kw
         if arg.strip() != ''
     ]
+    run_args = list(set(run_args))
 
     format_run_args = []
     for i in run_args:
