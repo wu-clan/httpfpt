@@ -6,7 +6,7 @@ from typing import Optional
 
 import pymysql
 from dbutils.pooled_db import PooledDB
-from jsonpath import jsonpath
+from jsonpath import findall
 
 from httpfpt.common.env_handler import write_env_vars
 from httpfpt.common.log import log
@@ -104,7 +104,7 @@ class MysqlDB:
         finally:
             self.close()
 
-    def exec_case_sql(self, sql: str | list, env: Optional[str] = None) -> None:
+    def exec_case_sql(self, sql: str | list, env: Optional[str] = None) -> dict | int | None:
         """
         执行用例 sql
 
@@ -118,15 +118,15 @@ class MysqlDB:
         else:
             if isinstance(sql, str):
                 log.info(f'执行 sql: {sql}')
-                self.query(sql)
+                return self.query(sql)
             for s in sql:
                 # 获取返回数据
                 if isinstance(s, str):
                     log.info(f'执行 sql: {s}')
                     if SqlType.select in s:
-                        self.query(s)
+                        return self.query(s)
                     else:
-                        self.execute(s)
+                        return self.execute(s)
                 # 设置变量
                 if isinstance(s, dict):
                     log.info(f'执行变量提取 sql: {s["sql"]}')
@@ -135,9 +135,9 @@ class MysqlDB:
                     sql_text = s['sql']
                     json_path = s['jsonpath']
                     query_data = self.query(sql_text)
-                    value = jsonpath(query_data, json_path)
+                    value = findall(json_path, query_data)
                     if value:
-                        value = value[0]
+                        value = str(value[0])
                     else:
                         raise ValueError(f'jsonpath 取值失败, 表达式: {json_path}')
                     if set_type == VarType.CACHE:

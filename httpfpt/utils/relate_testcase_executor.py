@@ -3,7 +3,7 @@
 import sys
 from typing import List, Dict, Union
 
-from jsonpath import jsonpath
+from jsonpath import findall
 from pydantic import ValidationError
 
 from httpfpt.common.log import log
@@ -242,7 +242,7 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     log.debug(msg)
     allure_step(msg, '此文件为空')
     response = send_request.send_request(testcase_data, log_data=False, relate_testcase=True)
-    value = jsonpath(response, testcase_data['set_var_jsonpath'])
+    value = findall(testcase_data['set_var_jsonpath'], response)
     if value:
         VariableCache().set(testcase_data['set_var_key'], value[0])
     else:

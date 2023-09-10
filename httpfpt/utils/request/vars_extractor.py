@@ -3,7 +3,7 @@
 import os.path
 import re
 
-from jsonpath import jsonpath
+from jsonpath import findall
 
 from httpfpt.common.env_handler import get_env_dict, write_env_vars
 from httpfpt.common.log import log
@@ -130,9 +130,9 @@ class VarsExtractor:
             key = et['key']
             set_type = et['type']
             json_path = et['jsonpath']
-            value = jsonpath(response, json_path)
+            value = findall(json_path, response)
             if value:
-                value = value[0]
+                value = str(value[0])
             else:
                 raise ValueError(f'jsonpath 取值失败, 表达式: {json_path}')
             if set_type == VarType.CACHE:

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import requests
-from jsonpath import jsonpath
+from jsonpath import findall
 
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.path_conf import AUTH_CONF_PATH
@@ -19,7 +18,7 @@ class AuthPlugins:
     def __init__(self) -> None:
         self.auth_type = AUTH_TYPE
         if not getattr(AuthType, self.auth_type, None):
-            raise ValueError(f'认证类型错误, 仅允许 {get_enum_values(AuthType)} 其中之一, 请检查认证配置文件')
+            raise ValueError(f'认证类型错误, 仅允许 {get_enum_values(AuthType)} 之一, 请检查认证配置文件')
 
     @property
     def bearer_token(self) -> str:
@@ -42,6 +41,8 @@ class AuthPlugins:
             if 'json' in str(headers):
                 request_data.update({'json': request_data.pop('data')})
             response = requests.session().post(**request_data)
-            token = jsonpath(response.json(), auth_data[f'{self.auth_type}']['token_key'])[0]
-            redis_client.set(f'{redis_client.prefix}:bearer_token', token, ex=timeout)
+            token = findall(auth_data[f'{self.auth_type}']['token_key'], response.json())
+            if not token:
+                raise ValueError('Token 获取失败，请检查接口响应或 token_key 表达式')
+            redis_client.set(f'{redis_client.prefix}:bearer_token', token[0], ex=timeout)
         return token
