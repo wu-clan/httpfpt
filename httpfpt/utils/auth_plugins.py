@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import requests
-from jsonpath import jsonpath
+from jsonpath import findall
 
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.path_conf import AUTH_CONF_PATH
@@ -42,6 +41,6 @@ class AuthPlugins:
             if 'json' in str(headers):
                 request_data.update({'json': request_data.pop('data')})
             response = requests.session().post(**request_data)
-            token = jsonpath(response.json(), auth_data[f'{self.auth_type}']['token_key'])[0]
+            token = findall(auth_data[f'{self.auth_type}']['token_key'], response.json())[0]
             redis_client.set(f'{redis_client.prefix}:bearer_token', token, ex=timeout)
         return token

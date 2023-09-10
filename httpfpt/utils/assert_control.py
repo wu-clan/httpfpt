@@ -3,11 +3,12 @@
 from decimal import Decimal
 from typing import Union, Any
 
-from jsonpath import jsonpath
+from jsonpath import findall
 
 from httpfpt.common.log import log
 from httpfpt.db.mysql_db import MysqlDB
 from httpfpt.enums.assert_type import AssertType
+from httpfpt.enums.sql_type import SqlType
 
 
 class Asserter:
@@ -69,7 +70,7 @@ class Asserter:
             2. ...
 
         语法说明::
-            符合 jsonpath 取值语法即可, `jsonpath <https://goessner.net/articles/JsonPath/index.html#e2>`_
+            符合 jsonpath 取值语法即可, `jsonpath <https://jg-rp.github.io/python-jsonpath/syntax/>`_
 
         取值范围::
             与 code 断言器一致
@@ -93,7 +94,7 @@ class Asserter:
         except KeyError as e:
             raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
         else:
-            response_value = jsonpath(response, assert_jsonpath)
+            response_value = findall(assert_jsonpath, response)
         if response_value:
             log.info(f'执行断言：{assert_text}')
             self._exec_json_assert(assert_check, assert_value, assert_type, response_value[0])
@@ -120,11 +121,15 @@ class Asserter:
         except KeyError as e:
             raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
         else:
+            if assert_sql.split(' ')[0].upper() != SqlType.select:
+                raise ValueError(f'sql 断言 {assert_check}:{assert_type} 执行失败，请检查 sql 是否为 DQL')
             sql_data = MysqlDB().exec_case_sql(assert_sql)
-            sql_value = jsonpath(sql_data, assert_jsonpath)
+            if not isinstance(sql_data, dict):
+                raise ValueError('jsonpath取值失败, sql 语句执行结果不是有效的 dict 类型')
+            sql_value = findall(assert_jsonpath, sql_data)[0]
         if sql_value:
             log.info(f'执行断言：{assert_text}')
-            self._exec_json_assert(assert_check, assert_value, assert_type, sql_value[0])
+            self._exec_json_assert(assert_check, assert_value, assert_type, sql_value)
         else:
             raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
 
