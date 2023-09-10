@@ -122,7 +122,7 @@ class Asserter:
             raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
         else:
             if assert_sql.split(' ')[0].upper() != SqlType.select:
-                raise ValueError(f'sql 断言 {assert_check}:{assert_type} 执行失败，请检查 sql 是否为 DQL')
+                raise ValueError(f'sql 断言 {assert_check}:{assert_type} 执行失败，请检查 sql 是否为 DQL 类型')
             sql_data = MysqlDB().exec_case_sql(assert_sql)
             if not isinstance(sql_data, dict):
                 raise ValueError('jsonpath取值失败, sql 语句执行结果不是有效的 dict 类型')
