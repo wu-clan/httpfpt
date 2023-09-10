@@ -126,12 +126,12 @@ class Asserter:
             sql_data = MysqlDB().exec_case_sql(assert_sql)
             if not isinstance(sql_data, dict):
                 raise ValueError('jsonpath取值失败, sql 语句执行结果不是有效的 dict 类型')
-            sql_value = findall(assert_jsonpath, sql_data)[0]
-        if sql_value:
-            log.info(f'执行断言：{assert_text}')
-            self._exec_json_assert(assert_check, assert_value, assert_type, sql_value)
-        else:
-            raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
+            sql_value = findall(assert_jsonpath, sql_data)
+            if sql_value:
+                log.info(f'执行断言：{assert_text}')
+                self._exec_json_assert(assert_check, assert_value, assert_type, sql_value[0])
+            else:
+                raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
 
     @staticmethod
     def _exec_code_assert(response: dict, assert_text: str) -> None:
