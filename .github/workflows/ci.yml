@@ -9,20 +9,23 @@ on:
   pull_request:
 
 jobs:
-  #  check_version:
-  #    name: check vesion
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - name: check GITHUB_REF matches package version
-  #        uses: samuelcolvin/check-python-version@v3.2
-  #        with:
-  #          version_file_path: httpfpt/__init__.py
+  check_version:
+    name: check version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check whether the GITHUB release matches the package version
+        uses: samuelcolvin/check-python-version@v4
+        with:
+          version_file_path: httpfpt/__init__.py
+
   lint:
     runs-on: ubuntu-latest
     name: lint ${{ matrix.python-version }}
     strategy:
       matrix:
-        python-version: ['3.10']
+        python-version: [ '3.10' ]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
