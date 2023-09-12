@@ -43,7 +43,7 @@ jobs:
 
   # https://github.com/re-actors/alls-green
   check:
-    name: check the status of other workflow jobs
+    name: check the needed jobs status
     runs-on: ubuntu-latest
     if: always()
     needs: [ lint ]
