@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Union
 
 from pydantic import ValidationError
 
+from httpfpt.common.errors import RequestDataParseError
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.pydantic_parser import parse_error
 
@@ -20,16 +21,16 @@ def get_request_data(*, file_data: dict, use_pydantic_verify: bool = False) -> U
     try:
         config = file_data['config']
     except KeyError:
-        raise ValueError('请求测试用力数据缺少 config 信息, 请检查测试用例文件内容')
+        raise RequestDataParseError('请求测试用例数据缺少 config 信息, 请检查测试用例文件内容')
     if config is None:
-        raise ValueError('请求测试用力数据缺少 config 内容, 请检查测试用例文件内容')
+        raise RequestDataParseError('请求测试用例数据缺少 config 内容, 请检查测试用例文件内容')
 
     try:
         cases = file_data['test_steps']
     except KeyError:
-        raise ValueError('请求测试用力数据缺少 test_steps 信息, 请检查测试用例文件内容')
+        raise RequestDataParseError('请求测试用例数据缺少 test_steps 信息, 请检查测试用例文件内容')
     if cases is None:
-        raise ValueError('请求测试用例数据缺少 test_steps 内容, 轻简查测试用例文件内容')
+        raise RequestDataParseError('请求测试用例数据缺少 test_steps 内容, 轻简查测试用例文件内容')
 
     try:
         count: int = 0
@@ -50,10 +51,10 @@ def get_request_data(*, file_data: dict, use_pydantic_verify: bool = False) -> U
                     else:
                         case_list.append(data)
                 else:
-                    raise ValueError('请求测试用例数据 test_steps 格式错误, 请检查测试用例文件内容')
+                    raise RequestDataParseError('请求测试用例数据 test_steps 格式错误, 请检查测试用例文件内容')
             return case_list
     except ValidationError as e:
         count = parse_error(e)
 
     if count > 0:
-        raise ValueError(f'测试用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
+        raise RequestDataParseError(f'测试用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')

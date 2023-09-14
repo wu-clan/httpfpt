@@ -11,6 +11,7 @@ import requests
 from httpx import Response as HttpxResponse
 from requests import Response as RequestsResponse
 
+from httpfpt.common.errors import SendRequestError, AssertError
 from httpfpt.common.log import log
 from httpfpt.core import get_conf
 from httpfpt.db.mysql_db import MysqlDB
@@ -70,7 +71,7 @@ class SendRequests:
             return response
         except Exception as e:
             log.error(f'发送 requests 请求异常: {e}')
-            raise e
+            raise SendRequestError(e.__str__())
 
     @staticmethod
     def _httpx_engin(**kwargs) -> HttpxResponse:
@@ -99,7 +100,7 @@ class SendRequests:
                 return response
         except Exception as e:
             log.error(f'发送 httpx 请求异常: {e}')
-            raise e
+            raise SendRequestError(e.__str__())
 
     def send_request(
         self,
@@ -122,7 +123,7 @@ class SendRequests:
         :return: response
         """
         if request_engin not in get_enum_values(EnginType):
-            raise ValueError('请求发起失败，请使用合法的请求引擎')
+            raise SendRequestError('请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
         log.info('开始解析请求数据')
@@ -199,7 +200,7 @@ class SendRequests:
         elif request_engin == EnginType.httpx:
             response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
         else:
-            raise ValueError('请求发起失败，请使用合法的请求引擎')
+            raise SendRequestError('请求发起失败，请使用合法的请求引擎')
 
         # 记录响应数据
         response_data['url'] = str(response.url)
@@ -245,8 +246,8 @@ class SendRequests:
                     log.info(f'执行请求后等待：{wait_time} s')
                     time.sleep(wait_time)
             except AssertionError as e:
-                log.error(f'断言失败: {e}')
-                raise e
+                log.error(f'断言失败: {e.__str__()}')
+                raise AssertError(f'断言失败: {e.__str__()}')
             except Exception as e:
                 log.error(f'请求后置处理异常: {e}')
                 raise e
