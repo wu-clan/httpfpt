@@ -27,7 +27,7 @@ def read_yaml(
         _file = filename
     if not _file:
         log.error('读取 yaml 文件失败，文件名为空')
-        raise ValueError('读取 yaml 文件失败，文件名为空')
+        raise FileNotFoundError('读取 yaml 文件失败，文件名为空')
     try:
         with open(_file, encoding='utf-8') as f:
             data = yaml.load(f, Loader=yaml.FullLoader)

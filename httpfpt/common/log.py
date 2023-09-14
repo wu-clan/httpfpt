@@ -30,10 +30,10 @@ class Logger:
         # 清除 logger 配置
         logger.remove()
 
-        # # 控制台输出
+        # 控制台输出
         # logger.add(
         #     sys.stdout,
-        #     format="{time:YYYYMMDD HH:mm:ss.SSS} | <level>{level: <8}</level> | <level>{message}</level>",
+        #     format='{time:YYYYMMDD HH:mm:ss.SSS} | <level>{level: <8}</level> | <level>{message}</level>',
         # )
 
         # 将 loguru 传播到 logging

@@ -9,6 +9,7 @@ from dbutils.pooled_db import PooledDB
 from jsonpath import findall
 
 from httpfpt.common.env_handler import write_env_vars
+from httpfpt.common.errors import SQLSyntaxError, JsonPathFindError, VariableError
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import VariableCache
 from httpfpt.common.yaml_handler import write_yaml_vars
@@ -62,7 +63,7 @@ class MysqlDB:
             elif fetch == QueryFetchType.ALL:
                 query_data = self.cursor.fetchall()
             else:
-                raise ValueError(f'查询条件 {fetch} 错误, 请使用 one / all')
+                raise SQLSyntaxError(f'查询条件 {fetch} 错误, 请使用 one / all')
         except Exception as e:
             log.error(f'执行 {sql} 失败: {e}')
             raise e
@@ -114,7 +115,7 @@ class MysqlDB:
         """
         sql_type = get_enum_values(SqlType)
         if any(_.upper() in sql for _ in sql_type):
-            raise ValueError(f'{sql} 中存在不允许的命令类型, 仅支持 {sql_type} 类型 sql 语句')
+            raise SQLSyntaxError(f'{sql} 中存在不允许的命令类型, 仅支持 {sql_type} 类型 sql 语句')
         else:
             if isinstance(sql, str):
                 log.info(f'执行 sql: {sql}')
@@ -139,7 +140,7 @@ class MysqlDB:
                     if value:
                         value = str(value[0])
                     else:
-                        raise ValueError(f'jsonpath 取值失败, 表达式: {json_path}')
+                        raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
                     if set_type == VarType.CACHE:
                         VariableCache().set(key, value)
                     elif set_type == VarType.ENV:
@@ -149,6 +150,6 @@ class MysqlDB:
                     elif set_type == VarType.GLOBAL:
                         write_yaml_vars({key: value})
                     else:
-                        raise ValueError(
+                        raise VariableError(
                             f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'  # noqa: E501
                         )

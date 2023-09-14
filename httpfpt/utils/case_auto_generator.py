@@ -20,7 +20,7 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
     # 获取所用用例数据文件
     yaml_datafiles = search_all_case_yaml_files()
     if len(yaml_datafiles) == 0:
-        raise ValueError('自动生成用例失败，未在指定项目下找到测试用例数据文件，请检查项目目录是否正确')
+        raise FileNotFoundError('自动生成用例失败，未在指定项目下找到测试用例数据文件，请检查项目目录是否正确')
 
     # 获取所有测试用例文件
     testcase_files = search_all_testcase_files()
