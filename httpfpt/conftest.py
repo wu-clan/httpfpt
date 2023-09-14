@@ -88,6 +88,12 @@ def pytest_html_results_summary(prefix):
 
 @pytest.mark.optionalhook
 def pytest_html_report_title(report):
+    """
+    html报告标题配置
+
+    :param report:
+    :return:
+    """
     report.title = f'{TEST_REPORT_TITLE}'
 
 
