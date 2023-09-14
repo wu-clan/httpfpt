@@ -14,6 +14,11 @@ if TYPE_CHECKING:
     import loguru
 
 
+class PropagateHandler(logging.Handler):
+    def emit(self, record) -> None:  # noqa: ANN001
+        logging.getLogger(record.name).handle(record)
+
+
 class Logger:
     @staticmethod
     def log() -> loguru.Logger:
@@ -30,18 +35,14 @@ class Logger:
         # 清除 logger 配置
         logger.remove()
 
-        # 控制台输出
+        # 控制台输出，建议通过 pytest.ini 配置
         # logger.add(
         #     sys.stdout,
         #     format='{time:YYYYMMDD HH:mm:ss.SSS} | <level>{level: <8}</level> | <level>{message}</level>',
         # )
 
-        # 将 loguru 传播到 logging
-        class PropagateHandler(logging.Handler):
-            def emit(self, record) -> None:  # noqa: ANN001
-                logging.getLogger(record.name).handle(record)
-
-        logger.add(PropagateHandler(), format='<level>{message}</level>', level='DEBUG')
+        # 将 logging message 替换为 loguru message
+        logger.add(PropagateHandler(), format='<level>{message}</level>')
 
         # 输出到文件
         logger.add(
