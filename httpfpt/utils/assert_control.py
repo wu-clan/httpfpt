@@ -5,6 +5,7 @@ from typing import Union, Any
 
 from jsonpath import findall
 
+from httpfpt.common.errors import AssertSyntaxError, JsonPathFindError
 from httpfpt.common.log import log
 from httpfpt.db.mysql_db import MysqlDB
 from httpfpt.enums.assert_type import AssertType
@@ -85,21 +86,21 @@ class Asserter:
         :return:
         """
         if not isinstance(assert_text, dict):
-            raise ValueError('断言内容格式错误, 请检查断言脚本是否为 dict 格式')
+            raise AssertSyntaxError('json 断言内容格式错误, 请检查断言脚本是否为 dict 格式')
         try:
             assert_check = assert_text['check']
             assert_value = assert_text['value']
             assert_type = assert_text['type']
             assert_jsonpath = assert_text['jsonpath']
         except KeyError as e:
-            raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
+            raise AssertSyntaxError(f'json 断言格式错误, 请检查: {e}')
         else:
             response_value = findall(assert_jsonpath, response)
         if response_value:
-            log.info(f'执行断言：{assert_text}')
+            log.info(f'执行 json 断言：{assert_text}')
             self._exec_json_assert(assert_check, assert_value, assert_type, response_value[0])
         else:
-            raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
+            raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
 
     def _sql_asserter(self, assert_text: dict) -> None:
         """
@@ -111,7 +112,7 @@ class Asserter:
         :return:
         """
         if not isinstance(assert_text, dict):
-            raise ValueError('断言内容格式错误, 请检查断言脚本是否为 dict 格式')
+            raise AssertSyntaxError('sql 断言内容格式错误, 请检查断言脚本是否为 dict 格式')
         try:
             assert_check = assert_text['check']
             assert_value = assert_text['value']
@@ -119,19 +120,19 @@ class Asserter:
             assert_sql = assert_text['sql']
             assert_jsonpath = assert_text['jsonpath']
         except KeyError as e:
-            raise ValueError(f'断言格式错误, 缺少必须参数, 请检查: {e}')
+            raise AssertSyntaxError(f'sql 断言格式错误, 请检查: {e}')
         else:
             if assert_sql.split(' ')[0].upper() != SqlType.select:
-                raise ValueError(f'sql 断言 {assert_check}:{assert_type} 执行失败，请检查 sql 是否为 DQL 类型')
+                raise AssertSyntaxError(f'sql 断言 {assert_check}:{assert_type} 执行失败，请检查 sql 是否为 DQL 类型')
             sql_data = MysqlDB().exec_case_sql(assert_sql)
             if not isinstance(sql_data, dict):
-                raise ValueError('jsonpath取值失败, sql 语句执行结果不是有效的 dict 类型')
+                raise JsonPathFindError('jsonpath 取值失败, sql 语句执行结果不是有效的 dict 类型')
             sql_value = findall(assert_jsonpath, sql_data)
             if sql_value:
                 log.info(f'执行断言：{assert_text}')
                 self._exec_json_assert(assert_check, assert_value, assert_type, sql_value[0])
             else:
-                raise ValueError(f'jsonpath取值失败, 表达式: {assert_jsonpath}')
+                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
 
     @staticmethod
     def _exec_code_assert(response: dict, assert_text: str) -> None:
@@ -144,18 +145,18 @@ class Asserter:
         """
         assert_split = assert_text.split(' ')
         if assert_text.startswith("'{") or assert_text.startswith("'["):
-            raise ValueError('code 断言内容语法错误, 请查看是否为 str / list 类型, 并检查断言语法是否规范')
+            raise AssertSyntaxError('code 断言内容语法错误, 请查看是否为 str / list 类型, 并检查断言语法是否符合规范')
         if not assert_text.startswith('assert '):
-            raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
+            raise AssertSyntaxError(f'code 断言取值表达式格式错误, 不符合语法规范: {assert_text}')
         if len(assert_split) < 4 or len(assert_split) > 6:
-            raise ValueError(f'断言取值表达式格式错误, 不符合语法规范: {assert_text}')
+            raise AssertSyntaxError(f'code 断言取值表达式格式错误, 不符合语法规范: {assert_text}')
         else:
             # 是否 dirty-equals 断言表达式
             if assert_split[1].startswith('pm.response.get'):
                 if assert_split[2] not in ['==', '!=']:
-                    raise ValueError(f'断言取值表达式格式错误, 含有不支持的断言类型 {assert_split[2]}')
+                    raise AssertSyntaxError(f'code 断言取值表达式格式错误, 含有不支持的断言类型 {assert_split[2]}')
                 if not assert_split[3].startswith('Is'):
-                    raise ValueError('断言取值表达式格式错误, 不符合 dirty-equals 断言表达式规范')
+                    raise AssertSyntaxError('code 断言取值表达式格式错误, 不符合 dirty-equals 断言表达式规范')
                 # 处理比较值获取代码
                 pm_code = assert_split[1]
                 get_code = pm_code.split('.')[2:]
@@ -167,34 +168,40 @@ class Asserter:
                 if use_code.endswith('))'):
                     use_code = use_code.replace('))', ')')
                 if not use_code.startswith('get('):
-                    raise ValueError('断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')
+                    raise AssertSyntaxError('code 断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')  # noqa: E501
                 else:
                     try:
                         response_value = eval(f'{response}.{use_code}')
                     except Exception as e:
                         err_msg = str(e.args).replace("\'", '"').replace('\\', '')
-                        raise ValueError(f'断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
+                        raise AssertSyntaxError(f'code 断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
                     else:
                         # 执行断言
                         format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
                         if len(assert_split) == 4:
                             # stdout 作为没有自定义断言错误时的信息补充
                             # 当断言错误触发时, 如果错误信息中包含自定义错误, 此项可忽略
-                            print('Warning: 未自定义断言错误信息的断言:')
+                            print('Warning: 未自定义 code 断言错误信息的断言:')
                             print(f'-> {format_assert_text}')
                         exec('from dirty_equals import *')
                         exec(format_assert_text)
             else:
                 assert_expr_type = ['==', '!=', '>', '<', '>=', '<=', 'in', 'not']
                 if assert_split[2] not in assert_expr_type:
-                    raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}, 仅支持: {assert_expr_type}')  # noqa: E501
+                    raise AssertSyntaxError(
+                        f'code 断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}, 仅支持: {assert_expr_type}'  # noqa: E501
+                    )
                 else:
                     if assert_split[2] == 'not':
                         if assert_split[3] != 'in':
-                            raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {" ".join(assert_split[2:4])}')
+                            raise AssertSyntaxError(
+                                f'code 断言表达式格式错误, 含有不支持的断言类型: {" ".join(assert_split[2:4])}'  # noqa: E501
+                            )
                         else:
                             if 'pm.response.get' not in assert_split[4]:
-                                raise ValueError(f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}')
+                                raise AssertSyntaxError(
+                                    f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}'  # noqa: E501
+                                )
                             # 如果包含自定义错误信息
                             if len(assert_split) == 6:
                                 pm_code = assert_split[4].replace(',', '')
@@ -203,7 +210,7 @@ class Asserter:
                     else:
                         # 非 dirty-equals 或 not in 断言表达式
                         if 'pm.response.get' not in assert_split[3]:
-                            raise ValueError(f'断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}')
+                            raise AssertSyntaxError(f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}')  # noqa: E501
                         if len(assert_split) == 5:
                             pm_code = assert_split[3].replace(',', '')
                         else:
@@ -217,13 +224,13 @@ class Asserter:
                     if use_code.endswith('))'):
                         use_code = use_code.replace('))', ')')
                     if not use_code.startswith('get('):
-                        raise ValueError('断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')
+                        raise AssertSyntaxError('code 断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')  # noqa: E501
                     else:
                         try:
                             response_value = eval(f'{response}.{use_code}')
                         except Exception as e:
                             err_msg = str(e.args).replace("\'", '"').replace('\\', '')
-                            raise ValueError(f'断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
+                            raise AssertSyntaxError(f'code 断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')  # noqa: E501
                         else:
                             # 执行断言
                             format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
@@ -359,6 +366,6 @@ class Asserter:
                     else:
                         self._sql_asserter(text)
                 else:
-                    raise ValueError(f'断言表达式格式错误: {text}')
+                    raise AssertSyntaxError(f'断言表达式格式错误: {text}')
         else:
-            raise ValueError(f'断言表达式格式错误: {assert_text}')
+            raise AssertSyntaxError(f'断言表达式格式错误: {assert_text}')

@@ -6,6 +6,7 @@ from typing import List, Dict, Union
 from jsonpath import findall
 from pydantic import ValidationError
 
+from httpfpt.common.errors import CorrelateTestCaseError, JsonPathFindError
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import VariableCache
 from httpfpt.common.yaml_handler import read_yaml
@@ -44,7 +45,7 @@ def get_all_testcase_id(case_data_list: list) -> list:
                 for case_id in case_id_values:
                     all_case_id.append(case_id)
     set_all_case_id = set(all_case_id)
-    all_re_case_id_desc = []
+    all_repeat_case_id_desc = []
     if len(set_all_case_id) != len(all_case_id):
         for i in set_all_case_id:
             re_count = 0
@@ -63,13 +64,13 @@ def get_all_testcase_id(case_data_list: list) -> list:
                         'detail': all_re_case_id_detail if len(all_re_case_id_detail) > 1 else all_re_case_id_detail[0],
                     }
                 )
-                all_re_case_id_desc.append(re_case_id_desc)
-    if len(all_re_case_id_desc) > 0:
-        redis_client.set(f'{redis_client.prefix}:is_re_case_id', 'true')
-        log.error(f'运行失败, 检测到用例数据使用重复id: {all_re_case_id_desc}')
+                all_repeat_case_id_desc.append(re_case_id_desc)
+    if len(all_repeat_case_id_desc) > 0:
+        redis_client.set(f'{redis_client.prefix}:is_repeat_case_id', 'true')
+        log.error(f'运行失败, 检测到用例数据重复 case_id: {all_repeat_case_id_desc}')
         sys.exit(1)
     else:
-        redis_client.delete(f'{redis_client.prefix}:is_re_case_id')
+        redis_client.delete(f'{redis_client.prefix}:is_repeat_case_id')
         redis_client.rset(f'{redis_client.prefix}:all_case_id', str(all_case_id))
     return all_case_id
 
@@ -83,7 +84,7 @@ def get_all_testcase_data(pydantic_verify: bool = False) -> list:
     """
     all_yaml_file = search_all_case_yaml_files()
     all_case_data = []
-    if not redis_client.redis.get(f'{redis_client.prefix}:is_re_case_id'):
+    if not redis_client.redis.get(f'{redis_client.prefix}:is_repeat_case_id'):
         redis_all_case_data = redis_client.get(f'{redis_client.prefix}:all_case_data')
         if redis_all_case_data:
             redis_all_case_data_len = redis_client.get(f'{redis_client.prefix}:all_case_data_len')
@@ -106,7 +107,7 @@ def get_all_testcase_data(pydantic_verify: bool = False) -> list:
             except ValidationError as e:
                 count = parse_error(e)
             if count > 0:
-                raise ValueError(f'测试用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
+                raise CorrelateTestCaseError(f'测试用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
     return all_case_data
 
 
@@ -123,10 +124,10 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
     for testcase in setup_testcase:
         if isinstance(testcase, dict):
             if testcase['case_id'] == parsed_case_id:
-                raise ValueError('执行关联测试用例失败，不能关联自身')
+                raise CorrelateTestCaseError('执行关联测试用例失败，禁止关联自身')
         elif isinstance(testcase, str):
             if testcase == parsed_case_id:
-                raise ValueError('执行关联测试用例失败，不能关联自身')
+                raise CorrelateTestCaseError('执行关联测试用例失败，禁止关联自身')
 
     all_case_data = get_all_testcase_data()
     all_case_id = redis_client.get(f'{redis_client.prefix}:all_case_id') or get_all_testcase_id(all_case_data)
@@ -137,10 +138,10 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
         if isinstance(testcase, dict):
             relate_case_id = testcase['case_id']
             if relate_case_id not in str(all_case_id):
-                raise ValueError('未在测试用例中找到关联测试用例，请检查关联测试用例的 case_id')
+                raise CorrelateTestCaseError('未在测试用例中找到关联测试用例，请检查关联测试用例 case_id 是否存在')
         elif isinstance(testcase, str):
             if testcase not in str(all_case_id):
-                raise ValueError('未在测试用例中找到关联测试用例，请检查关联测试用例的 case_id')
+                raise CorrelateTestCaseError('未在测试用例中找到关联测试用例，请检查关联测试用例 case_id 是否存在')
 
     # 获取关联测试用例数据
     for case_data in all_case_data:
@@ -223,10 +224,10 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
             for relate_testcase in relate_case_setup_testcase:
                 if isinstance(relate_testcase, dict):
                     if current_case_id == relate_testcase['case_id']:
-                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
+                        raise CorrelateTestCaseError('关联测试用例执行失败，在关联测试用例中，存在引用当前测试用例为关联测试用例，导致循环引用')  # noqa: E501
                 else:
                     if current_case_id == relate_testcase:
-                        raise ValueError('关联测试用例执行失败，因为在关联测试用例中的关联测试用例参数内含有当前正在执行的测试用例，导致了循环引用，触发此异常')  # noqa: E501
+                        raise CorrelateTestCaseError('关联测试用例执行失败，在关联测试用例中，存在引用当前测试用例为关联测试用例，导致循环引用')  # noqa: E501
 
 
 def relate_testcase_set_var(testcase_data: dict) -> None:
@@ -246,7 +247,7 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     if value:
         VariableCache().set(testcase_data['set_var_key'], value[0])
     else:
-        raise ValueError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
+        raise JsonPathFindError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
 
 
 def relate_testcase_exec(testcase_data: dict) -> None:

@@ -6,6 +6,7 @@ import re
 from jsonpath import findall
 
 from httpfpt.common.env_handler import get_env_dict, write_env_vars
+from httpfpt.common.errors import JsonPathFindError, VariableError, RequestDataParseError
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import VariableCache
 from httpfpt.common.yaml_handler import read_yaml, write_yaml_vars
@@ -36,14 +37,14 @@ class VarsExtractor:
         try:
             env = target['config']['request']['env']
         except KeyError:
-            raise ValueError('测试环境获取失败, 测试用例数据缺少 config:request:env 参数')
+            raise RequestDataParseError('运行环境获取失败, 测试用例数据缺少 config:request:env 参数')
         if not isinstance(env, str):
-            raise ValueError('测试环境获取失败, 请使用合法的环境配置')
+            raise RequestDataParseError('运行环境获取失败, 请使用合法的环境配置')
         try:
             env_file = os.path.join(RUN_ENV_PATH, env)
             env_vars = get_env_dict(env_file)
         except OSError:
-            raise ValueError('测试环境获取失败, 请检查测试用例环境配置')
+            raise RequestDataParseError('运行环境获取失败, 请检查测试用例环境配置')
 
         # 获取所有自定义全局变量
         read_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
@@ -69,7 +70,7 @@ class VarsExtractor:
                         log.info(f'请求数据变量 {var_key} 替换完成')
                     except Exception as e:
                         log.error(f'请求数据变量 {var_key} 替换失败: {e}')
-                        raise e
+                        raise VariableError(f'请求数据变量 {var_key} 替换失败: {e}')
                 else:
                     str_target = re.sub(self.vars_re, value, str_target, 1)
 
@@ -99,14 +100,14 @@ class VarsExtractor:
                 if value is None:
                     err_msg = '请求数据关联变量替换失败，临时变量池不存在变量: “{}”'.format(var_key)
                     log.error(err_msg)
-                    raise ValueError(err_msg)
+                    raise VariableError(err_msg)
                 else:
                     try:
                         str_target = re.sub(self.relate_vars_re, value, str_target, 1)
                         log.info(f'请求数据关联变量 {var_key} 替换完成')
                     except Exception as e:
                         log.error(f'请求数据关联变量 {var_key} 替换失败: {e}')
-                        raise e
+                        raise VariableError(f'请求数据关联变量 {var_key} 替换失败: {e}')
 
             # 删除关联用例临时变量
             VariableCache().delete(var_key)
@@ -134,7 +135,7 @@ class VarsExtractor:
             if value:
                 value = str(value[0])
             else:
-                raise ValueError(f'jsonpath 取值失败, 表达式: {json_path}')
+                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
             if set_type == VarType.CACHE:
                 VariableCache().set(key, value)
             elif set_type == VarType.ENV:
@@ -142,4 +143,6 @@ class VarsExtractor:
             elif set_type == VarType.GLOBAL:
                 write_yaml_vars({key: value})
             else:
-                raise ValueError(f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global')  # noqa: E501
+                raise VariableError(
+                    f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'  # noqa: E501
+                )

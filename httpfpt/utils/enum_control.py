@@ -5,7 +5,4 @@ from typing import Type
 
 
 def get_enum_values(enum_class: Type[Enum]) -> list:
-    if issubclass(enum_class, Enum):
-        return list(map(lambda ec: ec.value, enum_class))
-    else:
-        raise ValueError('获取枚举类所有属性值失败，传入了非枚举类参数')
+    return list(map(lambda ec: ec.value, enum_class))
