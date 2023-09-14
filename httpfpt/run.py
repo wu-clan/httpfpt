@@ -7,6 +7,7 @@ from typing import Union, Optional, Literal
 
 import pytest
 
+from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND, DING_TALK_REPORT_SEND, LARK_TALK_REPORT_SEND
 from httpfpt.core.path_conf import (
@@ -151,8 +152,8 @@ def run(
             format_run_args.append(i)
     format_run_args_to_pytest_command = ' '.join(_ for _ in format_run_args)
 
-    print(f'\n运行参数:\n{run_args}')
-    print(f'\nPytest cli:\npytest {format_run_args_to_pytest_command}\n')
+    log.info(f'开始运行项目：{PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}')
+    log.info(f'Pytest 命令: pytest {format_run_args_to_pytest_command}')
     pytest.main(run_args)
 
     yaml_report_files = os.listdir(YAML_REPORT_PATH)
@@ -175,6 +176,20 @@ def run(
 
 
 if __name__ == '__main__':
+    logo = """\n
+     /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
+    | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
+    | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$   
+    | $$$$$$$$   | $$      | $$   | $$$$$$$/| $$$$$   | $$$$$$$/   | $$   
+    | $$__  $$   | $$      | $$   | $$____/ | $$__/   | $$____/    | $$   
+    | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
+    | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
+    |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/   
+
+        """
+    print(logo)
+    log.info(logo)
+
     # 初始化 redis 数据库 (必选)
     redis_client.init()
 
