@@ -70,6 +70,16 @@ class RedisDB(Redis):
         self.delete(key)
         self.set(key, value, **kwargs)
 
+    def delete_prefix(self, prefix: str) -> None:
+        """
+        删除 redis 符合前缀的数据
+
+        :param prefix: key 前缀
+        :return:
+        """
+        for key in self.scan_iter(match=f'{prefix}*'):
+            self.delete(key)
+
     def exists(self, *key: Any) -> int:
         """
         判断 redis 数据是否存在

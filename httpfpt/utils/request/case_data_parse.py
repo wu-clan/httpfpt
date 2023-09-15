@@ -24,11 +24,12 @@ def case_data_init(pydantic_verify: bool = False) -> None:
     :return:
     """
     all_case_yaml_file = search_all_case_yaml_files()
+    redis_client.delete_prefix(f'{redis_client.prefix}::case_data::')
     for case_yaml_file in all_case_yaml_file:
         case_data = read_yaml(None, filename=case_yaml_file)
         filename = get_file_property(case_yaml_file)[0]
         case_data.update({'filename': filename})
-        redis_client.rset(f'{redis_client.prefix}::case_data::{filename}', str(case_data))
+        redis_client.set(f'{redis_client.prefix}::case_data::{filename}', str(case_data))
     if pydantic_verify:
         case_data_list = redis_client.get_prefix(f'{redis_client.prefix}::case_data::')
         count: int = 0
