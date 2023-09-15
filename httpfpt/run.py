@@ -154,13 +154,15 @@ def run(
 
     log.info(f'开始运行项目：{PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}')
     log.info(f'Pytest 命令: pytest {format_run_args_to_pytest_command}')
+    log.info('🚀 START')
     pytest.main(run_args)
+    log.info('🏁 FINISH')
 
     yaml_report_files = os.listdir(YAML_REPORT_PATH)
     yaml_report_files.sort()
     test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
 
-    SendMail(is_html_report_file.split('=')[1], test_result).send() if EMAIL_REPORT_SEND and html_report else ...
+    SendMail(test_result, is_html_report_file.split('=')[1]).send_report() if EMAIL_REPORT_SEND and html_report else ...
 
     DingTalk(test_result).send() if DING_TALK_REPORT_SEND else ...
 
@@ -175,29 +177,39 @@ def run(
     ) if allure and allure_serve else ...
 
 
+def main(*args, **kwargs) -> None:
+    try:
+        logo = """\n
+         /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
+        | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
+        | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$   
+        | $$$$$$$$   | $$      | $$   | $$$$$$$/| $$$$$   | $$$$$$$/   | $$   
+        | $$__  $$   | $$      | $$   | $$____/ | $$__/   | $$____/    | $$   
+        | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
+        | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
+        |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/   
+    
+            """
+        print(logo)
+        log.info(logo)
+
+        # 初始化 redis 数据库 (必选)
+        redis_client.init()
+
+        # 用例数据唯一 case_id 检测（可选）
+        get_all_testcase_id(get_all_testcase_data())
+
+        # 用例数据完整架构 pydantic 快速检测（可选）
+        get_all_testcase_data(pydantic_verify=True)
+
+        # 执行程序 (必选)
+        run(*args, **kwargs)
+    except Exception as e:
+        log.error(f'运行异常：{e}')
+        import traceback
+
+        SendMail({'error': traceback.format_exc()}).send_error()
+
+
 if __name__ == '__main__':
-    logo = """\n
-     /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
-    | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
-    | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$   
-    | $$$$$$$$   | $$      | $$   | $$$$$$$/| $$$$$   | $$$$$$$/   | $$   
-    | $$__  $$   | $$      | $$   | $$____/ | $$__/   | $$____/    | $$   
-    | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
-    | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
-    |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/   
-
-        """
-    print(logo)
-    log.info(logo)
-
-    # 初始化 redis 数据库 (必选)
-    redis_client.init()
-
-    # 用例数据唯一 case_id 检测（可选）
-    get_all_testcase_id(get_all_testcase_data())
-
-    # 用例数据完整架构 pydantic 快速检测（可选）
-    get_all_testcase_data(pydantic_verify=True)
-
-    # 执行程序 (必选)
-    run()
+    main()

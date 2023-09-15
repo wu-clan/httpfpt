@@ -26,11 +26,9 @@ def session_fixture(tmp_path_factory, worker_id):
 
 @pytest.fixture(scope='package', autouse=True)
 def package_fixture():
-    log.info('🚀 START')
     yield
-    log.info('')  # 预留空行
-    log.info('🏁 FINISH')
-
+    # 预留空行
+    log.info('')
     # 清理临时变量
     VariableCache().clear()
 
