@@ -85,3 +85,6 @@ class VariableCache:
         if result:
             log.info('清空临时变量')
         return result
+
+
+variable_cache = VariableCache()

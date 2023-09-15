@@ -11,7 +11,7 @@ from jsonpath import findall
 from httpfpt.common.env_handler import write_env_vars
 from httpfpt.common.errors import SQLSyntaxError, JsonPathFindError, VariableError
 from httpfpt.common.log import log
-from httpfpt.common.variable_cache import VariableCache
+from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import write_yaml_vars
 from httpfpt.core import get_conf
 from httpfpt.core.path_conf import RUN_ENV_PATH
@@ -142,7 +142,7 @@ class MysqlDB:
                     else:
                         raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
                     if set_type == VarType.CACHE:
-                        VariableCache().set(key, value)
+                        variable_cache.set(key, value)
                     elif set_type == VarType.ENV:
                         if env is None:
                             raise ValueError('写入环境变量准备失败, 缺少参数 env, 请检查传参')
@@ -153,3 +153,6 @@ class MysqlDB:
                         raise VariableError(
                             f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'  # noqa: E501
                         )
+
+
+mysql_client = MysqlDB()

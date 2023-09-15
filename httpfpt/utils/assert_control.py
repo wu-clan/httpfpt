@@ -7,7 +7,7 @@ from jsonpath import findall
 
 from httpfpt.common.errors import AssertSyntaxError, JsonPathFindError
 from httpfpt.common.log import log
-from httpfpt.db.mysql_db import MysqlDB
+from httpfpt.db.mysql_db import mysql_client
 from httpfpt.enums.assert_type import AssertType
 from httpfpt.enums.sql_type import SqlType
 
@@ -124,7 +124,7 @@ class Asserter:
         else:
             if assert_sql.split(' ')[0].upper() != SqlType.select:
                 raise AssertSyntaxError(f'sql 断言 {assert_check}:{assert_type} 执行失败，请检查 sql 是否为 DQL 类型')
-            sql_data = MysqlDB().exec_case_sql(assert_sql)
+            sql_data = mysql_client.exec_case_sql(assert_sql)
             if not isinstance(sql_data, dict):
                 raise JsonPathFindError('jsonpath 取值失败, sql 语句执行结果不是有效的 dict 类型')
             sql_value = findall(assert_jsonpath, sql_data)
@@ -369,3 +369,6 @@ class Asserter:
                     raise AssertSyntaxError(f'断言表达式格式错误: {text}')
         else:
             raise AssertSyntaxError(f'断言表达式格式错误: {assert_text}')
+
+
+asserter = Asserter()
