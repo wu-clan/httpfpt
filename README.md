@@ -2,6 +2,10 @@
 
 基于 HTTP 请求的快速数据驱动 pytest 接口自动化测试框架
 
+我在掘金发表了关于 `HttpFpt` 的前身和由来，包括部分功能点的说明， 感兴趣
+
+的小伙伴可以一睹为快，[点击跳转](https://juejin.cn/post/7224314619867136037)
+
 ## 功能点
 
 - 多项目分级，自由切换，互不干扰
@@ -18,6 +22,35 @@
 - 自动测试报告，html, allure
 - 自动测试结果通知，飞书，钉钉，~~企业微信~~，邮箱
 - ......
+
+## ⬇️ 下载
+
+克隆:
+
+```shell
+git clone https://github.com/wu-clan/httpfpt.git
+```
+
+## 🧑‍💻 USE / DEV
+
+1. 安装依赖:
+
+    ```shell
+    pip install -r requirements.txt
+    ```
+
+2. 安装 redis 并启动服务
+
+   [Redis Windows](https://github.com/redis-windows/redis-windows)
+
+   [Linux / macOS](https://redis.io/download/)
+
+   [Docker](https://hub.docker.com/_/redis)
+
+> [!WARNING]
+> allure 测试报告默认使用 allure-pytest
+> 生成，但是不能直接访问，你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
+> 本地程序和 [Java JDK](https://adoptopenjdk.net/archive.html?variant=openjdk8&jvmVariant=hotspot) 才能进行可视化浏览
 
 ## 帮助
 
