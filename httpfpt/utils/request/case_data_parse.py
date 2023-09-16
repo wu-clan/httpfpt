@@ -42,65 +42,70 @@ def case_data_init(pydantic_verify: bool = False) -> None:
             raise RequestDataParseError(f'测试用例数据校验失败，共有 {count} 处错误, 错误详情请查看日志')
 
 
-def case_id_unique_verify(case_id_verify: bool) -> None:
+def case_id_unique_verify() -> None:
     """
     获取所有用例 id
 
-    :param case_id_verify:
     :return:
     """
-    if case_id_verify:
-        all_case_id_dict: List[Dict[str, Union[str, list]]] = []
-        case_data_list = redis_client.get_prefix(f'{redis_client.prefix}::case_data::')
-        for case_data in case_data_list:
-            case_data = ast.literal_eval(case_data)
-            filename = case_data['filename']
-            try:
-                steps = case_data['test_steps']
-                if isinstance(steps, dict):
-                    all_case_id_dict.append({f'{filename}': steps['case_id']})
-                if isinstance(steps, list):
-                    case_id_list = []
-                    for s in steps:
-                        case_id_list.append(s['case_id'])
-                    all_case_id_dict.append({f'{filename}': case_id_list})
-            except KeyError:
-                raise RequestDataParseError(f'测试用例数据文件 {filename} 结构错误，建议开启 pydantic 验证')
-        all_case_id = []
-        for case_id_dict in all_case_id_dict:
-            for case_id_values in case_id_dict.values():
-                if isinstance(case_id_values, str):
-                    all_case_id.append(case_id_values)
-                else:
-                    for case_id in case_id_values:
-                        all_case_id.append(case_id)
-        set_all_case_id = set(all_case_id)
-        all_repeat_case_id_desc = []
-        if len(set_all_case_id) != len(all_case_id):
-            all_repeat_case_id_detail = []
-            for i in set_all_case_id:
-                repeat_count = 0
-                for j in all_case_id:
-                    if i == j:
-                        repeat_count += 1
-                if repeat_count > 1:
-                    repeat_case_id_desc = {'case_id': i, 'count': repeat_count}
-                    for case_id_dict in all_case_id_dict:
-                        for key in case_id_dict.keys():
-                            if i == case_id_dict[key] or i in case_id_dict[key]:
-                                all_repeat_case_id_detail.append(
-                                    {'filename': f'{key}', 'case_index': case_id_dict[key].index(i)}
-                                )
-                                print(i)
-                    repeat_case_id_desc.update({'detail': all_repeat_case_id_detail})
-                    all_repeat_case_id_desc.append(repeat_case_id_desc)
-        if len(all_repeat_case_id_desc) > 0:
-            redis_client.set(f'{redis_client.prefix}::case_id::repeated', 'true')
-            log.error(f'运行失败, 检测到用例重复 case_id: {all_repeat_case_id_desc}')
-            sys.exit(1)
-        else:
-            redis_client.delete(f'{redis_client.prefix}::case_id::repeated')
-            redis_client.rset(f'{redis_client.prefix}::case_id::all', str(all_case_id))
+    all_case_id_dict: List[Dict[str, Union[str, list]]] = []
+    case_data_list = redis_client.get_prefix(f'{redis_client.prefix}::case_data::')
+    for case_data in case_data_list:
+        case_data = ast.literal_eval(case_data)
+        filename = case_data['filename']
+        try:
+            steps = case_data['test_steps']
+            if isinstance(steps, dict):
+                all_case_id_dict.append({f'{filename}': steps['case_id']})
+            if isinstance(steps, list):
+                case_id_list = []
+                for s in steps:
+                    case_id_list.append(s['case_id'])
+                all_case_id_dict.append({f'{filename}': case_id_list})
+        except KeyError:
+            raise RequestDataParseError(f'测试用例数据文件 {filename} 结构错误，建议开启 pydantic 验证')
+    all_case_id = []
+    for case_id_dict in all_case_id_dict:
+        for case_id_values in case_id_dict.values():
+            if isinstance(case_id_values, str):
+                all_case_id.append(case_id_values)
+            else:
+                for case_id in case_id_values:
+                    all_case_id.append(case_id)
+    # 检测用例 id 是否重复
+    set_all_case_id = set(all_case_id)
+    all_repeat_case_id = []
+    if len(set_all_case_id) != len(all_case_id):
+        for i in set_all_case_id:
+            repeat_count = 0
+            for j in all_case_id:
+                if i == j:
+                    repeat_count += 1
+            # 输出重复用例 id 详情
+            if repeat_count > 1:
+                all_repeat_case_id_detail = []
+                repeat_case_id_desc = {'case_id': i, 'count': repeat_count}
+                for case_id_dict in all_case_id_dict:
+                    for key in case_id_dict.keys():
+                        file_case_id_list = case_id_dict[key]
+                        repeat_index_list = []
+                        if i in file_case_id_list:
+                            if file_case_id_list.count(i) == 1:
+                                repeat_index_list.append(file_case_id_list.index(i))
+                            else:  # 无需判断多种条件，因为只有存在重复 id 才能执行至此，如果重复数量不为 1 则必定大于 1
+                                for k in range(len(file_case_id_list)):
+                                    if file_case_id_list.count(file_case_id_list[k]) > 1:
+                                        repeat_index_list.append(k)
+                            all_repeat_case_id_detail.append({'filename': f'{key}', 'index': repeat_index_list})
+                repeat_case_id_desc.update({'detail': all_repeat_case_id_detail})
+                all_repeat_case_id.append(repeat_case_id_desc)
+    if len(all_repeat_case_id) > 0:
+        redis_client.set(f'{redis_client.prefix}::case_id::repeated', 'true')
+        log.error(f'运行失败, 检测到用例重复 case_id: {all_repeat_case_id[0]}')
+        sys.exit(1)
+    else:
+        redis_client.delete(f'{redis_client.prefix}::case_id::repeated')
+        redis_client.rset(f'{redis_client.prefix}::case_id::all', str(all_case_id))
 
 
 def get_request_data(*, filename: str) -> List[Dict[str, Any]]:

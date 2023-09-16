@@ -19,7 +19,7 @@ from httpfpt.core.path_conf import (
     YAML_REPORT_PATH,
 )
 from httpfpt.db.redis_db import redis_client
-from httpfpt.utils.request.case_data_parse import case_data_init, case_id_unique_verify
+from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.ding_talk import DingTalk
 from httpfpt.utils.send_report.lark_talk import LarkTalk
 from httpfpt.utils.send_report.send_email import SendMail
@@ -177,12 +177,13 @@ def run(
     ) if allure and allure_serve else ...
 
 
-def main(*args, pydantic_verify: bool = True, case_id_verify: bool = True, **kwargs) -> None:
+def main(*args, pydantic_verify: bool = True, **kwargs) -> None:
     """
     运行入口
 
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
-    :param case_id_verify: 用例数据唯一 case_id 检测, 默认开启
+    :param args: pytest 运行参数
+    :param kwargs: pytest 运行参数
     :return:
     """
     try:
@@ -200,8 +201,8 @@ def main(*args, pydantic_verify: bool = True, case_id_verify: bool = True, **kwa
         print(logo)
         log.info(logo)
         redis_client.init()
-        case_data_init(pydantic_verify)
-        case_id_unique_verify(case_id_verify)
+        case_data.case_data_init(pydantic_verify)
+        case_data.case_id_unique_verify()
         run(*args, **kwargs)
     except Exception as e:
         log.error(f'运行异常：{e}')
