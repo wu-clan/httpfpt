@@ -8,7 +8,7 @@ from filelock import FileLock
 from py._xmlgen import html
 
 from httpfpt.common.log import log
-from httpfpt.common.variable_cache import VariableCache
+from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import write_yaml_report
 from httpfpt.core.get_conf import TESTER_NAME, PROJECT_NAME, TEST_REPORT_TITLE
 
@@ -30,7 +30,7 @@ def package_fixture():
     # 预留空行
     log.info('')
     # 清理临时变量
-    VariableCache().clear()
+    variable_cache.clear()
 
 
 @pytest.fixture(scope='module', autouse=True)

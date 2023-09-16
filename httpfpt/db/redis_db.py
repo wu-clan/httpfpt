@@ -8,9 +8,9 @@ from httpfpt.common.log import log
 from httpfpt.core import get_conf
 
 
-class RedisDB:
+class RedisDB(Redis):
     def __init__(self) -> None:
-        self.redis = Redis(
+        super().__init__(
             host=get_conf.REDIS_HOST,
             port=get_conf.REDIS_PORT,
             password=get_conf.REDIS_PASSWORD,
@@ -22,7 +22,7 @@ class RedisDB:
 
     def init(self) -> None:
         try:
-            self.redis.ping()
+            self.ping()
         except TimeoutError:
             log.error('数据库 redis 连接超时')
         except AuthenticationError:
@@ -39,23 +39,24 @@ class RedisDB:
         :param key:
         :return:
         """
-        data = self.redis.get(key)
-        if data:
-            log.info(f'获取 redis 数据 {key} 成功')
-        else:
+        data = super().get(key)
+        if not data:
             log.warning(f'获取 redis 数据 {key} 失败, 此数据不存在')
         return data
 
-    def set(self, key: Any, value: Any, **kwargs) -> None:
+    def get_prefix(self, prefix: str) -> list:
         """
-        设置 redis 数据
+        获取 redis 符合前缀的数据
 
-        :param key:
-        :param value:
+        :param prefix: key 前缀
         :return:
         """
-        self.redis.set(key, value, **kwargs)
-        log.info(f'设置 redis 数据 {key} 成功')
+        data = []
+        for key in self.scan_iter(match=f'{prefix}*'):
+            value = super().get(key)
+            if value:
+                data.append(value)
+        return data
 
     def rset(self, key: Any, value: Any, **kwargs) -> None:
         """
@@ -66,20 +67,18 @@ class RedisDB:
         :param kwargs:
         :return:
         """
-        self.redis.delete(key)
-        self.redis.set(key, value, **kwargs)
-        log.info(f'重置 redis 数据 {key} 成功')
+        self.delete(key)
+        self.set(key, value, **kwargs)
 
-    def delete(self, *key: Any) -> None:
+    def delete_prefix(self, prefix: str) -> None:
         """
-        删除 redis 数据
+        删除 redis 符合前缀的数据
 
-        :param key:
+        :param prefix: key 前缀
         :return:
         """
-        count = self.redis.delete(*key)
-        if count > 0:
-            log.info(f'删除 redis 数据 {key} 成功')
+        for key in self.scan_iter(match=f'{prefix}*'):
+            self.delete(key)
 
     def exists(self, *key: Any) -> int:
         """
@@ -88,35 +87,10 @@ class RedisDB:
         :param key:
         :return:
         """
-        num = self.redis.exists(*key)
-        if num:
-            log.info(f'判断 redis 数据 {key} 存在')
-        else:
-            log.warning(f'判断 redis 数据 {key} 不存在')
+        num = super().exists(*key)
+        if not num:
+            log.error(f'不存在 redis 数据 {key}')
         return num
-
-    def lpush(self, key: Any, *value: Any) -> None:
-        """
-        从左侧插入列表数据
-
-        :param key:
-        :param value:
-        :return:
-        """
-        self.redis.lpush(key, *value)
-        log.info(f'从左侧插入 redis 数据 {key} 成功')
-
-    def relpush(self, key: Any, *value: Any) -> None:
-        """
-        删除原数据并重新从左侧插入列表数据
-
-        :param key:
-        :param value:
-        :return:
-        """
-        self.redis.delete(key)
-        self.redis.rpush(key, *value)
-        log.info(f'删除原数据并重新从左侧插入 redis 数据 {key} 成功')
 
 
 redis_client = RedisDB()

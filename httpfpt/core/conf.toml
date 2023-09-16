@@ -14,7 +14,7 @@ port = 3306
 user = 'root'
 password = '123456'
 database = 'test'
-charset = 'utf-8'
+charset = 'utf8mb4'
 
 # redis 数据库
 [redis]

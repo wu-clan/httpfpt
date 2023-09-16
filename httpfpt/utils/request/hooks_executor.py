@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import ast
 import re
 from typing import Any, Union
 
@@ -60,7 +61,7 @@ class HookExecutor:
             except Exception as e:
                 log.error(f'请求数据函数 {hook_key} 返回值替换失败: {e}')
                 raise e
-        dict_target = eval(str_target)
+        dict_target = ast.literal_eval(str_target)
 
         # 临时解决方案：数据还原
         if setup_hooks:
@@ -96,3 +97,6 @@ class HookExecutor:
         result = eval(code)
         log.info(f'执行代码：{code}')
         return result
+
+
+hook_executor = HookExecutor()

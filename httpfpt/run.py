@@ -19,13 +19,13 @@ from httpfpt.core.path_conf import (
     YAML_REPORT_PATH,
 )
 from httpfpt.db.redis_db import redis_client
-from httpfpt.utils.relate_testcase_executor import get_all_testcase_id, get_all_testcase_data
+from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.ding_talk import DingTalk
 from httpfpt.utils.send_report.lark_talk import LarkTalk
 from httpfpt.utils.send_report.send_email import SendMail
 
 
-def run(
+def startup(
     *args,
     # log level
     log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
@@ -49,7 +49,7 @@ def run(
     **kwargs,
 ) -> None:
     """
-    运行入口
+    运行启动程序
 
     :param log_level: 控制台打印输出级别, 默认"-v"
     :param case_path: 指定测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
@@ -177,14 +177,22 @@ def run(
     ) if allure and allure_serve else ...
 
 
-def main(*args, **kwargs) -> None:
+def run(*args, pydantic_verify: bool = True, **kwargs) -> None:
+    """
+    运行入口
+
+    :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
+    :param args: pytest 运行参数
+    :param kwargs: pytest 运行参数
+    :return:
+    """
     try:
         logo = """\n
          /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
         | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
         | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$   
-        | $$$$$$$$   | $$      | $$   | $$$$$$$/| $$$$$   | $$$$$$$/   | $$   
-        | $$__  $$   | $$      | $$   | $$____/ | $$__/   | $$____/    | $$   
+        | $$$$$$$$   | $$      | $$   | $$$$$$$/| $$$$$$  | $$$$$$$/   | $$   
+        | $$__  $$   | $$      | $$   | $$____/ | $$___/  | $$____/    | $$   
         | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
         | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
         |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/   
@@ -192,18 +200,10 @@ def main(*args, **kwargs) -> None:
             """
         print(logo)
         log.info(logo)
-
-        # 初始化 redis 数据库 (必选)
         redis_client.init()
-
-        # 用例数据唯一 case_id 检测（可选）
-        get_all_testcase_id(get_all_testcase_data())
-
-        # 用例数据完整架构 pydantic 快速检测（可选）
-        get_all_testcase_data(pydantic_verify=True)
-
-        # 执行程序 (必选)
-        run(*args, **kwargs)
+        case_data.case_data_init(pydantic_verify)
+        case_data.case_id_unique_verify()
+        startup(*args, **kwargs)
     except Exception as e:
         log.error(f'运行异常：{e}')
         import traceback
@@ -212,4 +212,4 @@ def main(*args, **kwargs) -> None:
 
 
 if __name__ == '__main__':
-    main()
+    run()

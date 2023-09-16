@@ -14,16 +14,16 @@ from requests import Response as RequestsResponse
 from httpfpt.common.errors import SendRequestError, AssertError
 from httpfpt.common.log import log
 from httpfpt.core import get_conf
-from httpfpt.db.mysql_db import MysqlDB
+from httpfpt.db.mysql_db import mysql_client
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
 from httpfpt.utils.allure_control import allure_attach_file, allure_step
-from httpfpt.utils.assert_control import Asserter
+from httpfpt.utils.assert_control import asserter
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.relate_testcase_executor import exec_setup_testcase
-from httpfpt.utils.request.hooks_executor import HookExecutor
+from httpfpt.utils.request.hooks_executor import hook_executor
 from httpfpt.utils.request.request_data_parse import RequestDataParse
-from httpfpt.utils.request.vars_extractor import VarsExtractor
+from httpfpt.utils.request.vars_extractor import var_extractor
 from httpfpt.utils.time_control import get_current_time
 
 
@@ -147,14 +147,14 @@ class SendRequests:
                 if setup_testcase is not None:
                     new_parsed = exec_setup_testcase(request_data_parse, setup_testcase)
                     if isinstance(new_parsed, RequestDataParse):
-                        # 对呀引用了关联测试用例变量的测试来讲, 这里可能造成微小的性能损耗
+                        # 获取最新数据，对于引用了关联测试用例变量的测试来讲, 可能造成性能损耗
                         parsed_data = request_data_parse.get_request_data_parsed
                 setup_sql = parsed_data['setup_sql']
                 if setup_sql is not None:
-                    MysqlDB().exec_case_sql(setup_sql, parsed_data['env'])
+                    mysql_client.exec_case_sql(setup_sql, parsed_data['env'])
                 setup_hooks = parsed_data['setup_hooks']
                 if setup_hooks is not None:
-                    HookExecutor().exec_hook_func(setup_hooks)
+                    hook_executor.exec_hook_func(setup_hooks)
                 wait_time = parsed_data['setup_wait_time']
                 if wait_time is not None:
                     log.info(f'执行请求前等待：{wait_time} s')
@@ -231,16 +231,16 @@ class SendRequests:
             try:
                 teardown_sql = parsed_data['teardown_sql']
                 if teardown_sql is not None:
-                    MysqlDB().exec_case_sql(teardown_sql, parsed_data['env'])
+                    mysql_client.exec_case_sql(teardown_sql, parsed_data['env'])
                 teardown_hooks = parsed_data['teardown_hooks']
                 if teardown_hooks is not None:
-                    HookExecutor().exec_hook_func(teardown_hooks)
+                    hook_executor.exec_hook_func(teardown_hooks)
                 teardown_extract = parsed_data['teardown_extract']
                 if teardown_extract is not None:
-                    VarsExtractor().teardown_var_extract(response_data, teardown_extract, parsed_data['env'])
+                    var_extractor.teardown_var_extract(response_data, teardown_extract, parsed_data['env'])
                 teardown_assert = parsed_data['teardown_assert']
                 if teardown_assert is not None:
-                    Asserter().exec_asserter(response_data, assert_text=teardown_assert)
+                    asserter.exec_asserter(response_data, assert_text=teardown_assert)
                 wait_time = parsed_data['teardown_wait_time']
                 if wait_time is not None:
                     log.info(f'执行请求后等待：{wait_time} s')

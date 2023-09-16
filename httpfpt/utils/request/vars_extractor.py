@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import ast
 import os.path
 import re
 
@@ -8,7 +9,7 @@ from jsonpath import findall
 from httpfpt.common.env_handler import get_env_dict, write_env_vars
 from httpfpt.common.errors import JsonPathFindError, VariableError, RequestDataParseError
 from httpfpt.common.log import log
-from httpfpt.common.variable_cache import VariableCache
+from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import read_yaml, write_yaml_vars
 from httpfpt.core.path_conf import TEST_DATA_PATH, RUN_ENV_PATH
 from httpfpt.enums.var_type import VarType
@@ -30,9 +31,6 @@ class VarsExtractor:
         :param target:
         :return:
         """
-        # 获取临时变量实例
-        cache_vars = VariableCache()
-
         # 获取所有环境变量
         try:
             env = target['config']['request']['env']
@@ -58,7 +56,7 @@ class VarsExtractor:
 
             # 替换: 临时变量 > 环境变量 > 全局变量
             if var_key is not None:
-                value = str(cache_vars.get(var_key))
+                value = str(variable_cache.get(var_key))
                 if value is None:
                     try:
                         value = str(env_vars[f'{var_key}'])
@@ -74,7 +72,7 @@ class VarsExtractor:
                 else:
                     str_target = re.sub(self.vars_re, value, str_target, 1)
 
-        dict_target = eval(str_target)
+        dict_target = ast.literal_eval(str_target)
 
         return dict_target
 
@@ -85,9 +83,6 @@ class VarsExtractor:
         :param target:
         :return:
         """
-        # 获取临时变量实例
-        cache_vars = VariableCache()
-
         # 获取变量
         str_target = str(target)
 
@@ -96,7 +91,7 @@ class VarsExtractor:
             var_key = key.group(1) or key.group(2)
 
             if var_key is not None:
-                value = str(cache_vars.get(var_key))
+                value = str(variable_cache.get(var_key))
                 if value is None:
                     err_msg = '请求数据关联变量替换失败，临时变量池不存在变量: “{}”'.format(var_key)
                     log.error(err_msg)
@@ -110,9 +105,9 @@ class VarsExtractor:
                         raise VariableError(f'请求数据关联变量 {var_key} 替换失败: {e}')
 
             # 删除关联用例临时变量
-            VariableCache().delete(var_key)
+            variable_cache.delete(var_key)
 
-        dict_target = eval(str_target)
+        dict_target = ast.literal_eval(str_target)
 
         return dict_target
 
@@ -137,7 +132,7 @@ class VarsExtractor:
             else:
                 raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
             if set_type == VarType.CACHE:
-                VariableCache().set(key, value)
+                variable_cache.set(key, value)
             elif set_type == VarType.ENV:
                 write_env_vars(RUN_ENV_PATH, env, key, value)
             elif set_type == VarType.GLOBAL:
@@ -146,3 +141,6 @@ class VarsExtractor:
                 raise VariableError(
                     f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'  # noqa: E501
                 )
+
+
+var_extractor = VarsExtractor()
