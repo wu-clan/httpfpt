@@ -25,7 +25,7 @@ from httpfpt.utils.send_report.lark_talk import LarkTalk
 from httpfpt.utils.send_report.send_email import SendMail
 
 
-def run(
+def startup(
     *args,
     # log level
     log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
@@ -49,7 +49,7 @@ def run(
     **kwargs,
 ) -> None:
     """
-    运行 pytest 测试
+    运行启动程序
 
     :param log_level: 控制台打印输出级别, 默认"-v"
     :param case_path: 指定测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
@@ -177,7 +177,7 @@ def run(
     ) if allure and allure_serve else ...
 
 
-def main(*args, pydantic_verify: bool = True, **kwargs) -> None:
+def run(*args, pydantic_verify: bool = True, **kwargs) -> None:
     """
     运行入口
 
@@ -203,7 +203,7 @@ def main(*args, pydantic_verify: bool = True, **kwargs) -> None:
         redis_client.init()
         case_data.case_data_init(pydantic_verify)
         case_data.case_id_unique_verify()
-        run(*args, **kwargs)
+        startup(*args, **kwargs)
     except Exception as e:
         log.error(f'运行异常：{e}')
         import traceback
@@ -212,4 +212,4 @@ def main(*args, pydantic_verify: bool = True, **kwargs) -> None:
 
 
 if __name__ == '__main__':
-    main()
+    run()
