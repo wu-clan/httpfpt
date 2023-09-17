@@ -17,7 +17,7 @@ config:
 test_steps:
   - name: 查询
     case_id: event_query_001
-    description: 测试直接请求
+    description: 测试关联变量
     is_run:
     request:
       method: get
@@ -51,7 +51,7 @@ test_steps:
 
   - name: 断言
     case_id: event_query_002
-    description: 高级断言
+    description: 测试高级断言
     is_run:
     request:
       method: get
@@ -100,3 +100,19 @@ test_steps:
           type: global
           jsonpath: $.url
       assert: assert 200 == pm.response.get('status_code')
+
+  - name: super_relate_testcase
+    case_id: event_relate_001
+    description: 测试跨文件关联用例
+    is_run:
+    request:
+      method: get
+      url: /posts/1
+      params:
+      headers:
+      body_type:
+      body:
+      files:
+    setup:
+      testcase:
+        - event_upload_004

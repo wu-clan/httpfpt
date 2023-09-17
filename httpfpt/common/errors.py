@@ -40,6 +40,13 @@ class SendRequestError(HttpFptErrorMixin, RuntimeError):
         super().__init__(msg)
 
 
+class SendRelateRequestError(HttpFptErrorMixin, RuntimeError):
+    """发送关联请求错误"""
+
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+
+
 class JsonPathFindError(HttpFptErrorMixin, ValueError):
     """JsonPath查找错误"""
 
