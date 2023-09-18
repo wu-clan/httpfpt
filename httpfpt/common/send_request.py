@@ -8,6 +8,7 @@ from typing import Literal
 import allure
 import httpx
 import requests
+from _pytest.outcomes import Skipped
 from httpx import Response as HttpxResponse
 from requests import Response as RequestsResponse
 
@@ -21,7 +22,7 @@ from httpfpt.utils.allure_control import allure_attach_file, allure_step
 from httpfpt.utils.assert_control import asserter
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.relate_testcase_executor import exec_setup_testcase
-from httpfpt.utils.request.hooks_executor import hook_executor
+from httpfpt.utils.request.hooks_executor import hooks_executor
 from httpfpt.utils.request.request_data_parse import RequestDataParse
 from httpfpt.utils.request.vars_extractor import var_extractor
 from httpfpt.utils.time_control import get_current_time
@@ -126,12 +127,19 @@ class SendRequests:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
-        log.info('开始解析请求数据')
-        request_data_parse = RequestDataParse(request_data, request_engin)
-        parsed_data = request_data_parse.get_request_data_parsed
-        log.info('请求数据解析完成')
-        if not relate_testcase:
-            log.info(f'🏷️ Case ID: {parsed_data["case_id"]}')
+        log.info('开始解析请求数据...' if not relate_testcase else '开始解析关联请求数据...')
+        try:
+            request_data_parse = RequestDataParse(request_data, request_engin)
+            parsed_data = request_data_parse.get_request_data_parsed
+            if not relate_testcase:
+                log.info(f'🏷️ ID: {parsed_data["case_id"]}')
+        except Skipped as e:
+            raise e
+        except Exception as e:
+            if not relate_testcase:
+                log.error(e)
+            raise e
+        log.info('请求数据解析完成' if not relate_testcase else '关联请求数据解析完成')
 
         # 记录请求前置数据; 请注意: 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         if log_data:
@@ -147,14 +155,15 @@ class SendRequests:
                 if setup_testcase is not None:
                     new_parsed = exec_setup_testcase(request_data_parse, setup_testcase)
                     if isinstance(new_parsed, RequestDataParse):
-                        # 获取最新数据，对于引用了关联测试用例变量的测试来讲, 可能造成性能损耗
+                        # 获取最新数据，对于引用了<关联测试用例变量>的测试来讲, 可能造成性能损耗
                         parsed_data = request_data_parse.get_request_data_parsed
+                    log.info('关联测试用例执行完成')
                 setup_sql = parsed_data['setup_sql']
                 if setup_sql is not None:
                     mysql_client.exec_case_sql(setup_sql, parsed_data['env'])
                 setup_hooks = parsed_data['setup_hooks']
                 if setup_hooks is not None:
-                    hook_executor.exec_hook_func(setup_hooks)
+                    hooks_executor.exec_hook_func(setup_hooks)
                 wait_time = parsed_data['setup_wait_time']
                 if wait_time is not None:
                     log.info(f'执行请求前等待：{wait_time} s')
@@ -234,7 +243,7 @@ class SendRequests:
                     mysql_client.exec_case_sql(teardown_sql, parsed_data['env'])
                 teardown_hooks = parsed_data['teardown_hooks']
                 if teardown_hooks is not None:
-                    hook_executor.exec_hook_func(teardown_hooks)
+                    hooks_executor.exec_hook_func(teardown_hooks)
                 teardown_extract = parsed_data['teardown_extract']
                 if teardown_extract is not None:
                     var_extractor.teardown_var_extract(response_data, teardown_extract, parsed_data['env'])
@@ -246,8 +255,8 @@ class SendRequests:
                     log.info(f'执行请求后等待：{wait_time} s')
                     time.sleep(wait_time)
             except AssertionError as e:
-                log.error(f'断言失败: {e.__str__()}')
-                raise AssertError(f'断言失败: {e.__str__()}')
+                log.error(f'断言失败: {e}')
+                raise AssertError(f'断言失败: {e}')
             except Exception as e:
                 log.error(f'请求后置处理异常: {e}')
                 raise e

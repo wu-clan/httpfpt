@@ -49,29 +49,29 @@ def case_id_unique_verify() -> None:
     :return:
     """
     all_case_id_dict: List[Dict[str, Union[str, list]]] = []
+    all_case_id = []
     case_data_list = redis_client.get_prefix(f'{redis_client.prefix}::case_data::')
+    redis_client.delete_prefix(f'{redis_client.prefix}::case_id_filename::')
     for case_data in case_data_list:
         case_data = ast.literal_eval(case_data)
         filename = case_data['filename']
         try:
             steps = case_data['test_steps']
             if isinstance(steps, dict):
-                all_case_id_dict.append({f'{filename}': steps['case_id']})
+                case_id = steps['case_id']
+                all_case_id.append(case_id)
+                all_case_id_dict.append({f'{filename}': case_id})
+                redis_client.set(f'{redis_client.prefix}::case_id_filename::{case_id}', filename)
             if isinstance(steps, list):
                 case_id_list = []
                 for s in steps:
-                    case_id_list.append(s['case_id'])
+                    case_id = s['case_id']
+                    case_id_list.append(case_id)
+                    all_case_id.append(case_id)
+                    redis_client.set(f'{redis_client.prefix}::case_id_filename::{case_id}', filename)
                 all_case_id_dict.append({f'{filename}': case_id_list})
         except KeyError:
             raise RequestDataParseError(f'测试用例数据文件 {filename} 结构错误，建议开启 pydantic 验证')
-    all_case_id = []
-    for case_id_dict in all_case_id_dict:
-        for case_id_values in case_id_dict.values():
-            if isinstance(case_id_values, str):
-                all_case_id.append(case_id_values)
-            else:
-                for case_id in case_id_values:
-                    all_case_id.append(case_id)
     # 检测用例 id 是否重复
     set_all_case_id = set(all_case_id)
     all_repeat_case_id = []

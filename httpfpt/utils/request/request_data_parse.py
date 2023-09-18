@@ -20,7 +20,7 @@ from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.request.method import MethodType
 from httpfpt.utils.auth_plugins import IS_AUTH, AUTH_TYPE, AuthPlugins
 from httpfpt.utils.enum_control import get_enum_values
-from httpfpt.utils.request.hooks_executor import hook_executor
+from httpfpt.utils.request.hooks_executor import hooks_executor
 from httpfpt.utils.request.vars_extractor import var_extractor
 
 _RequestDataParamGetError = (KeyError, TypeError)
@@ -33,7 +33,7 @@ def _error_msg(info: str) -> str:
 
 class RequestDataParse:
     def __init__(self, request_data: dict, request_engin: str):
-        self.request_data = var_extractor.vars_replace(hook_executor.hook_func_value_replace(request_data))
+        self.request_data = var_extractor.vars_replace(hooks_executor.hook_func_value_replace(request_data))
         self.request_engin = request_engin
         self._is_run()  # put bottom
 
@@ -243,7 +243,7 @@ class RequestDataParse:
             if is_run is not None:
                 if isinstance(is_run, bool):
                     if not is_run:
-                        log.info(f'🏷️ Case ID: {self.case_id}')
+                        log.info(f'🏷️ ID: {self.case_id}')
                         allure.dynamic.title(self.name)
                         allure.dynamic.description(self.description)
                         log.warning('此用例已设置跳过执行')
@@ -256,7 +256,7 @@ class RequestDataParse:
                     if 'skip' in is_run.keys():
                         if isinstance(is_run['skip'], bool):
                             if is_run['skip']:
-                                log.info(f'🏷️ Case ID: {self.case_id}')
+                                log.info(f'🏷️ ID: {self.case_id}')
                                 allure.dynamic.title(self.name)
                                 allure.dynamic.description(self.description)
                                 log.warning(f'此用例已设置跳过执行: {reason}')
@@ -270,8 +270,8 @@ class RequestDataParse:
                                     raise RequestDataParseError(
                                         _error_msg(f'参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值')
                                     )
-                                if hook_executor.exec_any_code(v):
-                                    log.info(f'🏷️ Case ID: {self.case_id}')
+                                if hooks_executor.exec_any_code(v):
+                                    log.info(f'🏷️ ID: {self.case_id}')
                                     allure.dynamic.title(self.name)
                                     allure.dynamic.description(self.description)
                                     log.warning(f'此用例已设置跳过执行: {reason}')
