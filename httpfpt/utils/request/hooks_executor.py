@@ -7,7 +7,7 @@ from typing import Any, Union
 from httpfpt.common.log import log
 
 
-class HookExecutor:
+class HooksExecutor:
     def __init__(self) -> None:
         # hooks 表达: ${func()} 或 ${func(1, 2)}
         # hooks 开头: a-zA-Z_
@@ -99,4 +99,4 @@ class HookExecutor:
         return result
 
 
-hook_executor = HookExecutor()
+hooks_executor = HooksExecutor()

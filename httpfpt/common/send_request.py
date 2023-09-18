@@ -22,7 +22,7 @@ from httpfpt.utils.allure_control import allure_attach_file, allure_step
 from httpfpt.utils.assert_control import asserter
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.relate_testcase_executor import exec_setup_testcase
-from httpfpt.utils.request.hooks_executor import hook_executor
+from httpfpt.utils.request.hooks_executor import hooks_executor
 from httpfpt.utils.request.request_data_parse import RequestDataParse
 from httpfpt.utils.request.vars_extractor import var_extractor
 from httpfpt.utils.time_control import get_current_time
@@ -165,7 +165,7 @@ class SendRequests:
                     mysql_client.exec_case_sql(setup_sql, parsed_data['env'])
                 setup_hooks = parsed_data['setup_hooks']
                 if setup_hooks is not None:
-                    hook_executor.exec_hook_func(setup_hooks)
+                    hooks_executor.exec_hook_func(setup_hooks)
                 wait_time = parsed_data['setup_wait_time']
                 if wait_time is not None:
                     log.info(f'执行请求前等待：{wait_time} s')
@@ -245,7 +245,7 @@ class SendRequests:
                     mysql_client.exec_case_sql(teardown_sql, parsed_data['env'])
                 teardown_hooks = parsed_data['teardown_hooks']
                 if teardown_hooks is not None:
-                    hook_executor.exec_hook_func(teardown_hooks)
+                    hooks_executor.exec_hook_func(teardown_hooks)
                 teardown_extract = parsed_data['teardown_extract']
                 if teardown_extract is not None:
                     var_extractor.teardown_var_extract(response_data, teardown_extract, parsed_data['env'])
