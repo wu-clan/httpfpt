@@ -243,7 +243,7 @@ class RequestDataParse:
             if is_run is not None:
                 if isinstance(is_run, bool):
                     if not is_run:
-                        log.info(f'🏷️ Case ID: {self.case_id}')
+                        log.info(f'🏷️ ID: {self.case_id}')
                         allure.dynamic.title(self.name)
                         allure.dynamic.description(self.description)
                         log.warning('此用例已设置跳过执行')
@@ -256,7 +256,7 @@ class RequestDataParse:
                     if 'skip' in is_run.keys():
                         if isinstance(is_run['skip'], bool):
                             if is_run['skip']:
-                                log.info(f'🏷️ Case ID: {self.case_id}')
+                                log.info(f'🏷️ ID: {self.case_id}')
                                 allure.dynamic.title(self.name)
                                 allure.dynamic.description(self.description)
                                 log.warning(f'此用例已设置跳过执行: {reason}')
@@ -271,7 +271,7 @@ class RequestDataParse:
                                         _error_msg(f'参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值')
                                     )
                                 if hooks_executor.exec_any_code(v):
-                                    log.info(f'🏷️ Case ID: {self.case_id}')
+                                    log.info(f'🏷️ ID: {self.case_id}')
                                     allure.dynamic.title(self.name)
                                     allure.dynamic.description(self.description)
                                     log.warning(f'此用例已设置跳过执行: {reason}')

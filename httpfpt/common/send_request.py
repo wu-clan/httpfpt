@@ -127,10 +127,12 @@ class SendRequests:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
-        log.info('开始解析请求数据' if not relate_testcase else '开始解析关联请求数据')
+        log.info('开始解析请求数据...' if not relate_testcase else '开始解析关联请求数据...')
         try:
             request_data_parse = RequestDataParse(request_data, request_engin)
             parsed_data = request_data_parse.get_request_data_parsed
+            if not relate_testcase:
+                log.info(f'🏷️ ID: {parsed_data["case_id"]}')
         except Skipped as e:
             raise e
         except Exception as e:
@@ -138,10 +140,6 @@ class SendRequests:
                 log.error(e)
             raise e
         log.info('请求数据解析完成' if not relate_testcase else '关联请求数据解析完成')
-        if not relate_testcase:
-            log.info(f'🏷️ Case ID: {parsed_data["case_id"]}')
-            log.info(f'📛 Case Name: {parsed_data["name"]}')
-            log.info(f'📄 Case Description: {parsed_data["description"]}')
 
         # 记录请求前置数据; 请注意: 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         if log_data:
