@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from typing import Optional, Union, Tuple, List, Dict, Any, Literal
 
 from pydantic import BaseModel, Field, AnyHttpUrl, ConfigDict
