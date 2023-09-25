@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
+from __future__ import annotations
+
 import datetime
 import decimal
 from typing import Optional
