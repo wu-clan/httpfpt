@@ -2,7 +2,7 @@
 
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/wu-clan/httpfpt/ci.yml?logo=github)
 [![GitHub](https://img.shields.io/github/license/wu-clan/httpfpt)](https://github.com/wu-clan/httpfpt/blob/master/LICENSE)
-[![Static Badge](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+![Static Badge](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
 ![GitHub tag (with filter)](https://img.shields.io/github/v/tag/wu-clan/httpfpt)
 
 [//]: # (![GitHub release &#40;with filter&#41;]&#40;https://img.shields.io/github/v/release/wu-clan/httpfpt&#41;)
