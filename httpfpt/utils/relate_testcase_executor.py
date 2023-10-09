@@ -34,7 +34,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
                 raise CorrelateTestCaseError(error_text)
 
     # 判断关联测试用例是否存在
-    all_case_id = ast.literal_eval(redis_client.get(f'{redis_client.prefix}::case_id::all'))
+    all_case_id = ast.literal_eval(redis_client.get(f'{redis_client.prefix}:case_id:all'))
     for testcase in setup_testcase:
         error_text = '执行关联测试用例失败，未在测试用例中找到关联测试用例，请检查关联测试用例 case_id 是否存在'
         if isinstance(testcase, dict):
@@ -53,8 +53,8 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
         if isinstance(testcase, dict):
             relate_count += 1
             relate_case_id = testcase['case_id']
-            relate_case_filename = redis_client.get(f'{redis_client.prefix}::case_id_filename::{relate_case_id}')
-            case_data = redis_client.get(f'{redis_client.prefix}::case_data::{relate_case_filename}')
+            relate_case_filename = redis_client.get(f'{redis_client.prefix}:case_id_filename:{relate_case_id}')
+            case_data = redis_client.get(f'{redis_client.prefix}:case_data:{relate_case_filename}')
             case_data = ast.literal_eval(case_data)
             case_data_test_steps = case_data['test_steps']
             if isinstance(case_data_test_steps, list):
@@ -79,8 +79,8 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
 
         # 用例中 testcase 参数为直接关联测试用例时
         elif isinstance(testcase, str):
-            relate_case_filename = redis_client.get(f'{redis_client.prefix}::case_id_filename::{testcase}')
-            case_data = redis_client.get(f'{redis_client.prefix}::case_data::{relate_case_filename}')
+            relate_case_filename = redis_client.get(f'{redis_client.prefix}:case_id_filename:{testcase}')
+            case_data = redis_client.get(f'{redis_client.prefix}:case_data:{relate_case_filename}')
             case_data = ast.literal_eval(case_data)
             case_data_test_steps = case_data['test_steps']
             if isinstance(case_data_test_steps, list):
