@@ -37,7 +37,7 @@ class GitRepoPaser:
         if result == 0:
             console.print('\n✅ Git 仓库数据文件拉取成功')
         else:
-            raise RuntimeError('❌ Git 仓库测试数据拉取失败')
+            raise RuntimeError('❌ Git 仓库测试数据拉取失败，请检查 Git 地址是否正确')
 
         console.print('\n🔥 开始自动验证测试数据结构...')
         all_yaml_file = search_all_case_yaml_files(online_dir_path)
