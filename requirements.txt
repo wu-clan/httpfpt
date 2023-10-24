@@ -11,7 +11,7 @@ loguru==0.6.0
 pre-commit==3.2.2
 pydantic==2.3.0
 pymysql==0.9.3
-pyright==1.1.315
+pyright==1.1.332
 pytest==7.4.1
 pytest-html==4.0.0
 pytest-metadata==3.0.0
@@ -24,3 +24,4 @@ redis[hiredis]==5.0.1
 requests==2.31.0
 rich==13.6.0
 rtoml==0.9.0
+xlrd==1.2.0
