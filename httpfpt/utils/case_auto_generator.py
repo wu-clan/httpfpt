@@ -3,11 +3,10 @@
 import os.path
 from pathlib import Path
 
-import typer
-
 from httpfpt.core.get_conf import PROJECT_NAME
 from httpfpt.core.path_conf import TEST_CASE_PATH
 from httpfpt.utils.file_control import search_all_case_yaml_files, search_all_testcase_files, get_file_property
+from httpfpt.utils.rich_console import console
 
 
 def auto_generate_testcases(rewrite: bool = False) -> None:
@@ -48,10 +47,10 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
         else:
             create_file_root_names.append(root_name)
     if len(create_file_root_names) == 0:
-        typer.secho('😝 用例已经很完善了, 添加新测试用例数据后再来生成吧~', fg='green', bold=True)
+        console.print('😝 用例已经很完善了, 添加新测试用例数据后再来生成吧~')
         return
 
-    typer.secho('⏳ 疯狂自动生成中...', fg='green', bold=True)
+    console.print('⏳ 疯狂自动生成中...')
 
     for create_file_root_name in create_file_root_names:
         for yaml_filename in yaml_filenames:
@@ -96,6 +95,6 @@ class {testcase_class_name}:
                     Path(case_path).parent.mkdir(parents=True, exist_ok=True)
                 with open(case_path, 'w', encoding='utf-8') as f:
                     f.write(case_code)
-                typer.secho(f'📄 Created: {get_file_property(case_path)[0]}', fg='green', bold=True)
+                console.print(f'📄 Created: {get_file_property(case_path)[0]}')
 
-    typer.secho('✅ 测试用例自动生成完成', fg='green', bold=True)
+    console.print('✅ 测试用例自动生成完成')

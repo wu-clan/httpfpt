@@ -4,14 +4,13 @@ import copy
 import os
 from typing import Optional, Union
 
-import typer
-
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
 from httpfpt.core.get_conf import PROJECT_NAME
 from httpfpt.core.path_conf import YAML_DATA_PATH
 from httpfpt.utils.data_manage.base_format import format_value
 from httpfpt.utils.file_control import get_file_property
+from httpfpt.utils.rich_console import console
 
 
 class ApiFoxParser:
@@ -56,7 +55,7 @@ class ApiFoxParser:
                 else:
                     pass  # todo 二叉树数据解析
             if (len(tag_case) or len(root_case)) > 0:
-                typer.secho('⏳ 奋力导入中...', fg='green', bold=True)
+                console.print('⏳ 奋力导入中...')
             # 写入项目 tag 目录
             if len(tag_case) > 0:
                 for k, v in tag_case.items():
@@ -78,10 +77,9 @@ class ApiFoxParser:
                         case_file_data,
                         mode='w',
                     )
+            console.print('✅ 导入 apifox 数据成功')
         except Exception as e:
             raise e
-        else:
-            typer.secho('✅ 导入 apifox 数据成功')
 
     @staticmethod
     def get_apifox_params(value: dict) -> Union[dict, None]:
