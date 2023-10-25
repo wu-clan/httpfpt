@@ -80,7 +80,7 @@ class RedisDB(Redis):
         for key in self.scan_iter(match=f'{prefix}*'):
             self.delete(key)
 
-    def exists(self, *key: Any) -> int:
+    def exists(self, *key: Any) -> Any:
         """
         判断 redis 数据是否存在
 

@@ -6,7 +6,7 @@ import warnings
 from typing import Union, Optional
 
 import requests
-import typer
+from rich.prompt import Confirm
 
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
@@ -14,6 +14,7 @@ from httpfpt.core.get_conf import PROJECT_NAME
 from httpfpt.core.path_conf import YAML_DATA_PATH
 from httpfpt.utils.data_manage.base_format import format_value
 from httpfpt.utils.file_control import get_file_property
+from httpfpt.utils.rich_console import console
 from httpfpt.utils.time_control import get_current_timestamp
 
 
@@ -62,7 +63,7 @@ class SwaggerParser:
             # 根目录测试用例数据
             root_case = {}
 
-            is_tag = typer.confirm('是否按openapi标签划分数据存放目录?', default=True)
+            is_tag = Confirm.ask('❓ 是否按 openapi 标签划分数据存放目录?', default=True)
             for url, values in self.data['paths'].items():
                 for method, values_map in values.items():
                     params = self.get_swagger_params(values_map)
@@ -164,15 +165,15 @@ class SwaggerParser:
                                 ]
                             )
                         file_list.append(root_filename)
-                typer.secho('⚠️ 即将创建以下数据文件:', fg='yellow', bold=True)
+                console.print('⚠️ 即将创建以下数据文件:')
                 for i in file_list:
-                    typer.secho(f'{i}', fg='cyan', bold=True)
-                is_force_write = typer.confirm(
-                    text='请检查是否存在同名文件, 此操作将强制覆盖写入所有数据文件, 是否继续执行? (此操作不可逆)', default=False  # noqa: E501
+                    console.print(f'\n\tdata\\test_data\\{i}')
+                is_force_write = Confirm.ask(
+                    '\n👁️ 请检查是否存在同名文件, 此操作将强制覆盖写入所有数据文件, 是否继续执行? (此操作不可逆)', default=False  # noqa: E501
                 )
                 # 强制写入
                 if is_force_write:
-                    typer.secho('⏳ 奋力导入中...', fg='green', bold=True)
+                    console.print('⏳ 奋力导入中...')
                     # 写入项目 tag 目录
                     if len(tag_case) > 0:
                         for k, v in tag_case.items():
@@ -216,8 +217,8 @@ class SwaggerParser:
                             )
                 # 选择写入
                 else:
-                    typer.secho('⚠️ 已取消强制覆写入所有数据文件', fg='yellow', bold=True)
-                    is_next = typer.confirm('是否进行逐一选择创建数据文件吗?', abort=True)
+                    console.print('⚠️ 已取消强制覆写入所有数据文件')
+                    is_next = Confirm.ask('❓ 是否进行逐一选择创建数据文件?', default=True)
                     if is_next:
                         # 写入项目 tag 目录
                         if len(tag_case) > 0:
@@ -233,7 +234,7 @@ class SwaggerParser:
                                         else f'openapi_{k}.yaml',
                                     ]
                                 )
-                                is_write = typer.confirm(text=f'是否需要创建 {tag_filename} 数据文件?', default=True)
+                                is_write = Confirm.ask(f'❓ 是否需要创建 {tag_filename} 数据文件?', default=True)
                                 if is_write:
                                     write_yaml(YAML_DATA_PATH, tag_filename, case_file_data, mode='w')
                         # 写入项目根目录
@@ -251,7 +252,7 @@ class SwaggerParser:
                                         if not openapi_source.startswith('http')
                                         else f'openapi_{k}.yaml'
                                     )
-                                is_write = typer.confirm(text=f'是否需要创建 {root_filename} 数据文件?', default=True)
+                                is_write = Confirm.ask(f'❓ 是否需要创建 {root_filename} 数据文件?', default=True)
                                 if is_write:
                                     case_file_data = {'config': config, 'test_steps': v}
                                     write_yaml(
@@ -260,10 +261,9 @@ class SwaggerParser:
                                         case_file_data,
                                         mode='w',
                                     )
+            console.print('✅ 导入 openapi 数据成功')
         except Exception as e:
             raise e
-        else:
-            typer.secho('✅ 导入 openapi 数据成功', fg='green', bold=True)
 
     def get_swagger_data(self, openapi_source: str) -> None:
         """
@@ -361,10 +361,10 @@ class SwaggerParser:
             if len(value['parameters']) > 0:
                 for i in value['parameters']:
                     if i.get('type') is None:
-                        data[i['name']] = format_value('object')
+                        data[i['name']] = format_value('object')  # type: ignore
                     else:
                         if i.get('type') != 'file':
-                            data[i['name']] = format_value(i.get('type', 'object'))
+                            data[i['name']] = format_value(i.get('type', 'object'))  # type: ignore
             return data if len(data) > 0 else None
         else:
             if not isinstance(value, dict):
