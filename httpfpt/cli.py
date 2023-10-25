@@ -196,7 +196,7 @@ class TestCaseCLI:
             short='-dv',
             long=True,
             default='',
-            help='验证测试数据结构, 当指定文件名时, 验证指定文件, 当指定 "all" 时, 验证所有文件.',
+            help='验证测试数据结构；当指定文件时, 仅验证指定文件, 当指定 "all" 时, 验证所有文件.',
             required=False,
         ),
     ]
@@ -217,22 +217,22 @@ class ImportCLI:
     openai: Annotated[
         Tuple[str, str],
         cappa.Arg(
-            value_name='<JSONFILE / URL, PROJECT>',
+            value_name='<JSONFILE / URL> <PROJECT>',
             short='-io',
             long='--import-openapi',
             default=(),
-            help='导入 openapi 数据到 yaml 数据文件; 通过 json 文件 / url 导入; project: 指定项目名.',
+            help='导入 openapi 数据到 yaml 数据文件; 支持 json 文件 / url 导入, 需要指定 project 项目名.',
             required=False,
         ),
     ]
     apifox: Annotated[
         Tuple[str, str],
         cappa.Arg(
-            value_name='<JSONFILE, PROJECT>',
+            value_name='<JSONFILE> <PROJECT>',
             short='-ia',
             long='--import-apifox',
             default=(),
-            help='Beta: 导入 apifox 数据到 yaml 数据文件; 通过 json 文件导入; project: 指定项目名.',
+            help='Beta: 导入 apifox 数据到 yaml 数据文件; 支持 json 文件导入, 需要指定 project 项目名.',
             required=False,
         ),
     ]
@@ -269,11 +269,11 @@ class ImportCLI:
     git: Annotated[
         str,
         cappa.Arg(
-            value_name='<Git HTTPS>',
+            value_name='<GIT HTTPS>',
             short='-ig',
             long='--import-git',
             default='',
-            help='导入 git 仓库 yaml 测试数据到本地.',
+            help='导入 git 仓库测试数据到本地.',
             required=False,
         ),
     ]
