@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import allure
 import pytest
+
 from dirty_equals import IsInt
 
 from httpfpt.common.log import log

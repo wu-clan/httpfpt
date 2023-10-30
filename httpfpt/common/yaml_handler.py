@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import yaml
 
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import YAML_DATA_PATH, YAML_REPORT_PATH, TEST_DATA_PATH
+from httpfpt.core.path_conf import TEST_DATA_PATH, YAML_DATA_PATH, YAML_REPORT_PATH
 
 
 def read_yaml(

@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 import glob
 import os.path
+
 from pathlib import Path
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 from httpfpt.core.get_conf import PROJECT_NAME
-from httpfpt.core.path_conf import YAML_DATA_PATH, TEST_CASE_PATH
+from httpfpt.core.path_conf import TEST_CASE_PATH, YAML_DATA_PATH
 
 
 def get_file_property(filepath: str) -> Tuple[str, str, str]:

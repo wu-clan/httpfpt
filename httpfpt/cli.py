@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import re
 import sys
+
 from typing import Tuple
 
 import cappa
+
 from cappa import Subcommands
 from pydantic import ValidationError
 from rich.prompt import Confirm
@@ -16,11 +18,11 @@ sys.path.append('..')
 
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.schemas.case_data import CaseData
-from httpfpt.utils.file_control import search_all_case_yaml_files
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
-from httpfpt.utils.data_manage.openapi import SwaggerParser
 from httpfpt.utils.data_manage.apifox import ApiFoxParser
 from httpfpt.utils.data_manage.git_repo import GitRepoPaser
+from httpfpt.utils.data_manage.openapi import SwaggerParser
+from httpfpt.utils.file_control import search_all_case_yaml_files
 from httpfpt.utils.rich_console import console
 
 
@@ -101,7 +103,9 @@ def import_openapi_case_data(openapi: Tuple[str, str]) -> None:
 def import_apifox_case_data(apifox: Tuple[str, str]) -> None:
     """导入 apifox 测试用例数据"""
     console.print(
-        '\n' 'Beta: 此命令目前处于测试阶段, 请谨慎使用。\n' 'Warning: 如果现有文件名与导入文件名相同, 此命令目前会覆盖写入用例数据, 请谨慎操作。\n',  # noqa: E501
+        '\n'
+        'Beta: 此命令目前处于测试阶段, 请谨慎使用。\n'
+        'Warning: 如果现有文件名与导入文件名相同, 此命令目前会覆盖写入用例数据, 请谨慎操作。\n',
         style='bold #ffd700',
     )
     result = Confirm.ask('⚠️ 确认执行此操作吗?', default=False)

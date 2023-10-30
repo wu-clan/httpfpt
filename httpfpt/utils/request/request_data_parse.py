@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+
 from string import Template
 from typing import Union
 
 import allure
+
 from _pytest.outcomes import Skipped
 from dirty_equals import IsUrl
 
@@ -18,7 +20,7 @@ from httpfpt.enums.request.auth import AuthType
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.request.method import MethodType
-from httpfpt.utils.auth_plugins import IS_AUTH, AUTH_TYPE, AuthPlugins
+from httpfpt.utils.auth_plugins import AUTH_TYPE, IS_AUTH, AuthPlugins
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.request.hooks_executor import hooks_executor
 from httpfpt.utils.request.vars_extractor import var_extractor
@@ -159,7 +161,9 @@ class RequestDataParse:
                     raise RequestDataParseError(_error_msg('参数 config:request:proxies 不是有效的 dict 类型'))
                 keys = list(proxies.keys())
                 if 'http' not in keys or 'https' not in keys:
-                    raise RequestDataParseError(_error_msg('测试用例数据解析失败，参数 config:request:proxies 不符合规范'))  # noqa: E501
+                    raise RequestDataParseError(
+                        _error_msg('测试用例数据解析失败，参数 config:request:proxies 不符合规范')
+                    )
                 for k, v in proxies.items():
                     if v is not None:
                         if not isinstance(v, str):

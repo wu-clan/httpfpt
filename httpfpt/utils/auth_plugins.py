@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import requests
+
 from jsonpath import findall
 
 from httpfpt.common.errors import AuthError

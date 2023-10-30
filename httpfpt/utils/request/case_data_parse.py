@@ -3,7 +3,8 @@
 import ast
 import copy
 import sys
-from typing import List, Dict, Any, Union
+
+from typing import Any, Dict, List, Union
 
 from pydantic import ValidationError
 
@@ -12,7 +13,7 @@ from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.db.redis_db import redis_client
 from httpfpt.schemas.case_data import CaseData
-from httpfpt.utils.file_control import search_all_case_yaml_files, get_file_property
+from httpfpt.utils.file_control import get_file_property, search_all_case_yaml_files
 from httpfpt.utils.pydantic_parser import parse_error
 
 

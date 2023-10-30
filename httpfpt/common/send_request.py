@@ -2,17 +2,19 @@
 # _*_ coding:utf-8 _*_
 import json
 import time
+
 from json import JSONDecodeError
 from typing import Literal
 
 import allure
 import httpx
 import requests
+
 from _pytest.outcomes import Skipped
 from httpx import Response as HttpxResponse
 from requests import Response as RequestsResponse
 
-from httpfpt.common.errors import SendRequestError, AssertError
+from httpfpt.common.errors import AssertError, SendRequestError
 from httpfpt.common.log import log
 from httpfpt.core import get_conf
 from httpfpt.db.mysql_db import mysql_client

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Any
 
-from redis import Redis, AuthenticationError
+from redis import AuthenticationError, Redis
 
 from httpfpt.common.log import log
 from httpfpt.core import get_conf
