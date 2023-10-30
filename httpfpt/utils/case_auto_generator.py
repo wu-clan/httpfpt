@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os.path
+
 from pathlib import Path
 
 from httpfpt.core.get_conf import PROJECT_NAME
 from httpfpt.core.path_conf import TEST_CASE_PATH
-from httpfpt.utils.file_control import search_all_case_yaml_files, search_all_testcase_files, get_file_property
+from httpfpt.utils.file_control import get_file_property, search_all_case_yaml_files, search_all_testcase_files
 from httpfpt.utils.rich_console import console
 
 

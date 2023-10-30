@@ -1,9 +1,10 @@
 select = [
     "E",
     "F",
+    "I",
+    "TCH",
     "W505",
     "PT018",
-    "Q000",
     "SIM101",
     "SIM114",
     "PGH004",
@@ -15,37 +16,31 @@ select = [
     "ANN204",
     "ANN205",
     "ANN206",
-    "TCH"
 ]
 line-length = 120
-format = "grouped"
-target-version = "py310"
 cache-dir = "./httpfpt/.ruff_cache"
 extend-exclude = ["httpfpt/conftest.py"]
 
-[flake8-pytest-style]
+[lint.flake8-pytest-style]
 mark-parentheses = false
 parametrize-names-type = "list"
 parametrize-values-row-type = "list"
 parametrize-values-type = "tuple"
 
-[flake8-quotes]
-avoid-escape = false
-docstring-quotes = "double"
-inline-quotes = "single"
-multiline-quotes = "single"
-
-[flake8-unused-arguments]
+[lint.flake8-unused-arguments]
 ignore-variadic-names = true
 
-[isort]
+[lint.isort]
 lines-between-types = 1
 order-by-type = true
 
-[flake8-annotations]
+[lint.flake8-annotations]
 mypy-init-return = true
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "httpfpt/testcases/test_*.py" = ["ANN001", "ANN201"]
 "httpfpt/conftest.py" = ["ANN001", "ANN201", "ANN202"]
 "httpfpt/cli.py" = ["E402"]
+
+[format]
+quote-style = "single"

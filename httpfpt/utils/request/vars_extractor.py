@@ -7,11 +7,11 @@ import re
 from jsonpath import findall
 
 from httpfpt.common.env_handler import get_env_dict, write_env_vars
-from httpfpt.common.errors import JsonPathFindError, VariableError, RequestDataParseError
+from httpfpt.common.errors import JsonPathFindError, RequestDataParseError, VariableError
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import read_yaml, write_yaml_vars
-from httpfpt.core.path_conf import TEST_DATA_PATH, RUN_ENV_PATH
+from httpfpt.core.path_conf import RUN_ENV_PATH, TEST_DATA_PATH
 from httpfpt.enums.var_type import VarType
 
 
@@ -139,7 +139,7 @@ class VarsExtractor:
                 write_yaml_vars({key: value})
             else:
                 raise VariableError(
-                    f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'  # noqa: E501
+                    f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
                 )
 
 

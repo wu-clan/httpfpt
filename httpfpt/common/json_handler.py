@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-from typing import Optional, Any
+
+from typing import Any, Optional
 
 from httpfpt.common.log import log
 

@@ -3,9 +3,11 @@
 import copy
 import os
 import warnings
-from typing import Union, Optional
+
+from typing import Optional, Union
 
 import requests
+
 from rich.prompt import Confirm
 
 from httpfpt.common.json_handler import read_json_file
@@ -169,7 +171,8 @@ class SwaggerParser:
                 for i in file_list:
                     console.print(f'\n\tdata\\test_data\\{i}')
                 is_force_write = Confirm.ask(
-                    '\n👁️ 请检查是否存在同名文件, 此操作将强制覆盖写入所有数据文件, 是否继续执行? (此操作不可逆)', default=False  # noqa: E501
+                    '\n👁️ 请检查是否存在同名文件, 此操作将强制覆盖写入所有数据文件, 是否继续执行? (此操作不可逆)',
+                    default=False,
                 )
                 # 强制写入
                 if is_force_write:
@@ -370,7 +373,7 @@ class SwaggerParser:
             if not isinstance(value, dict):
                 schema_data = self.get_swagger_schema_data(value)
                 for k, v in schema_data['properties'].items():
-                    if v.get('format') is None:  # noqa: SIM114
+                    if v.get('format') is None:
                         data[k] = format_value(v.get('type', 'object'))
                     else:
                         if v.get('format') != 'binary':

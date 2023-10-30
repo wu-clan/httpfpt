@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import json
-from typing import Union, Any, Optional
+
+from typing import Any, Optional, Union
 
 import allure
+
 from allure_commons.types import AttachmentType
 
 from httpfpt.utils.file_control import get_file_property

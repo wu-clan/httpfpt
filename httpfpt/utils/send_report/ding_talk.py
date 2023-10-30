@@ -31,7 +31,10 @@ class DingTalk:
                 },
             }
             response = requests.session().post(
-                url=get_conf.DING_TALK_WEBHOOK, json=data, headers=headers, proxies=get_conf.DING_TALK_PROXY  # type: ignore  # noqa: E501
+                url=get_conf.DING_TALK_WEBHOOK,
+                json=data,
+                headers=headers,
+                proxies=get_conf.DING_TALK_PROXY,
             )
             response.raise_for_status()
         except Exception as e:

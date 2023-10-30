@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import Optional, Union, Tuple, List, Dict, Any, Literal
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
-from pydantic import BaseModel, Field, AnyHttpUrl, ConfigDict
+from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 
 __all__ = ['CaseData']
 

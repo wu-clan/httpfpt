@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from decimal import Decimal
-from typing import Union, Any
+from typing import Any, Union
 
 from jsonpath import findall
 
@@ -168,12 +168,14 @@ class Asserter:
                 if use_code.endswith('))'):
                     use_code = use_code.replace('))', ')')
                 if not use_code.startswith('get('):
-                    raise AssertSyntaxError('code 断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')  # noqa: E501
+                    raise AssertSyntaxError(
+                        'code 断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值'
+                    )
                 else:
                     try:
                         response_value = eval(f'{response}.{use_code}')
                     except Exception as e:
-                        err_msg = str(e.args).replace("\'", '"').replace('\\', '')
+                        err_msg = str(e.args).replace("'", '"').replace('\\', '')
                         raise AssertSyntaxError(f'code 断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
                     else:
                         # 执行断言
@@ -189,18 +191,18 @@ class Asserter:
                 assert_expr_type = ['==', '!=', '>', '<', '>=', '<=', 'in', 'not']
                 if assert_split[2] not in assert_expr_type:
                     raise AssertSyntaxError(
-                        f'code 断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}, 仅支持: {assert_expr_type}'  # noqa: E501
+                        f'code 断言表达式格式错误, 含有不支持的断言类型: {assert_split[2]}, 仅支持: {assert_expr_type}'
                     )
                 else:
                     if assert_split[2] == 'not':
                         if assert_split[3] != 'in':
                             raise AssertSyntaxError(
-                                f'code 断言表达式格式错误, 含有不支持的断言类型: {" ".join(assert_split[2:4])}'  # noqa: E501
+                                f'code 断言表达式格式错误, 含有不支持的断言类型: {" ".join(assert_split[2:4])}'
                             )
                         else:
                             if 'pm.response.get' not in assert_split[4]:
                                 raise AssertSyntaxError(
-                                    f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}'  # noqa: E501
+                                    f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}'
                                 )
                             # 如果包含自定义错误信息
                             if len(assert_split) == 6:
@@ -210,7 +212,9 @@ class Asserter:
                     else:
                         # 非 dirty-equals 或 not in 断言表达式
                         if 'pm.response.get' not in assert_split[3]:
-                            raise AssertSyntaxError(f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}')  # noqa: E501
+                            raise AssertSyntaxError(
+                                f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}'
+                            )
                         if len(assert_split) == 5:
                             pm_code = assert_split[3].replace(',', '')
                         else:
@@ -224,13 +228,17 @@ class Asserter:
                     if use_code.endswith('))'):
                         use_code = use_code.replace('))', ')')
                     if not use_code.startswith('get('):
-                        raise AssertSyntaxError('code 断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值')  # noqa: E501
+                        raise AssertSyntaxError(
+                            'code 断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值'
+                        )
                     else:
                         try:
                             response_value = eval(f'{response}.{use_code}')
                         except Exception as e:
-                            err_msg = str(e.args).replace("\'", '"').replace('\\', '')
-                            raise AssertSyntaxError(f'code 断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')  # noqa: E501
+                            err_msg = str(e.args).replace("'", '"').replace('\\', '')
+                            raise AssertSyntaxError(
+                                f'code 断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}'
+                            )
                         else:
                             # 执行断言
                             format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
@@ -272,7 +280,7 @@ class Asserter:
         elif assert_type == AssertType.greater_than_or_equal:
             assert expected_value >= actual_value, (
                 assert_check
-                or f'预期结果: {Decimal(str(expected_value))} 不大于等于实际结果: {Decimal(str(actual_value))}'  # noqa: E501
+                or f'预期结果: {Decimal(str(expected_value))} 不大于等于实际结果: {Decimal(str(actual_value))}'
             )
 
         elif assert_type == AssertType.less_than:
@@ -283,7 +291,7 @@ class Asserter:
         elif assert_type == AssertType.less_than_or_equal:
             assert expected_value <= actual_value, (
                 assert_check
-                or f'预期结果: {Decimal(str(expected_value))} 不小于等于实际结果: {Decimal(str(actual_value))}'  # noqa: E501
+                or f'预期结果: {Decimal(str(expected_value))} 不小于等于实际结果: {Decimal(str(actual_value))}'
             )
 
         elif assert_type == AssertType.string_equal:

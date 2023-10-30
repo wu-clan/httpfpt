@@ -3,19 +3,20 @@
 import datetime
 import os
 import shutil
-from typing import Union, Optional, Literal
+
+from typing import Literal, Optional, Union
 
 import pytest
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import PROJECT_NAME, EMAIL_REPORT_SEND, DING_TALK_REPORT_SEND, LARK_TALK_REPORT_SEND
+from httpfpt.core.get_conf import DING_TALK_REPORT_SEND, EMAIL_REPORT_SEND, LARK_TALK_REPORT_SEND, PROJECT_NAME
 from httpfpt.core.path_conf import (
-    HTML_REPORT_PATH,
-    ALLURE_REPORT_PATH,
     ALLURE_ENV_FILE,
     ALLURE_REPORT_ENV_FILE,
     ALLURE_REPORT_HTML_PATH,
+    ALLURE_REPORT_PATH,
+    HTML_REPORT_PATH,
     YAML_REPORT_PATH,
 )
 from httpfpt.db.redis_db import redis_client
@@ -88,8 +89,8 @@ def startup(
             os.makedirs(HTML_REPORT_PATH)
 
     is_html_report_file = (
-        f'''--html={HTML_REPORT_PATH}\\{PROJECT_NAME}_{datetime.datetime.now().strftime(
-            "%Y-%m-%d-%H_%M_%S")}.html'''
+        f"""--html={HTML_REPORT_PATH}\\{PROJECT_NAME}_{datetime.datetime.now().strftime(
+            "%Y-%m-%d-%H_%M_%S")}.html"""
         if html_report
         else ''
     )
