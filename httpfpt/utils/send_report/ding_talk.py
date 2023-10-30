@@ -34,7 +34,7 @@ class DingTalk:
                 url=get_conf.DING_TALK_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=get_conf.DING_TALK_PROXY,
+                proxies=get_conf.DING_TALK_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:

@@ -40,7 +40,7 @@ class LarkTalk:
                 url=get_conf.LARK_TALK_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=get_conf.LARK_TALK_PROXY,
+                proxies=get_conf.LARK_TALK_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:
