@@ -19,7 +19,7 @@ def allure_step(step: str, var: Union[str, dict]) -> None:
     :param var: 操作步骤中的变量
     :return:
     """
-    with allure.step(step):  # type: ignore
+    with allure.step(step):
         allure.attach(
             body=json.dumps(var, ensure_ascii=False, indent=2) if isinstance(var, dict) else var,
             name='JSON Serialize',

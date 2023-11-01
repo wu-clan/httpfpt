@@ -1,14 +1,16 @@
 allure-pytest==2.13.2
 cache3==0.2.1
-cappa==0.10.2
+cappa==0.11.5
 cryptography==41.0.4
 dbutils==3.0.2
 dirty_equals==0.6.0
 faker==13.15.0
+filelock==3.12.4
 httpx==0.23.0
 jinja2==3.1.2
 loguru==0.6.0
 pre-commit==3.2.2
+py==1.11.0
 pydantic==2.3.0
 pymysql==0.9.3
 pyright==1.1.332

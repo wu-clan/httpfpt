@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import datetime
 import os
 import shutil
+import sys
 
+from datetime import datetime
 from typing import Literal, Optional, Union
 
 import pytest
+
+sys.path.append('..')
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
@@ -42,8 +45,8 @@ def startup(
     reruns: int = 0,
     maxfail: int = 0,
     x: bool = False,
-    n: Union[Literal['auto', 'logical'], int] = 'auto',
-    dist: Literal['load', 'loadscope', 'loadfile', 'loadgroup', 'worksteal', 'no'] = 'loadscope',
+    n: Union[Literal['auto', 'logical'], int, None] = None,
+    dist: Union[Literal['load', 'loadscope', 'loadfile', 'loadgroup', 'worksteal', 'no'], None] = None,
     strict_markers: bool = False,
     capture: bool = True,
     disable_warnings: bool = True,
@@ -61,17 +64,17 @@ def startup(
     :param reruns: 用例运行失败重试次数, 兼容性差, 默认不开启使用
     :param maxfail: 用例运行失败数量，到达数量上限后终止运行，默认为 0，即不终止
     :param x: 用例运行失败, 终止运行, 默认关闭
-    :param n: 分布式运行, 默认 "auto"
-    :param dist: 分布式运行方式, 默认"loadscope", 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
+    :param n: 分布式运行, 默认关闭
+    :param dist: 分布式运行方式, 默认关闭, 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
     :param strict_markers: markers 严格模式, 对于使用了自定义 marker 的用例, 如果 marker 未在 pytest.ini 注册, 用例将报错
     :param capture: 避免在使用输出模式为"v"和"s"时，html报告中的表格日志为空的情况, 默认开启
     :param disable_warnings: 关闭控制台警告信息, 默认开启
     :return:
     """  # noqa: E501
-    default_case_path = f'./testcases/{PROJECT_NAME}/'  # 默认执行指定项目下的所有测试用例
-    if case_path is None:
-        run_path = default_case_path
-    else:
+    run_args = [log_level]
+
+    default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', PROJECT_NAME])
+    if case_path:
         if '::' not in case_path:
             raise ValueError(
                 '用例收集失败, 请检查路径参数 \n'
@@ -82,67 +85,60 @@ def startup(
                 '\t1. 项目目录下没有多级目录: case_path = "文件名::类名::函数名" \n'
                 '\t2. 项目目录下有多级目录: case_path = "目录名/.../文件名::函数名"'
             )
-        run_path = default_case_path + case_path
+        sep = os.path.sep
+        case_path = case_path.replace('/', sep)
+        run_path = os.sep.join([default_case_path, case_path])
+    else:
+        run_path = default_case_path
+    run_args.append(run_path)
 
     if html_report:
         if not os.path.exists(HTML_REPORT_PATH):
             os.makedirs(HTML_REPORT_PATH)
+        __html_report_file = f'{PROJECT_NAME}_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.html'
+        run_args.append(f'--html={os.path.join(HTML_REPORT_PATH, __html_report_file)}')
+        run_args.append('--self-contained-html')
 
-    is_html_report_file = (
-        f"""--html={HTML_REPORT_PATH}\\{PROJECT_NAME}_{datetime.datetime.now().strftime(
-            "%Y-%m-%d-%H_%M_%S")}.html"""
-        if html_report
-        else ''
-    )
+    if allure:
+        run_args.append(f'--alluredir={ALLURE_REPORT_PATH}')
+        if allure_clear:
+            run_args.append('--clean-alluredir')
 
-    is_html_report_self = '--self-contained-html' if html_report else ''
+    if reruns != 0:
+        run_args.append(f'--reruns {reruns}')
 
-    is_allure = f'--alluredir={ALLURE_REPORT_PATH}' if allure else ''
+    if maxfail != 0:
+        run_args.append(f'--maxfail {maxfail}')
 
-    is_clear_allure = '--clean-alluredir' if is_allure and allure_clear else ''
+    if x:
+        run_args.append('-x')
 
-    is_reruns = f'--reruns {reruns}' if reruns != 0 else ''  # noqa: F841
+    if n:
+        run_args.append(f'-n={n}')
 
-    is_maxfail = f'--maxfail={maxfail}' if maxfail != 0 else ''
+    if dist:
+        run_args.append(f'--dist={dist}')
 
-    is_x = '-x' if x else ''
+    if strict_markers:
+        run_args.append('--strict-markers')
 
-    is_n = f'-n={n}'  # noqa: F841
+    if capture:
+        run_args.append('--capture=tee-sys')
 
-    is_dist = f'--dist={dist}'  # noqa: F841
+    if disable_warnings:
+        run_args.append('--disable-warnings')
 
-    is_strict_markers = '--strict-markers' if strict_markers else ''
-
-    is_capture = '--capture=tee-sys' if capture else ''
-
-    is_disable_warnings = '--disable-warnings' if disable_warnings else ''
-
-    kw = [f'{k}={v}' for k, v in kwargs.items()]
-
-    run_args = [
-        arg
-        for arg in [
-            f'{log_level}',
-            f'{run_path}',
-            f'{is_html_report_file}',
-            f'{is_html_report_self}',
-            f'{is_allure}',
-            f'{is_clear_allure}'
-            # f'{is_reruns}',
-            f'{is_maxfail}',
-            f'{is_x}',
-            # f'{is_n}',  # 分布式运行存在诸多问题, 请谨慎使用
-            # f'{is_dist}',
-            f'{is_strict_markers}',
-            f'{is_capture}',
-            f'{is_disable_warnings}',
-            *args,
-        ]
-        + kw
-        if arg.strip() != ''
-    ]
+    if len(args) > 0:
+        for i in args:
+            if i not in run_args:
+                run_args.append(i)
+    if len(kwargs) > 0:
+        for k, v in kwargs.items():
+            for i in run_args:
+                if '=' in i and k in i:
+                    run_args.remove(i)
+                    run_args.append(f'{k}={v}')
     run_args = list(set(run_args))
-
     format_run_args = []
     for i in run_args:
         if '=' in i:
@@ -151,10 +147,10 @@ def startup(
             format_run_args.append(new_i)
         else:
             format_run_args.append(i)
-    format_run_args_to_pytest_command = ' '.join(_ for _ in format_run_args)
+    run_pytest_command_args = ' '.join(_ for _ in format_run_args)
 
     log.info(f'开始运行项目：{PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}')
-    log.info(f'Pytest 命令: pytest {format_run_args_to_pytest_command}')
+    log.info(f'Pytest CLI: pytest {run_pytest_command_args}')
     log.info('🚀 START')
     pytest.main(run_args)
     log.info('🏁 FINISH')
@@ -163,19 +159,23 @@ def startup(
     yaml_report_files.sort()
     test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
 
-    SendMail(test_result, is_html_report_file.split('=')[1]).send_report() if EMAIL_REPORT_SEND and html_report else ...
+    if html_report and EMAIL_REPORT_SEND:
+        SendMail(test_result, __html_report_file).send_report()  # noqa: ignore  # type: ignore
 
-    DingTalk(test_result).send() if DING_TALK_REPORT_SEND else ...
+    if DING_TALK_REPORT_SEND:
+        DingTalk(test_result).send()
 
-    LarkTalk(test_result).send() if LARK_TALK_REPORT_SEND else ...
+    if LARK_TALK_REPORT_SEND:
+        LarkTalk(test_result).send()
 
-    shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE) if allure else ... if not os.path.exists(
-        ALLURE_REPORT_ENV_FILE
-    ) else ...
+    if allure:
+        if not os.path.exists(ALLURE_REPORT_ENV_FILE):
+            shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE)
 
-    os.popen(f'allure generate {ALLURE_REPORT_PATH} -o {ALLURE_REPORT_HTML_PATH} --clean') and os.popen(
-        f'allure serve {ALLURE_REPORT_PATH}'
-    ) if allure and allure_serve else ...
+    if allure and allure_serve:
+        os.popen(f'allure generate {ALLURE_REPORT_PATH} -o {ALLURE_REPORT_HTML_PATH} --clean') and os.popen(
+            f'allure serve {ALLURE_REPORT_PATH}'
+        )  # type: ignore
 
 
 def run(*args, pydantic_verify: bool = True, **kwargs) -> None:
