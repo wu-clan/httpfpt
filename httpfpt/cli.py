@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 import sys
 
-from typing import Tuple
+from typing import TYPE_CHECKING, List, Tuple
 
 import cappa
 
@@ -17,6 +17,7 @@ from typing_extensions import Annotated  # noqa: TCH002
 sys.path.append('..')
 
 from httpfpt.common.yaml_handler import read_yaml
+from httpfpt.run import run
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.data_manage.apifox import ApiFoxParser
@@ -24,6 +25,9 @@ from httpfpt.utils.data_manage.git_repo import GitRepoPaser
 from httpfpt.utils.data_manage.openapi import SwaggerParser
 from httpfpt.utils.file_control import search_all_case_yaml_files
 from httpfpt.utils.rich_console import console
+
+if TYPE_CHECKING:
+    from cappa.parser import Value
 
 
 def get_version() -> None:
@@ -144,40 +148,15 @@ def import_git_case_data(src: str) -> None:
         raise e
 
 
-def httpfpt_cli(httpfpt: HttpFptCLI) -> None:
-    """CLI 入口"""
-    if httpfpt.version:
-        get_version()
-    if httpfpt.subcmd:
-        if isinstance(httpfpt.subcmd, TestCaseCLI):
-            data_verify = httpfpt.subcmd.data_verify
-            generate = httpfpt.subcmd.generate
-            if data_verify:
-                testcase_data_verify(data_verify)
-            if generate:
-                generate_testcases()
-        if isinstance(httpfpt.subcmd, ImportCLI):
-            openai = httpfpt.subcmd.openai
-            apifox = httpfpt.subcmd.apifox
-            har = httpfpt.subcmd.har
-            jmeter = httpfpt.subcmd.jmeter
-            postman = httpfpt.subcmd.postman
-            git = httpfpt.subcmd.git
-            if openai:
-                import_openapi_case_data(openai)
-            if apifox:
-                import_apifox_case_data(apifox)
-            if har:
-                import_har_case_data(har)
-            if jmeter:
-                import_jmeter_case_data(jmeter)
-            if postman:
-                import_postman_case_data(postman)
-            if git:
-                import_git_case_data(git)
+def cmd_run_test_parse(value: Value) -> bool | Value:
+    """运行测试命令参数解析"""
+    if len(value) == 0:  # type: ignore
+        return True
+    else:
+        return value
 
 
-@cappa.command(name='httpfpt-cli', invoke=httpfpt_cli)
+@cappa.command(name='httpfpt-cli')
 class HttpFptCLI:
     version: Annotated[
         bool,
@@ -188,10 +167,32 @@ class HttpFptCLI:
             help='Print version information.',
         ),
     ]
+    run_test: Annotated[
+        List[str],
+        cappa.Arg(
+            value_name='<PYTEST ARGS / NONE>',
+            short='-r',
+            long='--run',
+            default=[],
+            help='Run test cases, do not support use with other commands, but support custom pytest running parameters,'
+            ' default parameters see: httpfpt/run.py',
+            parse=cmd_run_test_parse,
+            num_args=-1,
+        ),
+    ]
     subcmd: Subcommands[TestCaseCLI | ImportCLI | None] = None
 
+    def __call__(self) -> None:
+        if self.version:
+            get_version()
+        if self.run_test:
+            if self.version or self.subcmd:
+                console.print('\n❌ 暂不支持 -r/--run 命令与其他 CLI 命令同时使用')
+                raise cappa.Exit(code=1)
+            run(*self.run_test) if isinstance(self.run_test, list) else run()
 
-@cappa.command(name='testcase', help='Test case tools', invoke=httpfpt_cli)
+
+@cappa.command(name='testcase', help='Test case tools')
 class TestCaseCLI:
     data_verify: Annotated[
         str,
@@ -215,8 +216,14 @@ class TestCaseCLI:
         ),
     ]
 
+    def __call__(self) -> None:
+        if self.data_verify:
+            testcase_data_verify(self.data_verify)
+        if self.generate:
+            generate_testcases()
 
-@cappa.command(name='import', help='Import test case data', invoke=httpfpt_cli)
+
+@cappa.command(name='import', help='Import test case data')
 class ImportCLI:
     openai: Annotated[
         Tuple[str, str],
@@ -281,6 +288,20 @@ class ImportCLI:
             required=False,
         ),
     ]
+
+    def __call__(self) -> None:
+        if self.openai:
+            import_openapi_case_data(self.openai)
+        if self.apifox:
+            import_apifox_case_data(self.apifox)
+        if self.har:
+            import_har_case_data(self.har)
+        if self.jmeter:
+            import_jmeter_case_data(self.jmeter)
+        if self.postman:
+            import_postman_case_data(self.postman)
+        if self.git:
+            import_git_case_data(self.git)
 
 
 if __name__ == '__main__':
