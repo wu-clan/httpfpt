@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from functools import cache
 from pathlib import Path
 
 from httpfpt.common.toml_handler import read_toml
 
-__config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
+
+@cache
+def __cache_config() -> dict:
+    return read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
+
+
+__config = __cache_config()
 
 # 项目目录名
 PROJECT_NAME = __config['project']['project']
