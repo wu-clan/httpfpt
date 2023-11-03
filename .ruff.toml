@@ -8,7 +8,6 @@ select = [
     "SIM101",
     "SIM114",
     "PGH004",
-    "PLE1142",
     "RUF100",
     "ANN001",
     "ANN201",

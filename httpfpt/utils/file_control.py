@@ -45,3 +45,17 @@ def search_all_testcase_files() -> list:
     """
     files = glob.glob(os.path.join(TEST_CASE_PATH, f'{PROJECT_NAME}', '**', 'test_*.py'), recursive=True)
     return files
+
+
+def get_file_hash(filepath: str) -> str:
+    """
+    获取文件 hash (hash256) 值
+
+    :param filepath:
+    :return:
+    """
+    import hashlib
+
+    with open(filepath, 'rb') as f:
+        file_hash = hashlib.sha256(f.read()).hexdigest()
+    return file_hash

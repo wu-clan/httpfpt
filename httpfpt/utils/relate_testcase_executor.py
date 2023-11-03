@@ -35,7 +35,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
                 raise CorrelateTestCaseError(error_text)
 
     # 判断关联测试用例是否存在
-    all_case_id = ast.literal_eval(redis_client.get(f'{redis_client.prefix}:case_id:all'))
+    all_case_id = ast.literal_eval(redis_client.get(f'{redis_client.prefix}:case_id_list'))
     for testcase in setup_testcase:
         error_text = '执行关联测试用例失败，未在测试用例中找到关联测试用例，请检查关联测试用例 case_id 是否存在'
         if isinstance(testcase, dict):
