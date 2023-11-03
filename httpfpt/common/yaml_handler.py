@@ -2,19 +2,17 @@
 # -*- coding: utf-8 -*-
 import os
 
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
 import yaml
 
 from httpfpt.common.log import log
 from httpfpt.core.path_conf import TEST_DATA_PATH, YAML_DATA_PATH, YAML_REPORT_PATH
+from httpfpt.utils.time_control import get_current_time
 
 
-def read_yaml(
-    filepath: Optional[str] = YAML_DATA_PATH, *, filename: str
-) -> Dict[str, Union[str, int, float, bool, List[Any], Dict[str, Any], None]]:
+def read_yaml(filepath: Optional[str] = YAML_DATA_PATH, *, filename: str) -> Dict[str, Any]:
     """
     读取 yaml 文件
 
@@ -68,12 +66,11 @@ def write_yaml(filepath: str, filename: str, data: Any = None, *, encoding: str 
 
 
 def write_yaml_report(
-    filename: str = f'APITestResult_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.yaml',
+    filename: str = f'APITestResult_{get_current_time("%Y-%m-%d %H_%M_%S")}.yaml',
     *,
     data: Any,
     encoding: str = 'utf-8',
     mode: str = 'a',
-    status: str,
 ) -> None:
     """
     写入 yaml 测试报告
@@ -82,12 +79,8 @@ def write_yaml_report(
     :param data: 写入数据
     :param encoding: 文件编码格式
     :param mode: 文件写入模式
-    :param status: 测试结果
     :return
     """
-    status_upper = status.upper()
-    if status_upper not in ('PASS', 'FAIL'):
-        raise ValueError('yaml测试报告结果用力状态只允许"PASS","FAIL"')
     if not os.path.exists(YAML_REPORT_PATH):
         os.makedirs(YAML_REPORT_PATH)
     _file = os.path.join(YAML_REPORT_PATH, filename)

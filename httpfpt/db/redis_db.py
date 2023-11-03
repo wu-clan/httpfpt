@@ -32,16 +32,18 @@ class RedisDB(Redis):
         else:
             log.info('数据库 redis 连接成功')
 
-    def get(self, key: Any) -> Any:
+    def get(self, key: Any, logging: bool = True) -> Any:
         """
         获取 redis 数据
 
         :param key:
+        :param logging:
         :return:
         """
         data = super().get(key)
         if not data:
-            log.warning(f'获取 redis 数据 {key} 失败, 此数据不存在')
+            if logging:
+                log.warning(f'获取 redis 数据 {key} 失败, 此数据不存在')
         return data
 
     def get_prefix(self, prefix: str) -> list:
@@ -67,7 +69,8 @@ class RedisDB(Redis):
         :param kwargs:
         :return:
         """
-        self.delete(key)
+        if super().exists(key):
+            self.delete(key)
         self.set(key, value, **kwargs)
 
     def delete_prefix(self, prefix: str) -> None:
@@ -79,18 +82,6 @@ class RedisDB(Redis):
         """
         for key in self.scan_iter(match=f'{prefix}*'):
             self.delete(key)
-
-    def exists(self, *key: Any) -> Any:
-        """
-        判断 redis 数据是否存在
-
-        :param key:
-        :return:
-        """
-        num = super().exists(*key)
-        if not num:
-            log.error(f'不存在 redis 数据 {key}')
-        return num
 
 
 redis_client = RedisDB()

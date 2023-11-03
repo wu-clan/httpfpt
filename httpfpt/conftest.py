@@ -179,4 +179,4 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         'started_time': datetime.fromtimestamp(started_time).strftime('%Y-%m-%d %H:%M:%S'),
         'elapsed': float(datetime.fromtimestamp(elapsed).strftime('%S.%f')[:-3]),
     }
-    write_yaml_report(data=data, status='PASS')
+    write_yaml_report(data=data)

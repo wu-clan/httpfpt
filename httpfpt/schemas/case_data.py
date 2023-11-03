@@ -98,3 +98,4 @@ class CaseData(BaseModel):
     config: Config
     test_steps: Union[Steps, List[Steps]]
     filename: Optional[str] = None
+    file_hash: Optional[str] = None

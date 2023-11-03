@@ -4,7 +4,6 @@ import os
 import shutil
 import sys
 
-from datetime import datetime
 from typing import Literal, Optional, Union
 
 import pytest
@@ -27,6 +26,7 @@ from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.ding_talk import DingTalk
 from httpfpt.utils.send_report.lark_talk import LarkTalk
 from httpfpt.utils.send_report.send_email import SendMail
+from httpfpt.utils.time_control import get_current_time
 
 
 def startup(
@@ -92,11 +92,11 @@ def startup(
         run_path = default_case_path
     run_args.append(run_path)
 
+    html_report_filename = f'{PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
     if html_report:
         if not os.path.exists(HTML_REPORT_PATH):
             os.makedirs(HTML_REPORT_PATH)
-        __html_report_file = f'{PROJECT_NAME}_{datetime.now().strftime("%Y-%m-%d %H_%M_%S")}.html'
-        run_args.append(f'--html={os.path.join(HTML_REPORT_PATH, __html_report_file)}')
+        run_args.append(f'--html={os.path.join(HTML_REPORT_PATH, html_report_filename)}')
         run_args.append('--self-contained-html')
 
     if allure:
@@ -160,7 +160,7 @@ def startup(
     test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
 
     if html_report and EMAIL_REPORT_SEND:
-        SendMail(test_result, __html_report_file).send_report()  # noqa: ignore  # type: ignore
+        SendMail(test_result, html_report_filename).send_report()
 
     if DING_TALK_REPORT_SEND:
         DingTalk(test_result).send()
