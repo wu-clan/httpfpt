@@ -1,7 +1,7 @@
 allure-pytest==2.13.2
 cache3==0.2.1
 cappa==0.11.5
-cryptography==41.0.4
+cryptography==41.0.6
 dbutils==3.0.2
 dirty_equals==0.7.1
 faker==13.15.0
