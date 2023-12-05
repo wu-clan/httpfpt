@@ -44,7 +44,7 @@ git clone https://github.com/wu-clan/httpfpt.git
     pip install -r requirements.txt
     ```
 
-2. 安装 redis 并启动服务
+2. 安装 redis 数据库并启动服务
 
    [Redis Windows](https://github.com/redis-windows/redis-windows)
 
@@ -52,15 +52,14 @@ git clone https://github.com/wu-clan/httpfpt.git
 
    [Docker](https://hub.docker.com/_/redis)
 
-3. 安装 mysql 并创建一个任意名称数据库，同步修改 conf.toml 中的数据库配置
+3. 安装 mysql 数据库（可选，如果你需要执行 SQL 操作）
 
    [Windows / Linux / macOS](https://dev.mysql.com/downloads/installer/)
 
    [Docker](https://hub.docker.com/_/mysql)
 
 > [!WARNING]
-> allure 测试报告默认使用 allure-pytest
-> 生成，但是不能直接访问，你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
+> allure 测试报告默认使用 allure-pytest 生成，但是不能直接访问，你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
 > 本地程序和 [Java JDK](https://adoptopenjdk.net/archive.html?variant=openjdk8&jvmVariant=hotspot) 才能进行可视化浏览
 
 ## 帮助

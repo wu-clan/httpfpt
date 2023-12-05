@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime
 import decimal
 
-from typing import Optional
+from typing import Any, Optional
 
 import pymysql
 
@@ -39,17 +39,26 @@ class MysqlDB:
             blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待
             autocommit=False,  # 是否自动提交
         )
-        self.conn = self._pool.connection()
-        self.cursor = self.conn.cursor(cursor=pymysql.cursors.DictCursor)  # type: ignore
 
-    def close(self) -> None:
+    def init(self) -> tuple[Any, pymysql.cursors.DictCursor]:  # type: ignore
+        """
+        初始化连接和游标
+
+        :return:
+        """
+        conn = self._pool.connection()
+        cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)  # type: ignore
+        return conn, cursor
+
+    @staticmethod
+    def close(conn: Any, cursor: pymysql.cursors.DictCursor) -> None:  # type: ignore
         """
         关闭游标和数据库连接
 
         :return:
         """
-        self.cursor.close()
-        self.conn.close()
+        cursor.close()
+        conn.close()
 
     def query(self, sql: str, fetch: str = 'all') -> dict:
         """
@@ -59,13 +68,14 @@ class MysqlDB:
         :param fetch: 查询条件; one: 查询一条数据; all: 查询所有数据
         :return:
         """
+        conn, cursor = self.init()
         data = {}
         try:
-            self.cursor.execute(sql)
+            cursor.execute(sql)
             if fetch == QueryFetchType.ONE:
-                query_data = self.cursor.fetchone()
+                query_data = cursor.fetchone()
             elif fetch == QueryFetchType.ALL:
-                query_data = self.cursor.fetchall()
+                query_data = cursor.fetchall()
             else:
                 raise SQLSyntaxError(f'查询条件 {fetch} 错误, 请使用 one / all')
         except Exception as e:
@@ -88,7 +98,7 @@ class MysqlDB:
                 raise e
             return data
         finally:
-            self.close()
+            self.close(conn, cursor)
 
     def execute(self, sql: str) -> int:
         """
@@ -96,18 +106,19 @@ class MysqlDB:
 
         :return:
         """
+        conn, cursor = self.init()
         try:
-            rowcount = self.cursor.execute(sql)
-            self.conn.commit()
+            rowcount = cursor.execute(sql)
+            conn.commit()
         except Exception as e:
-            self.conn.rollback()
+            conn.rollback()
             log.error(f'执行 {sql} 失败: {e}')
             raise e
         else:
             log.info(f'执行 {sql} 成功')
             return rowcount
         finally:
-            self.close()
+            self.close(conn, cursor)
 
     def exec_case_sql(self, sql: str | list, env: Optional[str] = None) -> dict | int | None:
         """
