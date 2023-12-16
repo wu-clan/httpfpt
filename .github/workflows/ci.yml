@@ -38,6 +38,7 @@ jobs:
       - name: pyright
         uses: jakebailey/pyright-action@v1
         with:
+          version: 1.1.332
           project: .
           verbose: true
 
