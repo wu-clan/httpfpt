@@ -59,7 +59,7 @@ class VarsExtractor:
                 value = str(variable_cache.get(var_key))
                 if value is None:
                     try:
-                        value = str(env_vars[f'{var_key}'])
+                        value = str(env_vars[f'{var_key.upper()}'])
                         str_target = re.sub(self.vars_re, value, str_target, 1)
                         log.info(f'请求数据变量 {var_key} 替换完成')
                     except KeyError:
