@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
 import os
 
+from json import dumps as json_dumps
 from string import Template
 from typing import Union
 
@@ -368,13 +368,13 @@ class RequestDataParse:
         elif body_type == BodyType.binary:
             headers_format.update({'Content-Type': 'application/octet-stream'})
         elif body_type == BodyType.GraphQL:
-            headers_format.update({'Content-Type': 'application/json; charset=uft-8'})
+            headers_format.update({'Content-Type': 'application/json'})
         elif body_type == BodyType.TEXT:
             headers_format.update({'Content-Type': 'text/plain'})
         elif body_type == BodyType.JavaScript:
             headers_format.update({'Content-Type': 'application/javascript'})
         elif body_type == BodyType.JSON:
-            headers_format.update({'Content-Type': 'application/json; charset=uft-8'})
+            headers_format.update({'Content-Type': 'application/json'})
         elif body_type == BodyType.HTML:
             headers_format.update({'Content-Type': 'text/html'})
         elif body_type == BodyType.XML:
@@ -423,7 +423,7 @@ class RequestDataParse:
                     elif body_type == BodyType.GraphQL:
                         if not isinstance(body, dict):
                             raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
-                        body = json.loads(json.dumps(body, ensure_ascii=False))
+                        body = json_dumps(body, ensure_ascii=False).encode('utf-8')
                     elif body_type == BodyType.TEXT:  # noqa: SIM114
                         body = body
                     elif body_type == BodyType.JavaScript:
@@ -431,7 +431,7 @@ class RequestDataParse:
                     elif body_type == BodyType.JSON:
                         if not isinstance(body, dict):
                             raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
-                        body = json.loads(json.dumps(body, ensure_ascii=False))
+                        body = json_dumps(body, ensure_ascii=False).encode('utf-8')
                     elif body_type == BodyType.HTML:  # noqa: SIM114
                         body = body
                     elif body_type == BodyType.XML:
