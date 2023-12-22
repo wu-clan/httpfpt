@@ -560,7 +560,7 @@ class RequestDataParse:
     @property
     def is_teardown(self) -> bool:
         try:
-            teardown = self.request_data['test_steps']['setup']
+            teardown = self.request_data['test_steps']['teardown']
         except _RequestDataParamGetError:
             return False
         else:
