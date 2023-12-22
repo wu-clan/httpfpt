@@ -76,7 +76,7 @@ test_steps:
 
   - name: hooks
     case_id: event_create_001
-    description: 测试hooks
+    description: 测试全局变量和hooks
     is_run:
     request:
       method: post
@@ -86,7 +86,7 @@ test_steps:
       body_type: json
       body:
         title: foo
-        body: this is a test, sum(a+b)=${sum_a_b(1,2)}
+        body: this is a test; sum(a+b)=${sum_a_b(1,2)}; $test
         userId: 1
       files:
     setup:
