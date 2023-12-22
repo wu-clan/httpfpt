@@ -45,7 +45,7 @@ class VarsExtractor:
             raise RequestDataParseError('运行环境获取失败, 请检查测试用例环境配置')
 
         # 获取所有自定义全局变量
-        read_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
+        global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
         # 获取变量
         str_target = str(target)
@@ -56,21 +56,21 @@ class VarsExtractor:
 
             # 替换: 临时变量 > 环境变量 > 全局变量
             if var_key is not None:
-                value = str(variable_cache.get(var_key))
-                if value is None:
+                cache_value = str(variable_cache.get(var_key))
+                if cache_value == 'None':
                     try:
-                        value = str(env_vars[f'{var_key.upper()}'])
-                        str_target = re.sub(self.vars_re, value, str_target, 1)
+                        env_value = str(env_vars[f'{var_key.upper()}'])
+                        str_target = re.sub(self.vars_re, env_value, str_target, 1)
                         log.info(f'请求数据变量 {var_key} 替换完成')
                     except KeyError:
-                        value = str(read_vars[f'{var_key}'])
-                        str_target = re.sub(self.vars_re, value, str_target, 1)
+                        global_value = str(global_vars[f'{var_key}'])
+                        str_target = re.sub(self.vars_re, global_value, str_target, 1)
                         log.info(f'请求数据变量 {var_key} 替换完成')
                     except Exception as e:
                         log.error(f'请求数据变量 {var_key} 替换失败: {e}')
                         raise VariableError(f'请求数据变量 {var_key} 替换失败: {e}')
                 else:
-                    str_target = re.sub(self.vars_re, value, str_target, 1)
+                    str_target = re.sub(self.vars_re, cache_value, str_target, 1)
 
         dict_target = ast.literal_eval(str_target)
 
@@ -91,14 +91,14 @@ class VarsExtractor:
             var_key = key.group(1) or key.group(2)
 
             if var_key is not None:
-                value = str(variable_cache.get(var_key))
-                if value is None:
+                cache_value = str(variable_cache.get(var_key))
+                if cache_value == 'None':
                     err_msg = '请求数据关联变量替换失败，临时变量池不存在变量: “{}”'.format(var_key)
                     log.error(err_msg)
                     raise VariableError(err_msg)
                 else:
                     try:
-                        str_target = re.sub(self.relate_vars_re, value, str_target, 1)
+                        str_target = re.sub(self.relate_vars_re, cache_value, str_target, 1)
                         log.info(f'请求数据关联变量 {var_key} 替换完成')
                     except Exception as e:
                         log.error(f'请求数据关联变量 {var_key} 替换失败: {e}')
