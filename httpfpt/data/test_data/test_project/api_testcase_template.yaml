@@ -39,9 +39,9 @@ test_steps:
       sql:
       hooks:
       extract:
-        - key: test
+        - key: test_cache
           type: cache
-          jsonpath: $.url
+          jsonpath: $.status_code
       assert:
         - check:
           value: ^rcode
@@ -67,26 +67,29 @@ test_steps:
       wait_time: 0
     teardown:
       extract:
-        - key: test
+        - key: test_env
           type: env
-          jsonpath: $.url
+          jsonpath: $.status_code
+        - key: test_global
+          type: global
+          jsonpath: $.status_code
       assert:
         - assert 200 == pm.response.get('status_code')
         - assert 'postId' not in str(pm.response.get('content')), '没有返回content'
 
   - name: hooks
     case_id: event_create_001
-    description: 测试全局变量和hooks
+    description: 测试hooks
     is_run:
     request:
       method: post
-      url: /posts
+      url: /users/1
       params:
       headers:
       body_type: json
       body:
         title: foo
-        body: this is a test; sum(a+b)=${sum_a_b(1,2)}; $test
+        body: sum(a+b)=${sum_a_b(1,2)}; $test_cache; $test_cache; ${test_global}.
         userId: 1
       files:
     setup:
@@ -95,10 +98,6 @@ test_steps:
     teardown:
       hooks:
         - ${random_phone()}
-      extract:
-        - key: test
-          type: global
-          jsonpath: $.url
       assert: assert 200 == pm.response.get('status_code')
 
   - name: super_relate_testcase
@@ -107,7 +106,7 @@ test_steps:
     is_run:
     request:
       method: get
-      url: /posts/1
+      url: /albums/1
       params:
       headers:
       body_type:
