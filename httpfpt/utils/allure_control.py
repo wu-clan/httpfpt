@@ -20,7 +20,7 @@ def allure_step(step: str, var: Union[str, dict]) -> None:
     """
     with allure.step(step):
         allure.attach(
-            body=json_dumps(var, ensure_ascii=False, indent=2).encode('utf-8') if isinstance(var, dict) else var,
+            body=json_dumps(var, ensure_ascii=False, indent=2) if isinstance(var, dict) else var,
             name='JSON Serialize',
             attachment_type=AttachmentType.JSON,
         )

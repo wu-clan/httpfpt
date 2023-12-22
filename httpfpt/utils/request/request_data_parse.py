@@ -423,7 +423,7 @@ class RequestDataParse:
                     elif body_type == BodyType.GraphQL:
                         if not isinstance(body, dict):
                             raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
-                        body = json_dumps(body, ensure_ascii=False).encode('utf-8')
+                        body = json_dumps(body, ensure_ascii=False)
                     elif body_type == BodyType.TEXT:  # noqa: SIM114
                         body = body
                     elif body_type == BodyType.JavaScript:
@@ -431,7 +431,7 @@ class RequestDataParse:
                     elif body_type == BodyType.JSON:
                         if not isinstance(body, dict):
                             raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
-                        body = json_dumps(body, ensure_ascii=False).encode('utf-8')
+                        body = json_dumps(body, ensure_ascii=False)
                     elif body_type == BodyType.HTML:  # noqa: SIM114
                         body = body
                     elif body_type == BodyType.XML:
