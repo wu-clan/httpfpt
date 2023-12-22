@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
-
+from json import dumps as json_dumps
 from typing import Any, Optional, Union
 
 import allure
@@ -21,7 +20,7 @@ def allure_step(step: str, var: Union[str, dict]) -> None:
     """
     with allure.step(step):
         allure.attach(
-            body=json.dumps(var, ensure_ascii=False, indent=2) if isinstance(var, dict) else var,
+            body=json_dumps(var, ensure_ascii=False, indent=2).encode('utf-8') if isinstance(var, dict) else var,
             name='JSON Serialize',
             attachment_type=AttachmentType.JSON,
         )

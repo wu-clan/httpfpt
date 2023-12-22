@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
-import json
 import time
 
 from json import JSONDecodeError
+from json import dumps as json_dumps
 from typing import Literal
 
 import allure
@@ -224,7 +224,7 @@ class SendRequests:
         except JSONDecodeError:
             log.warning('响应数据解析失败，响应数据不是有效的 json 格式')
             json_data = {}
-        response_data['json'] = json.dumps(json_data)
+        response_data['json'] = json_dumps(json_data).encode('utf-8')
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
 
