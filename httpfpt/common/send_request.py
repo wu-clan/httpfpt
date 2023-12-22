@@ -3,7 +3,6 @@
 import time
 
 from json import JSONDecodeError
-from json import dumps as json_dumps
 from typing import Literal
 
 import allure
