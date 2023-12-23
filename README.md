@@ -73,12 +73,15 @@ git clone https://github.com/wu-clan/httpfpt.git
 
 <table>
   <tr>
-    <td><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
+    <td style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
   </tr>
   <tr>
-    <td> Telegram </td>
+    <td>Telegram（科学上网）</td>
   </tr>
 </table>
+
+## 状态
+![Alt](https://repobeats.axiom.co/api/embed/98343c7bb6875c60a529fff021611eceecb296f1.svg "Repo beats analytics image")
 
 ## 赞助
 
@@ -86,7 +89,7 @@ git clone https://github.com/wu-clan/httpfpt.git
 
 <table>
   <tr>
-    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px" alt="Wechat"/>
+    <td><img src="https://github.com/wu-clan/image/blob/master/pay/weixin.jpg?raw=true" width="180px" alt="WeChat"/>
     <td><img src="https://github.com/wu-clan/image/blob/master/pay/zfb.jpg?raw=true" width="180px" alt="Alipay"/>
     <td><img src="https://github.com/wu-clan/image/blob/master/pay/ERC20.jpg?raw=true" width="180px" alt="0x40D5e2304b452256afD9CE2d3d5531dc8d293138"/>
   </tr>
