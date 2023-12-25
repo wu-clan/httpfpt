@@ -359,31 +359,6 @@ class RequestDataParse:
             return headers
 
     @property
-    def headers_auto_fix(self) -> dict:
-        headers = self.headers
-        body_type = self.body_type
-        headers_format = headers or {}
-        if body_type == BodyType.form_data:
-            headers_format.update({'Content-Type': 'multipart/form-data'})
-        elif body_type == BodyType.x_www_form_urlencoded:
-            headers_format.update({'Content-Type': 'application/x-www-form-urlencoded'})
-        elif body_type == BodyType.binary:
-            headers_format.update({'Content-Type': 'application/octet-stream'})
-        elif body_type == BodyType.GraphQL:
-            headers_format.update({'Content-Type': 'application/json'})
-        elif body_type == BodyType.TEXT:
-            headers_format.update({'Content-Type': 'text/plain'})
-        elif body_type == BodyType.JavaScript:
-            headers_format.update({'Content-Type': 'application/javascript'})
-        elif body_type == BodyType.JSON:
-            headers_format.update({'Content-Type': 'application/json'})
-        elif body_type == BodyType.HTML:
-            headers_format.update({'Content-Type': 'text/html'})
-        elif body_type == BodyType.XML:
-            headers_format.update({'Content-Type': 'application/xml'})
-        return headers_format
-
-    @property
     def body_type(self) -> Union[str, None]:
         try:
             data_type = self.request_data['test_steps']['request']['body_type']
@@ -407,11 +382,7 @@ class RequestDataParse:
                     body_type = self.body_type
                     if body_type is None:
                         raise RequestDataParseError('缺少 test_steps:request:body_type 参数')
-                    elif body_type == BodyType.form_data:  # noqa: SIM114
-                        if not isinstance(body, dict):
-                            raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
-                        body = body
-                    elif body_type == BodyType.x_www_form_urlencoded:
+                    elif body_type == BodyType.form_data or body_type == BodyType.x_www_form_urlencoded:
                         if not isinstance(body, dict):
                             raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
                         body = body
@@ -429,20 +400,17 @@ class RequestDataParse:
                     elif body_type == BodyType.GraphQL:
                         if not isinstance(body, dict):
                             raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
-                        body = json_dumps(body, ensure_ascii=False)
+                        body = body
                     elif body_type == BodyType.TEXT:  # noqa: SIM114
-                        body = body
+                        body = json_dumps(body, ensure_ascii=False)
                     elif body_type == BodyType.JavaScript:
-                        body = body
+                        body = json_dumps(body, ensure_ascii=False)
                     elif body_type == BodyType.JSON:
-                        if isinstance(body, dict):
-                            body = json_dumps(body, ensure_ascii=False)
-                        else:
-                            body = body
+                        body = body
                     elif body_type == BodyType.HTML:  # noqa: SIM114
-                        body = body
+                        body = json_dumps(body, ensure_ascii=False)
                     elif body_type == BodyType.XML:
-                        body = body
+                        body = json_dumps(body, ensure_ascii=False)
             except Exception as e:
                 raise RequestDataParseError(_error_msg(e.__str__()))
         return body
@@ -451,16 +419,27 @@ class RequestDataParse:
     def files(self) -> Union[dict, list, None]:
         files = self.files_no_parse
         if files is not None:
-            for k, v in files.items():
-                try:
-                    # 多文件
-                    if isinstance(v, list):
-                        files = [(f'{k}', open(_, 'rb')) for _ in v]
-                    # 单文件
-                    else:
-                        files = {f'{k}': open(v, 'rb')}
-                except FileNotFoundError:
-                    raise RequestDataParseError(_error_msg(f'参数 test_steps:request:files:{k} 文件不存在'))
+            if len(files) == 1:
+                for k, v in files.items():
+                    try:
+                        if isinstance(v, list):
+                            files = [(f'{k}', open(_, 'rb')) for _ in v]
+                        else:
+                            files = {f'{k}': open(v, 'rb')}
+                    except FileNotFoundError:
+                        raise RequestDataParseError(_error_msg(f'参数 test_steps:request:files:{k} 文件不存在'))
+            else:
+                uploads = []
+                for k, v in files.items():
+                    try:
+                        if isinstance(v, list):
+                            v_files = [(f'{k}', open(_, 'rb')) for _ in v]
+                        else:
+                            v_files = (f'{k}', open(v, 'rb'))
+                        uploads.append(v_files)
+                    except FileNotFoundError:
+                        raise RequestDataParseError(_error_msg(f'参数 test_steps:request:files:{k} 文件不存在'))
+                return uploads
         return files
 
     @property
@@ -668,8 +647,35 @@ class RequestDataParse:
 
         :return:
         """
+        # 自动解析 headers
+        headers = self.headers
+        body_type = self.body_type
+        body = self.body
+        files = self.files
+        auto_headers = headers or {}
+        if body_type == BodyType.form_data:
+            if files is not None:
+                pass  # 如果 files 不为空，则交给引擎自动处理
+            else:
+                auto_headers.update({'Content-Type': 'multipart/form-data'})
+        elif body_type == BodyType.x_www_form_urlencoded:
+            auto_headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+        elif body_type == BodyType.binary:
+            auto_headers.update({'Content-Type': 'application/octet-stream'})
+        elif body_type == BodyType.GraphQL:
+            auto_headers.update({'Content-Type': 'application/json'})
+        elif body_type == BodyType.TEXT:
+            auto_headers.update({'Content-Type': 'text/plain'})
+        elif body_type == BodyType.JavaScript:
+            auto_headers.update({'Content-Type': 'application/javascript'})
+        elif body_type == BodyType.JSON:
+            auto_headers.update({'Content-Type': 'application/json'})
+        elif body_type == BodyType.HTML:
+            auto_headers.update({'Content-Type': 'text/html'})
+        elif body_type == BodyType.XML:
+            auto_headers.update({'Content-Type': 'application/xml'})
+        # 请求数据整合
         all_data = {
-            'config': self.config,
             'allure_epic': self.allure_epic,
             'allure_feature': self.allure_feature,
             'allure_story': self.allure_story,
@@ -680,17 +686,16 @@ class RequestDataParse:
             'redirects': self.redirects,
             'proxies': self.proxies,
             'module': self.module,
-            'test_steps': self.test_steps,
             'name': self.name,
             'case_id': self.case_id,
             'description': self.description,
             'method': self.method,
             'url': self.url,
             'params': self.params,
-            'headers': self.headers_auto_fix,
-            'body_type': self.body_type,
-            'body': self.body,
-            'files': self.files,
+            'headers': auto_headers,
+            'body_type': body_type,
+            'body': body,
+            'files': files,
             'files_no_parse': self.files_no_parse,
             'is_setup': self.is_setup,
             'setup_testcase': self.setup_testcase,
