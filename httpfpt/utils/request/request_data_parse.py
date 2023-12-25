@@ -296,7 +296,9 @@ class RequestDataParse:
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:method 为空'))
             if not isinstance(method, str):
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:method 不是有效的 str 类型'))
-            if method.upper() not in get_enum_values(MethodType):
+            if not method.isupper():
+                raise RequestDataParseError(_error_msg('参数 test_steps:request:method 必须为大写'))
+            if method not in get_enum_values(MethodType):
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:method 不是合法的请求类型'))
             return method.upper()
 
@@ -326,7 +328,7 @@ class RequestDataParse:
         except _RequestDataParamGetError:
             raise RequestDataParseError(_error_msg('缺少 test_steps:request:params 参数'))
         else:
-            if params is not None:  # excel 数据处理
+            if params is not None:
                 if not isinstance(params, dict):
                     raise RequestDataParseError(_error_msg('参数 test_steps:request:params 不是有效的 dict 类型'))
         return params
@@ -406,8 +408,12 @@ class RequestDataParse:
                     if body_type is None:
                         raise RequestDataParseError('缺少 test_steps:request:body_type 参数')
                     elif body_type == BodyType.form_data:  # noqa: SIM114
+                        if not isinstance(body, dict):
+                            raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
                         body = body
                     elif body_type == BodyType.x_www_form_urlencoded:
+                        if not isinstance(body, dict):
+                            raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
                         body = body
                     elif body_type == BodyType.binary:
                         if isinstance(body, bytes):
@@ -429,9 +435,10 @@ class RequestDataParse:
                     elif body_type == BodyType.JavaScript:
                         body = body
                     elif body_type == BodyType.JSON:
-                        if not isinstance(body, dict):
-                            raise RequestDataParseError('参数 test_steps:request:body 不是有效的 dict 类型')
-                        body = json_dumps(body, ensure_ascii=False)
+                        if isinstance(body, dict):
+                            body = json_dumps(body, ensure_ascii=False)
+                        else:
+                            body = body
                     elif body_type == BodyType.HTML:  # noqa: SIM114
                         body = body
                     elif body_type == BodyType.XML:

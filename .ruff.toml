@@ -41,6 +41,7 @@ mypy-init-return = true
 "httpfpt/conftest.py" = ["ANN001", "ANN201", "ANN202"]
 "httpfpt/cli.py" = ["E402"]
 "httpfpt/run.py" = ["E402"]
+"httpfpt/schemas/case_data.py" = ["TCH001"]
 
 [format]
 quote-style = "single"

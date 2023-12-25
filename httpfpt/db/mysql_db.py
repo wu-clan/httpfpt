@@ -60,7 +60,7 @@ class MysqlDB:
         cursor.close()
         conn.close()
 
-    def query(self, sql: str, fetch: str = 'all') -> dict:
+    def query(self, sql: str, fetch: QueryFetchType = QueryFetchType.ALL) -> dict:
         """
         数据库查询
 

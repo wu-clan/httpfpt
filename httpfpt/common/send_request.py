@@ -3,7 +3,6 @@
 import time
 
 from json import JSONDecodeError
-from typing import Literal
 
 import allure
 import httpx
@@ -108,7 +107,7 @@ class SendRequests:
         self,
         request_data: dict,
         *,
-        request_engin: Literal['requests', 'httpx'] = 'requests',
+        request_engin: EnginType = EnginType.requests,
         log_data: bool = True,
         allure_data: bool = True,
         relate_testcase: bool = False,
