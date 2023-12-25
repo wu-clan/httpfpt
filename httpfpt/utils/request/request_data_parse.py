@@ -298,7 +298,7 @@ class RequestDataParse:
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:method 不是有效的 str 类型'))
             if not method.isupper():
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:method 必须为大写'))
-            if method.upper() not in get_enum_values(MethodType):
+            if method not in get_enum_values(MethodType):
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:method 不是合法的请求类型'))
             return method.upper()
 
