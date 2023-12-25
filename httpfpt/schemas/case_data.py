@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Union
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 
@@ -13,16 +13,16 @@ class ConfigAllureData(BaseModel):
     epic: str
     feature: str
     story: str
-    severity: Optional[str] = None
+    severity: str | None = None
 
 
 class ConfigRequestData(BaseModel):
     env: str
-    headers: Optional[dict] = None
-    timeout: Optional[int] = Field(None, ge=0)
-    verify: Optional[bool] = None
-    redirects: Optional[bool] = None
-    proxies: Optional[Dict[Literal['http', 'https', 'http://', 'https://'], Union[AnyHttpUrl, None]]] = None
+    headers: dict | None = None
+    timeout: int | None = Field(None, ge=0)
+    verify: bool | None = None
+    redirects: bool | None = None
+    proxies: Dict[Literal['http', 'https', 'http://', 'https://'], Union[AnyHttpUrl, None]] | None = None
 
 
 class Config(BaseModel):
@@ -32,12 +32,12 @@ class Config(BaseModel):
 
 
 class StepsRequestData(BaseModel):
-    method: str
+    method: Literal['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
     url: str
-    params: Union[dict, bytes, None]
-    headers: Optional[dict]
-    body_type: Optional[str]
-    body: Union[dict, bytes, Tuple[list], None]
+    params: Union[dict, List[tuple], bytes, None]
+    headers: dict | None
+    body_type: Literal['form', 'x_form', 'binary', 'GraphQL', 'text', 'js', 'json', 'html', 'xml'] | None
+    body: Any | None
     files: Union[Dict[str, Union[str, List[str]]], None]
 
 
@@ -49,16 +49,16 @@ class SetupTestCaseData(BaseModel):
 
 class SetupSqlData(BaseModel):
     key: str
-    type: str
+    type: Literal['cache', 'wnv', 'global']
     sql: str
     jsonpath: str
 
 
 class StepsSetUpData(BaseModel):
-    testcase: Optional[List[Union[str, SetupTestCaseData]]] = None
-    sql: Optional[List[Union[str, SetupSqlData]]] = None
-    hooks: Optional[List[str]] = None
-    wait_time: Optional[int] = None
+    testcase: List[Union[str, SetupTestCaseData]] | None = None
+    sql: List[Union[str, SetupSqlData]] | None = None
+    hooks: List[str] | None = None
+    wait_time: int | None = None
 
 
 class TeardownExtractData(BaseModel):
@@ -68,18 +68,36 @@ class TeardownExtractData(BaseModel):
 
 
 class TeardownAssertData(BaseModel):
-    check: Optional[str] = None
+    check: str | None = None
     value: Any
-    type: str
+    type: Literal[
+        'eq',
+        'not_eq',
+        'gt',
+        'ge',
+        'lt',
+        'le',
+        'str_eq',
+        'len_eq',
+        'not_len_eq',
+        'len_lt',
+        'len_le',
+        'len_gt',
+        'len_ge',
+        'contains',
+        'not_contains',
+        'startswith',
+        'endswith',
+    ]
     jsonpath: str
 
 
 class StepsTearDownData(BaseModel):
-    sql: Optional[List[Union[str, SetupSqlData]]] = None
-    hooks: Optional[List[str]] = None
-    extract: Optional[List[TeardownExtractData]] = None
-    assert_: Optional[Union[str, List[str | TeardownAssertData]]] = Field(None, alias='assert')
-    wait_time: Optional[int] = None
+    sql: List[Union[str, SetupSqlData]] | None = None
+    hooks: List[str] | None = None
+    extract: List[TeardownExtractData] | None = None
+    assert_: Union[str, List[str | TeardownAssertData]] | None = Field(None, alias='assert')
+    wait_time: int | None = None
 
 
 class Steps(BaseModel):
@@ -88,8 +106,8 @@ class Steps(BaseModel):
     description: str
     is_run: Union[bool, dict, None] = None
     request: StepsRequestData
-    setup: Optional[StepsSetUpData] = None
-    teardown: Optional[StepsTearDownData] = None
+    setup: StepsSetUpData | None = None
+    teardown: StepsTearDownData | None = None
 
 
 class CaseData(BaseModel):
@@ -97,5 +115,5 @@ class CaseData(BaseModel):
 
     config: Config
     test_steps: Union[Steps, List[Steps]]
-    filename: Optional[str] = None
-    file_hash: Optional[str] = None
+    filename: str | None = None
+    file_hash: str | None = None

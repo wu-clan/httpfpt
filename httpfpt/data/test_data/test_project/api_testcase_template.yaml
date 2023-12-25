@@ -20,7 +20,7 @@ test_steps:
     description: 测试关联变量
     is_run:
     request:
-      method: get
+      method: GET
       url: /posts/1
       params:
       headers:
@@ -54,7 +54,7 @@ test_steps:
     description: 测试高级断言
     is_run:
     request:
-      method: get
+      method: GET
       url: /comments
       params:
         postId: 1
@@ -82,7 +82,7 @@ test_steps:
     description: 测试hooks
     is_run:
     request:
-      method: post
+      method: POST
       url: /users/1
       params:
       headers:
@@ -105,7 +105,7 @@ test_steps:
     description: 测试跨文件关联用例
     is_run:
     request:
-      method: get
+      method: GET
       url: /albums/1
       params:
       headers:
