@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 from jinja2 import Template
 
 from httpfpt.common.log import log
-from httpfpt.core import get_conf
+from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import HTML_EMAIL_REPORT_PATH
 from httpfpt.enums.email_type import EmailType
 from httpfpt.utils.file_control import get_file_property
@@ -29,11 +29,11 @@ class SendMail:
         获取报告
         """
         msg = MIMEMultipart()
-        msg['Subject'] = get_conf.TEST_REPORT_TITLE
-        msg['From'] = get_conf.EMAIL_USER
+        msg['Subject'] = config.TEST_REPORT_TITLE
+        msg['From'] = config.EMAIL_USER
         msg['date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
-        self.content.update({'test_title': get_conf.TEST_REPORT_TITLE})
-        self.content.update({'tester_name': get_conf.TESTER_NAME})
+        self.content.update({'test_title': config.TEST_REPORT_TITLE})
+        self.content.update({'tester_name': config.TESTER_NAME})
 
         # 邮件正文
         with open(os.path.join(HTML_EMAIL_REPORT_PATH, 'email_report.html'), 'r', encoding='utf-8') as f:
@@ -60,7 +60,7 @@ class SendMail:
         """
         msg = MIMEMultipart()
         msg['Subject'] = 'HttpFpt 运行异常通知'
-        msg['From'] = get_conf.EMAIL_USER
+        msg['From'] = config.EMAIL_USER
         msg['date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
 
         # 邮件正文
@@ -81,12 +81,12 @@ class SendMail:
             msg = self.take_report().as_string()
         elif msg_type == EmailType.ERROR:
             msg = self.take_error().as_string()
-        if get_conf.EMAIL_SSL:
-            smtp = smtplib.SMTP_SSL(host=get_conf.EMAIL_SERVER, port=get_conf.EMAIL_PORT)
+        if config.EMAIL_SSL:
+            smtp = smtplib.SMTP_SSL(host=config.EMAIL_SERVER, port=config.EMAIL_PORT)
         else:
-            smtp = smtplib.SMTP(host=get_conf.EMAIL_SERVER, port=get_conf.EMAIL_PORT)
-        smtp.login(get_conf.EMAIL_USER, get_conf.EMAIL_PASSWORD)
-        smtp.sendmail(get_conf.EMAIL_USER, get_conf.EMAIL_SEND_TO, msg)
+            smtp = smtplib.SMTP(host=config.EMAIL_SERVER, port=config.EMAIL_PORT)
+        smtp.login(config.EMAIL_USER, config.EMAIL_PASSWORD)
+        smtp.sendmail(config.EMAIL_USER, config.EMAIL_SEND_TO, msg)
         smtp.quit()
 
     def send_report(self) -> None:

@@ -17,7 +17,7 @@ from httpfpt.common.errors import JsonPathFindError, SQLSyntaxError, VariableErr
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import write_yaml_vars
-from httpfpt.core import get_conf
+from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import RUN_ENV_PATH
 from httpfpt.enums.query_fetch import QueryFetchType
 from httpfpt.enums.sql_type import SqlType
@@ -29,12 +29,12 @@ class MysqlDB:
     def __init__(self) -> None:
         self._pool = PooledDB(
             pymysql,
-            host=get_conf.MysqlDB_HOST,
-            port=get_conf.MysqlDB_PORT,
-            user=get_conf.MysqlDB_USER,
-            password=get_conf.MysqlDB_PASSWORD,
-            database=get_conf.MysqlDB_DATABASE,
-            charset=get_conf.MysqlDB_CHARSET,
+            host=config.MYSQL_HOST,
+            port=config.MYSQL_PORT,
+            user=config.MYSQL_USER,
+            password=config.MYSQL_PASSWORD,
+            database=config.MYSQL_DATABASE,
+            charset=config.MYSQL_CHARSET,
             maxconnections=15,
             blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待
             autocommit=False,  # 是否自动提交

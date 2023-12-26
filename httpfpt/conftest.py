@@ -10,7 +10,7 @@ from py._xmlgen import html
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import write_yaml_report
-from httpfpt.core.get_conf import TESTER_NAME, PROJECT_NAME, TEST_REPORT_TITLE
+from httpfpt.core.get_conf import config as sys_config
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -72,7 +72,7 @@ def pytest_configure(config):
     if metadata:
         from pytest_metadata.plugin import metadata_key
 
-        config.stash[metadata_key]['Project Name'] = PROJECT_NAME
+        config.stash[metadata_key]['Project Name'] = sys_config.PROJECT_NAME
         del config.stash[metadata_key]['Packages']
         del config.stash[metadata_key]['Platform']
         del config.stash[metadata_key]['Plugins']
@@ -86,7 +86,7 @@ def pytest_html_results_summary(prefix):
     :return:
     """
     # 向 html 报告中的 summary 添加额外信息
-    prefix.extend([html.p(f'Tester: {TESTER_NAME}')])
+    prefix.extend([html.p(f'Tester: {sys_config.TESTER_NAME}')])
 
 
 @pytest.mark.optionalhook
@@ -97,7 +97,7 @@ def pytest_html_report_title(report):
     :param report:
     :return:
     """
-    report.title = f'{TEST_REPORT_TITLE}'
+    report.title = f'{sys_config.TEST_REPORT_TITLE}'
 
 
 @pytest.mark.optionalhook

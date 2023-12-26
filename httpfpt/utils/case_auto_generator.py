@@ -4,7 +4,7 @@ import os.path
 
 from pathlib import Path
 
-from httpfpt.core.get_conf import PROJECT_NAME
+from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import TEST_CASE_PATH
 from httpfpt.utils.file_control import get_file_property, search_all_case_yaml_files, search_all_testcase_files
 from httpfpt.utils.rich_console import console
@@ -89,13 +89,13 @@ class {testcase_class_name}:
                 # 创建测试用例文件
                 tag = str(Path(yaml_filename).parent)[1:]
                 if tag != '':
-                    case_path = os.path.join(TEST_CASE_PATH, PROJECT_NAME, tag, testcase_func_name + '.py')
+                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, tag, testcase_func_name + '.py')
                 else:
-                    case_path = os.path.join(TEST_CASE_PATH, PROJECT_NAME, testcase_func_name + '.py')
-                if not Path(case_path).parent.exists():
-                    Path(case_path).parent.mkdir(parents=True, exist_ok=True)
+                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, testcase_func_name + '.py')
+                if not Path(case_path).parent.exists():  # noqa: ignore
+                    Path(case_path).parent.mkdir(parents=True, exist_ok=True)  # noqa: ignore
                 with open(case_path, 'w', encoding='utf-8') as f:
                     f.write(case_code)
-                console.print(f'📄 Created: {get_file_property(case_path)[0]}')
+                console.print(f'📄 Created: {get_file_property(case_path)[0]}')  # noqa: ignore
 
     console.print('✅ 测试用例自动生成完成')

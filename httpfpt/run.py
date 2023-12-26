@@ -12,7 +12,7 @@ sys.path.append('..')
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import DING_TALK_REPORT_SEND, EMAIL_REPORT_SEND, LARK_TALK_REPORT_SEND, PROJECT_NAME
+from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import (
     ALLURE_ENV_FILE,
     ALLURE_REPORT_ENV_FILE,
@@ -73,7 +73,7 @@ def startup(
     """  # noqa: E501
     run_args = [log_level]
 
-    default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', PROJECT_NAME])
+    default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', config.PROJECT_NAME])
     if case_path:
         if '::' not in case_path:
             raise ValueError(
@@ -92,7 +92,7 @@ def startup(
         run_path = default_case_path
     run_args.append(run_path)
 
-    html_report_filename = f'{PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
+    html_report_filename = f'{config.PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
     if html_report:
         if not os.path.exists(HTML_REPORT_PATH):
             os.makedirs(HTML_REPORT_PATH)
@@ -149,7 +149,7 @@ def startup(
             format_run_args.append(i)
     run_pytest_command_args = ' '.join(_ for _ in format_run_args)
 
-    log.info(f'开始运行项目：{PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}')
+    log.info(f'开始运行项目：{config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}')
     log.info(f'Pytest CLI: pytest {run_pytest_command_args}')
     log.info('🚀 START')
     pytest.main(run_args)
@@ -159,13 +159,13 @@ def startup(
     yaml_report_files.sort()
     test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
 
-    if html_report and EMAIL_REPORT_SEND:
+    if html_report and config.EMAIL_REPORT_SEND:
         SendMail(test_result, html_report_filename).send_report()
 
-    if DING_TALK_REPORT_SEND:
+    if config.DING_TALK_REPORT_SEND:
         DingTalk(test_result).send()
 
-    if LARK_TALK_REPORT_SEND:
+    if config.LARK_TALK_REPORT_SEND:
         LarkTalk(test_result).send()
 
     if allure:

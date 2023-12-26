@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from httpfpt.common.log import log
-from httpfpt.core import get_conf
+from httpfpt.core.get_conf import config
 
 
 class DingTalk:
@@ -17,9 +17,9 @@ class DingTalk:
             data = {
                 'msgtype': 'markdown',
                 'markdown': {
-                    'title': get_conf.TEST_REPORT_TITLE,
-                    'text': f"> ## {get_conf.PROJECT_NAME} 自动化测试报告\n\n"
-                    f"> 👤 测试人员: {get_conf.TESTER_NAME}\n\n"
+                    'title': config.TEST_REPORT_TITLE,
+                    'text': f"> ## {config.PROJECT_NAME} 自动化测试报告\n\n"
+                    f"> 👤 测试人员: {config.TESTER_NAME}\n\n"
                     f"> 🤖 测试结果: {self.content['result']}\n\n"
                     f"> ✅ 通过用例: {self.content['passed']}\n\n"
                     f"> 🔧 失败用例: {self.content['failed']}\n\n"
@@ -31,10 +31,10 @@ class DingTalk:
                 },
             }
             response = requests.session().post(
-                url=get_conf.DING_TALK_WEBHOOK,
+                url=config.DING_TALK_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=get_conf.DING_TALK_PROXY,  # type: ignore
+                proxies=config.DING_TALK_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:

@@ -6,7 +6,7 @@ import os.path
 from pathlib import Path
 from typing import Optional, Tuple
 
-from httpfpt.core.get_conf import PROJECT_NAME
+from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import TEST_CASE_PATH, YAML_DATA_PATH
 
 
@@ -30,7 +30,7 @@ def search_all_case_yaml_files(filepath: Optional[str] = None) -> list:
 
     :return:
     """
-    yaml_filepath = os.path.join(YAML_DATA_PATH, f'{PROJECT_NAME}') if filepath is None else filepath
+    yaml_filepath = os.path.join(YAML_DATA_PATH, f'{config.PROJECT_NAME}') if filepath is None else filepath
     files = glob.glob(os.path.join(yaml_filepath, '**', '*.yaml'), recursive=True) + glob.glob(
         os.path.join(yaml_filepath, '**', '*.yml'), recursive=True
     )
@@ -43,7 +43,7 @@ def search_all_testcase_files() -> list:
 
     :return:
     """
-    files = glob.glob(os.path.join(TEST_CASE_PATH, f'{PROJECT_NAME}', '**', 'test_*.py'), recursive=True)
+    files = glob.glob(os.path.join(TEST_CASE_PATH, f'{config.PROJECT_NAME}', '**', 'test_*.py'), recursive=True)
     return files
 
 

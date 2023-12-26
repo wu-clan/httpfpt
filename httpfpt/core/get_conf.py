@@ -6,69 +6,90 @@ from pathlib import Path
 from httpfpt.common.toml_handler import read_toml
 
 
+class Config:
+    def __init__(self) -> None:
+        self.__config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
+
+        # 项目目录名
+        self.PROJECT_NAME = self.__config['project']['project']
+
+        # 测试报告
+        self.TEST_REPORT_TITLE = self.__config['report']['title']
+        self.TESTER_NAME = self.__config['report']['tester_name']
+
+        # mysql 数据库
+        self.MYSQL_HOST = self.__config['mysql']['host']
+        self.MYSQL_PORT = self.__config['mysql']['port']
+        self.MYSQL_USER = self.__config['mysql']['user']
+        self.MYSQL_PASSWORD = self.__config['mysql']['password']
+        self.MYSQL_DATABASE = self.__config['mysql']['database']
+        self.MYSQL_CHARSET = self.__config['mysql']['charset']
+
+        # redis 数据库
+        self.REDIS_HOST = self.__config['redis']['host']
+        self.REDIS_PORT = self.__config['redis']['port']
+        self.REDIS_PASSWORD = self.__config['redis']['password']
+        self.REDIS_DATABASE = self.__config['redis']['database']
+        self.REDIS_TIMEOUT = self.__config['redis']['timeout']
+
+        # 邮件
+        self.EMAIL_SERVER = self.__config['email']['host_server']
+        self.EMAIL_PORT = self.__config['email']['port']
+        self.EMAIL_USER = self.__config['email']['user']
+        self.EMAIL_PASSWORD = self.__config['email']['password']
+        self.EMAIL_SEND_TO = self.__config['email']['send_to']
+        self.EMAIL_SSL = self.__config['email']['ssl']
+        self.EMAIL_REPORT_SEND = self.__config['email']['send_report']
+
+        # 钉钉
+        self.DING_TALK_WEBHOOK = self.__config['ding_talk']['webhook']
+        self.DING_TALK_PROXY = {
+            'http': self.__config['ding_talk']['proxies']['http']
+            if self.__config['ding_talk']['proxies']['http'] != ''
+            else None,
+            'https': self.__config['ding_talk']['proxies']['https']
+            if self.__config['ding_talk']['proxies']['https'] != ''
+            else None,
+        }
+        self.DING_TALK_REPORT_SEND = self.__config['ding_talk']['send_report']
+
+        # 飞书
+        self.LARK_TALK_WEBHOOK = self.__config['lark_talk']['webhook']
+        self.LARK_TALK_PROXY = {
+            'http': self.__config['lark_talk']['proxies']['http']
+            if self.__config['lark_talk']['proxies']['http'] != ''
+            else None,
+            'https': self.__config['lark_talk']['proxies']['https']
+            if self.__config['lark_talk']['proxies']['https'] != ''
+            else None,
+        }
+        self.LARK_TALK_REPORT_SEND = self.__config['lark_talk']['send_report']
+
+        # 请求发送
+        self.REQUEST_TIMEOUT = self.__config['request']['timeout']
+        self.REQUEST_VERIFY = self.__config['request']['verify']
+        self.REQUEST_REDIRECTS = self.__config['request']['redirects']
+        self.REQUEST_PROXIES_REQUESTS = {
+            'http': self.__config['request']['proxies']['http']
+            if self.__config['request']['proxies']['http'] != ''
+            else None,
+            'https': self.__config['request']['proxies']['https']
+            if self.__config['request']['proxies']['https'] != ''
+            else None,
+        }
+        self.REQUEST_PROXIES_HTTPX = {
+            'http://': self.__config['request']['proxies']['http']
+            if self.__config['request']['proxies']['http'] != ''
+            else None,
+            'https://': self.__config['request']['proxies']['https']
+            if self.__config['request']['proxies']['https'] != ''
+            else None,
+        }
+
+
 @lru_cache(maxsize=None)
-def __cache_config() -> dict:
-    return read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
+def cache_config() -> Config:
+    return Config()
 
 
-__config = __cache_config()
-
-# 项目目录名
-PROJECT_NAME = __config['project']['project']
-
-# 测试报告
-TEST_REPORT_TITLE = __config['report']['title']
-TESTER_NAME = __config['report']['tester_name']
-
-# mysql 数据库
-MysqlDB_HOST = __config['mysql']['host']
-MysqlDB_PORT = __config['mysql']['port']
-MysqlDB_USER = __config['mysql']['user']
-MysqlDB_PASSWORD = __config['mysql']['password']
-MysqlDB_DATABASE = __config['mysql']['database']
-MysqlDB_CHARSET = __config['mysql']['charset']
-
-# redis 数据库
-REDIS_HOST = __config['redis']['host']
-REDIS_PORT = __config['redis']['port']
-REDIS_PASSWORD = __config['redis']['password']
-REDIS_DATABASE = __config['redis']['database']
-REDIS_TIMEOUT = __config['redis']['timeout']
-
-# 邮件
-EMAIL_SERVER = __config['email']['host_server']
-EMAIL_PORT = __config['email']['port']
-EMAIL_USER = __config['email']['user']
-EMAIL_PASSWORD = __config['email']['password']
-EMAIL_SEND_TO = __config['email']['send_to']
-EMAIL_SSL = __config['email']['ssl']
-EMAIL_REPORT_SEND = __config['email']['send_report']
-
-# 钉钉
-DING_TALK_WEBHOOK = __config['ding_talk']['webhook']
-DING_TALK_PROXY = {
-    'http': __config['ding_talk']['proxies']['http'] if __config['ding_talk']['proxies']['http'] != '' else None,
-    'https': __config['ding_talk']['proxies']['https'] if __config['ding_talk']['proxies']['https'] != '' else None,
-}
-DING_TALK_REPORT_SEND = __config['ding_talk']['send_report']
-
-# 飞书
-LARK_TALK_WEBHOOK = __config['lark_talk']['webhook']
-LARK_TALK_PROXY = {
-    'http': __config['lark_talk']['proxies']['http'] if __config['lark_talk']['proxies']['http'] != '' else None,
-    'https': __config['lark_talk']['proxies']['https'] if __config['lark_talk']['proxies']['https'] != '' else None,
-}
-LARK_TALK_REPORT_SEND = __config['lark_talk']['send_report']
-
-# 请求发送
-REQUEST_TIMEOUT = __config['request']['timeout']
-REQUEST_VERIFY = __config['request']['verify']
-REQUEST_REDIRECTS = __config['request']['redirects']
-REQUEST_PROXIES_REQUESTS = {
-    'http': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,
-    'https': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None,
-}
-REQUEST_PROXIES_HTTPX = {
-    'http://': __config['request']['proxies']['http'] if __config['request']['proxies']['http'] != '' else None,
-    'https://': __config['request']['proxies']['https'] if __config['request']['proxies']['https'] != '' else None,
-}
+config = cache_config()
