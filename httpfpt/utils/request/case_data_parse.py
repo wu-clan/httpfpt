@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import ast
 import copy
+import json
 import sys
 
 from typing import Any, Dict, List, Union
@@ -32,17 +32,19 @@ def case_data_init(pydantic_verify: bool = False) -> None:
         case_data.update({'filename': filename, 'file_hash': file_hash})
         redis_case_data = redis_client.get(f'{redis_client.prefix}:case_data:{filename}', logging=False)
         if redis_case_data is None:
-            redis_client.set(f'{redis_client.prefix}:case_data:{filename}', str(case_data))
+            redis_client.set(f'{redis_client.prefix}:case_data:{filename}', json.dumps(case_data, ensure_ascii=False))
         else:
-            redis_file_hash = ast.literal_eval(redis_case_data).get('file_hash')
+            redis_file_hash = json.loads(redis_case_data).get('file_hash')
             if file_hash != redis_file_hash:
-                redis_client.rset(f'{redis_client.prefix}:case_data:{filename}', str(case_data))
+                redis_client.rset(
+                    f'{redis_client.prefix}:case_data:{filename}', json.dumps(case_data, ensure_ascii=False)
+                )
     if pydantic_verify:
         case_data_list = redis_client.get_prefix(f'{redis_client.prefix}:case_data:')
         count: int = 0
         for case_data in case_data_list:
             try:
-                CaseData.model_validate(ast.literal_eval(case_data))
+                CaseData.model_validate(json.loads(case_data))
             except ValidationError as e:
                 count += parse_error(e)
         if count > 0:
@@ -60,7 +62,7 @@ def case_id_unique_verify() -> None:
     case_data_list = redis_client.get_prefix(f'{redis_client.prefix}:case_data:')
     redis_client.delete_prefix(f'{redis_client.prefix}:case_id_filename:')
     for case_data in case_data_list:
-        case_data = ast.literal_eval(case_data)
+        case_data = json.loads(case_data)
         filename = case_data['filename']
         try:
             steps = case_data['test_steps']
@@ -122,7 +124,7 @@ def get_request_data(*, filename: str) -> List[Dict[str, Any]]:
     :param filename: 测试用例数据文件名称
     :return:
     """
-    case_data = ast.literal_eval(redis_client.get(f'{redis_client.prefix}:case_data:{filename}'))
+    case_data = json.loads(redis_client.get(f'{redis_client.prefix}:case_data:{filename}'))
     config_error = f'请求测试用例数据文件 {filename} 缺少 config 信息, 请检查测试用例文件内容'
     test_steps_error = f'请求测试用例数据文件 {filename} 缺少 test_steps 信息, 请检查测试用例文件内容'
     try:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import ast
+import json
 
 from typing import Union
 
@@ -56,7 +57,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
             relate_case_id = testcase['case_id']
             relate_case_filename = redis_client.get(f'{redis_client.prefix}:case_id_filename:{relate_case_id}')
             case_data = redis_client.get(f'{redis_client.prefix}:case_data:{relate_case_filename}')
-            case_data = ast.literal_eval(case_data)
+            case_data = json.loads(case_data)
             case_data_test_steps = case_data['test_steps']
             if isinstance(case_data_test_steps, list):
                 for case_test_steps in case_data_test_steps:
@@ -82,7 +83,7 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union
         elif isinstance(testcase, str):
             relate_case_filename = redis_client.get(f'{redis_client.prefix}:case_id_filename:{testcase}')
             case_data = redis_client.get(f'{redis_client.prefix}:case_data:{relate_case_filename}')
-            case_data = ast.literal_eval(case_data)
+            case_data = json.loads(case_data)
             case_data_test_steps = case_data['test_steps']
             if isinstance(case_data_test_steps, list):
                 for case_test_steps in case_data_test_steps:

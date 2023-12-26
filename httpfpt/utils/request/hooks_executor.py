@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import ast
+import json
 import re
 
 from typing import Any, Union
@@ -47,7 +47,7 @@ class HooksExecutor:
         if teardown_hooks:
             del target['test_steps']['teardown']['hooks']
 
-        str_target = str(target)
+        str_target = json.dumps(target, ensure_ascii=False)
         exec('from httpfpt.data.hooks import *')
         while re.findall(self.func_re, str_target):
             key = re.search(self.func_re, str_target)
@@ -62,7 +62,7 @@ class HooksExecutor:
             except Exception as e:
                 log.error(f'请求数据函数 {hook_key} 返回值替换失败: {e}')
                 raise e
-        dict_target = ast.literal_eval(str_target)
+        dict_target = json.loads(str_target)
 
         # 临时解决方案：数据还原
         if setup_hooks:

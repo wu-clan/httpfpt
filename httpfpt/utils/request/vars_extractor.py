@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import ast
+import json
 import os.path
 import re
 
@@ -47,8 +47,7 @@ class VarsExtractor:
         # 获取所有自定义全局变量
         global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
-        # 获取变量
-        str_target = str(target)
+        str_target = json.dumps(target, ensure_ascii=False)
 
         while re.findall(self.vars_re, str_target):
             key = re.search(self.vars_re, str_target)
@@ -72,7 +71,7 @@ class VarsExtractor:
                 else:
                     str_target = re.sub(self.vars_re, cache_value, str_target, 1)
 
-        dict_target = ast.literal_eval(str_target)
+        dict_target = json.loads(str_target)
 
         return dict_target
 
@@ -83,8 +82,7 @@ class VarsExtractor:
         :param target:
         :return:
         """
-        # 获取变量
-        str_target = str(target)
+        str_target = json.dumps(target)
 
         while re.findall(self.relate_vars_re, str_target):
             key = re.search(self.relate_vars_re, str_target)
@@ -107,7 +105,7 @@ class VarsExtractor:
             # 删除关联用例临时变量
             variable_cache.delete(var_key)
 
-        dict_target = ast.literal_eval(str_target)
+        dict_target = json.loads(str_target)
 
         return dict_target
 
