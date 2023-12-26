@@ -22,7 +22,7 @@ test_steps:
       body_type:
       body:
       files:
-        file: D:\\0000000000_test\\666.txt
+        file: D:\0000000000_test\666.txt
     teardown:
       assert:
         - check: 检查接口链接
