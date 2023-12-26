@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from httpfpt.common.log import log
-from httpfpt.core import get_conf
+from httpfpt.core.get_conf import config
 
 
 class LarkTalk:
@@ -20,9 +20,9 @@ class LarkTalk:
                 'content': {
                     'post': {
                         'zh_cn': {
-                            'title': get_conf.TEST_REPORT_TITLE,
+                            'title': config.TEST_REPORT_TITLE,
                             'content': [
-                                [{'tag': 'text', 'text': f'👤 测试人员: {get_conf.TESTER_NAME}'}],
+                                [{'tag': 'text', 'text': f'👤 测试人员: {config.TESTER_NAME}'}],
                                 [{'tag': 'text', 'text': f"🤖 测试结果: {self.content['result']}"}],
                                 [{'tag': 'text', 'text': f"✅ 通过用例: {self.content['passed']}"}],
                                 [{'tag': 'text', 'text': f"🔧 失败用例: {self.content['failed']}"}],
@@ -37,10 +37,10 @@ class LarkTalk:
                 },
             }
             response = requests.session().post(
-                url=get_conf.LARK_TALK_WEBHOOK,
+                url=config.LARK_TALK_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=get_conf.LARK_TALK_PROXY,  # type: ignore
+                proxies=config.LARK_TALK_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:

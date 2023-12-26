@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
-from httpfpt.core.get_conf import PROJECT_NAME
+from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import YAML_DATA_PATH
 from httpfpt.utils.data_manage.base_format import format_value
 from httpfpt.utils.file_control import get_file_property
@@ -30,8 +30,8 @@ class ApiFoxParser:
         if apifox != '1.0.0':
             raise Exception('不受支持的 apifox 版本')
         try:
-            config = {}
-            config.update(
+            case_config = {}
+            case_config.update(
                 {
                     'allure': {
                         'epic': data['info']['name'],
@@ -60,21 +60,21 @@ class ApiFoxParser:
             # 写入项目 tag 目录
             if len(tag_case) > 0:
                 for k, v in tag_case.items():
-                    config['allure']['feature'] = config['module'] = k
-                    case_file_data = {'config': config, 'test_steps': v}
+                    case_config['allure']['feature'] = case_config['module'] = k
+                    case_file_data = {'config': case_config, 'test_steps': v}
                     write_yaml(
                         YAML_DATA_PATH,
-                        os.sep.join([project or PROJECT_NAME, k, get_file_property(source)[1] + '.yaml']),
+                        os.sep.join([project or config.PROJECT_NAME, k, get_file_property(source)[1] + '.yaml']),
                         case_file_data,
                         mode='w',
                     )
             # 写入项目根目录
             if len(root_case) > 0:
                 for _, v in root_case.items():
-                    case_file_data = {'config': config, 'test_steps': v}
+                    case_file_data = {'config': case_config, 'test_steps': v}
                     write_yaml(
                         YAML_DATA_PATH,
-                        os.sep.join([project or PROJECT_NAME, get_file_property(source)[1] + '.yaml']),
+                        os.sep.join([project or config.PROJECT_NAME, get_file_property(source)[1] + '.yaml']),
                         case_file_data,
                         mode='w',
                     )

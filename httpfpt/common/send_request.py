@@ -14,7 +14,7 @@ from requests import Response as RequestsResponse
 
 from httpfpt.common.errors import AssertError, SendRequestError
 from httpfpt.common.log import log
-from httpfpt.core import get_conf
+from httpfpt.core.get_conf import config
 from httpfpt.db.mysql_db import mysql_client
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
@@ -60,10 +60,10 @@ class SendRequests:
         :return:
         """
         try:
-            kwargs['timeout'] = kwargs['timeout'] or get_conf.REQUEST_TIMEOUT
-            kwargs['verify'] = kwargs['verify'] or get_conf.REQUEST_VERIFY
-            kwargs['proxies'] = kwargs['proxies'] or get_conf.REQUEST_PROXIES_REQUESTS
-            kwargs['allow_redirects'] = kwargs['allow_redirects'] or get_conf.REQUEST_REDIRECTS
+            kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
+            kwargs['verify'] = kwargs['verify'] or config.REQUEST_VERIFY
+            kwargs['proxies'] = kwargs['proxies'] or config.REQUEST_PROXIES_REQUESTS
+            kwargs['allow_redirects'] = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
             # 消除安全警告
             requests.packages.urllib3.disable_warnings()  # type: ignore
             log.info('开始发送请求...')
@@ -83,10 +83,10 @@ class SendRequests:
         :return:
         """
         try:
-            kwargs['timeout'] = kwargs['timeout'] or get_conf.REQUEST_TIMEOUT
-            verify = kwargs['verify'] or get_conf.REQUEST_VERIFY
-            proxies = kwargs['proxies'] or get_conf.REQUEST_PROXIES_HTTPX
-            redirects = kwargs['allow_redirects'] or get_conf.REQUEST_REDIRECTS
+            kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
+            verify = kwargs['verify'] or config.REQUEST_VERIFY
+            proxies = kwargs['proxies'] or config.REQUEST_PROXIES_HTTPX
+            redirects = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
             del kwargs['verify']
             del kwargs['proxies']
             del kwargs['allow_redirects']
