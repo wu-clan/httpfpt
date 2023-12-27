@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import copy
 import os
 
-from typing import Optional, Union
+from typing import Optional
 
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
@@ -83,7 +85,7 @@ class ApiFoxParser:
             raise e
 
     @staticmethod
-    def get_apifox_params(value: dict) -> Union[dict, None]:
+    def get_apifox_params(value: dict) -> dict | None:
         """
         获取查询参数
 
@@ -99,7 +101,7 @@ class ApiFoxParser:
         return data if len(data) > 0 else None
 
     @staticmethod
-    def get_apifox_headers(value: dict) -> Union[dict, None]:
+    def get_apifox_headers(value: dict) -> dict | None:
         """
         获取查询参数
 
@@ -113,7 +115,7 @@ class ApiFoxParser:
         return data if len(data) > 0 else None
 
     @staticmethod
-    def get_apifox_request_data(value: dict) -> Union[dict, None]:
+    def get_apifox_request_data(value: dict) -> dict | None:
         """
         获取请求 data
 
@@ -128,7 +130,7 @@ class ApiFoxParser:
         return body if len(body) > 0 else None
 
     @staticmethod
-    def get_apifox_request_files(value: dict) -> Union[dict, None]:
+    def get_apifox_request_files(value: dict) -> dict | None:
         """
         获取请求 files
 

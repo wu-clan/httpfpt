@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import json
 import re
 
-from typing import Any, Union
+from typing import Any
 
 from httpfpt.common.log import log
 
@@ -14,7 +16,7 @@ class HooksExecutor:
         # hooks 开头: a-zA-Z_
         self.func_re = r'\${([a-zA-Z_]\w*\([\$\w\.\-/\s=,]*\))}'
 
-    def hook_func_extract(self, target: Union[list, str]) -> list:
+    def hook_func_extract(self, target: list | str) -> list:
         """
         提取用例中的函数
 

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import ast
 import json
 
-from typing import Union
+from typing import TYPE_CHECKING
 
 from jsonpath import findall
 
@@ -12,11 +14,13 @@ from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.allure_control import allure_step
-from httpfpt.utils.request.request_data_parse import RequestDataParse
 from httpfpt.utils.request.vars_extractor import var_extractor
 
+if TYPE_CHECKING:
+    from httpfpt.utils.request.request_data_parse import RequestDataParse
 
-def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Union['RequestDataParse', None]:
+
+def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> RequestDataParse | None:
     """
     执行前置关联测试用例
 

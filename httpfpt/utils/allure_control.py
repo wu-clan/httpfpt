@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from json import dumps as json_dumps
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import allure
 
@@ -10,7 +12,7 @@ from allure_commons.types import AttachmentType
 from httpfpt.utils.file_control import get_file_property
 
 
-def allure_step(step: str, var: Union[str, dict]) -> None:
+def allure_step(step: str, var: str | dict) -> None:
     """
     allure 操作步骤
 

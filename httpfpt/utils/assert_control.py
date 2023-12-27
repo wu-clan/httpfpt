@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from decimal import Decimal
-from typing import Any, Union
+from typing import Any
 
 from jsonpath import findall
 
@@ -250,9 +252,7 @@ class Asserter:
                             exec(format_assert_text)
 
     @staticmethod
-    def _exec_json_assert(
-        assert_check: Union[str, None], expected_value: Any, assert_type: str, actual_value: Any
-    ) -> None:
+    def _exec_json_assert(assert_check: str | None, expected_value: Any, assert_type: str, actual_value: Any) -> None:
         """
         执行 jsonpath 断言
 
@@ -352,7 +352,7 @@ class Asserter:
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 
-    def exec_asserter(self, response: dict, assert_text: Union[str, list, dict, None]) -> None:
+    def exec_asserter(self, response: dict, assert_text: str | list | dict | None) -> None:
         """
         根据断言内容自动选择断言器执行
 

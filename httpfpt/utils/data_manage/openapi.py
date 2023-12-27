@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import copy
 import os
 import warnings
 
-from typing import Optional, Union
+from typing import Optional
 
 import requests
 
@@ -297,7 +299,7 @@ class SwaggerParser:
             raise Exception('不受支持的 openapi 版本')
         self.data = data
 
-    def get_swagger_params(self, value: dict) -> Union[dict, None]:
+    def get_swagger_params(self, value: dict) -> dict | None:
         """
         获取查询参数
 
@@ -319,7 +321,7 @@ class SwaggerParser:
                     data = {i['name']: None}
             return data if len(data) > 0 else None
 
-    def get_swagger_headers(self, value: dict) -> Union[dict, None]:
+    def get_swagger_headers(self, value: dict) -> dict | None:
         """
         获取查询参数
 
@@ -352,7 +354,7 @@ class SwaggerParser:
             data = self.data.get('components').get('schemas').get(name)
         return data
 
-    def get_swagger_request_data(self, value: Union[dict, str]) -> Union[dict, None]:
+    def get_swagger_request_data(self, value: dict | str) -> dict | None:
         """
         获取请求 data
 
@@ -388,7 +390,7 @@ class SwaggerParser:
                         data[value['title']] = format_value(value.get('type', 'object'))
             return data if len(data) > 0 else None
 
-    def get_swagger_request_files(self, value: Union[str, dict]) -> Union[dict, None]:
+    def get_swagger_request_files(self, value: str | dict) -> dict | None:
         """
         获取请求 files
 

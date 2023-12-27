@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 import shutil
 import sys
 
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 import pytest
 
@@ -45,8 +47,8 @@ def startup(
     reruns: int = 0,
     maxfail: int = 0,
     x: bool = False,
-    n: Union[Literal['auto', 'logical'], int, None] = None,
-    dist: Union[Literal['load', 'loadscope', 'loadfile', 'loadgroup', 'worksteal', 'no'], None] = None,
+    n: Literal['auto', 'logical'] | int | None = None,
+    dist: Literal['load', 'loadscope', 'loadfile', 'loadgroup', 'worksteal', 'no'] | None = None,
     strict_markers: bool = False,
     capture: bool = True,
     disable_warnings: bool = True,

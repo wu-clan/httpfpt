@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Union
+from typing import Any, Dict, List, Literal
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 
@@ -22,7 +22,7 @@ class ConfigRequestData(BaseModel):
     timeout: int | None = Field(None, ge=0)
     verify: bool | None = None
     redirects: bool | None = None
-    proxies: Dict[Literal['http', 'https', 'http://', 'https://'], Union[AnyHttpUrl, None]] | None = None
+    proxies: Dict[Literal['http', 'https', 'http://', 'https://'], AnyHttpUrl | None] | None = None
 
 
 class Config(BaseModel):
@@ -34,11 +34,11 @@ class Config(BaseModel):
 class StepsRequestData(BaseModel):
     method: Literal['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
     url: str
-    params: Union[dict, List[tuple], bytes, None]
+    params: dict | List[tuple] | bytes | None
     headers: dict | None
     body_type: Literal['form', 'x_form', 'binary', 'GraphQL', 'text', 'js', 'json', 'html', 'xml'] | None
     body: Any | None
-    files: Union[Dict[str, Union[str, List[str]]], None]
+    files: Dict[str, str | List[str]] | None
 
 
 class SetupTestCaseData(BaseModel):
@@ -55,8 +55,8 @@ class SetupSqlData(BaseModel):
 
 
 class StepsSetUpData(BaseModel):
-    testcase: List[Union[str, SetupTestCaseData]] | None = None
-    sql: List[Union[str, SetupSqlData]] | None = None
+    testcase: List[str | SetupTestCaseData] | None = None
+    sql: List[str | SetupSqlData] | None = None
     hooks: List[str] | None = None
     wait_time: int | None = None
 
@@ -93,10 +93,10 @@ class TeardownAssertData(BaseModel):
 
 
 class StepsTearDownData(BaseModel):
-    sql: List[Union[str, SetupSqlData]] | None = None
+    sql: List[str | SetupSqlData] | None = None
     hooks: List[str] | None = None
     extract: List[TeardownExtractData] | None = None
-    assert_: Union[str, List[str | TeardownAssertData]] | None = Field(None, alias='assert')
+    assert_: str | List[str | TeardownAssertData] | None = Field(None, alias='assert')
     wait_time: int | None = None
 
 
@@ -104,7 +104,7 @@ class Steps(BaseModel):
     name: str
     case_id: str
     description: str
-    is_run: Union[bool, dict, None] = None
+    is_run: bool | dict | None = None
     request: StepsRequestData
     setup: StepsSetUpData | None = None
     teardown: StepsTearDownData | None = None
@@ -114,6 +114,6 @@ class CaseData(BaseModel):
     model_config = ConfigDict(extra='forbid', strict=True)
 
     config: Config
-    test_steps: Union[Steps, List[Steps]]
+    test_steps: Steps | List[Steps]
     filename: str | None = None
     file_hash: str | None = None
