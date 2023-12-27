@@ -8,7 +8,7 @@ from typing import Literal, Optional, Union
 
 import pytest
 
-sys.path.append('..')
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
