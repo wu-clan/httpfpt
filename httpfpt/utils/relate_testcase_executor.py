@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from httpfpt.utils.request.request_data_parse import RequestDataParse
 
 
-def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> 'RequestDataParse' | None:
+def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> RequestDataParse | None:
     """
     执行前置关联测试用例
 
