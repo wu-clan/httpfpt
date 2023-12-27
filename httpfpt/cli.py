@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+import os
 import re
 import sys
 
@@ -14,7 +15,7 @@ from pydantic import ValidationError
 from rich.prompt import Confirm
 from typing_extensions import Annotated  # noqa: TCH002
 
-sys.path.append('..')
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.run import run
