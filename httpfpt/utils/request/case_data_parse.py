@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import copy
 import json
 import sys
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from pydantic import ValidationError
 
@@ -68,7 +70,7 @@ def case_id_unique_verify() -> None:
 
     :return:
     """
-    all_case_id_dict: List[Dict[str, Union[str, list]]] = []
+    all_case_id_dict: List[Dict[str, str | list]] = []
     all_case_id = []
     case_data_list = redis_client.get_prefix(f'{redis_client.prefix}:case_data:')
     redis_client.delete_prefix(f'{redis_client.prefix}:case_id_filename:')

@@ -1,4 +1,8 @@
-from typing import Any, Union
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from typing import Any
 
 from cache3 import SafeCache
 
@@ -62,7 +66,7 @@ class VariableCache:
             log.info(f'存在临时变量: {key}')
         return result
 
-    def incr(self, key: str, **kwargs) -> Union[int, float]:
+    def incr(self, key: str, **kwargs) -> int | float:
         """
         是否存在缓存值, 当不存在时触发 ValueError
 

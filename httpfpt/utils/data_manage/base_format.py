@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import Union
+from __future__ import annotations
 
 
-def format_value(value_type: str) -> Union[str, int, float, bool, dict, list]:
+def format_value(value_type: str) -> str | int | float | bool | dict | list:
     """
     根据数据类型格式化数据
 

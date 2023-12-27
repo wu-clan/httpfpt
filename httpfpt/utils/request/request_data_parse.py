@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 
 from json import dumps as json_dumps
 from string import Template
-from typing import Union
 
 import allure
 
@@ -90,7 +91,7 @@ class RequestDataParse:
             return story
 
     @property
-    def allure_severity(self) -> Union[str, None]:
+    def allure_severity(self) -> str | None:
         try:
             severity = self.request_data['config']['allure']['severity']
         except _RequestDataParamGetError:
@@ -119,7 +120,7 @@ class RequestDataParse:
             return env
 
     @property
-    def timeout(self) -> Union[int, None]:
+    def timeout(self) -> int | None:
         try:
             timeout = self.request_data['config']['request']['timeout']
             if timeout is not None:
@@ -130,7 +131,7 @@ class RequestDataParse:
         return timeout
 
     @property
-    def verify(self) -> Union[bool, str, None]:
+    def verify(self) -> bool | str | None:
         try:
             verify = self.request_data['config']['request']['verify']
             if verify is not None:
@@ -142,7 +143,7 @@ class RequestDataParse:
         return verify
 
     @property
-    def redirects(self) -> Union[bool, None]:
+    def redirects(self) -> bool | None:
         try:
             redirects = self.request_data['config']['request']['redirects']
             if redirects is not None:
@@ -153,7 +154,7 @@ class RequestDataParse:
         return redirects
 
     @property
-    def proxies(self) -> Union[dict, None]:
+    def proxies(self) -> dict | None:
         try:
             proxies = self.request_data['config']['request']['proxies']
             if proxies is not None:
@@ -192,7 +193,7 @@ class RequestDataParse:
             return module
 
     @property
-    def test_steps(self) -> Union[dict, list]:
+    def test_steps(self) -> dict | list:
         try:
             test_steps = self.request_data['test_steps']
         except _RequestDataParamGetError:
@@ -229,7 +230,7 @@ class RequestDataParse:
             return case_id
 
     @property
-    def description(self) -> Union[str, None]:
+    def description(self) -> str | None:
         try:
             description = self.request_data['test_steps']['description']
             if not isinstance(description, str):
@@ -322,7 +323,7 @@ class RequestDataParse:
             return url
 
     @property
-    def params(self) -> Union[dict, bytes, None]:
+    def params(self) -> dict | bytes | None:
         try:
             params = self.request_data['test_steps']['request']['params']
         except _RequestDataParamGetError:
@@ -334,7 +335,7 @@ class RequestDataParse:
         return params
 
     @property
-    def headers(self) -> Union[dict, None]:
+    def headers(self) -> dict | None:
         try:
             headers = self.request_data['test_steps']['request']['headers']
         except _RequestDataParamGetError:
@@ -359,7 +360,7 @@ class RequestDataParse:
             return headers
 
     @property
-    def body_type(self) -> Union[str, None]:
+    def body_type(self) -> str | None:
         try:
             data_type = self.request_data['test_steps']['request']['body_type']
         except _RequestDataParamGetError:
@@ -371,7 +372,7 @@ class RequestDataParse:
         return data_type
 
     @property
-    def body(self) -> Union[dict, bytes, str, None]:
+    def body(self) -> dict | bytes | str | None:
         try:
             body = self.request_data['test_steps']['request']['body']
         except _RequestDataParamGetError:
@@ -416,7 +417,7 @@ class RequestDataParse:
         return body
 
     @property
-    def files(self) -> Union[dict, list, None]:
+    def files(self) -> dict | list | None:
         files = self.files_no_parse
         if files is not None:
             if len(files) == 1:
@@ -443,7 +444,7 @@ class RequestDataParse:
         return files
 
     @property
-    def files_no_parse(self) -> Union[dict, None]:
+    def files_no_parse(self) -> dict | None:
         try:
             files = self.request_data['test_steps']['request']['files']
         except _RequestDataParamGetError:
@@ -467,7 +468,7 @@ class RequestDataParse:
                 return False
 
     @property
-    def setup_testcase(self) -> Union[list, None]:
+    def setup_testcase(self) -> list | None:
         try:
             testcase = self.request_data['test_steps']['setup']['testcase']
             if testcase is not None:
@@ -491,7 +492,7 @@ class RequestDataParse:
         return testcase
 
     @property
-    def setup_sql(self) -> Union[list, None]:
+    def setup_sql(self) -> list | None:
         try:
             sql = self.request_data['test_steps']['setup']['sql']
             if sql is not None:
@@ -516,7 +517,7 @@ class RequestDataParse:
         return sql
 
     @property
-    def setup_hooks(self) -> Union[list, None]:
+    def setup_hooks(self) -> list | None:
         try:
             hook = self.request_data['test_steps']['setup']['hooks']
             if hook is not None:
@@ -533,7 +534,7 @@ class RequestDataParse:
         return hook
 
     @property
-    def setup_wait_time(self) -> Union[int, None]:
+    def setup_wait_time(self) -> int | None:
         try:
             time = self.request_data['test_steps']['setup']['wait_time']
             if time is not None:
@@ -556,7 +557,7 @@ class RequestDataParse:
                 return False
 
     @property
-    def teardown_sql(self) -> Union[list, None]:
+    def teardown_sql(self) -> list | None:
         try:
             sql = self.request_data['test_steps']['teardown']['sql']
             if sql is not None:
@@ -581,7 +582,7 @@ class RequestDataParse:
         return sql
 
     @property
-    def teardown_hooks(self) -> Union[list, None]:
+    def teardown_hooks(self) -> list | None:
         try:
             hook = self.request_data['test_steps']['teardown']['hooks']
             if hook is not None:
@@ -598,7 +599,7 @@ class RequestDataParse:
         return hook
 
     @property
-    def teardown_extract(self) -> Union[list, None]:
+    def teardown_extract(self) -> list | None:
         try:
             extract = self.request_data['test_steps']['teardown']['extract']
             if extract is not None:
@@ -619,7 +620,7 @@ class RequestDataParse:
         return extract
 
     @property
-    def teardown_assert(self) -> Union[str, list, dict, None]:
+    def teardown_assert(self) -> str | list | dict | None:
         try:
             assert_text = self.request_data['test_steps']['teardown']['assert']
         except _RequestDataParamGetError:
@@ -630,7 +631,7 @@ class RequestDataParse:
         return assert_text
 
     @property
-    def teardown_wait_time(self) -> Union[int, None]:
+    def teardown_wait_time(self) -> int | None:
         try:
             time = self.request_data['test_steps']['teardown']['wait_time']
             if time is not None:
