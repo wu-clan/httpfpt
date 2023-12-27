@@ -29,10 +29,10 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
     yaml_filenames = []
     yaml_file_root_names = []
     for _ in yaml_datafiles:
-        yaml_filenames.append(get_file_property(_)[0])
+        yaml_filenames.append(_)
         yaml_file_root_names.append(get_file_property(_)[1])
 
-    # 获取所有测试用例文件名
+    # 获取所有测试用例数据文件名
     testcase_filenames = []
     for _ in testcase_files:
         testcase_filenames.append(get_file_property(_)[0])
@@ -55,7 +55,8 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
 
     for create_file_root_name in create_file_root_names:
         for yaml_filename in yaml_filenames:
-            if create_file_root_name == get_file_property(yaml_filename)[1]:
+            file_property = get_file_property(yaml_filename)
+            if create_file_root_name == file_property[1]:
                 testcase_class_name = ''.join(name.title() for name in create_file_root_name.split('_'))
                 testcase_func_name = create_file_root_name
                 if not create_file_root_name.startswith('test_'):
@@ -70,7 +71,7 @@ from httpfpt.common.send_request import send_request
 from httpfpt.utils.request.case_data_parse import get_request_data
 from httpfpt.utils.request.ids_extract import get_ids
 
-request_data = get_request_data(filename='{yaml_filename}')
+request_data = get_request_data(filename='{file_property[0]}')
 allure_text = request_data[0]['config']['allure']
 request_ids = get_ids(request_data)
 
@@ -87,15 +88,17 @@ class {testcase_class_name}:
         send_request.send_request(data)
 '''
                 # 创建测试用例文件
-                tag = str(Path(yaml_filename).parent)[1:]
-                if tag != '':
-                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, tag, testcase_func_name + '.py')
+                tag = yaml_filename.split(config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
+                new_testcase_filename = testcase_func_name + '.py'
+                if tag:
+                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, *tag, new_testcase_filename)
                 else:
-                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, testcase_func_name + '.py')
-                if not Path(case_path).parent.exists():  # noqa: ignore
-                    Path(case_path).parent.mkdir(parents=True, exist_ok=True)  # noqa: ignore
+                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, new_testcase_filename)
+                new_testcase_dir = Path(str(case_path)).parent
+                if not new_testcase_dir.exists():
+                    new_testcase_dir.mkdir(parents=True, exist_ok=True)
                 with open(case_path, 'w', encoding='utf-8') as f:
                     f.write(case_code)
-                console.print(f'📄 Created: {get_file_property(case_path)[0]}')  # noqa: ignore
+                console.print(f'📄 Created: {new_testcase_filename}')
 
     console.print('✅ 测试用例自动生成完成')

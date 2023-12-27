@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import time
+
 from datetime import datetime
 
 import pytest
+
 from filelock import FileLock
 from py._xmlgen import html
 
@@ -68,7 +70,7 @@ def pytest_configure(config):
     :return:
     """
     # 元信息配置
-    metadata = config.pluginmanager.getplugin("metadata")
+    metadata = config.pluginmanager.getplugin('metadata')
     if metadata:
         from pytest_metadata.plugin import metadata_key
 
@@ -145,7 +147,7 @@ def pytest_runtest_makereport(item, call):
         report.description = str(item.function.__doc__)
 
 
-def pytest_collection_modifyitems(items) -> None:
+def pytest_collection_modifyitems(items):
     """
     解决数据驱动ids参数为中文时,控制台输出乱码问题
 
@@ -155,7 +157,7 @@ def pytest_collection_modifyitems(items) -> None:
     # item表示每个用例
     for item in items:
         item.name = item.name.encode('utf-8').decode('unicode_escape')
-        item._nodeid = item.nodeid.encode("utf-8").decode("unicode_escape")
+        item._nodeid = item.nodeid.encode('utf-8').decode('unicode_escape')
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
