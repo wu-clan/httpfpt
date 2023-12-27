@@ -17,7 +17,18 @@ from httpfpt.utils.file_control import get_file_hash, get_file_property, search_
 from httpfpt.utils.pydantic_parser import parse_error
 
 
-def case_data_init(pydantic_verify: bool = False) -> None:
+def clean_redis_data(clean_redis: bool) -> None:
+    """
+    清理 redis 缓存数据
+
+    :param clean_redis:
+    :return:
+    """
+    if clean_redis:
+        redis_client.delete_prefix(redis_client.prefix)
+
+
+def case_data_init(pydantic_verify: bool) -> None:
     """
     初始化用例数据
 
