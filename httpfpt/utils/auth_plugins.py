@@ -30,9 +30,9 @@ class AuthPlugins:
         headers = auth_data[f'{self.auth_type}']['headers']
         headers.update({'Connection': 'close'})
         timeout = auth_data[f'{self.auth_type}']['timeout'] or 86400
-        aap_bearer_token = redis_client.get(f'{redis_client.prefix}:token:{url}')
-        if aap_bearer_token:
-            token = aap_bearer_token
+        cache_bearer_token = redis_client.get(f'{redis_client.prefix}:token:{url}')
+        if not cache_bearer_token:
+            token = cache_bearer_token
         else:
             request_data = {
                 'url': url,
@@ -43,8 +43,9 @@ class AuthPlugins:
             if 'json' in str(headers):
                 request_data.update({'json': request_data.pop('data')})
             response = requests.session().post(**request_data)
-            token = findall(auth_data[f'{self.auth_type}']['token_key'], response.json())
+            jp_token = findall(auth_data[f'{self.auth_type}']['token_key'], response.json())
+            token = jp_token[0]
             if not token:
                 raise AuthError('Token 获取失败，请检查登录接口响应或 token_key 表达式')
-            redis_client.set(f'{redis_client.prefix}:token:{url}', token[0], ex=timeout)
+            redis_client.set(f'{redis_client.prefix}:token:{url}', token, ex=timeout)
         return token

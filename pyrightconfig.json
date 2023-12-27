@@ -13,6 +13,6 @@
   "reportUnusedImport": "error",
   "reportOptionalMemberAccess": false,
   "reportOptionalSubscript": false,
-  "reportUnnecessaryTypeIgnoreComment": true,
+  "reportUnnecessaryTypeIgnoreComment": "warning",
   "pythonPlatform": "All"
 }

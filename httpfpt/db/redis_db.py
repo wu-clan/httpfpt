@@ -32,18 +32,18 @@ class RedisDB(Redis):
         else:
             log.info('数据库 redis 连接成功')
 
-    def get(self, key: Any, logging: bool = True) -> Any:
+    def get(self, name: Any, logging: bool = True) -> Any:
         """
         获取 redis 数据
 
-        :param key:
+        :param name:
         :param logging:
         :return:
         """
-        data = super().get(key)
+        data = super().get(name)
         if not data:
             if logging:
-                log.warning(f'获取 redis 数据 {key} 失败, 此数据不存在')
+                log.warning(f'获取 redis 数据 {name} 失败, 此数据不存在')
         return data
 
     def get_prefix(self, prefix: str) -> list:
