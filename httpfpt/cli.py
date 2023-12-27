@@ -176,7 +176,7 @@ class HttpFptCLI:
             long='--run',
             default=None,
             help='Run test cases, do not support use with other commands, but support custom pytest running parameters,'
-            ' default parameters see: httpfpt/run.py',
+            ' default parameters see `httpfpt/run.py`.',
             parse=cmd_run_test_parse,
             num_args=-1,
         ),
@@ -193,7 +193,7 @@ class HttpFptCLI:
             run(*self.run_test) if isinstance(self.run_test, list) else run()
 
 
-@cappa.command(name='testcase', help='Test case tools')
+@cappa.command(name='testcase', help='Test case tools.')
 class TestCaseCLI:
     data_verify: Annotated[
         str,
@@ -224,7 +224,7 @@ class TestCaseCLI:
             generate_testcases()
 
 
-@cappa.command(name='import', help='Import test case data')
+@cappa.command(name='import', help='Import test case data.')
 class ImportCLI:
     openai: Annotated[
         Tuple[str, str],
