@@ -652,28 +652,31 @@ class RequestDataParse:
         body_type = self.body_type
         body = self.body
         files = self.files
-        auto_headers = headers or {}
-        if body_type == BodyType.form_data:
-            if files is not None:
-                pass  # 如果 files 不为空，则交给引擎自动处理
-            else:
-                auto_headers.update({'Content-Type': 'multipart/form-data'})
-        elif body_type == BodyType.x_www_form_urlencoded:
-            auto_headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
-        elif body_type == BodyType.binary:
-            auto_headers.update({'Content-Type': 'application/octet-stream'})
-        elif body_type == BodyType.GraphQL:
-            auto_headers.update({'Content-Type': 'application/json'})
-        elif body_type == BodyType.TEXT:
-            auto_headers.update({'Content-Type': 'text/plain'})
-        elif body_type == BodyType.JavaScript:
-            auto_headers.update({'Content-Type': 'application/javascript'})
-        elif body_type == BodyType.JSON:
-            auto_headers.update({'Content-Type': 'application/json'})
-        elif body_type == BodyType.HTML:
-            auto_headers.update({'Content-Type': 'text/html'})
-        elif body_type == BodyType.XML:
-            auto_headers.update({'Content-Type': 'application/xml'})
+        if not body_type:
+            auto_headers = headers
+        else:
+            auto_headers = headers or {}
+            if body_type == BodyType.form_data:
+                if files is not None:
+                    pass  # 如果包含上传文件操作，则交给引擎自动处理
+                else:
+                    auto_headers.update({'Content-Type': 'multipart/form-data'})
+            elif body_type == BodyType.x_www_form_urlencoded:
+                auto_headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+            elif body_type == BodyType.binary:
+                auto_headers.update({'Content-Type': 'application/octet-stream'})
+            elif body_type == BodyType.GraphQL:
+                auto_headers.update({'Content-Type': 'application/json'})
+            elif body_type == BodyType.TEXT:
+                auto_headers.update({'Content-Type': 'text/plain'})
+            elif body_type == BodyType.JavaScript:
+                auto_headers.update({'Content-Type': 'application/javascript'})
+            elif body_type == BodyType.JSON:
+                auto_headers.update({'Content-Type': 'application/json'})
+            elif body_type == BodyType.HTML:
+                auto_headers.update({'Content-Type': 'text/html'})
+            elif body_type == BodyType.XML:
+                auto_headers.update({'Content-Type': 'application/xml'})
         # 请求数据整合
         all_data = {
             'allure_epic': self.allure_epic,
