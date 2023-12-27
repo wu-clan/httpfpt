@@ -169,12 +169,12 @@ class HttpFptCLI:
         ),
     ]
     run_test: Annotated[
-        List[str],
+        List[str] | None,
         cappa.Arg(
             value_name='<PYTEST ARGS / NONE>',
             short='-r',
             long='--run',
-            default=[],
+            default=None,
             help='Run test cases, do not support use with other commands, but support custom pytest running parameters,'
             ' default parameters see: httpfpt/run.py',
             parse=cmd_run_test_parse,
