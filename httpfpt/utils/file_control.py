@@ -20,7 +20,7 @@ def get_file_property(filepath: str) -> Tuple[str, str, str]:
     file = Path(filepath)
     filename = file.name
     file_root_name = file.stem
-    filetype = filename.split('.')[-1]
+    filetype = file.suffix[1:]
     return filename, file_root_name, filetype
 
 
