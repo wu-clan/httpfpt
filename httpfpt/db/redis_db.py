@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from typing import Any
 
 from redis import AuthenticationError, Redis
@@ -76,7 +78,7 @@ class RedisDB(Redis):
             self.delete(key)
         self.set(key, value, **kwargs)
 
-    def delete_prefix(self, prefix: str, exclude: str = None) -> None:
+    def delete_prefix(self, prefix: str, exclude: str | None = None) -> None:
         """
         删除 redis 符合前缀的数据
 
