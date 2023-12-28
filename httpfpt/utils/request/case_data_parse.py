@@ -73,7 +73,7 @@ def case_id_unique_verify() -> None:
     all_case_id_dict: List[Dict[str, str | list]] = []
     all_case_id = []
     case_data_list = redis_client.get_prefix(f'{redis_client.case_data_prefix}:')
-    redis_client.delete_prefix(f'{redis_client.case_id_file}:')
+    redis_client.delete_prefix(f'{redis_client.case_id_file_prefix}:')
     for case_data in case_data_list:
         case_data = json.loads(case_data)
         filename = case_data['filename']
@@ -83,14 +83,14 @@ def case_id_unique_verify() -> None:
                 case_id = steps['case_id']
                 all_case_id.append(case_id)
                 all_case_id_dict.append({f'{filename}': case_id})
-                redis_client.set(f'{redis_client.case_id_file}:{case_id}', filename)
+                redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
             if isinstance(steps, list):
                 case_id_list = []
                 for s in steps:
                     case_id = s['case_id']
                     case_id_list.append(case_id)
                     all_case_id.append(case_id)
-                    redis_client.set(f'{redis_client.case_id_file}:{case_id}', filename)
+                    redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
                 all_case_id_dict.append({f'{filename}': case_id_list})
         except KeyError:
             raise RequestDataParseError(f'测试用例数据文件 {filename} 结构错误，建议开启 pydantic 验证')
