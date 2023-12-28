@@ -27,7 +27,7 @@ def clean_redis_data(clean_redis: bool) -> None:
     :return:
     """
     if clean_redis:
-        redis_client.delete_prefix(redis_client.prefix)
+        redis_client.delete_prefix(redis_client.prefix, exclude=redis_client.token_prefix)
 
 
 def case_data_init(pydantic_verify: bool) -> None:
@@ -43,17 +43,17 @@ def case_data_init(pydantic_verify: bool) -> None:
         filename = get_file_property(case_yaml_file)[0]
         file_hash = get_file_hash(case_yaml_file)
         case_data.update({'filename': filename, 'file_hash': file_hash})
-        redis_case_data = redis_client.get(f'{redis_client.prefix}:case_data:{filename}', logging=False)
+        redis_case_data = redis_client.get(f'{redis_client.case_data_prefix}:{filename}', logging=False)
         if redis_case_data is None:
-            redis_client.set(f'{redis_client.prefix}:case_data:{filename}', json.dumps(case_data, ensure_ascii=False))
+            redis_client.set(f'{redis_client.case_data_prefix}:{filename}', json.dumps(case_data, ensure_ascii=False))
         else:
             redis_file_hash = json.loads(redis_case_data).get('file_hash')
             if file_hash != redis_file_hash:
                 redis_client.rset(
-                    f'{redis_client.prefix}:case_data:{filename}', json.dumps(case_data, ensure_ascii=False)
+                    f'{redis_client.case_data_prefix}:{filename}', json.dumps(case_data, ensure_ascii=False)
                 )
     if pydantic_verify:
-        case_data_list = redis_client.get_prefix(f'{redis_client.prefix}:case_data:')
+        case_data_list = redis_client.get_prefix(f'{redis_client.case_data_prefix}:')
         count: int = 0
         for case_data in case_data_list:
             try:
@@ -72,8 +72,8 @@ def case_id_unique_verify() -> None:
     """
     all_case_id_dict: List[Dict[str, str | list]] = []
     all_case_id = []
-    case_data_list = redis_client.get_prefix(f'{redis_client.prefix}:case_data:')
-    redis_client.delete_prefix(f'{redis_client.prefix}:case_id_filename:')
+    case_data_list = redis_client.get_prefix(f'{redis_client.case_data_prefix}:')
+    redis_client.delete_prefix(f'{redis_client.case_id_file_prefix}:')
     for case_data in case_data_list:
         case_data = json.loads(case_data)
         filename = case_data['filename']
@@ -83,14 +83,14 @@ def case_id_unique_verify() -> None:
                 case_id = steps['case_id']
                 all_case_id.append(case_id)
                 all_case_id_dict.append({f'{filename}': case_id})
-                redis_client.set(f'{redis_client.prefix}:case_id_filename:{case_id}', filename)
+                redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
             if isinstance(steps, list):
                 case_id_list = []
                 for s in steps:
                     case_id = s['case_id']
                     case_id_list.append(case_id)
                     all_case_id.append(case_id)
-                    redis_client.set(f'{redis_client.prefix}:case_id_filename:{case_id}', filename)
+                    redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
                 all_case_id_dict.append({f'{filename}': case_id_list})
         except KeyError:
             raise RequestDataParseError(f'测试用例数据文件 {filename} 结构错误，建议开启 pydantic 验证')
@@ -137,7 +137,7 @@ def get_request_data(*, filename: str) -> List[Dict[str, Any]]:
     :param filename: 测试用例数据文件名称
     :return:
     """
-    case_data = json.loads(redis_client.get(f'{redis_client.prefix}:case_data:{filename}'))
+    case_data = json.loads(redis_client.get(f'{redis_client.case_data_prefix}:{filename}'))
     config_error = f'请求测试用例数据文件 {filename} 缺少 config 信息, 请检查测试用例文件内容'
     test_steps_error = f'请求测试用例数据文件 {filename} 缺少 test_steps 信息, 请检查测试用例文件内容'
     try:

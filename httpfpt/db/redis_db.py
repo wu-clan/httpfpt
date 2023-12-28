@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from typing import Any
 
 from redis import AuthenticationError, Redis
@@ -19,6 +21,9 @@ class RedisDB(Redis):
             decode_responses=True,  # 转码 utf-8
         )
         self.prefix = 'httpfpt'
+        self.token_prefix = f'{self.prefix}:token'
+        self.case_data_prefix = f'{self.prefix}:case_data'
+        self.case_id_file_prefix = f'{self.prefix}:case_id_file'
 
     def init(self) -> None:
         try:
@@ -73,15 +78,20 @@ class RedisDB(Redis):
             self.delete(key)
         self.set(key, value, **kwargs)
 
-    def delete_prefix(self, prefix: str) -> None:
+    def delete_prefix(self, prefix: str, exclude: str | None = None) -> None:
         """
         删除 redis 符合前缀的数据
 
         :param prefix: key 前缀
+        :param exclude: 排除的前缀
         :return:
         """
         for key in self.scan_iter(match=f'{prefix}*'):
-            self.delete(key)
+            if not exclude:
+                self.delete(key)
+            else:
+                if not key.startswith(exclude):
+                    self.delete(key)
 
 
 redis_client = RedisDB()

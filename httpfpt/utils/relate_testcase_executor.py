@@ -59,8 +59,8 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Reque
         if isinstance(testcase, dict):
             relate_count += 1
             relate_case_id = testcase['case_id']
-            relate_case_filename = redis_client.get(f'{redis_client.prefix}:case_id_filename:{relate_case_id}')
-            case_data = redis_client.get(f'{redis_client.prefix}:case_data:{relate_case_filename}')
+            relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{relate_case_id}')
+            case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
             case_data = json.loads(case_data)
             case_data_test_steps = case_data['test_steps']
             if isinstance(case_data_test_steps, list):
@@ -85,8 +85,8 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Reque
 
         # 用例中 testcase 参数为直接关联测试用例时
         elif isinstance(testcase, str):
-            relate_case_filename = redis_client.get(f'{redis_client.prefix}:case_id_filename:{testcase}')
-            case_data = redis_client.get(f'{redis_client.prefix}:case_data:{relate_case_filename}')
+            relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{testcase}')
+            case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
             case_data = json.loads(case_data)
             case_data_test_steps = case_data['test_steps']
             if isinstance(case_data_test_steps, list):

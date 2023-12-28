@@ -21,7 +21,7 @@ from httpfpt.enums.request.auth import AuthType
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.request.method import MethodType
-from httpfpt.utils.auth_plugins import AUTH_TYPE, IS_AUTH, AuthPlugins
+from httpfpt.utils.auth_plugins import AuthPlugins
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.request.hooks_executor import hooks_executor
 from httpfpt.utils.request.vars_extractor import var_extractor
@@ -352,9 +352,10 @@ class RequestDataParse:
             if headers is not None:
                 if len(headers) == 0:
                     raise RequestDataParseError(_error_msg('参数 test_steps:request:headers 为空'))
-            if IS_AUTH:
-                if AUTH_TYPE == AuthType.bearer_token:
-                    token = AuthPlugins().bearer_token
+            auth = AuthPlugins()
+            if auth.is_auth:
+                if auth.auth_type == AuthType.bearer_token:
+                    token = auth.bearer_token
                     bearer_token = {'Authorization': f'Bearer {token}'}
                     headers = headers.update(bearer_token) if headers else bearer_token
             return headers
