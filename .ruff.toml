@@ -18,7 +18,7 @@ select = [
 ]
 line-length = 120
 cache-dir = "./httpfpt/.ruff_cache"
-extend-exclude = ["httpfpt/conftest.py"]
+unsafe-fixes = true
 
 [lint.flake8-pytest-style]
 mark-parentheses = false
@@ -37,11 +37,10 @@ order-by-type = true
 mypy-init-return = true
 
 [lint.per-file-ignores]
-"httpfpt/testcases/test_*.py" = ["ANN001", "ANN201"]
-"httpfpt/conftest.py" = ["ANN001", "ANN201", "ANN202"]
+"httpfpt/testcases/test_*.py" = ["ANN"]
+"httpfpt/conftest.py" = ["ANN"]
 "httpfpt/cli.py" = ["E402"]
 "httpfpt/run.py" = ["E402"]
-"httpfpt/schemas/case_data.py" = ["TCH001"]
 
 [format]
 quote-style = "single"
