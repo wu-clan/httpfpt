@@ -180,12 +180,12 @@ def startup(
         )  # type: ignore
 
 
-def run(*args, pydantic_verify: bool = True, clean_redis: bool = False, **kwargs) -> None:
+def run(*args, pydantic_verify: bool = True, clean_cache: bool = False, **kwargs) -> None:
     """
     运行入口
 
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
-    :param clean_redis: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
+    :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param args: pytest 运行参数
     :param kwargs: pytest 运行参数
     :return:
@@ -205,7 +205,7 @@ def run(*args, pydantic_verify: bool = True, clean_redis: bool = False, **kwargs
         print(logo)
         log.info(logo)
         redis_client.init()
-        case_data.clean_redis_data(clean_redis)
+        case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
         case_data.case_id_unique_verify()
         startup(*args, **kwargs)

@@ -94,7 +94,7 @@ class {testcase_class_name}:
                     case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, *tag, new_testcase_filename)
                 else:
                     case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, new_testcase_filename)
-                new_testcase_dir = Path(str(case_path)).parent
+                new_testcase_dir = Path(case_path).parent
                 if not new_testcase_dir.exists():
                     new_testcase_dir.mkdir(parents=True, exist_ok=True)
                 with open(case_path, 'w', encoding='utf-8') as f:
