@@ -650,7 +650,6 @@ class RequestDataParse:
         :return:
         """
         # 自动解析 headers
-        # 此功能可能存在问题，请根据本地情况自行调整（修改/删除？）
         headers = self.headers
         body_type = self.body_type
         body = self.body
