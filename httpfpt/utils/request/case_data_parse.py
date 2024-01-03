@@ -19,14 +19,14 @@ from httpfpt.utils.file_control import get_file_hash, get_file_property, search_
 from httpfpt.utils.pydantic_parser import parse_error
 
 
-def clean_redis_data(clean_redis: bool) -> None:
+def clean_redis_data(clean_cache: bool) -> None:
     """
     清理 redis 缓存数据
 
-    :param clean_redis:
+    :param clean_cache:
     :return:
     """
-    if clean_redis:
+    if clean_cache:
         redis_client.delete_prefix(redis_client.prefix, exclude=redis_client.token_prefix)
 
 
