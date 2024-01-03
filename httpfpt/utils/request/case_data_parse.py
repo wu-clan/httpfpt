@@ -19,7 +19,7 @@ from httpfpt.utils.file_control import get_file_hash, get_file_property, search_
 from httpfpt.utils.pydantic_parser import parse_error
 
 
-def clean_redis_data(clean_cache: bool) -> None:
+def clean_cache_data(clean_cache: bool) -> None:
     """
     清理 redis 缓存数据
 

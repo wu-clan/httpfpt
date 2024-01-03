@@ -205,7 +205,7 @@ def run(*args, pydantic_verify: bool = True, clean_cache: bool = False, **kwargs
         print(logo)
         log.info(logo)
         redis_client.init()
-        case_data.clean_redis_data(clean_cache)
+        case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
         case_data.case_id_unique_verify()
         startup(*args, **kwargs)
