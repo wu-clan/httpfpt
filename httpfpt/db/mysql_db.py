@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime
 import decimal
 
-from typing import Any, Optional
+from typing import Any
 
 import pymysql
 
@@ -130,7 +130,7 @@ class MysqlDB:
         finally:
             self.close(conn, cursor)
 
-    def exec_case_sql(self, sql: str | list, env: Optional[str] = None) -> dict | int | None:
+    def exec_case_sql(self, sql: str | list, env: str | None = None) -> dict | int | None:
         """
         执行用例 sql
 
@@ -166,7 +166,7 @@ class MysqlDB:
                     if set_type == VarType.CACHE:
                         variable_cache.set(key, value)
                     elif set_type == VarType.ENV:
-                        write_env_vars(RUN_ENV_PATH, env, key, value)
+                        write_env_vars(RUN_ENV_PATH, env, key, value)  # type: ignore
                     elif set_type == VarType.GLOBAL:
                         write_yaml_vars({key: value})
                     else:
