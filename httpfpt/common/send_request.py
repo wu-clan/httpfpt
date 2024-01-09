@@ -266,10 +266,10 @@ class SendRequests:
 
     @staticmethod
     def log_request_setup(parsed_data: dict) -> None:
-        log.info(f"请求 setup_testcase: {parsed_data['setup_testcase']}")
-        log.info(f"请求 setup_sql: {parsed_data['setup_sql']}")
-        log.info(f"请求 setup_hooks: {parsed_data['setup_hooks']}")
-        log.info(f"请求 setup_wait_time: {parsed_data['setup_wait_time']}")
+        log.info(f"前置 setup_testcase: {parsed_data['setup_testcase']}")
+        log.info(f"前置 setup_sql: {parsed_data['setup_sql']}")
+        log.info(f"前置 setup_hooks: {parsed_data['setup_hooks']}")
+        log.info(f"前置 setup_wait_time: {parsed_data['setup_wait_time']}")
 
     @staticmethod
     def log_request_up(parsed_data: dict) -> None:
@@ -290,11 +290,11 @@ class SendRequests:
 
     @staticmethod
     def log_request_teardown(parsed_data: dict) -> None:
-        log.info(f"请求 teardown_sql: {parsed_data['teardown_sql']}")
-        log.info(f"请求 teardown_hooks: {parsed_data['teardown_hooks']}")
-        log.info(f"请求 teardown_extract: {parsed_data['teardown_extract']}")
-        log.info(f"请求 teardown_assert: {parsed_data['teardown_assert']}")
-        log.info(f"请求 teardown_wait_time: {parsed_data['teardown_wait_time']}")
+        log.info(f"后置 teardown_sql: {parsed_data['teardown_sql']}")
+        log.info(f"后置 teardown_hooks: {parsed_data['teardown_hooks']}")
+        log.info(f"后置 teardown_extract: {parsed_data['teardown_extract']}")
+        log.info(f"后置 teardown_assert: {parsed_data['teardown_assert']}")
+        log.info(f"后置 teardown_wait_time: {parsed_data['teardown_wait_time']}")
 
     @staticmethod
     def log_request_down(response_data: dict) -> None:

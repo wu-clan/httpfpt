@@ -16,6 +16,7 @@ from httpfpt.common.env_handler import get_env_dict
 from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
 from httpfpt.core.path_conf import RUN_ENV_PATH
+from httpfpt.db.mysql_db import mysql_client
 from httpfpt.enums.allure_severity_type import SeverityType
 from httpfpt.enums.request.auth import AuthType
 from httpfpt.enums.request.body import BodyType
@@ -503,16 +504,19 @@ class RequestDataParse:
                     for i in sql:
                         if isinstance(i, dict):
                             for k, v in i.items():
-                                if k != 'value':
-                                    if not isinstance(v, str):
-                                        raise RequestDataParseError(
-                                            _error_msg(f'参数 test_steps:setup:sql:{k} 不是有效的 str 类型')
-                                        )
+                                if not isinstance(v, str):
+                                    raise RequestDataParseError(
+                                        _error_msg(f'参数 test_steps:setup:sql:{k} 不是有效的 str 类型')
+                                    )
+                                if k == 'sql':
+                                    mysql_client.sql_verify(v)
                         else:
                             if not isinstance(i, str):
                                 raise RequestDataParseError(
                                     _error_msg(f'参数 test_steps:setup:sql:{i} 不是有效的 str 类型'),
                                 )
+                            else:
+                                mysql_client.sql_verify(i)
         except _RequestDataParamGetError:
             sql = None
         return sql
@@ -568,16 +572,19 @@ class RequestDataParse:
                     for i in sql:
                         if isinstance(i, dict):
                             for k, v in i.items():
-                                if k != 'value':
-                                    if not isinstance(v, str):
-                                        raise RequestDataParseError(
-                                            _error_msg(f'参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'),
-                                        )
+                                if not isinstance(v, str):
+                                    raise RequestDataParseError(
+                                        _error_msg(f'参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'),
+                                    )
+                                if k == 'sql':
+                                    mysql_client.sql_verify(v)
                         else:
                             if not isinstance(i, str):
                                 raise RequestDataParseError(
                                     _error_msg(f'参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'),
                                 )
+                            else:
+                                mysql_client.sql_verify(i)
         except _RequestDataParamGetError:
             sql = None
         return sql
