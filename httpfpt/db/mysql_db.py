@@ -139,20 +139,20 @@ class MysqlDB:
         :return:
         """
         if isinstance(sql, str):
-            log.info(f'执行 sql: {sql}')
+            log.info(f'执行 SQL: {sql}')
             return self.query(sql)
         if isinstance(sql, list):
             for s in sql:
                 # 获取返回数据
                 if isinstance(s, str):
-                    log.info(f'执行 sql: {s}')
+                    log.info(f'执行 SQL: {s}')
                     if s.startswith(SqlType.select):
-                        return self.query(s)
+                        self.query(s)
                     else:
-                        return self.execute(s)
+                        self.execute(s)
                 # 设置变量
                 if isinstance(s, dict):
-                    log.info(f'执行变量提取 sql: {s["sql"]}')
+                    log.info(f'执行变量提取 SQL: {s["sql"]}')
                     key = s['key']
                     set_type = s['type']
                     sql_text = s['sql']
@@ -166,14 +166,12 @@ class MysqlDB:
                     if set_type == VarType.CACHE:
                         variable_cache.set(key, value)
                     elif set_type == VarType.ENV:
-                        if env is None:
-                            raise ValueError('写入环境变量准备失败, 缺少参数 env, 请检查传参')
                         write_env_vars(RUN_ENV_PATH, env, key, value)
                     elif set_type == VarType.GLOBAL:
                         write_yaml_vars({key: value})
                     else:
                         raise VariableError(
-                            f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+                            f'前置 SQL 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
                         )
 
     @staticmethod
