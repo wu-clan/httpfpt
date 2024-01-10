@@ -28,26 +28,26 @@ test_steps:
       body:
       files:
     setup:
-      testcase:
-        - case_id: event_query_002
+      - testcase:
+          case_id: event_query_002
           key: rcode
           jsonpath: $.status_code
-        - event_query_002
-      hooks:
-      wait_time: 0
+      - testcase: event_query_002
+      - hooks:
+      - wait_time: 0
     teardown:
-      sql:
-      hooks:
-      extract:
-        - key: test_cache
+      - sql:
+      - hooks:
+      - extract:
+          key: test_cache
           type: cache
           jsonpath: $.status_code
-      assert:
-        - check:
+      - assert:
+          check:
           value: ^rcode
           type: str_eq
           jsonpath: $.status_code
-      wait_time: 0
+      - wait_time: 0
 
   - name: 断言
     case_id: event_query_002
@@ -63,19 +63,19 @@ test_steps:
       body:
       files:
     setup:
-      testcase:
-      wait_time: 0
+      - testcase:
+      - wait_time: 0
     teardown:
-      extract:
-        - key: test_env
+      - extract:
+          key: test_env
           type: env
           jsonpath: $.status_code
-        - key: test_global
+      - extract:
+          key: test_global
           type: global
           jsonpath: $.status_code
-      assert:
-        - assert 200 == pm.response.get('status_code')
-        - assert 'postId' not in str(pm.response.get('content')), '没有返回content'
+      - assert: assert 200 == pm.response.get('status_code')
+      - assert: assert 'postId' not in str(pm.response.get('content')), '没有返回content'
 
   - name: hooks
     case_id: event_create_001
@@ -93,12 +93,10 @@ test_steps:
         userId: 1
       files:
     setup:
-      hooks:
-        - ${current_time()}
+      - hooks: ${current_time()}
     teardown:
-      hooks:
-        - ${random_phone()}
-      assert: assert 200 == pm.response.get('status_code')
+      - hooks: ${random_phone()}
+      - assert: assert 200 == pm.response.get('status_code')
 
   - name: super_relate_testcase
     case_id: event_relate_001
@@ -113,5 +111,4 @@ test_steps:
       body:
       files:
     setup:
-      testcase:
-        - event_upload_004
+      - testcase: event_upload_004

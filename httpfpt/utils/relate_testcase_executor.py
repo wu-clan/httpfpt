@@ -13,6 +13,7 @@ from httpfpt.common.errors import CorrelateTestCaseError, JsonPathFindError
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.db.redis_db import redis_client
+from httpfpt.enums.setup_type import SetupType
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.request.vars_extractor import var_extractor
 
@@ -118,20 +119,24 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
     :param relate_case_steps:
     :return:
     """
+    relate_case_setup_testcases = []
     try:
-        relate_case_setup_testcase = relate_case_steps['setup']['testcase']
+        relate_case_setup = relate_case_steps['setup']
+        if relate_case_setup:
+            for key, value in relate_case_setup:
+                if key == SetupType.TESTCASE:
+                    if isinstance(value, str):
+                        relate_case_setup_testcases.append(value)
+                    if isinstance(value, dict):
+                        relate_case_setup_testcases.append(value['case_id'])
     except KeyError:
         pass
     else:
-        if relate_case_setup_testcase is not None:
-            for relate_testcase in relate_case_setup_testcase:
-                text = '关联测试用例执行失败，关联测试用例中存在引用当前测试用例为关联测试用例，导致循环引用'
-                if isinstance(relate_testcase, dict):
-                    if current_case_id == relate_testcase['case_id']:
-                        raise CorrelateTestCaseError(text)
-                else:
-                    if current_case_id == relate_testcase:
-                        raise CorrelateTestCaseError(text)
+        if relate_case_setup_testcases:
+            for relate_testcase in relate_case_setup_testcases:
+                text = '关联测试用例执行失败，关联测试用例中的前置关联测试用例包含当前测试用例，导致循环引用'
+                if current_case_id == relate_testcase:
+                    raise CorrelateTestCaseError(text)
 
 
 def relate_testcase_set_var(testcase_data: dict) -> None:
@@ -146,7 +151,7 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     msg = '🔗 执行关联测试用例变量提取：{}'.format(testcase_data['test_steps']['case_id'])
     log.debug(msg)
     allure_step(msg, '此文件为空')
-    response = send_request.send_request(testcase_data, log_data=False, relate_testcase=True)
+    response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
     value = findall(testcase_data['set_var_jsonpath'], response)
     if value:
         variable_cache.set(testcase_data['set_var_key'], value[0])
@@ -166,4 +171,4 @@ def relate_testcase_exec(testcase_data: dict) -> None:
     msg = '🔗 执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
     log.debug(msg)
     allure_step(msg, '此文件为空')
-    send_request.send_request(testcase_data, log_data=False, relate_testcase=True)
+    send_request.send_request(testcase_data, log_data=False, relate_log=True)

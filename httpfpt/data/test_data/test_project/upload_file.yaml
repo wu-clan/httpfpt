@@ -24,8 +24,8 @@ test_steps:
       files:
         file: D:\0000000000_test\666.txt
     teardown:
-      assert:
-        - check: 检查接口链接
+      - assert:
+          check: 检查接口链接
           value: https://api.anonfiles.com/upload
           type: str_eq
           jsonpath: $.url

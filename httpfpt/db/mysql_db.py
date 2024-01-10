@@ -19,7 +19,7 @@ from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import write_yaml_vars
 from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import RUN_ENV_PATH
-from httpfpt.enums.query_fetch import QueryFetchType
+from httpfpt.enums.query_fetch_type import QueryFetchType
 from httpfpt.enums.sql_type import SqlType
 from httpfpt.enums.var_type import VarType
 from httpfpt.utils.enum_control import get_enum_values

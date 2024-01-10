@@ -32,6 +32,7 @@ class HooksExecutor:
                 str_target = str_target.replace(hook_key, '')
         return hook_list
 
+    # TODO: 重构
     def hook_func_value_replace(self, target: dict) -> Any:
         """
         执行除前后置 hooks 以外的所有 hook 函数并替换为它的返回值

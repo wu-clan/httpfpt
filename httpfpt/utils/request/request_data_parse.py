@@ -22,6 +22,8 @@ from httpfpt.enums.request.auth import AuthType
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.request.method import MethodType
+from httpfpt.enums.setup_type import SetupType
+from httpfpt.enums.teardown_type import TeardownType
 from httpfpt.utils.auth_plugins import AuthPlugins
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.request.hooks_executor import hooks_executor
@@ -465,89 +467,95 @@ class RequestDataParse:
             return False
         else:
             if setup is not None:
+                if not isinstance(setup, list):
+                    raise RequestDataParseError(_error_msg('参数 test_steps:setup 不是有效的 list 类型'))
                 return True
             else:
                 return False
 
     @property
-    def setup_testcase(self) -> list | None:
+    def setup(self) -> list | None:
         try:
-            testcase = self.request_data['test_steps']['setup']['testcase']
-            if testcase is not None:
-                if not isinstance(testcase, list):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:setup:testcase 不是有效的 list 类型'))
-                else:
-                    for i in testcase:
-                        if isinstance(i, dict):
-                            for k, v in i.items():
-                                if not isinstance(v, str):
-                                    raise RequestDataParseError(
-                                        _error_msg(f'参数 test_steps:setup:testcase:{k} 不是有效的 str 类型')
-                                    )
-                        else:
-                            if not isinstance(i, str):
-                                raise RequestDataParseError(
-                                    _error_msg(f'参数 test_steps:setup:testcase:{i} 不是有效的 str 类型')
-                                )
+            setup = self.request_data['test_steps']['setup']
         except _RequestDataParamGetError:
-            testcase = None
+            return None
+        else:
+            if setup is not None:
+                for v in setup:
+                    for key, value in v.items():
+                        if key == SetupType.TESTCASE:
+                            self._setup_testcase(value)
+                        elif key == SetupType.SQL:
+                            self._setup_sql(value)
+                        elif key == SetupType.HOOK:
+                            self._setup_hook(value)
+                        elif key == SetupType.WAIT_TIME:
+                            self._setup_wait_time(value)
+            return setup
+
+    @staticmethod
+    def _setup_testcase(testcase: str | dict | None) -> str | dict | None:
+        if testcase is not None:
+            if not isinstance(testcase, list):
+                raise RequestDataParseError(_error_msg('参数 test_steps:setup:testcase 不是有效的 list 类型'))
+            else:
+                for i in testcase:
+                    if isinstance(i, dict):
+                        for k, v in i.items():
+                            if not isinstance(v, str):
+                                raise RequestDataParseError(
+                                    _error_msg(f'参数 test_steps:setup:testcase:{k} 不是有效的 str 类型')
+                                )
+                    else:
+                        if not isinstance(i, str):
+                            raise RequestDataParseError(
+                                _error_msg(f'参数 test_steps:setup:testcase:{i} 不是有效的 str 类型')
+                            )
         return testcase
 
-    @property
-    def setup_sql(self) -> list | None:
-        try:
-            sql = self.request_data['test_steps']['setup']['sql']
-            if sql is not None:
-                if not isinstance(sql, list):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:setup:sql 不是有效的 list 类型'))
-                else:
-                    for i in sql:
-                        if isinstance(i, dict):
-                            for k, v in i.items():
-                                if not isinstance(v, str):
-                                    raise RequestDataParseError(
-                                        _error_msg(f'参数 test_steps:setup:sql:{k} 不是有效的 str 类型')
-                                    )
-                                if k == 'sql':
-                                    mysql_client.sql_verify(v)
-                        else:
-                            if not isinstance(i, str):
+    @staticmethod
+    def _setup_sql(sql: str | dict | None) -> str | dict | None:
+        if sql is not None:
+            if not isinstance(sql, list):
+                raise RequestDataParseError(_error_msg('参数 test_steps:setup:sql 不是有效的 list 类型'))
+            else:
+                for i in sql:
+                    if isinstance(i, dict):
+                        for k, v in i.items():
+                            if not isinstance(v, str):
                                 raise RequestDataParseError(
-                                    _error_msg(f'参数 test_steps:setup:sql:{i} 不是有效的 str 类型'),
+                                    _error_msg(f'参数 test_steps:setup:sql:{k} 不是有效的 str 类型')
                                 )
-                            else:
-                                mysql_client.sql_verify(i)
-        except _RequestDataParamGetError:
-            sql = None
+                            if k == 'sql':
+                                mysql_client.sql_verify(v)
+                    else:
+                        if not isinstance(i, str):
+                            raise RequestDataParseError(
+                                _error_msg(f'参数 test_steps:setup:sql:{i} 不是有效的 str 类型'),
+                            )
+                        else:
+                            mysql_client.sql_verify(i)
         return sql
 
-    @property
-    def setup_hooks(self) -> list | None:
-        try:
-            hook = self.request_data['test_steps']['setup']['hooks']
-            if hook is not None:
-                if not isinstance(hook, list):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:setup:hook 不是有效的 list 类型'))
-                else:
-                    for v in hook:
-                        if not isinstance(v, str):
-                            raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:setup:hooks:{v} 不是有效的 str 类型'),
-                            )
-        except _RequestDataParamGetError:
-            hook = None
+    @staticmethod
+    def _setup_hook(hook: str | None) -> str | None:
+        if hook is not None:
+            if not isinstance(hook, list):
+                raise RequestDataParseError(_error_msg('参数 test_steps:setup:hook 不是有效的 list 类型'))
+            else:
+                for v in hook:
+                    if not isinstance(v, str):
+                        raise RequestDataParseError(
+                            _error_msg(f'参数 test_steps:setup:hooks:{v} 不是有效的 str 类型'),
+                        )
         return hook
 
-    @property
-    def setup_wait_time(self) -> int | None:
-        try:
-            time = self.request_data['test_steps']['setup']['wait_time']
-            if time is not None:
-                if not isinstance(time, int):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:setup:wait_time 不是有效的 int 类型'))
-        except _RequestDataParamGetError:
-            time = None
-        return time
+    @staticmethod
+    def _setup_wait_time(wait_time: int | None) -> int | None:
+        if wait_time is not None:
+            if not isinstance(wait_time, int):
+                raise RequestDataParseError(_error_msg('参数 test_steps:setup:wait_time 不是有效的 int 类型'))
+        return wait_time
 
     @property
     def is_teardown(self) -> bool:
@@ -557,97 +565,101 @@ class RequestDataParse:
             return False
         else:
             if teardown is not None:
+                if not isinstance(teardown, list):
+                    raise RequestDataParseError(_error_msg('参数 test_steps:teardown 不是有效的 list 类型'))
                 return True
             else:
                 return False
 
     @property
-    def teardown_sql(self) -> list | None:
+    def teardown(self) -> list | None:
         try:
-            sql = self.request_data['test_steps']['teardown']['sql']
-            if sql is not None:
-                if not isinstance(sql, list):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:teardown:sql 不是有效的 list 类型'))
-                else:
-                    for i in sql:
-                        if isinstance(i, dict):
-                            for k, v in i.items():
-                                if not isinstance(v, str):
-                                    raise RequestDataParseError(
-                                        _error_msg(f'参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'),
-                                    )
-                                if k == 'sql':
-                                    mysql_client.sql_verify(v)
-                        else:
-                            if not isinstance(i, str):
-                                raise RequestDataParseError(
-                                    _error_msg(f'参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'),
-                                )
-                            else:
-                                mysql_client.sql_verify(i)
+            teardown = self.request_data['test_steps']['teardown']
         except _RequestDataParamGetError:
-            sql = None
+            return None
+        else:
+            if teardown is not None:
+                for v in teardown:
+                    for key, value in v.items():
+                        if key == TeardownType.SQL:
+                            self._teardown_sql(value)
+                        if key == TeardownType.HOOK:
+                            self._teardown_hook(value)
+                        if key == TeardownType.EXTRACT:
+                            self._teardown_extract(value)
+                        if key == TeardownType.ASSERT:
+                            self._teardown_assert(value)
+                        elif key == TeardownType.WAIT_TIME:
+                            self._teardown_wait_time(value)
+            return teardown
+
+    @staticmethod
+    def _teardown_sql(sql: str | dict | None) -> str | dict | None:
+        if sql is not None:
+            if not isinstance(sql, list):
+                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:sql 不是有效的 list 类型'))
+            else:
+                for i in sql:
+                    if isinstance(i, dict):
+                        for k, v in i.items():
+                            if not isinstance(v, str):
+                                raise RequestDataParseError(
+                                    _error_msg(f'参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'),
+                                )
+                            if k == 'sql':
+                                mysql_client.sql_verify(v)
+                    else:
+                        if not isinstance(i, str):
+                            raise RequestDataParseError(
+                                _error_msg(f'参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'),
+                            )
+                        else:
+                            mysql_client.sql_verify(i)
         return sql
 
-    @property
-    def teardown_hooks(self) -> list | None:
-        try:
-            hook = self.request_data['test_steps']['teardown']['hooks']
-            if hook is not None:
-                if not isinstance(hook, list):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:teardown:hook 不是有效的 list 类型'))
-                else:
-                    for v in hook:
-                        if not isinstance(v, str):
-                            raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型'),
-                            )
-        except _RequestDataParamGetError:
-            hook = None
+    @staticmethod
+    def _teardown_hook(hook: str | None) -> str | None:
+        if hook is not None:
+            if not isinstance(hook, list):
+                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:hook 不是有效的 list 类型'))
+            else:
+                for v in hook:
+                    if not isinstance(v, str):
+                        raise RequestDataParseError(
+                            _error_msg(f'参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型'),
+                        )
         return hook
 
-    @property
-    def teardown_extract(self) -> list | None:
-        try:
-            extract = self.request_data['test_steps']['teardown']['extract']
-            if extract is not None:
-                if not isinstance(extract, list):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract 不是有效的 list 类型'))
-                else:
-                    for i in extract:
-                        if isinstance(i, dict):
-                            for k, v in i.items():
-                                if not isinstance(v, str):
-                                    raise RequestDataParseError(
-                                        _error_msg(f'参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
-                                    )
-                        else:
-                            raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract:{i} 不是合法数据'))
-        except _RequestDataParamGetError:
-            extract = None
+    @staticmethod
+    def _teardown_extract(extract: dict | None) -> dict | None:
+        if extract is not None:
+            if not isinstance(extract, list):
+                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract 不是有效的 list 类型'))
+            else:
+                for i in extract:
+                    if isinstance(i, dict):
+                        for k, v in i.items():
+                            if not isinstance(v, str):
+                                raise RequestDataParseError(
+                                    _error_msg(f'参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
+                                )
+                    else:
+                        raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract:{i} 不是合法数据'))
         return extract
 
-    @property
-    def teardown_assert(self) -> str | list | dict | None:
-        try:
-            assert_text = self.request_data['test_steps']['teardown']['assert']
-        except _RequestDataParamGetError:
-            assert_text = None
+    @staticmethod
+    def _teardown_assert(assert_text: str | dict | None) -> str | dict | None:
         if assert_text is not None:
             if not any([isinstance(assert_text, str), isinstance(assert_text, list)]):
                 raise RequestDataParseError(_error_msg('参数 test_steps:teardown:assert 不是有效的 str / list 类型'))
         return assert_text
 
-    @property
-    def teardown_wait_time(self) -> int | None:
-        try:
-            time = self.request_data['test_steps']['teardown']['wait_time']
-            if time is not None:
-                if not isinstance(time, int):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:teardown:wait_time 不是有效的 int 类型'))
-        except _RequestDataParamGetError:
-            time = None
-        return time
+    @staticmethod
+    def _teardown_wait_time(wait_time: int | None) -> int | None:
+        if wait_time is not None:
+            if not isinstance(wait_time, int):
+                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:wait_time 不是有效的 int 类型'))
+        return wait_time
 
     @property
     def get_request_data_parsed(self) -> dict:
@@ -709,15 +721,8 @@ class RequestDataParse:
             'files': files,
             'files_no_parse': self.files_no_parse,
             'is_setup': self.is_setup,
-            'setup_testcase': self.setup_testcase,
-            'setup_sql': self.setup_sql,
-            'setup_hooks': self.setup_hooks,
-            'setup_wait_time': self.setup_wait_time,
+            'setup': self.setup,
             'is_teardown': self.is_teardown,
-            'teardown_sql': self.teardown_sql,
-            'teardown_hooks': self.teardown_hooks,
-            'teardown_extract': self.teardown_extract,
-            'teardown_assert': self.teardown_assert,
-            'teardown_wait_time': self.teardown_wait_time,
+            'teardown': self.teardown,
         }
         return all_data
