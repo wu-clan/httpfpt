@@ -11,7 +11,6 @@ import pymysql
 
 from dbutils.pooled_db import PooledDB
 from jsonpath import findall
-from typing_extensions import Iterable
 
 from httpfpt.common.env_handler import write_env_vars
 from httpfpt.common.errors import JsonPathFindError, SQLSyntaxError, VariableError
@@ -99,7 +98,7 @@ class MysqlDB:
 
                 if isinstance(query_data, dict):
                     format_row(query_data)
-                if isinstance(query_data, Iterable):
+                if isinstance(query_data, list):
                     if query_data:
                         for i in query_data:
                             format_row(i)
