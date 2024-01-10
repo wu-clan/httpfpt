@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime
 import decimal
 
-from typing import Any, Optional
+from typing import Any
 
 import pymysql
 
@@ -79,22 +79,31 @@ class MysqlDB:
             else:
                 raise SQLSyntaxError(f'查询条件 {fetch} 错误, 请使用 one / all')
         except Exception as e:
-            log.error(f'执行 {sql} 失败: {e}')
+            log.error(f'执行 SQL 失败: {e}')
             raise e
         else:
-            log.info(f'执行 {sql} 成功')
+            log.info(f'执行 SQL 成功: {query_data}')
             try:
-                for k, v in query_data.items():
-                    if isinstance(v, decimal.Decimal):
-                        if v % 1 == 0:
-                            data[k] = int(v)
-                        data[k] = float(v)
-                    elif isinstance(v, datetime.datetime):
-                        data[k] = str(v)
-                    else:
-                        data[k] = v
+
+                def format_row(row: dict) -> None:
+                    for k, v in row.items():
+                        if isinstance(v, decimal.Decimal):
+                            if v % 1 == 0:
+                                data[k] = int(v)
+                            data[k] = float(v)
+                        elif isinstance(v, datetime.datetime):
+                            data[k] = str(v)
+                        else:
+                            data[k] = v
+
+                if isinstance(query_data, dict):
+                    format_row(query_data)
+                if isinstance(query_data, list):
+                    if query_data:
+                        for i in query_data:
+                            format_row(i)
             except Exception as e:
-                log.error(f'序列化 {sql} 查询结果失败: {e}')
+                log.error(f'序列化 SQL 查询结果失败: {e}')
                 raise e
             return data
         finally:
@@ -112,15 +121,15 @@ class MysqlDB:
             conn.commit()
         except Exception as e:
             conn.rollback()
-            log.error(f'执行 {sql} 失败: {e}')
+            log.error(f'执行 SQL 失败: {e}')
             raise e
         else:
-            log.info(f'执行 {sql} 成功')
+            log.info('执行 SQL 成功')
             return rowcount
         finally:
             self.close(conn, cursor)
 
-    def exec_case_sql(self, sql: str | list, env: Optional[str] = None) -> dict | int | None:
+    def exec_case_sql(self, sql: str | list, env: str | None = None) -> dict | int | None:
         """
         执行用例 sql
 
@@ -128,24 +137,21 @@ class MysqlDB:
         :param env:
         :return:
         """
-        sql_type = get_enum_values(SqlType)
-        if any(_.upper() in sql for _ in sql_type):
-            raise SQLSyntaxError(f'{sql} 中存在不允许的命令类型, 仅支持 {sql_type} 类型 sql 语句')
-        else:
-            if isinstance(sql, str):
-                log.info(f'执行 sql: {sql}')
-                return self.query(sql)
+        if isinstance(sql, str):
+            log.info(f'执行 SQL: {sql}')
+            return self.query(sql)
+        if isinstance(sql, list):
             for s in sql:
                 # 获取返回数据
                 if isinstance(s, str):
-                    log.info(f'执行 sql: {s}')
-                    if SqlType.select in s:
-                        return self.query(s)
+                    log.info(f'执行 SQL: {s}')
+                    if s.startswith(SqlType.select):
+                        self.query(s)
                     else:
-                        return self.execute(s)
+                        self.execute(s)
                 # 设置变量
                 if isinstance(s, dict):
-                    log.info(f'执行变量提取 sql: {s["sql"]}')
+                    log.info(f'执行变量提取 SQL: {s["sql"]}')
                     key = s['key']
                     set_type = s['type']
                     sql_text = s['sql']
@@ -159,15 +165,19 @@ class MysqlDB:
                     if set_type == VarType.CACHE:
                         variable_cache.set(key, value)
                     elif set_type == VarType.ENV:
-                        if env is None:
-                            raise ValueError('写入环境变量准备失败, 缺少参数 env, 请检查传参')
-                        write_env_vars(RUN_ENV_PATH, env, key, value)
+                        write_env_vars(RUN_ENV_PATH, env, key, value)  # type: ignore
                     elif set_type == VarType.GLOBAL:
                         write_yaml_vars({key: value})
                     else:
                         raise VariableError(
-                            f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+                            f'前置 SQL 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
                         )
+
+    @staticmethod
+    def sql_verify(sql: str) -> None:
+        sql_types = get_enum_values(SqlType)
+        if not any(sql.startswith(_) for _ in sql_types):
+            raise SQLSyntaxError(f'SQL 中存在非法命令类型, 仅支持: {sql_types}')
 
 
 mysql_client = MysqlDB()
