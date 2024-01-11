@@ -24,13 +24,12 @@ class HookExecutor:
 
         :return:
         """
-        hook = None
         while re.findall(self.func_re, target):
             key = re.search(self.func_re, target)
             hook = key.group(1)
             if hook is not None:
                 target.replace(hook, '')
-        return hook
+        return target
 
     def hook_func_value_replace(self, target: dict) -> Any:
         """
