@@ -24,11 +24,13 @@ class HookExecutor:
 
         :return:
         """
+        hook = None
         while re.findall(self.func_re, target):
             key = re.search(self.func_re, target)
-            hook_key = key.group(1)
-            target.replace(hook_key, '')
-        return target
+            hook = key.group(1)
+            if hook is not None:
+                target.replace(hook, '')
+        return hook
 
     def hook_func_value_replace(self, target: dict) -> Any:
         """
@@ -89,14 +91,14 @@ class HookExecutor:
 
         return dict_target
 
-    def exec_hook_func(self, hook_func: str) -> None:
+    def exec_hook_func(self, hook_var: str) -> None:
         """
         执行 hook 函数不返回任何值
 
-        :param hook_func:
+        :param hook_var:
         :return:
         """
-        func = self.hook_func_extract(hook_func)
+        func = self.hook_func_extract(hook_var)
         exec('from httpfpt.data.hooks import *')
         log.info(f'执行 hook：{func}')
         exec(func)
