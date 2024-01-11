@@ -55,9 +55,9 @@ class SetupSqlData(BaseModel):
 
 
 class StepsSetUpData(BaseModel):
-    testcase: List[str | SetupTestCaseData] | None = None
-    sql: List[str | SetupSqlData] | None = None
-    hooks: List[str] | None = None
+    testcase: str | SetupTestCaseData | None = None
+    sql: str | SetupSqlData | None = None
+    hook: str | None = None
     wait_time: int | None = None
 
 
@@ -93,10 +93,10 @@ class TeardownAssertData(BaseModel):
 
 
 class StepsTearDownData(BaseModel):
-    sql: List[str | SetupSqlData] | None = None
-    hooks: List[str] | None = None
-    extract: List[TeardownExtractData] | None = None
-    assert_: str | List[str | TeardownAssertData] | None = Field(None, alias='assert')
+    sql: str | SetupSqlData | None = None
+    hook: str | None = None
+    extract: TeardownExtractData | None = None
+    assert_: str | TeardownAssertData | None = Field(None, alias='assert')
     wait_time: int | None = None
 
 
@@ -106,8 +106,8 @@ class Steps(BaseModel):
     description: str
     is_run: bool | dict | None = None
     request: StepsRequestData
-    setup: StepsSetUpData | None = None
-    teardown: StepsTearDownData | None = None
+    setup: List[StepsSetUpData] | None = None
+    teardown: List[StepsTearDownData] | None = None
 
 
 class CaseData(BaseModel):

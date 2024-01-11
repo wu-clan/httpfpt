@@ -62,9 +62,13 @@ class VarsExtractor:
                         str_target = re.sub(self.vars_re, env_value, str_target, 1)
                         log.info(f'请求数据变量 {var_key} 替换完成')
                     except KeyError:
-                        global_value = str(global_vars[f'{var_key}'])
-                        str_target = re.sub(self.vars_re, global_value, str_target, 1)
-                        log.info(f'请求数据变量 {var_key} 替换完成')
+                        try:
+                            global_value = str(global_vars[f'{var_key}'])
+                            str_target = re.sub(self.vars_re, global_value, str_target, 1)
+                            log.info(f'请求数据变量 {var_key} 替换完成')
+                        except KeyError as e:
+                            log.error(f'请求数据变量 {var_key} 替换失败，此变量不存在')
+                            raise e
                     except Exception as e:
                         log.error(f'请求数据变量 {var_key} 替换失败: {e}')
                         raise VariableError(f'请求数据变量 {var_key} 替换失败: {e}')
@@ -110,7 +114,7 @@ class VarsExtractor:
         return dict_target
 
     @staticmethod
-    def teardown_var_extract(response: dict, extract: list, env: str) -> None:
+    def teardown_var_extract(response: dict, extract: dict, env: str) -> None:
         """
         后置参数提取
 
@@ -119,26 +123,25 @@ class VarsExtractor:
         :param env:
         :return:
         """
-        for et in extract:
-            log.info(f'执行变量提取：{et["key"]}')
-            key = et['key']
-            set_type = et['type']
-            json_path = et['jsonpath']
-            value = findall(json_path, response)
-            if value:
-                value = str(value[0])
-            else:
-                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
-            if set_type == VarType.CACHE:
-                variable_cache.set(key, value)
-            elif set_type == VarType.ENV:
-                write_env_vars(RUN_ENV_PATH, env, key, value)
-            elif set_type == VarType.GLOBAL:
-                write_yaml_vars({key: value})
-            else:
-                raise VariableError(
-                    f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
-                )
+        log.info(f'执行变量提取：{extract["key"]}')
+        key = extract['key']
+        set_type = extract['type']
+        json_path = extract['jsonpath']
+        value = findall(json_path, response)
+        if value:
+            value = str(value[0])
+        else:
+            raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
+        if set_type == VarType.CACHE:
+            variable_cache.set(key, value)
+        elif set_type == VarType.ENV:
+            write_env_vars(RUN_ENV_PATH, env, key, value)
+        elif set_type == VarType.GLOBAL:
+            write_yaml_vars({key: value})
+        else:
+            raise VariableError(
+                f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+            )
 
 
 var_extractor = VarsExtractor()

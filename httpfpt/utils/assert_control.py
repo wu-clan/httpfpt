@@ -361,20 +361,14 @@ class Asserter:
         :return:
         """
         if not assert_text:
-            ...
-        elif isinstance(assert_text, str):
+            return
+        if isinstance(assert_text, str):
             self._code_asserter(response, assert_text)
-        elif isinstance(assert_text, list):
-            for text in assert_text:
-                if isinstance(text, str):
-                    self._code_asserter(response, text)
-                elif isinstance(text, dict):
-                    if text.get('sql') is None:
-                        self._json_asserter(response, text)
-                    else:
-                        self._sql_asserter(text)
-                else:
-                    raise AssertSyntaxError(f'断言表达式格式错误: {text}')
+        elif isinstance(assert_text, dict):
+            if assert_text.get('sql') is None:
+                self._json_asserter(response, assert_text)
+            else:
+                self._sql_asserter(assert_text)
         else:
             raise AssertSyntaxError(f'断言表达式格式错误: {assert_text}')
 
