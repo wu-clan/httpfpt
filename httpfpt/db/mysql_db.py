@@ -129,7 +129,7 @@ class MysqlDB:
         finally:
             self.close(conn, cursor)
 
-    def exec_case_sql(self, sql: str | list, env: str | None = None) -> dict | int | None:
+    def exec_case_sql(self, sql: str, env: str | None = None) -> dict | int | None:
         """
         执行用例 sql
 
@@ -137,41 +137,36 @@ class MysqlDB:
         :param env:
         :return:
         """
+        # 获取返回数据
         if isinstance(sql, str):
             log.info(f'执行 SQL: {sql}')
-            return self.query(sql)
-        if isinstance(sql, list):
-            for s in sql:
-                # 获取返回数据
-                if isinstance(s, str):
-                    log.info(f'执行 SQL: {s}')
-                    if s.startswith(SqlType.select):
-                        self.query(s)
-                    else:
-                        self.execute(s)
-                # 设置变量
-                if isinstance(s, dict):
-                    log.info(f'执行变量提取 SQL: {s["sql"]}')
-                    key = s['key']
-                    set_type = s['type']
-                    sql_text = s['sql']
-                    json_path = s['jsonpath']
-                    query_data = self.query(sql_text)
-                    value = findall(json_path, query_data)
-                    if value:
-                        value = str(value[0])
-                    else:
-                        raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
-                    if set_type == VarType.CACHE:
-                        variable_cache.set(key, value)
-                    elif set_type == VarType.ENV:
-                        write_env_vars(RUN_ENV_PATH, env, key, value)  # type: ignore
-                    elif set_type == VarType.GLOBAL:
-                        write_yaml_vars({key: value})
-                    else:
-                        raise VariableError(
-                            f'前置 SQL 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
-                        )
+            if sql.startswith(SqlType.select):
+                return self.query(sql)
+            else:
+                return self.execute(sql)
+        # 设置变量
+        if isinstance(sql, dict):
+            log.info(f'执行变量提取 SQL: {sql["sql"]}')
+            key = sql['key']
+            set_type = sql['type']
+            sql_text = sql['sql']
+            json_path = sql['jsonpath']
+            query_data = self.query(sql_text)
+            value = findall(json_path, query_data)
+            if value:
+                value = str(value[0])
+            else:
+                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
+            if set_type == VarType.CACHE:
+                variable_cache.set(key, value)
+            elif set_type == VarType.ENV:
+                write_env_vars(RUN_ENV_PATH, env, key, value)  # type: ignore
+            elif set_type == VarType.GLOBAL:
+                write_yaml_vars({key: value})
+            else:
+                raise VariableError(
+                    f'前置 SQL 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+                )
 
     @staticmethod
     def sql_verify(sql: str) -> None:

@@ -26,7 +26,7 @@ from httpfpt.enums.setup_type import SetupType
 from httpfpt.enums.teardown_type import TeardownType
 from httpfpt.utils.auth_plugins import AuthPlugins
 from httpfpt.utils.enum_control import get_enum_values
-from httpfpt.utils.request.hooks_executor import hooks_executor
+from httpfpt.utils.request.hook_executor import hook_executor
 from httpfpt.utils.request.vars_extractor import var_extractor
 
 _RequestDataParamGetError = (KeyError, TypeError)
@@ -39,7 +39,7 @@ def _error_msg(info: str) -> str:
 
 class RequestDataParse:
     def __init__(self, request_data: dict, request_engin: str):
-        self.request_data = var_extractor.vars_replace(hooks_executor.hook_func_value_replace(request_data))
+        self.request_data = var_extractor.vars_replace(hook_executor.hook_func_value_replace(request_data))
         self.request_engin = request_engin
         self._is_run()  # put bottom
 
@@ -278,7 +278,7 @@ class RequestDataParse:
                                     raise RequestDataParseError(
                                         _error_msg(f'参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值')
                                     )
-                                if hooks_executor.exec_any_code(v):
+                                if hook_executor.exec_any_code(v):
                                     log.info(f'🏷️ ID: {self.case_id}')
                                     allure.dynamic.title(self.name)
                                     allure.dynamic.description(self.description)
@@ -481,71 +481,68 @@ class RequestDataParse:
             return None
         else:
             if setup is not None:
-                for v in setup:
-                    for key, value in v.items():
+                for i, item in enumerate(setup):
+                    for key, value in item.items():
                         if key == SetupType.TESTCASE:
-                            self._setup_testcase(value)
+                            self._setup_testcase(i, value)
                         elif key == SetupType.SQL:
-                            self._setup_sql(value)
+                            self._setup_sql(i, value)
                         elif key == SetupType.HOOK:
-                            self._setup_hook(value)
+                            self._setup_hook(i, value)
                         elif key == SetupType.WAIT_TIME:
-                            self._setup_wait_time(value)
+                            self._setup_wait_time(i, value)
             return setup
 
     @staticmethod
-    def _setup_testcase(testcase: str | dict | None) -> str | dict | None:
+    def _setup_testcase(index: int, testcase: str | dict | None) -> str | dict | None:
         if testcase is not None:
-            for i in testcase:
-                if isinstance(i, dict):
-                    for k, v in i.items():
-                        if not isinstance(v, str):
-                            raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:setup:testcase:{k} 不是有效的 str 类型')
-                            )
-                else:
-                    if not isinstance(i, str):
+            if isinstance(testcase, dict):
+                for k, v in testcase.items():
+                    if not isinstance(v, str):
                         raise RequestDataParseError(
-                            _error_msg(f'参数 test_steps:setup:testcase:{i} 不是有效的 str 类型')
+                            _error_msg(f'参数 test_steps:setup:testcase[{index}] 不是有效的 str 类型')
                         )
+            else:
+                if not isinstance(testcase, str):
+                    raise RequestDataParseError(
+                        _error_msg(f'参数 test_steps:setup:testcase[{index}] 不是有效的 str 类型')
+                    )
         return testcase
 
     @staticmethod
-    def _setup_sql(sql: str | dict | None) -> str | dict | None:
+    def _setup_sql(index: int, sql: str | dict | None) -> str | dict | None:
         if sql is not None:
-            for i in sql:
-                if isinstance(i, dict):
-                    for k, v in i.items():
-                        if not isinstance(v, str):
-                            raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:setup:sql:{k} 不是有效的 str 类型')
-                            )
-                        if k == 'sql':
-                            mysql_client.sql_verify(v)
-                else:
-                    if not isinstance(i, str):
+            if isinstance(sql, dict):
+                for k, v in sql.items():
+                    if not isinstance(v, str):
                         raise RequestDataParseError(
-                            _error_msg(f'参数 test_steps:setup:sql:{i} 不是有效的 str 类型'),
+                            _error_msg(f'参数 test_steps:setup:sql[{index}] 不是有效的 str 类型')
                         )
-                    else:
-                        mysql_client.sql_verify(i)
+                    if k == 'sql':
+                        mysql_client.sql_verify(v)
+            else:
+                if not isinstance(sql, str):
+                    raise RequestDataParseError(
+                        _error_msg(f'参数 test_steps:setup:sql[{index}] 不是有效的 str 类型'),
+                    )
+                else:
+                    mysql_client.sql_verify(sql)
         return sql
 
     @staticmethod
-    def _setup_hook(hook: str | None) -> str | None:
+    def _setup_hook(index: int, hook: str | None) -> str | None:
         if hook is not None:
-            for v in hook:
-                if not isinstance(v, str):
-                    raise RequestDataParseError(
-                        _error_msg(f'参数 test_steps:setup:hooks:{v} 不是有效的 str 类型'),
-                    )
+            if not isinstance(hook, str):
+                raise RequestDataParseError(
+                    _error_msg(f'参数 test_steps:setup:hook[{index}] 不是有效的 str 类型'),
+                )
         return hook
 
     @staticmethod
-    def _setup_wait_time(wait_time: int | None) -> int | None:
+    def _setup_wait_time(index: int, wait_time: int | None) -> int | None:
         if wait_time is not None:
             if not isinstance(wait_time, int):
-                raise RequestDataParseError(_error_msg('参数 test_steps:setup:wait_time 不是有效的 int 类型'))
+                raise RequestDataParseError(_error_msg(f'参数 test_steps:setup:wait_time[{index}] 不是有效的 int 类型'))
         return wait_time
 
     @property
@@ -570,77 +567,78 @@ class RequestDataParse:
             return None
         else:
             if teardown is not None:
-                for v in teardown:
-                    for key, value in v.items():
+                for i, item in enumerate(teardown):
+                    for key, value in item.items():
                         if key == TeardownType.SQL:
-                            self._teardown_sql(value)
+                            self._teardown_sql(i, value)
                         if key == TeardownType.HOOK:
-                            self._teardown_hook(value)
+                            self._teardown_hook(i, value)
                         if key == TeardownType.EXTRACT:
-                            self._teardown_extract(value)
+                            self._teardown_extract(i, value)
                         if key == TeardownType.ASSERT:
-                            self._teardown_assert(value)
+                            self._teardown_assert(i, value)
                         elif key == TeardownType.WAIT_TIME:
-                            self._teardown_wait_time(value)
+                            self._teardown_wait_time(i, value)
             return teardown
 
     @staticmethod
-    def _teardown_sql(sql: str | dict | None) -> str | dict | None:
+    def _teardown_sql(index: int, sql: str | dict | None) -> str | dict | None:
         if sql is not None:
-            for i in sql:
-                if isinstance(i, dict):
-                    for k, v in i.items():
-                        if not isinstance(v, str):
-                            raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'),
-                            )
-                        if k == 'sql':
-                            mysql_client.sql_verify(v)
-                else:
-                    if not isinstance(i, str):
+            if isinstance(sql, dict):
+                for k, v in sql.items():
+                    if not isinstance(v, str):
                         raise RequestDataParseError(
-                            _error_msg(f'参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'),
+                            _error_msg(f'参数 test_steps:teardown:sql[{index}]:{k} 不是有效的 str 类型'),
                         )
-                    else:
-                        mysql_client.sql_verify(i)
+                    if k == 'sql':
+                        mysql_client.sql_verify(v)
+            else:
+                if not isinstance(sql, str):
+                    raise RequestDataParseError(
+                        _error_msg(f'参数 test_steps:teardown:sql[{index}] 不是有效的 str 类型'),
+                    )
+                else:
+                    mysql_client.sql_verify(sql)
         return sql
 
     @staticmethod
-    def _teardown_hook(hook: str | None) -> str | None:
+    def _teardown_hook(index: int, hook: str | None) -> str | None:
         if hook is not None:
-            for v in hook:
-                if not isinstance(v, str):
-                    raise RequestDataParseError(
-                        _error_msg(f'参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型'),
-                    )
+            if not isinstance(hook, str):
+                raise RequestDataParseError(
+                    _error_msg(f'参数 test_steps:teardown:hook[{index}] 不是有效的 str 类型'),
+                )
         return hook
 
     @staticmethod
-    def _teardown_extract(extract: dict | None) -> dict | None:
+    def _teardown_extract(index: int, extract: dict | None) -> dict | None:
         if extract is not None:
-            for i in extract:
-                if isinstance(i, dict):
-                    for k, v in i.items():
-                        if not isinstance(v, str):
-                            raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
-                            )
-                else:
-                    raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract:{i} 不是合法数据'))
+            if isinstance(extract, dict):
+                for k, v in extract.items():
+                    if not isinstance(v, str):
+                        raise RequestDataParseError(
+                            _error_msg(f'参数 test_steps:teardown:extract[{index}]:{k} 不是有效的 str 类型')
+                        )
+            else:
+                raise RequestDataParseError(_error_msg(f'参数 test_steps:teardown:extract[{index}] 不是合法数据'))
         return extract
 
     @staticmethod
-    def _teardown_assert(assert_text: str | dict | None) -> str | dict | None:
+    def _teardown_assert(index: int, assert_text: str | dict | None) -> str | dict | None:
         if assert_text is not None:
             if not any([isinstance(assert_text, str), isinstance(assert_text, dict)]):
-                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:assert 不是有效的 str / dict 类型'))
+                raise RequestDataParseError(
+                    _error_msg(f'参数 test_steps:teardown:assert[{index}] 不是有效的 str / dict 类型')
+                )
         return assert_text
 
     @staticmethod
-    def _teardown_wait_time(wait_time: int | None) -> int | None:
+    def _teardown_wait_time(index: int, wait_time: int | None) -> int | None:
         if wait_time is not None:
             if not isinstance(wait_time, int):
-                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:wait_time 不是有效的 int 类型'))
+                raise RequestDataParseError(
+                    _error_msg(f'参数 test_steps:teardown:wait_time[{index}] 不是有效的 int 类型')
+                )
         return wait_time
 
     @property

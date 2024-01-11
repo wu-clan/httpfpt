@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from httpfpt.utils.request.request_data_parse import RequestDataParse
 
 
-def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> RequestDataParse | None:
+def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: str | dict) -> RequestDataParse | None:
     """
     执行前置关联测试用例
 
@@ -31,77 +31,72 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: list) -> Reque
     """
     # 判断是否关联用例自身
     parsed_case_id = parsed.case_id
-    for testcase in setup_testcase:
-        error_text = '执行关联测试用例失败，禁止关联自身'
-        if isinstance(testcase, dict):
-            if testcase['case_id'] == parsed_case_id:
-                raise CorrelateTestCaseError(error_text)
-        elif isinstance(testcase, str):
-            if testcase == parsed_case_id:
-                raise CorrelateTestCaseError(error_text)
+    error_text = '执行关联测试用例失败，禁止关联自身'
+    if isinstance(setup_testcase, dict):
+        if setup_testcase['case_id'] == parsed_case_id:
+            raise CorrelateTestCaseError(error_text)
+    elif isinstance(setup_testcase, str):
+        if setup_testcase == parsed_case_id:
+            raise CorrelateTestCaseError(error_text)
 
     # 判断关联测试用例是否存在
     all_case_id = ast.literal_eval(redis_client.get(f'{redis_client.prefix}:case_id_list'))
-    for testcase in setup_testcase:
-        error_text = '执行关联测试用例失败，未在测试用例中找到关联测试用例，请检查关联测试用例 case_id 是否存在'
-        if isinstance(testcase, dict):
-            if testcase['case_id'] not in all_case_id:
-                raise CorrelateTestCaseError(error_text)
-        elif isinstance(testcase, str):
-            if testcase not in all_case_id:
-                raise CorrelateTestCaseError(error_text)
-        else:
-            raise CorrelateTestCaseError('执行关联测试用例失败，关联测试用例参数类型错误')
+    error_text = '执行关联测试用例失败，未在测试用例中找到关联测试用例，请检查关联测试用例 case_id 是否存在'
+    if isinstance(setup_testcase, dict):
+        if setup_testcase['case_id'] not in all_case_id:
+            raise CorrelateTestCaseError(error_text)
+    elif isinstance(setup_testcase, str):
+        if setup_testcase not in all_case_id:
+            raise CorrelateTestCaseError(error_text)
 
     # 执行关联测试用例
     relate_count = 0
-    for testcase in setup_testcase:
-        # 用例中 testcase 参数为设置变量时
-        if isinstance(testcase, dict):
-            relate_count += 1
-            relate_case_id = testcase['case_id']
-            relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{relate_case_id}')
-            case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
-            case_data = json.loads(case_data)
-            case_data_test_steps = case_data['test_steps']
-            if isinstance(case_data_test_steps, list):
-                for case_test_steps in case_data_test_steps:
-                    if relate_case_id == case_test_steps['case_id']:
-                        relate_case_steps = case_test_steps
-                        is_circular_relate(parsed_case_id, relate_case_steps)
-                        # 重新组合测试用例
-                        testcase_data = {
-                            'test_steps': relate_case_steps,
-                            'set_var_key': testcase['key'],
-                            'set_var_jsonpath': testcase['jsonpath'],
-                        }
-                        case_data.update(testcase_data)
-                        relate_testcase_set_var(case_data)
-            else:
-                relate_case_steps = case_data_test_steps
-                is_circular_relate(parsed_case_id, relate_case_steps)
-                testcase_data = {'set_var_key': testcase['key'], 'set_var_jsonpath': testcase['jsonpath']}
-                case_data.update(testcase_data)
-                relate_testcase_set_var(case_data)
+    # 用例中 testcase 参数为设置变量时
+    if isinstance(setup_testcase, dict):
+        relate_count += 1
+        relate_case_id = setup_testcase['case_id']
+        relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{relate_case_id}')
+        case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
+        case_data = json.loads(case_data)
+        case_data_test_steps = case_data['test_steps']
+        if isinstance(case_data_test_steps, list):
+            for case_test_steps in case_data_test_steps:
+                if relate_case_id == case_test_steps['case_id']:
+                    relate_case_steps = case_test_steps
+                    is_circular_relate(parsed_case_id, relate_case_steps)
+                    # 重新组合测试用例
+                    testcase_data = {
+                        'test_steps': relate_case_steps,
+                        'set_var_key': setup_testcase['key'],
+                        'set_var_jsonpath': setup_testcase['jsonpath'],
+                    }
+                    case_data.update(testcase_data)
+                    relate_testcase_set_var(case_data)
+        else:
+            relate_case_steps = case_data_test_steps
+            is_circular_relate(parsed_case_id, relate_case_steps)
+            testcase_data = {'set_var_key': setup_testcase['key'], 'set_var_jsonpath': setup_testcase['jsonpath']}
+            case_data.update(testcase_data)
+            relate_testcase_set_var(case_data)
 
-        # 用例中 testcase 参数为直接关联测试用例时
-        elif isinstance(testcase, str):
-            relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{testcase}')
-            case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
-            case_data = json.loads(case_data)
-            case_data_test_steps = case_data['test_steps']
-            if isinstance(case_data_test_steps, list):
-                for case_test_steps in case_data_test_steps:
-                    if testcase == case_test_steps['case_id']:
-                        relate_case_steps = case_test_steps
-                        is_circular_relate(parsed_case_id, relate_case_steps)
-                        new_data = {'test_steps': relate_case_steps}
-                        case_data.update(new_data)
-                        relate_testcase_exec(case_data)
-            else:
-                relate_case_steps = case_data_test_steps
-                is_circular_relate(parsed_case_id, relate_case_steps)
-                relate_testcase_exec(case_data)
+    # 用例中 testcase 参数为直接关联测试用例时
+    elif isinstance(setup_testcase, str):
+        relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{setup_testcase}')
+        case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
+        case_data = json.loads(case_data)
+        case_data_test_steps = case_data['test_steps']
+        if isinstance(case_data_test_steps, list):
+            for case_test_steps in case_data_test_steps:
+                if setup_testcase == case_test_steps['case_id']:
+                    relate_case_steps = case_test_steps
+                    is_circular_relate(parsed_case_id, relate_case_steps)
+                    new_data = {'test_steps': relate_case_steps}
+                    case_data.update(new_data)
+                    relate_testcase_exec(case_data)
+        else:
+            relate_case_steps = case_data_test_steps
+            is_circular_relate(parsed_case_id, relate_case_steps)
+            relate_testcase_exec(case_data)
 
     if relate_count > 0:
         # 应用关联测试用例变量到请求数据，使用模糊匹配，可能有优化效果
@@ -123,12 +118,13 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
     try:
         relate_case_setup = relate_case_steps['setup']
         if relate_case_setup:
-            for key, value in relate_case_setup:
-                if key == SetupType.TESTCASE:
-                    if isinstance(value, str):
-                        relate_case_setup_testcases.append(value)
-                    if isinstance(value, dict):
-                        relate_case_setup_testcases.append(value['case_id'])
+            for setup in relate_case_setup:
+                for key, value in setup:
+                    if key == SetupType.TESTCASE:
+                        if isinstance(value, str):
+                            relate_case_setup_testcases.append(value)
+                        if isinstance(value, dict):
+                            relate_case_setup_testcases.append(value['case_id'])
     except KeyError:
         pass
     else:

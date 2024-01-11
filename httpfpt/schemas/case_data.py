@@ -57,7 +57,7 @@ class SetupSqlData(BaseModel):
 class StepsSetUpData(BaseModel):
     testcase: str | SetupTestCaseData | None = None
     sql: str | SetupSqlData | None = None
-    hooks: str | None = None
+    hook: str | None = None
     wait_time: int | None = None
 
 
@@ -94,7 +94,7 @@ class TeardownAssertData(BaseModel):
 
 class StepsTearDownData(BaseModel):
     sql: str | SetupSqlData | None = None
-    hooks: str | None = None
+    hook: str | None = None
     extract: TeardownExtractData | None = None
     assert_: str | TeardownAssertData | None = Field(None, alias='assert')
     wait_time: int | None = None

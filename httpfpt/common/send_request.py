@@ -24,7 +24,7 @@ from httpfpt.utils.allure_control import allure_attach_file, allure_step
 from httpfpt.utils.assert_control import asserter
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.relate_testcase_executor import exec_setup_testcase
-from httpfpt.utils.request.hooks_executor import hooks_executor
+from httpfpt.utils.request.hook_executor import hook_executor
 from httpfpt.utils.request.request_data_parse import RequestDataParse
 from httpfpt.utils.request.vars_extractor import var_extractor
 from httpfpt.utils.time_control import get_current_time
@@ -137,7 +137,7 @@ class SendRequests:
             raise e
         except Exception as e:
             if not relate_log:
-                log.error(e)
+                log.error(f'请求数据解析失败: {e}')
             raise e
         log.info('请求数据解析完成' if not relate_log else '关联请求数据解析完成')
 
@@ -151,20 +151,21 @@ class SendRequests:
         if parsed_data['is_setup']:
             log.info('开始处理请求前置...')
             try:
-                for key, value in setup.items():
-                    if key == SetupType.TESTCASE:
-                        new_parsed = exec_setup_testcase(request_data_parse, value)
-                        if isinstance(new_parsed, RequestDataParse):
-                            # 获取最新数据，对于引用了<关联测试用例变量>的测试来讲, 可能造成性能损耗
-                            parsed_data = request_data_parse.get_request_data_parsed
-                        log.info('关联测试用例执行完成')
-                    elif key == SetupType.SQL:
-                        mysql_client.exec_case_sql(value, parsed_data['env'])
-                    elif key == SetupType.HOOK:
-                        hooks_executor.exec_hook_func(value)
-                    elif key == SetupType.WAIT_TIME:
-                        time.sleep(value)
-                        log.info(f'执行请求前等待：{value} s')
+                for item in setup:
+                    for key, value in item.items():
+                        if key == SetupType.TESTCASE:
+                            new_parsed = exec_setup_testcase(request_data_parse, value)
+                            if isinstance(new_parsed, RequestDataParse):
+                                # 获取最新数据，对于引用了<关联测试用例变量>的测试来讲, 可能造成性能损耗
+                                parsed_data = request_data_parse.get_request_data_parsed
+                            log.info('关联测试用例执行完成')
+                        elif key == SetupType.SQL:
+                            mysql_client.exec_case_sql(value, parsed_data['env'])
+                        elif key == SetupType.HOOK:
+                            hook_executor.exec_hook_func(value)
+                        elif key == SetupType.WAIT_TIME:
+                            time.sleep(value)
+                            log.info(f'执行请求前等待：{value} s')
             except Exception as e:
                 log.error(f'请求前置处理异常: {e}')
                 raise e
@@ -234,18 +235,19 @@ class SendRequests:
         if parsed_data['is_teardown']:
             log.info('开始处理请求后置...')
             try:
-                for key, value in teardown.items():
-                    if key == TeardownType.SQL:
-                        mysql_client.exec_case_sql(value, parsed_data['env'])
-                    if key == TeardownType.HOOK:
-                        hooks_executor.exec_hook_func(value)
-                    if key == TeardownType.EXTRACT:
-                        var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
-                    if key == TeardownType.ASSERT:
-                        asserter.exec_asserter(response_data, assert_text=value)
-                    elif key == TeardownType.WAIT_TIME:
-                        log.info(f'执行请求后等待：{value} s')
-                        time.sleep(value)
+                for item in teardown:
+                    for key, value in item.items():
+                        if key == TeardownType.SQL:
+                            mysql_client.exec_case_sql(value, parsed_data['env'])
+                        if key == TeardownType.HOOK:
+                            hook_executor.exec_hook_func(value)
+                        if key == TeardownType.EXTRACT:
+                            var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
+                        if key == TeardownType.ASSERT:
+                            asserter.exec_asserter(response_data, assert_text=value)
+                        elif key == TeardownType.WAIT_TIME:
+                            log.info(f'执行请求后等待：{value} s')
+                            time.sleep(value)
             except AssertionError as e:
                 log.error(f'断言失败: {e}')
                 raise AssertError(f'断言失败: {e}')
@@ -256,20 +258,21 @@ class SendRequests:
 
         return response_data
 
-    def log_request_setup(self, setup: dict) -> None:
-        for key, value in setup.items():
-            if key == SetupType.TESTCASE:
-                log.info(f'前置 setup_testcase: {value}')
-                self.allure_request_setup({'setup_testcase': value})
-            elif key == SetupType.SQL:
-                log.info(f'前置 setup_sql: {value}')
-                self.allure_request_setup({'setup_sql': value})
-            elif key == SetupType.HOOK:
-                log.info(f'前置 setup_hooks: {value}')
-                self.allure_request_setup({'setup_hooks': value})
-            elif key == SetupType.WAIT_TIME:
-                log.info(f'前置 setup_wait_time: {value}')
-                self.allure_request_setup({'setup_wait_time': value})
+    def log_request_setup(self, setup: list) -> None:
+        for item in setup:
+            for key, value in item.items():
+                if key == SetupType.TESTCASE:
+                    log.info(f'前置 setup_testcase: {value}')
+                    self.allure_request_setup({'setup_testcase': value})
+                elif key == SetupType.SQL:
+                    log.info(f'前置 setup_sql: {value}')
+                    self.allure_request_setup({'setup_sql': value})
+                elif key == SetupType.HOOK:
+                    log.info(f'前置 setup_hook: {value}')
+                    self.allure_request_setup({'setup_hook': value})
+                elif key == SetupType.WAIT_TIME:
+                    log.info(f'前置 setup_wait_time: {value}')
+                    self.allure_request_setup({'setup_wait_time': value})
 
     @staticmethod
     def log_request_up(parsed_data: dict) -> None:
@@ -288,23 +291,24 @@ class SendRequests:
             log.info(f"请求 json: {parsed_data['body']}")
         log.info(f"请求 files: {parsed_data['files_no_parse']}")
 
-    def log_request_teardown(self, teardown: dict) -> None:
-        for key, value in teardown.items():
-            if key == TeardownType.SQL:
-                log.info(f'后置 teardown_sql: {value}')
-                self.allure_request_teardown({'teardown_sql': value})
-            elif key == TeardownType.HOOK:
-                log.info(f'后置 teardown_hooks: {value}')
-                self.allure_request_teardown({'teardown_hooks': value})
-            elif key == TeardownType.EXTRACT:
-                log.info(f'后置 teardown_extract: {value}')
-                self.allure_request_teardown({'teardown_extract': value})
-            elif key == TeardownType.ASSERT:
-                log.info(f'后置 teardown_assert: {value}')
-                self.allure_request_teardown({'teardown_assert': value})
-            elif key == TeardownType.WAIT_TIME:
-                log.info(f'后置 teardown_wait_time: {value}')
-                self.allure_request_teardown({'teardown_wait_time': value})
+    def log_request_teardown(self, teardown: list) -> None:
+        for item in teardown:
+            for key, value in item.items():
+                if key == TeardownType.SQL:
+                    log.info(f'后置 teardown_sql: {value}')
+                    self.allure_request_teardown({'teardown_sql': value})
+                elif key == TeardownType.HOOK:
+                    log.info(f'后置 teardown_hook: {value}')
+                    self.allure_request_teardown({'teardown_hook': value})
+                elif key == TeardownType.EXTRACT:
+                    log.info(f'后置 teardown_extract: {value}')
+                    self.allure_request_teardown({'teardown_extract': value})
+                elif key == TeardownType.ASSERT:
+                    log.info(f'后置 teardown_assert: {value}')
+                    self.allure_request_teardown({'teardown_assert': value})
+                elif key == TeardownType.WAIT_TIME:
+                    log.info(f'后置 teardown_wait_time: {value}')
+                    self.allure_request_teardown({'teardown_wait_time': value})
 
     @staticmethod
     def log_request_down(response_data: dict) -> None:

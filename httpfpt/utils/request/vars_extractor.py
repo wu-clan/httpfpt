@@ -62,9 +62,13 @@ class VarsExtractor:
                         str_target = re.sub(self.vars_re, env_value, str_target, 1)
                         log.info(f'请求数据变量 {var_key} 替换完成')
                     except KeyError:
-                        global_value = str(global_vars[f'{var_key}'])
-                        str_target = re.sub(self.vars_re, global_value, str_target, 1)
-                        log.info(f'请求数据变量 {var_key} 替换完成')
+                        try:
+                            global_value = str(global_vars[f'{var_key}'])
+                            str_target = re.sub(self.vars_re, global_value, str_target, 1)
+                            log.info(f'请求数据变量 {var_key} 替换完成')
+                        except KeyError as e:
+                            log.error(f'请求数据变量 {var_key} 替换失败，此变量不存在')
+                            raise e
                     except Exception as e:
                         log.error(f'请求数据变量 {var_key} 替换失败: {e}')
                         raise VariableError(f'请求数据变量 {var_key} 替换失败: {e}')

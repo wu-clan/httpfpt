@@ -33,11 +33,11 @@ test_steps:
           key: rcode
           jsonpath: $.status_code
       - testcase: event_query_002
-      - hooks:
+      - hook:
       - wait_time: 0
     teardown:
       - sql:
-      - hooks:
+      - hook:
       - extract:
           key: test_cache
           type: cache
@@ -77,9 +77,9 @@ test_steps:
       - assert: assert 200 == pm.response.get('status_code')
       - assert: assert 'postId' not in str(pm.response.get('content')), '没有返回content'
 
-  - name: hooks
+  - name: hook
     case_id: event_create_001
-    description: 测试hooks
+    description: 测试hook
     is_run:
     request:
       method: POST
@@ -93,9 +93,9 @@ test_steps:
         userId: 1
       files:
     setup:
-      - hooks: ${current_time()}
+      - hook: ${current_time()}
     teardown:
-      - hooks: ${random_phone()}
+      - hook: ${random_phone()}
       - assert: assert 200 == pm.response.get('status_code')
 
   - name: super_relate_testcase
