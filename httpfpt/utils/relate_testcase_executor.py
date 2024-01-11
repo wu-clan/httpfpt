@@ -119,7 +119,7 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
         relate_case_setup = relate_case_steps['setup']
         if relate_case_setup:
             for setup in relate_case_setup:
-                for key, value in setup:
+                for key, value in setup.items():
                     if key == SetupType.TESTCASE:
                         if isinstance(value, str):
                             relate_case_setup_testcases.append(value)
