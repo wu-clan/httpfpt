@@ -496,58 +496,49 @@ class RequestDataParse:
     @staticmethod
     def _setup_testcase(testcase: str | dict | None) -> str | dict | None:
         if testcase is not None:
-            if not isinstance(testcase, list):
-                raise RequestDataParseError(_error_msg('参数 test_steps:setup:testcase 不是有效的 list 类型'))
-            else:
-                for i in testcase:
-                    if isinstance(i, dict):
-                        for k, v in i.items():
-                            if not isinstance(v, str):
-                                raise RequestDataParseError(
-                                    _error_msg(f'参数 test_steps:setup:testcase:{k} 不是有效的 str 类型')
-                                )
-                    else:
-                        if not isinstance(i, str):
+            for i in testcase:
+                if isinstance(i, dict):
+                    for k, v in i.items():
+                        if not isinstance(v, str):
                             raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:setup:testcase:{i} 不是有效的 str 类型')
+                                _error_msg(f'参数 test_steps:setup:testcase:{k} 不是有效的 str 类型')
                             )
+                else:
+                    if not isinstance(i, str):
+                        raise RequestDataParseError(
+                            _error_msg(f'参数 test_steps:setup:testcase:{i} 不是有效的 str 类型')
+                        )
         return testcase
 
     @staticmethod
     def _setup_sql(sql: str | dict | None) -> str | dict | None:
         if sql is not None:
-            if not isinstance(sql, list):
-                raise RequestDataParseError(_error_msg('参数 test_steps:setup:sql 不是有效的 list 类型'))
-            else:
-                for i in sql:
-                    if isinstance(i, dict):
-                        for k, v in i.items():
-                            if not isinstance(v, str):
-                                raise RequestDataParseError(
-                                    _error_msg(f'参数 test_steps:setup:sql:{k} 不是有效的 str 类型')
-                                )
-                            if k == 'sql':
-                                mysql_client.sql_verify(v)
-                    else:
-                        if not isinstance(i, str):
+            for i in sql:
+                if isinstance(i, dict):
+                    for k, v in i.items():
+                        if not isinstance(v, str):
                             raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:setup:sql:{i} 不是有效的 str 类型'),
+                                _error_msg(f'参数 test_steps:setup:sql:{k} 不是有效的 str 类型')
                             )
-                        else:
-                            mysql_client.sql_verify(i)
+                        if k == 'sql':
+                            mysql_client.sql_verify(v)
+                else:
+                    if not isinstance(i, str):
+                        raise RequestDataParseError(
+                            _error_msg(f'参数 test_steps:setup:sql:{i} 不是有效的 str 类型'),
+                        )
+                    else:
+                        mysql_client.sql_verify(i)
         return sql
 
     @staticmethod
     def _setup_hook(hook: str | None) -> str | None:
         if hook is not None:
-            if not isinstance(hook, list):
-                raise RequestDataParseError(_error_msg('参数 test_steps:setup:hook 不是有效的 list 类型'))
-            else:
-                for v in hook:
-                    if not isinstance(v, str):
-                        raise RequestDataParseError(
-                            _error_msg(f'参数 test_steps:setup:hooks:{v} 不是有效的 str 类型'),
-                        )
+            for v in hook:
+                if not isinstance(v, str):
+                    raise RequestDataParseError(
+                        _error_msg(f'参数 test_steps:setup:hooks:{v} 不是有效的 str 类型'),
+                    )
         return hook
 
     @staticmethod
@@ -596,62 +587,53 @@ class RequestDataParse:
     @staticmethod
     def _teardown_sql(sql: str | dict | None) -> str | dict | None:
         if sql is not None:
-            if not isinstance(sql, list):
-                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:sql 不是有效的 list 类型'))
-            else:
-                for i in sql:
-                    if isinstance(i, dict):
-                        for k, v in i.items():
-                            if not isinstance(v, str):
-                                raise RequestDataParseError(
-                                    _error_msg(f'参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'),
-                                )
-                            if k == 'sql':
-                                mysql_client.sql_verify(v)
-                    else:
-                        if not isinstance(i, str):
+            for i in sql:
+                if isinstance(i, dict):
+                    for k, v in i.items():
+                        if not isinstance(v, str):
                             raise RequestDataParseError(
-                                _error_msg(f'参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'),
+                                _error_msg(f'参数 test_steps:teardown:sql:{k} 不是有效的 str 类型'),
                             )
-                        else:
-                            mysql_client.sql_verify(i)
+                        if k == 'sql':
+                            mysql_client.sql_verify(v)
+                else:
+                    if not isinstance(i, str):
+                        raise RequestDataParseError(
+                            _error_msg(f'参数 test_steps:teardown:sql:{i} 不是有效的 str 类型'),
+                        )
+                    else:
+                        mysql_client.sql_verify(i)
         return sql
 
     @staticmethod
     def _teardown_hook(hook: str | None) -> str | None:
         if hook is not None:
-            if not isinstance(hook, list):
-                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:hook 不是有效的 list 类型'))
-            else:
-                for v in hook:
-                    if not isinstance(v, str):
-                        raise RequestDataParseError(
-                            _error_msg(f'参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型'),
-                        )
+            for v in hook:
+                if not isinstance(v, str):
+                    raise RequestDataParseError(
+                        _error_msg(f'参数 test_steps:teardown:hooks:{v} 不是有效的 str 类型'),
+                    )
         return hook
 
     @staticmethod
     def _teardown_extract(extract: dict | None) -> dict | None:
         if extract is not None:
-            if not isinstance(extract, list):
-                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract 不是有效的 list 类型'))
-            else:
-                for i in extract:
-                    if isinstance(i, dict):
-                        for k, v in i.items():
-                            if not isinstance(v, str):
-                                raise RequestDataParseError(
-                                    _error_msg(f'参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
-                                )
-                    else:
-                        raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract:{i} 不是合法数据'))
+            for i in extract:
+                if isinstance(i, dict):
+                    for k, v in i.items():
+                        if not isinstance(v, str):
+                            raise RequestDataParseError(
+                                _error_msg(f'参数 test_steps:teardown:extract:{k} 不是有效的 str 类型')
+                            )
+                else:
+                    raise RequestDataParseError(_error_msg('参数 test_steps:teardown:extract:{i} 不是合法数据'))
         return extract
 
     @staticmethod
     def _teardown_assert(assert_text: str | dict | None) -> str | dict | None:
         if assert_text is not None:
-            if not any([isinstance(assert_text, str), isinstance(assert_text, list)]):
-                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:assert 不是有效的 str / list 类型'))
+            if not any([isinstance(assert_text, str), isinstance(assert_text, dict)]):
+                raise RequestDataParseError(_error_msg('参数 test_steps:teardown:assert 不是有效的 str / dict 类型'))
         return assert_text
 
     @staticmethod
