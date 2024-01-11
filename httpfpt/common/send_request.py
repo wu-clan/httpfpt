@@ -153,19 +153,20 @@ class SendRequests:
             try:
                 for item in setup:
                     for key, value in item.items():
-                        if key == SetupType.TESTCASE:
-                            new_parsed = exec_setup_testcase(request_data_parse, value)
-                            if isinstance(new_parsed, RequestDataParse):
-                                # 获取最新数据，对于引用了<关联测试用例变量>的测试来讲, 可能造成性能损耗
-                                parsed_data = request_data_parse.get_request_data_parsed
-                            log.info('关联测试用例执行完成')
-                        elif key == SetupType.SQL:
-                            mysql_client.exec_case_sql(value, parsed_data['env'])
-                        elif key == SetupType.HOOK:
-                            hook_executor.exec_hook_func(value)
-                        elif key == SetupType.WAIT_TIME:
-                            time.sleep(value)
-                            log.info(f'执行请求前等待：{value} s')
+                        if value is not None:
+                            if key == SetupType.TESTCASE:
+                                new_parsed = exec_setup_testcase(request_data_parse, value)
+                                if isinstance(new_parsed, RequestDataParse):
+                                    # 获取最新数据，对于引用了<关联测试用例变量>的测试来讲, 可能造成性能损耗
+                                    parsed_data = request_data_parse.get_request_data_parsed
+                                log.info('关联测试用例执行完成')
+                            elif key == SetupType.SQL:
+                                mysql_client.exec_case_sql(value, parsed_data['env'])
+                            elif key == SetupType.HOOK:
+                                hook_executor.exec_hook_func(value)
+                            elif key == SetupType.WAIT_TIME:
+                                time.sleep(value)
+                                log.info(f'执行请求前等待：{value} s')
             except Exception as e:
                 log.error(f'请求前置处理异常: {e}')
                 raise e
@@ -237,17 +238,18 @@ class SendRequests:
             try:
                 for item in teardown:
                     for key, value in item.items():
-                        if key == TeardownType.SQL:
-                            mysql_client.exec_case_sql(value, parsed_data['env'])
-                        if key == TeardownType.HOOK:
-                            hook_executor.exec_hook_func(value)
-                        if key == TeardownType.EXTRACT:
-                            var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
-                        if key == TeardownType.ASSERT:
-                            asserter.exec_asserter(response_data, assert_text=value)
-                        elif key == TeardownType.WAIT_TIME:
-                            log.info(f'执行请求后等待：{value} s')
-                            time.sleep(value)
+                        if value is not None:
+                            if key == TeardownType.SQL:
+                                mysql_client.exec_case_sql(value, parsed_data['env'])
+                            if key == TeardownType.HOOK:
+                                hook_executor.exec_hook_func(value)
+                            if key == TeardownType.EXTRACT:
+                                var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
+                            if key == TeardownType.ASSERT:
+                                asserter.exec_asserter(response_data, assert_text=value)
+                            elif key == TeardownType.WAIT_TIME:
+                                log.info(f'执行请求后等待：{value} s')
+                                time.sleep(value)
             except AssertionError as e:
                 log.error(f'断言失败: {e}')
                 raise AssertError(f'断言失败: {e}')
