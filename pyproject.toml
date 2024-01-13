@@ -28,7 +28,7 @@ dependencies = [
     "pytest-pretty==1.2.0",
     "pytest-xdist==2.5.0",
     "python-dotenv==0.20.0",
-    "python-jsonpath==0.9.0",
+    "python-jsonpath==0.10.3",
     "pyyaml==6.0.1",
     "redis[hiredis]==5.0.1",
     "requests==2.31.0",
