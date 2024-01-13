@@ -12,6 +12,11 @@
 
 的小伙伴可以一睹为快，[点击跳转](https://juejin.cn/post/7224314619867136037)
 
+> [!CAUTION]
+> 如果你正在使用 python<=3.9，可能导致运行错误，尽管 ci 验证通过
+> 由于 pydantic-2.0 相关[【问题】](https://github.com/pydantic/pydantic/pull/8209)，导致在 python<=3.9 时运行异常
+> 我决定保持当前行为，一旦 pydantic 修复此问题，便发布补丁版本
+
 ## 功能点
 
 - 多项目分级，自由切换，互不干扰
@@ -72,16 +77,12 @@ git clone https://github.com/wu-clan/httpfpt.git
 
 有且仅有当前一个频道，请注意辨别真伪
 
-<table>
-  <tr>
-    <td style="text-align: center;"><a href="https://t.me/+ZlPhIFkPp7E4NGI1">直链跳转</a></td>
-  </tr>
-  <tr>
-    <td>Telegram（科学上网）</td>
-  </tr>
-</table>
+| [Jump](https://t.me/+ZlPhIFkPp7E4NGI1) |
+|----------------------------------------|
+| Telegram（科学上网）                         |
 
 ## 状态
+
 ![Alt](https://repobeats.axiom.co/api/embed/98343c7bb6875c60a529fff021611eceecb296f1.svg "Repo beats analytics image")
 
 ## 赞助

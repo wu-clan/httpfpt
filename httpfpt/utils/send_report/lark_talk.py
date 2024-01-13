@@ -29,7 +29,7 @@ class LarkTalk:
                                 [{'tag': 'text', 'text': f"❌ 错误用例: {self.content['error']}"}],
                                 [{'tag': 'text', 'text': f"⚠️ 跳过用例: {self.content['skipped']}"}],
                                 [{'tag': 'text', 'text': f"⌛ 开始时间: {self.content['started_time']}"}],
-                                [{'tag': 'text', 'text': f"⏱️ 执行耗时: {self.content['elapsed']} s"}],
+                                [{'tag': 'text', 'text': f"⏱️ 执行耗时: {self.content['elapsed']}"}],
                                 [{'tag': 'a', 'text': '➡️ 查看详情', 'href': 'https://foryourself'}],
                             ],
                         }

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -164,13 +164,16 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     """
     收集测试结果
     """
-    total = terminalreporter._numcollected
-    passed = len(terminalreporter.stats.get('passed', []))
-    failed = len(terminalreporter.stats.get('failed', []))
-    error = len(terminalreporter.stats.get('error', []))
-    skipped = len(terminalreporter.stats.get('skipped', []))
     started_time = terminalreporter._sessionstarttime
-    elapsed = time.time() - started_time
+    elapsed_seconds = float(time.time() - started_time)
+    hours, remainder = divmod(elapsed_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    total = terminalreporter._numcollected
+    stats = terminalreporter.stats
+    passed = len(stats.get('passed', []))
+    failed = len(stats.get('failed', []))
+    error = len(stats.get('error', []))
+    skipped = len(stats.get('skipped', []))
     data = {
         'result': 'Success' if failed == 0 else 'Failed',
         'total': total,
@@ -179,6 +182,6 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         'error': error,
         'skipped': skipped,
         'started_time': datetime.fromtimestamp(started_time).strftime('%Y-%m-%d %H:%M:%S'),
-        'elapsed': float(datetime.fromtimestamp(elapsed).strftime('%S.%f')[:-3]),
+        'elapsed': f'{int(hours):02}:{int(minutes):02}:{int(seconds):02}',
     }
     write_yaml_report(data=data)

@@ -26,7 +26,7 @@ class DingTalk:
                     f"> ❌ 错误用例: {self.content['error']}\n\n"
                     f"> ⚠️ 跳过用例: {self.content['skipped']}\n\n"
                     f"> ⌛ 开始时间: {self.content['started_time']}\n\n"
-                    f"> ⏱️ 执行耗时: {self.content['elapsed']} s\n\n"
+                    f"> ⏱️ 执行耗时: {self.content['elapsed']}\n\n"
                     f"> ➡️ [查看详情](https://foryourself)",
                 },
             }
