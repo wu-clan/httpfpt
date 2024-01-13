@@ -8,6 +8,8 @@ from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 
 __all__ = ['CaseData']
 
+# TODO: 由于 pydantic-v2 运行时不处理旧版本类型评估，导致 ci 可以正常通过，但运行会报告错误。详情：https://github.com/pydantic/pydantic/pull/8209
+
 
 class ConfigAllureData(BaseModel):
     epic: str
