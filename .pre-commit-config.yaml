@@ -4,7 +4,6 @@ repos:
     hooks:
       - id: check-added-large-files
       - id: end-of-file-fixer
-      - id: requirements-txt-fixer
       - id: check-yaml
       - id: check-toml
 
