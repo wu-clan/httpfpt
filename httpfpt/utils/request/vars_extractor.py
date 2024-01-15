@@ -24,56 +24,58 @@ class VarsExtractor:
         # 关联变量开头: a-zA-Z_
         self.relate_vars_re = r'\^([a-zA-Z_]\w*)|\^{([a-zA-Z_]\w*)\}'
 
-    def vars_replace(self, target: dict) -> dict:
+    def vars_replace(self, target: dict, env_filename: str | None = None) -> dict:
         """
         变量替换
 
         :param target:
+        :param env_filename:
         :return:
         """
-        # 获取所有环境变量
-        try:
-            env = target['config']['request']['env']
-        except KeyError:
+        str_target = json.dumps(target, ensure_ascii=False)
+
+        # 获取变量名
+        key = re.search(self.vars_re, str_target)
+        var_key = key.group(1) or key.group(2)
+        if var_key is None:
+            dict_target = json.loads(str_target)
+            return dict_target
+
+        # 获取环境名称
+        env = env_filename or target.get('config', {}).get('request', {}).get('env')
+        if not env or not isinstance(env, str):
             raise RequestDataParseError('运行环境获取失败, 测试用例数据缺少 config:request:env 参数')
-        if not isinstance(env, str):
-            raise RequestDataParseError('运行环境获取失败, 请使用合法的环境配置')
         try:
             env_file = os.path.join(RUN_ENV_PATH, env)
             env_vars = get_env_dict(env_file)
         except OSError:
             raise RequestDataParseError('运行环境获取失败, 请检查测试用例环境配置')
 
-        # 获取所有自定义全局变量
+        # 获取全局变量
         global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
-        str_target = json.dumps(target, ensure_ascii=False)
-
         while re.findall(self.vars_re, str_target):
-            key = re.search(self.vars_re, str_target)
-            var_key = key.group(1) or key.group(2)
-
             # 替换: 临时变量 > 环境变量 > 全局变量
             if var_key is not None:
-                cache_value = str(variable_cache.get(var_key))
-                if cache_value == 'None':
-                    try:
-                        env_value = str(env_vars[f'{var_key.upper()}'])
-                        str_target = re.sub(self.vars_re, env_value, str_target, 1)
-                        log.info(f'请求数据变量 {var_key} 替换完成')
-                    except KeyError:
-                        try:
-                            global_value = str(global_vars[f'{var_key}'])
-                            str_target = re.sub(self.vars_re, global_value, str_target, 1)
-                            log.info(f'请求数据变量 {var_key} 替换完成')
-                        except KeyError as e:
-                            log.error(f'请求数据变量 {var_key} 替换失败，此变量不存在')
-                            raise e
-                    except Exception as e:
-                        log.error(f'请求数据变量 {var_key} 替换失败: {e}')
-                        raise VariableError(f'请求数据变量 {var_key} 替换失败: {e}')
-                else:
-                    str_target = re.sub(self.vars_re, cache_value, str_target, 1)
+                log_type = '请求数据'
+                try:
+                    cache_value = variable_cache.get(var_key)
+                    if cache_value is None:
+                        value = env_vars.get(var_key.upper()) or global_vars.get(var_key)
+                        if value is not None:
+                            if env_filename is not None:
+                                log_type = 'SQL '
+                            str_target = re.sub(self.vars_re, str(value), str_target, 1)
+                            log.info(f'{log_type}变量 {var_key} 替换完成')
+                        else:
+                            raise VariableError(var_key)
+                    else:
+                        str_target = re.sub(self.vars_re, str(cache_value), str_target, 1)
+                        log.info(f'{log_type}变量 {var_key} 替换完成')
+                except Exception as e:
+                    log_err_msg = f'{log_type}变量 {var_key} 替换失败'
+                    log.error(log_err_msg)
+                    raise VariableError(f'{log_err_msg}: {e}')
 
         dict_target = json.loads(str_target)
 

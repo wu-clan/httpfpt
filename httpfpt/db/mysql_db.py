@@ -23,6 +23,7 @@ from httpfpt.enums.query_fetch_type import QueryFetchType
 from httpfpt.enums.sql_type import SqlType
 from httpfpt.enums.var_type import VarType
 from httpfpt.utils.enum_control import get_enum_values
+from httpfpt.utils.request.vars_extractor import var_extractor
 
 
 class MysqlDB:
@@ -129,14 +130,17 @@ class MysqlDB:
         finally:
             self.close(conn, cursor)
 
-    def exec_case_sql(self, sql: str, env: str | None = None) -> dict | int | None:
+    def exec_case_sql(self, sql: str, env_filename: str | None = None) -> dict | int | None:
         """
         执行用例 sql
 
         :param sql:
-        :param env:
+        :param env_filename:
         :return:
         """
+        if env_filename is not None:
+            sql = var_extractor.vars_replace({'sql': sql}, env_filename)['sql']
+
         # 获取返回数据
         if isinstance(sql, str):
             log.info(f'执行 SQL: {sql}')
@@ -144,6 +148,7 @@ class MysqlDB:
                 return self.query(sql)
             else:
                 return self.execute(sql)
+
         # 设置变量
         if isinstance(sql, dict):
             log.info(f'执行变量提取 SQL: {sql["sql"]}')
@@ -153,16 +158,15 @@ class MysqlDB:
             json_path = sql['jsonpath']
             query_data = self.query(sql_text)
             value = findall(json_path, query_data)
-            if value:
-                value = str(value[0])
-            else:
+            if not value:
                 raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
+            value_str = str(value[0])
             if set_type == VarType.CACHE:
-                variable_cache.set(key, value)
+                variable_cache.set(key, value_str)
             elif set_type == VarType.ENV:
-                write_env_vars(RUN_ENV_PATH, env, key, value)  # type: ignore
+                write_env_vars(RUN_ENV_PATH, env_filename, key, value_str)  # type: ignore
             elif set_type == VarType.GLOBAL:
-                write_yaml_vars({key: value})
+                write_yaml_vars({key: value_str})
             else:
                 raise VariableError(
                     f'前置 SQL 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
