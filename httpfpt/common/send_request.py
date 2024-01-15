@@ -159,7 +159,6 @@ class SendRequests:
                                 if isinstance(new_parsed, RequestDataParse):
                                     # 获取最新数据，对于引用了<关联测试用例变量>的测试来讲, 可能造成性能损耗
                                     parsed_data = request_data_parse.get_request_data_parsed
-                                log.info('关联测试用例执行完成')
                             elif key == SetupType.SQL:
                                 mysql_client.exec_case_sql(value, parsed_data['env'])
                             elif key == SetupType.HOOK:

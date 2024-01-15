@@ -6,6 +6,7 @@ import copy
 import json
 import sys
 
+from collections import defaultdict
 from typing import Any, Dict, List
 
 from pydantic import ValidationError
@@ -70,58 +71,50 @@ def case_id_unique_verify() -> None:
 
     :return:
     """
-    all_case_id_dict: List[Dict[str, str | list]] = []
+    all_case_id_dict: List[Dict[str, str | List[str]]] = []
     all_case_id = []
+    case_id_count = defaultdict(int)
+
     case_data_list = redis_client.get_prefix(f'{redis_client.case_data_prefix}:')
     redis_client.delete_prefix(f'{redis_client.case_id_file_prefix}:')
+
     for case_data in case_data_list:
         case_data = json.loads(case_data)
         filename = case_data['filename']
+
         try:
             steps = case_data['test_steps']
             if isinstance(steps, dict):
                 case_id = steps['case_id']
                 all_case_id.append(case_id)
-                all_case_id_dict.append({f'{filename}': case_id})
+                all_case_id_dict.append({filename: [case_id]})
+                case_id_count[case_id] += 1
                 redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
+
             if isinstance(steps, list):
-                case_id_list = []
-                for s in steps:
-                    case_id = s['case_id']
-                    case_id_list.append(case_id)
-                    all_case_id.append(case_id)
+                case_id_list = [s['case_id'] for s in steps]
+                all_case_id.extend(case_id_list)
+                all_case_id_dict.append({filename: case_id_list})
+
+                for case_id in case_id_list:
+                    case_id_count[case_id] += 1
                     redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
-                all_case_id_dict.append({f'{filename}': case_id_list})
+
         except KeyError:
             raise RequestDataParseError(f'测试用例数据文件 {filename} 结构错误，建议开启 pydantic 验证')
-    # 检测用例 id 是否重复
-    set_all_case_id = set(all_case_id)
-    all_repeat_case_id = []
-    if len(set_all_case_id) != len(all_case_id):
-        for i in set_all_case_id:
-            repeat_count = 0
-            for j in all_case_id:
-                if i == j:
-                    repeat_count += 1
-            # 输出重复用例 id 详情
-            if repeat_count > 1:
-                all_repeat_case_id_detail = []
-                repeat_case_id_desc = {'case_id': i, 'count': repeat_count}
-                for case_id_dict in all_case_id_dict:
-                    for key in case_id_dict.keys():
-                        file_case_id_list = case_id_dict[key]
-                        repeat_index_list = []
-                        if i in file_case_id_list:
-                            if file_case_id_list.count(i) == 1:
-                                repeat_index_list.append(file_case_id_list.index(i))
-                            else:  # 无需判断多种条件，因为只有存在重复 id 才能执行至此，如果重复数量不为 1 则必定大于 1
-                                for k in range(len(file_case_id_list)):
-                                    if file_case_id_list.count(file_case_id_list[k]) > 1:
-                                        repeat_index_list.append(k)
-                            all_repeat_case_id_detail.append({'filename': f'{key}', 'index': repeat_index_list})
-                repeat_case_id_desc.update({'detail': all_repeat_case_id_detail})
-                all_repeat_case_id.append(repeat_case_id_desc)
-    if len(all_repeat_case_id) > 0:
+
+    all_repeat_case_id = [
+        {'case_id': case_id, 'count': count, 'detail': []} for case_id, count in case_id_count.items() if count > 1
+    ]
+
+    for repeat_case in all_repeat_case_id:
+        for case_data_dict in all_case_id_dict:
+            for key, case_id_list in case_data_dict.items():
+                repeat_index_list = [i for i, cid in enumerate(case_id_list) if cid == repeat_case['case_id']]
+                if repeat_index_list:
+                    repeat_case['detail'].append({'filename': key, 'index': repeat_index_list})
+
+    if all_repeat_case_id:
         redis_client.set(f'{redis_client.prefix}:case_id:repeated', 'true')
         log.error(f'运行失败, 检测到用例重复 case_id: {all_repeat_case_id[0]}')
         sys.exit(1)
