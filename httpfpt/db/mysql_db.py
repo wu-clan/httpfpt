@@ -61,7 +61,7 @@ class MysqlDB:
         cursor.close()
         conn.close()
 
-    def query(self, sql: str, fetch: QueryFetchType = QueryFetchType.ALL) -> dict:
+    def query(self, sql: str, fetch: QueryFetchType = QueryFetchType.ALL) -> dict | list | None:
         """
         数据库查询
 
@@ -84,6 +84,8 @@ class MysqlDB:
             raise e
         else:
             log.info(f'执行 SQL 成功: {query_data}')
+            if not query_data:
+                return None
             try:
 
                 def format_row(row: dict) -> None:
@@ -99,14 +101,16 @@ class MysqlDB:
 
                 if isinstance(query_data, dict):
                     format_row(query_data)
+                    return data
                 if isinstance(query_data, list):
-                    if query_data:
-                        for i in query_data:
-                            format_row(i)
+                    data_list = []
+                    for i in query_data:
+                        format_row(i)
+                        data_list.append(data)
+                    return data_list
             except Exception as e:
                 log.error(f'序列化 SQL 查询结果失败: {e}')
                 raise e
-            return data
         finally:
             self.close(conn, cursor)
 
@@ -130,7 +134,7 @@ class MysqlDB:
         finally:
             self.close(conn, cursor)
 
-    def exec_case_sql(self, sql: str, env_filename: str | None = None) -> dict | int | None:
+    def exec_case_sql(self, sql: str, env_filename: str | None = None) -> dict | list | int | None:
         """
         执行用例 sql
 
@@ -138,11 +142,10 @@ class MysqlDB:
         :param env_filename:
         :return:
         """
-        if env_filename is not None:
-            sql = var_extractor.vars_replace({'sql': sql}, env_filename)['sql']
-
         # 获取返回数据
         if isinstance(sql, str):
+            if env_filename is not None:
+                sql = var_extractor.vars_replace({'sql': sql}, env_filename)['sql']
             log.info(f'执行 SQL: {sql}')
             if sql.startswith(SqlType.select):
                 return self.query(sql)
@@ -156,7 +159,11 @@ class MysqlDB:
             set_type = sql['type']
             sql_text = sql['sql']
             json_path = sql['jsonpath']
+            if env_filename is not None:
+                sql_text = var_extractor.vars_replace({'sql': sql_text}, env_filename)['sql']
             query_data = self.query(sql_text)
+            if not query_data:
+                raise SQLSyntaxError('变量提取失败，SQL 查询结果为空')
             value = findall(json_path, query_data)
             if not value:
                 raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
