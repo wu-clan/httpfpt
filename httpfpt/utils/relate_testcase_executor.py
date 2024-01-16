@@ -151,6 +151,7 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     value = findall(testcase_data['set_var_jsonpath'], response)
     if value:
         variable_cache.set(testcase_data['set_var_key'], value[0])
+        log.info('⛓️ 关联测试用例变量提取执行完成')
     else:
         raise JsonPathFindError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
 
@@ -168,3 +169,4 @@ def relate_testcase_exec(testcase_data: dict) -> None:
     log.debug(msg)
     allure_step(msg, '此文件为空')
     send_request.send_request(testcase_data, log_data=False, relate_log=True)
+    log.info('⛓️ 关联测试用例执行完成')
