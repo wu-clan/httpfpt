@@ -101,18 +101,19 @@ class VarsExtractor:
             key = re.search(self.relate_vars_re, str_target)
             var_key = key.group(1) or key.group(2)
             if var_key is not None:
-                cache_value = str(variable_cache.get(var_key))
-                if cache_value == 'None':
-                    err_msg = '请求数据关联变量替换失败，临时变量池不存在变量: “{}”'.format(var_key)
-                    log.error(err_msg)
-                    raise VariableError(err_msg)
-                else:
+                cache_value = variable_cache.get(var_key)
+                if cache_value is not None:
                     try:
-                        str_target = re.sub(self.relate_vars_re, cache_value, str_target, 1)
+                        str_target = re.sub(self.relate_vars_re, str(cache_value), str_target, 1)
                         log.info(f'请求数据关联变量 {var_key} 替换完成')
                     except Exception as e:
-                        log.error(f'请求数据关联变量 {var_key} 替换失败: {e}')
-                        raise VariableError(f'请求数据关联变量 {var_key} 替换失败: {e}')
+                        log_error_msg = f'请求数据关联变量 {var_key} 替换失败: {e}'
+                        log.error(log_error_msg)
+                        raise VariableError(log_error_msg)
+                else:
+                    err_msg = f'请求数据关联变量替换失败，临时变量池不存在变量: "{var_key}"'
+                    log.error(err_msg)
+                    raise VariableError(err_msg)
 
         dict_target = json.loads(str_target)
 
@@ -129,14 +130,14 @@ class VarsExtractor:
         :return:
         """
         log.info(f'执行变量提取：{extract["key"]}')
+
         key = extract['key']
         set_type = extract['type']
         json_path = extract['jsonpath']
         value = findall(json_path, response)
-        if value:
-            value_str = str(value[0])
-        else:
+        if not value:
             raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
+        value_str = str(value[0])
         if set_type == VarType.CACHE:
             variable_cache.set(key, value_str)
         elif set_type == VarType.ENV:
@@ -145,7 +146,7 @@ class VarsExtractor:
             write_yaml_vars({key: value_str})
         else:
             raise VariableError(
-                f'前置 sql 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
+                f'前置 SQL 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
             )
 
 
