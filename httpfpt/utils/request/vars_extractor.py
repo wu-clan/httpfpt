@@ -57,9 +57,8 @@ class VarsExtractor:
         # 获取全局变量
         global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
-        re_str = self.vars_re
-        if env_filename:
-            re_str = self.sql_vars_re
+        # 获取 re 规则字符串
+        re_str = self.sql_vars_re if env_filename else self.vars_re
 
         while re.findall(re_str, str_target):
             key = re.search(re_str, str_target)
@@ -68,13 +67,15 @@ class VarsExtractor:
             if var_key is not None:
                 log_type = '请求数据'
                 try:
-                    cache_value = variable_cache.get(var_key)
-                    if cache_value is None:
-                        value = env_vars.get(var_key.upper()) or global_vars.get(var_key)
-                        if value is not None:
+                    # 设置默认值为特殊字符, 避免变量值为 None 时错误判断
+                    default = '`AE86`'
+                    cache_value = variable_cache.get(var_key, default=default)
+                    if cache_value == default:
+                        var_value = env_vars.get(var_key.upper(), global_vars.get(var_key, default))
+                        if var_value != default:
                             if env_filename is not None:
                                 log_type = 'SQL '
-                            str_target = re.sub(re_str, str(value), str_target, 1)
+                            str_target = re.sub(re_str, str(var_value), str_target, 1)
                             log.info(f'{log_type}变量 {var_key} 替换完成')
                         else:
                             raise VariableError(var_key)
@@ -101,19 +102,16 @@ class VarsExtractor:
             key = re.search(self.relate_vars_re, str_target)
             var_key = key.group(1) or key.group(2)
             if var_key is not None:
-                cache_value = variable_cache.get(var_key)
-                if cache_value is not None:
+                default = '`AE86`'
+                cache_value = variable_cache.get(var_key, default=default)
+                if cache_value != default:
                     try:
                         str_target = re.sub(self.relate_vars_re, str(cache_value), str_target, 1)
                         log.info(f'请求数据关联变量 {var_key} 替换完成')
                     except Exception as e:
-                        log_error_msg = f'请求数据关联变量 {var_key} 替换失败: {e}'
-                        log.error(log_error_msg)
-                        raise VariableError(log_error_msg)
+                        raise VariableError(f'请求数据关联变量 {var_key} 替换失败: {e}')
                 else:
-                    err_msg = f'请求数据关联变量替换失败，临时变量池不存在变量: "{var_key}"'
-                    log.error(err_msg)
-                    raise VariableError(err_msg)
+                    raise VariableError(f'请求数据关联变量替换失败，临时变量池不存在变量: "{var_key}"')
 
         dict_target = json.loads(str_target)
 
