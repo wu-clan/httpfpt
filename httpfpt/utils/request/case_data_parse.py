@@ -74,14 +74,12 @@ def case_id_unique_verify() -> None:
     all_case_id_dict: List[Dict[str, str | List[str]]] = []
     all_case_id = []
     case_id_count = defaultdict(int)
-
     case_data_list = redis_client.get_prefix(f'{redis_client.case_data_prefix}:')
     redis_client.delete_prefix(f'{redis_client.case_id_file_prefix}:')
 
     for case_data in case_data_list:
         case_data = json.loads(case_data)
         filename = case_data['filename']
-
         try:
             steps = case_data['test_steps']
             if isinstance(steps, dict):
@@ -90,16 +88,13 @@ def case_id_unique_verify() -> None:
                 all_case_id_dict.append({filename: [case_id]})
                 case_id_count[case_id] += 1
                 redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
-
             if isinstance(steps, list):
                 case_id_list = [s['case_id'] for s in steps]
                 all_case_id.extend(case_id_list)
                 all_case_id_dict.append({filename: case_id_list})
-
                 for case_id in case_id_list:
                     case_id_count[case_id] += 1
                     redis_client.set(f'{redis_client.case_id_file_prefix}:{case_id}', filename)
-
         except KeyError:
             raise RequestDataParseError(f'测试用例数据文件 {filename} 结构错误，建议开启 pydantic 验证')
 
