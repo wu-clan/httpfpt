@@ -34,7 +34,7 @@
 - 自动测试结果通知，飞书，钉钉，~~企业微信~~，邮箱
 - ......
 
-## 流程
+## 流程图
 
 ![httpfpt_flowchart](https://github.com/wu-clan/image/blob/master/httpfpt_flowchart.png?raw=true)
 
