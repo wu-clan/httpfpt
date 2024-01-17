@@ -14,7 +14,9 @@
 
 > [!CAUTION]
 > 如果你正在使用 python<=3.9，可能导致运行错误，尽管 ci 验证通过
+> 
 > 由于 pydantic-2.0 相关[【问题】](https://github.com/pydantic/pydantic/pull/8209)，导致在 python<=3.9 时运行异常
+> 
 > 我决定保持当前行为，一旦 pydantic 修复此问题，便发布补丁版本
 
 ## 功能点
@@ -42,7 +44,7 @@
 git clone https://github.com/wu-clan/httpfpt.git
 ```
 
-## 🧑‍💻 DEV
+## 🧑‍💻 Use
 
 1. 安装依赖:
 
@@ -58,7 +60,7 @@ git clone https://github.com/wu-clan/httpfpt.git
 
    [Docker](https://hub.docker.com/_/redis)
 
-3. 安装 mysql 数据库（可选，如果你需要执行 SQL 操作）
+3. 安装 mysql 数据库（可选，如果你需要本地数据库）
 
    [Windows / Linux / macOS](https://dev.mysql.com/downloads/installer/)
 
