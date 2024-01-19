@@ -98,11 +98,13 @@ class VarsExtractor:
         """
         str_target = json.dumps(target)
 
-        var_key = None
+        var_keys = []
+        log.info('执行关联测试用例变量替换...')
         while re.findall(self.relate_vars_re, str_target):
             key = re.search(self.relate_vars_re, str_target)
             var_key = key.group(1) or key.group(2)
             if var_key is not None:
+                var_keys.append(var_key)
                 default = '`AE86`'
                 cache_value = variable_cache.get(var_key, default=default, tag='relate_testcase')
                 if cache_value != default:
@@ -114,8 +116,11 @@ class VarsExtractor:
                 else:
                     raise VariableError(f'请求数据关联变量替换失败，临时变量池不存在变量: "{var_key}"')
 
-        if var_key is not None:
-            variable_cache.delete(var_key, tag='relate_testcase')
+        log.info('关联测试用例变量替换完毕')
+        # TODO: https://github.com/StKali/cache3/issues/18
+        if var_keys:
+            for var_key in var_keys:
+                variable_cache.delete(var_key, tag='relate_testcase')
 
         dict_target = json.loads(str_target)
 
