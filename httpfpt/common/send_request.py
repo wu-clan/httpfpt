@@ -130,7 +130,7 @@ class SendRequests:
         log.info('开始解析请求数据...' if not relate_log else '开始解析关联请求数据...')
         try:
             request_data_parse = RequestDataParse(request_data, request_engin)
-            parsed_data = request_data_parse.get_request_data_parsed
+            parsed_data = request_data_parse.get_request_data_parsed()
             if not relate_log:
                 log.info(f'🏷️ ID: {parsed_data["case_id"]}')
         except Skipped as e:
@@ -155,10 +155,9 @@ class SendRequests:
                     for key, value in item.items():
                         if value is not None:
                             if key == SetupType.TESTCASE:
-                                new_parsed = exec_setup_testcase(request_data_parse, value)
-                                if isinstance(new_parsed, RequestDataParse):
-                                    # 获取最新数据，对于引用了<关联测试用例变量>的测试来讲, 可能造成性能损耗
-                                    parsed_data = request_data_parse.get_request_data_parsed
+                                relate_parsed_data = exec_setup_testcase(parsed_data, value)
+                                if relate_parsed_data:
+                                    parsed_data = relate_parsed_data
                             elif key == SetupType.SQL:
                                 mysql_client.exec_case_sql(value, parsed_data['env'])
                             elif key == SetupType.HOOK:

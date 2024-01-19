@@ -641,7 +641,6 @@ class RequestDataParse:
                 )
         return wait_time
 
-    @property
     def get_request_data_parsed(self) -> dict:
         """
         获取所有解析后的请求数据

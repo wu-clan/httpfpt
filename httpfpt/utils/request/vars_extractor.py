@@ -98,12 +98,13 @@ class VarsExtractor:
         """
         str_target = json.dumps(target)
 
+        var_key = None
         while re.findall(self.relate_vars_re, str_target):
             key = re.search(self.relate_vars_re, str_target)
             var_key = key.group(1) or key.group(2)
             if var_key is not None:
                 default = '`AE86`'
-                cache_value = variable_cache.get(var_key, default=default)
+                cache_value = variable_cache.get(var_key, default=default, tag='relate_testcase')
                 if cache_value != default:
                     try:
                         str_target = re.sub(self.relate_vars_re, str(cache_value), str_target, 1)
@@ -112,6 +113,9 @@ class VarsExtractor:
                         raise VariableError(f'请求数据关联变量 {var_key} 替换失败: {e}')
                 else:
                     raise VariableError(f'请求数据关联变量替换失败，临时变量池不存在变量: "{var_key}"')
+
+        if var_key is not None:
+            variable_cache.delete(var_key, tag='relate_testcase')
 
         dict_target = json.loads(str_target)
 
