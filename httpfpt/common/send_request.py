@@ -204,10 +204,8 @@ class SendRequests:
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
             response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
-            response_data['headers'] = response.headers
         elif request_engin == EnginType.httpx:
             response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
-            response_data['headers'] = dict(response.headers)
         else:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
@@ -215,6 +213,7 @@ class SendRequests:
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
+        response_data['headers'] = dict(response.headers)
         response_data['cookies'] = dict(response.cookies)
         try:
             json_data = response.json()
