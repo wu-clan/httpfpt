@@ -170,7 +170,7 @@ class SendRequests:
                 raise e
             log.info('请求前置处理完成')
 
-        # 记录请求数据
+        # 日志记录请求数据
         if log_data:
             self.log_request_up(parsed_data)
             self.allure_request_up(parsed_data)
@@ -178,14 +178,13 @@ class SendRequests:
         # allure 记录动态数据
         self.allure_dynamic_data(parsed_data)
 
-        # 发送请求
+        # 整理请求参数
         request_conf = {
             'timeout': parsed_data['timeout'],
             'verify': parsed_data['verify'],
             'proxies': parsed_data['proxies'],
             'allow_redirects': parsed_data['redirects'],
         }
-        response_data = self.init_response_metadata
         request_data_parsed = {
             'method': parsed_data['method'],
             'url': parsed_data['url'],
@@ -199,19 +198,23 @@ class SendRequests:
         elif parsed_data['body_type'] == BodyType.binary:
             if request_engin == EnginType.httpx:
                 request_data_parsed.update({'content': request_data_parsed.pop('data')})
+
+        # 发送请求
+        response_data = self.init_response_metadata
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
             response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
+            response_data['headers'] = response.headers
         elif request_engin == EnginType.httpx:
             response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
+            response_data['headers'] = dict(response.headers)
         else:
-            raise SendRequestError('请求发起失败，请使用合法的请求引擎')
+            raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
         # 记录响应数据
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
-        response_data['headers'] = response.headers
         response_data['cookies'] = dict(response.cookies)
         try:
             json_data = response.json()
@@ -222,7 +225,7 @@ class SendRequests:
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
 
-        # 记录响应数据
+        # 日志记录响应数据
         teardown = parsed_data['teardown']
         if log_data:
             self.log_request_down(response_data)
