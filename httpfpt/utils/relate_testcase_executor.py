@@ -5,8 +5,6 @@ from __future__ import annotations
 import ast
 import json
 
-from typing import TYPE_CHECKING
-
 from jsonpath import findall
 
 from httpfpt.common.errors import CorrelateTestCaseError, JsonPathFindError
@@ -17,20 +15,17 @@ from httpfpt.enums.setup_type import SetupType
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.request.vars_extractor import var_extractor
 
-if TYPE_CHECKING:
-    from httpfpt.utils.request.request_data_parse import RequestDataParse
 
-
-def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: str | dict) -> RequestDataParse | None:
+def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict | None:
     """
     执行前置关联测试用例
 
-    :param parsed:
+    :param parsed_data:
     :param setup_testcase:
     :return:
     """
     # 判断是否关联用例自身
-    parsed_case_id = parsed.case_id
+    parsed_case_id = parsed_data['case_id']
     error_text = '执行关联测试用例失败，禁止关联自身'
     if isinstance(setup_testcase, dict):
         if setup_testcase['case_id'] == parsed_case_id:
@@ -75,7 +70,10 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: str | dict) ->
         else:
             relate_case_steps = case_data_test_steps
             is_circular_relate(parsed_case_id, relate_case_steps)
-            testcase_data = {'set_var_key': setup_testcase['key'], 'set_var_jsonpath': setup_testcase['jsonpath']}
+            testcase_data = {
+                'set_var_key': setup_testcase['key'],
+                'set_var_jsonpath': setup_testcase['jsonpath'],
+            }
             case_data.update(testcase_data)
             relate_testcase_set_var(case_data)
 
@@ -99,11 +97,10 @@ def exec_setup_testcase(parsed: RequestDataParse, setup_testcase: str | dict) ->
             relate_testcase_exec(case_data)
 
     if relate_count > 0:
-        # 应用关联测试用例变量到请求数据，使用模糊匹配，可能有优化效果
-        request_data = parsed.request_data
-        if '^' in str(request_data):
-            parsed.request_data = var_extractor.relate_vars_replace(request_data)
-            return parsed
+        # 应用关联测试用例变量到请求数据，使用模糊匹配，可能有解析速度优化效果
+        if '^' in str(parsed_data):
+            relate_parsed_data = var_extractor.relate_vars_replace(parsed_data)
+            return relate_parsed_data
 
 
 def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
@@ -150,7 +147,7 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
     value = findall(testcase_data['set_var_jsonpath'], response)
     if value:
-        variable_cache.set(testcase_data['set_var_key'], value[0])
+        variable_cache.set(testcase_data['set_var_key'], value[0], tag='relate_testcase')
         log.info('⛓️ 关联测试用例变量提取执行完成')
     else:
         raise JsonPathFindError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
