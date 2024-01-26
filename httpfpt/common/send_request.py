@@ -82,7 +82,7 @@ class SendRequests:
             log.error(f'发送 requests 请求响应异常: {e}')
             raise SendRequestError(e.__str__())
         else:
-            return response
+            return response  # type: ignore
 
     @staticmethod
     def _httpx_engin(**kwargs) -> HttpxResponse:
@@ -103,7 +103,7 @@ class SendRequests:
         del kwargs['retry']
         log.info('开始发送请求...')
         try:
-            with httpx.Client(verify=verify, proxies=proxies, follow_redirects=redirects) as client:
+            with httpx.Client(verify=verify, proxies=proxies, follow_redirects=redirects) as client:  # type: ignore
                 for attempt in stamina.retry_context(on=httpx.HTTPError, attempts=request_retry):
                     with attempt:
                         if stamina.is_active():
@@ -114,7 +114,7 @@ class SendRequests:
             log.error(f'发送 httpx 请求响应异常: {e}')
             raise SendRequestError(e.__str__())
         else:
-            return response
+            return response  # type: ignore
 
     def send_request(
         self,
