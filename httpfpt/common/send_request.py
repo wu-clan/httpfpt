@@ -7,6 +7,7 @@ from json import JSONDecodeError
 import allure
 import httpx
 import requests
+import stamina
 
 from _pytest.outcomes import Skipped
 from httpx import Response as HttpxResponse
@@ -61,20 +62,27 @@ class SendRequests:
         :param kwargs:
         :return:
         """
+        kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
+        kwargs['verify'] = kwargs['verify'] or config.REQUEST_VERIFY
+        kwargs['proxies'] = kwargs['proxies'] or config.REQUEST_PROXIES_REQUESTS
+        kwargs['allow_redirects'] = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
+        request_retry = kwargs['retry'] or config.REQUEST_RETRY
+        del kwargs['retry']
+        # 消除安全警告
+        requests.packages.urllib3.disable_warnings()  # type: ignore
+        log.info('开始发送请求...')
         try:
-            kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
-            kwargs['verify'] = kwargs['verify'] or config.REQUEST_VERIFY
-            kwargs['proxies'] = kwargs['proxies'] or config.REQUEST_PROXIES_REQUESTS
-            kwargs['allow_redirects'] = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
-            # 消除安全警告
-            requests.packages.urllib3.disable_warnings()  # type: ignore
-            log.info('开始发送请求...')
-            response = requests.session().request(**kwargs)
-            response.raise_for_status()
-            return response
+            for attempt in stamina.retry_context(on=requests.HTTPError, attempts=request_retry):
+                with attempt:
+                    if stamina.is_active():
+                        log.warning('请求响应异常重试...')
+                    response = requests.session().request(**kwargs)
+                    response.raise_for_status()
         except Exception as e:
-            log.error(f'发送 requests 请求异常: {e}')
+            log.error(f'发送 requests 请求响应异常: {e}')
             raise SendRequestError(e.__str__())
+        else:
+            return response  # type: ignore
 
     @staticmethod
     def _httpx_engin(**kwargs) -> HttpxResponse:
@@ -84,26 +92,29 @@ class SendRequests:
         :param kwargs:
         :return:
         """
+        kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
+        verify = kwargs['verify'] or config.REQUEST_VERIFY
+        proxies = kwargs['proxies'] or config.REQUEST_PROXIES_HTTPX
+        redirects = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
+        request_retry = kwargs['retry'] or config.REQUEST_RETRY
+        del kwargs['verify']
+        del kwargs['proxies']
+        del kwargs['allow_redirects']
+        del kwargs['retry']
+        log.info('开始发送请求...')
         try:
-            kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
-            verify = kwargs['verify'] or config.REQUEST_VERIFY
-            proxies = kwargs['proxies'] or config.REQUEST_PROXIES_HTTPX
-            redirects = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
-            del kwargs['verify']
-            del kwargs['proxies']
-            del kwargs['allow_redirects']
-            log.info('开始发送请求...')
-            with httpx.Client(
-                verify=verify,
-                proxies=proxies,  # type: ignore
-                follow_redirects=redirects,
-            ) as client:
-                response = client.request(**kwargs)
-                response.raise_for_status()
-                return response
+            with httpx.Client(verify=verify, proxies=proxies, follow_redirects=redirects) as client:  # type: ignore
+                for attempt in stamina.retry_context(on=httpx.HTTPError, attempts=request_retry):
+                    with attempt:
+                        if stamina.is_active():
+                            log.warning('请求响应异常重试...')
+                        response = client.request(**kwargs)
+                        response.raise_for_status()
         except Exception as e:
-            log.error(f'发送 httpx 请求异常: {e}')
+            log.error(f'发送 httpx 请求响应异常: {e}')
             raise SendRequestError(e.__str__())
+        else:
+            return response  # type: ignore
 
     def send_request(
         self,
@@ -192,6 +203,7 @@ class SendRequests:
             'headers': parsed_data['headers'],
             'data': parsed_data['body'],
             'files': parsed_data['files'],
+            'retry': parsed_data['retry'],
         }
         if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
             request_data_parsed.update({'json': request_data_parsed.pop('data')})
@@ -292,6 +304,7 @@ class SendRequests:
         else:
             log.info(f"请求 json: {parsed_data['body']}")
         log.info(f"请求 files: {parsed_data['files_no_parse']}")
+        log.info(f"请求 retry: {parsed_data['retry']}")
 
     def log_request_teardown(self, teardown: list) -> None:
         for item in teardown:

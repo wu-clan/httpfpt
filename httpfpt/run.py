@@ -44,7 +44,6 @@ def startup(
     allure_clear: bool = True,
     allure_serve: bool = False,
     # extra
-    reruns: int = 0,
     maxfail: int = 0,
     x: bool = False,
     n: Literal['auto', 'logical'] | int | None = None,
@@ -63,7 +62,6 @@ def startup(
     :param allure: 生成 allure 测试报告, 默认开启
     :param allure_clear: 清空 allure 报告历史记录, 默认开启
     :param allure_serve: 自动打开 allure 测试报告服务， 默认关闭
-    :param reruns: 用例运行失败重试次数, 兼容性差, 默认不开启使用
     :param maxfail: 用例运行失败数量，到达数量上限后终止运行，默认为 0，即不终止
     :param x: 用例运行失败, 终止运行, 默认关闭
     :param n: 分布式运行, 默认关闭
@@ -105,9 +103,6 @@ def startup(
         run_args.append(f'--alluredir={ALLURE_REPORT_PATH}')
         if allure_clear:
             run_args.append('--clean-alluredir')
-
-    if reruns != 0:
-        run_args.append(f'--reruns {reruns}')
 
     if maxfail != 0:
         run_args.append(f'--maxfail {maxfail}')

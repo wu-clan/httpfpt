@@ -56,3 +56,4 @@ verify = false
 redirects = true
 proxies.http = ''
 proxies.https = ''
+retry = 3

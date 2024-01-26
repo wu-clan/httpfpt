@@ -8,8 +8,6 @@ from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 
 __all__ = ['CaseData']
 
-# TODO: 由于 pydantic-v2 运行时不处理旧版本类型评估，导致 ci 可以正常通过，但运行会报告错误。详情：https://github.com/pydantic/pydantic/pull/8209
-
 
 class ConfigAllureData(BaseModel):
     epic: str
@@ -25,6 +23,7 @@ class ConfigRequestData(BaseModel):
     verify: bool | None = None
     redirects: bool | None = None
     proxies: Dict[Literal['http', 'https', 'http://', 'https://'], AnyHttpUrl | None] | None = None
+    retry: int | None = None
 
 
 class Config(BaseModel):
@@ -41,6 +40,7 @@ class StepsRequestData(BaseModel):
     body_type: Literal['form', 'x_form', 'binary', 'GraphQL', 'text', 'js', 'json', 'html', 'xml'] | None
     body: Any | None
     files: Dict[str, str | List[str]] | None
+    retry: int | None = None
 
 
 class SetupTestCaseData(BaseModel):
