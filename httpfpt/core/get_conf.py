@@ -85,6 +85,7 @@ class Config:
             if self.__config['request']['proxies']['https'] != ''
             else None,
         }
+        self.REQUEST_RETRY = self.__config['request']['retry']
 
 
 @lru_cache(maxsize=None)

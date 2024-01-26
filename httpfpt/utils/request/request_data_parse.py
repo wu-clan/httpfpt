@@ -139,8 +139,7 @@ class RequestDataParse:
             verify = self.request_data['config']['request']['verify']
             if verify is not None:
                 if not isinstance(verify, bool):
-                    if not isinstance(verify, str):
-                        raise RequestDataParseError(_error_msg('参数 config:request:verify 不是有效的 bool / str 类型'))
+                    raise RequestDataParseError(_error_msg('参数 config:request:verify 不是有效的 bool 类型'))
         except _RequestDataParamGetError:
             verify = None
         return verify
@@ -181,6 +180,20 @@ class RequestDataParse:
         except _RequestDataParamGetError:
             proxies = None
         return proxies
+
+    @property
+    def retry(self) -> int | None:
+        try:
+            retry = self.request_data['test_steps']['request']['retry']
+        except _RequestDataParamGetError:
+            try:
+                retry = self.request_data['config']['request']['retry']
+            except _RequestDataParamGetError:
+                retry = None
+        if retry is not None:
+            if isinstance(retry, int):
+                raise RequestDataParseError(_error_msg('参数 config:request:retry 不是有效的 int 类型'))
+        return retry
 
     @property
     def module(self) -> str:
@@ -687,6 +700,7 @@ class RequestDataParse:
             'verify': self.verify,
             'redirects': self.redirects,
             'proxies': self.proxies,
+            'retry': self.retry,
             'module': self.module,
             'name': self.name,
             'case_id': self.case_id,
