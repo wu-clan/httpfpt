@@ -82,6 +82,7 @@ test_steps:
     case_id: event_create_001
     description: 测试hook
     is_run:
+    retry: 2
     request:
       method: POST
       url: /users/1
@@ -93,7 +94,6 @@ test_steps:
         body: sum(a+b)=${sum_a_b(1,2)}; $test_cache; $test_env; ${test_global}.
         userId: 1
       files:
-      retry: 2
     setup:
       - hook: ${current_time()}
     teardown:

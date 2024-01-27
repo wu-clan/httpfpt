@@ -23,7 +23,6 @@ class ConfigRequestData(BaseModel):
     verify: bool | None = None
     redirects: bool | None = None
     proxies: Dict[Literal['http', 'https', 'http://', 'https://'], AnyHttpUrl | None] | None = None
-    retry: int | None = None
 
 
 class Config(BaseModel):
@@ -107,6 +106,7 @@ class Steps(BaseModel):
     case_id: str
     description: str
     is_run: bool | dict | None = None
+    retry: int | None = None
     request: StepsRequestData
     setup: List[StepsSetUpData] | None = None
     teardown: List[StepsTearDownData] | None = None
