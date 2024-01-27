@@ -707,7 +707,7 @@ class RequestDataParse:
             'retry': self.retry,
             'module': self.module,
             'name': self.name,
-            'case_id': self.case_id,
+            'case_id': case_id,
             'description': self.description,
             'method': self.method,
             'url': self.url,
