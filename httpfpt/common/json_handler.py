@@ -70,4 +70,4 @@ def write_json_file(
         log.error(f'写入文件 "{filename}" 错误: {e}')
         raise e
     else:
-        log.success(f'写入文件 {filename} 成功')
+        log.info(f'写入文件 {filename} 成功')

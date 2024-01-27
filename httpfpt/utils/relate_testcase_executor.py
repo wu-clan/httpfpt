@@ -141,14 +141,14 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     """
     from httpfpt.common.send_request import send_request
 
-    msg = '🔗 执行关联测试用例变量提取：{}'.format(testcase_data['test_steps']['case_id'])
+    msg = f'>>> 执行关联测试用例变量提取：{testcase_data["test_steps"]["case_id"]}'
     log.debug(msg)
     allure_step(msg, '此文件为空')
     response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
     value = findall(testcase_data['set_var_jsonpath'], response)
     if value:
         variable_cache.set(testcase_data['set_var_key'], value[0], tag='relate_testcase')
-        log.info('⛓️ 关联测试用例变量提取执行完成')
+        log.info('<<< 关联测试用例变量提取执行完成')
     else:
         raise JsonPathFindError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
 
@@ -162,8 +162,8 @@ def relate_testcase_exec(testcase_data: dict) -> None:
     """
     from httpfpt.common.send_request import send_request
 
-    msg = '🔗 执行关联测试用例：{}'.format(testcase_data['test_steps']['case_id'])
+    msg = f'>>> 执行关联测试用例：{testcase_data["test_steps"]["case_id"]}'
     log.debug(msg)
     allure_step(msg, '此文件为空')
     send_request.send_request(testcase_data, log_data=False, relate_log=True)
-    log.info('⛓️ 关联测试用例执行完成')
+    log.info('<<< 关联测试用例执行完成')

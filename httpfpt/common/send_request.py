@@ -74,7 +74,7 @@ class SendRequests:
         try:
             for attempt in stamina.retry_context(on=requests.HTTPError, attempts=request_retry):
                 with attempt:
-                    if stamina.is_active():
+                    if attempt.num > 1:
                         log.warning('请求响应异常重试...')
                     response = requests.session().request(**kwargs)
                     response.raise_for_status()
@@ -106,7 +106,7 @@ class SendRequests:
             with httpx.Client(verify=verify, proxies=proxies, follow_redirects=redirects) as client:  # type: ignore
                 for attempt in stamina.retry_context(on=httpx.HTTPError, attempts=request_retry):
                     with attempt:
-                        if stamina.is_active():
+                        if attempt.num > 1:
                             log.warning('请求响应异常重试...')
                         response = client.request(**kwargs)
                         response.raise_for_status()
@@ -141,9 +141,7 @@ class SendRequests:
         log.info('开始解析请求数据...' if not relate_log else '开始解析关联请求数据...')
         try:
             request_data_parse = RequestDataParse(request_data, request_engin)
-            parsed_data = request_data_parse.get_request_data_parsed()
-            if not relate_log:
-                log.info(f'🏷️ ID: {parsed_data["case_id"]}')
+            parsed_data = request_data_parse.get_request_data_parsed(relate_log)
         except Skipped as e:
             raise e
         except Exception as e:
@@ -304,7 +302,6 @@ class SendRequests:
         else:
             log.info(f"请求 json: {parsed_data['body']}")
         log.info(f"请求 files: {parsed_data['files_no_parse']}")
-        log.info(f"请求 retry: {parsed_data['retry']}")
 
     def log_request_teardown(self, teardown: list) -> None:
         for item in teardown:
@@ -332,7 +329,7 @@ class SendRequests:
         if str_status_code.startswith('4') or str_status_code.startswith('5'):
             log.error(f"响应状态码: {response_data['status_code']}")
         else:
-            log.success(f"响应状态码: {response_data['status_code']}")
+            log.info(f"响应状态码: {response_data['status_code']}")
         log.info(f"响应时间: {response_data['elapsed']} ms")
 
     @staticmethod
