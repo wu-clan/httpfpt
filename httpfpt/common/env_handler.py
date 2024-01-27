@@ -30,10 +30,11 @@ def write_env_vars(filepath: str, filename: str, key: str, value: str) -> None:
     :return:
     """
     _file = os.path.join(filepath, filename)
+    key_upper = key.upper()
     try:
-        dotenv.set_key(_file, key.upper(), value)
+        dotenv.set_key(_file, key_upper, value)
     except Exception as e:
-        log.error(f'写入 {filename} 环境变量 {key.upper()}={value} 错误: {e}')
+        log.error(f'写入 {filename} 环境变量 {key_upper}={value} 错误: {e}')
         raise e
     else:
-        log.success(f'写入 {filename} 环境变量 {key.upper()}={value} 成功')
+        log.info(f'写入环境变量成功: {filename} -> {key_upper}={value}')

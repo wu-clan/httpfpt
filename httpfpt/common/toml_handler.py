@@ -49,5 +49,5 @@ def write_toml(filepath: str, filename: str, data: dict, encoding: str = 'utf-8'
         log.error(f'写入文件 "{filename}" 错误 \n {e}')
         raise e
     else:
-        log.success(f'写入文件 {filename} 成功')
+        log.info(f'写入文件 {filename} 成功')
         return result

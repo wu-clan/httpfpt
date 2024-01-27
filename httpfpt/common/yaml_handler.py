@@ -61,7 +61,7 @@ def write_yaml(filepath: str, filename: str, data: Any = None, *, encoding: str 
         log.error(f'写入文件 "{filename}" 错误: {e}')
         raise e
     else:
-        log.success(f'写入文件 {filename} 成功')
+        log.info(f'写入文件成功: {filename} ')
         return result
 
 
@@ -91,7 +91,7 @@ def write_yaml_report(
         log.error(f'写入 {filename} 测试报告失败: {e}')
         raise e
     else:
-        log.success(f'写入 {filename} 测试报告成功')
+        log.info(f'写入测试报告成功: {filename}')
 
 
 def write_yaml_vars(data: dict) -> None:
@@ -110,7 +110,7 @@ def write_yaml_vars(data: dict) -> None:
     except Exception as e:
         log.error(f'写入 global_vars.yaml 全局变量 {data} 错误: {e}')
     else:
-        log.success(f'写入 global_vars.yaml 全局变量 {data} 成功')
+        log.info(f'写入全局变量成功: global_vars.yaml -> {data}')
 
 
 def get_yaml_file(filepath: str = YAML_DATA_PATH, *, filename: str) -> str:

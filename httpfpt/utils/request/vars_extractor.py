@@ -119,6 +119,7 @@ class VarsExtractor:
         log.info('关联测试用例变量替换完毕')
         # TODO: https://github.com/StKali/cache3/issues/18
         if var_keys:
+            log.info('自动清理关联变量中...')
             for var_key in var_keys:
                 variable_cache.delete(var_key, tag='relate_testcase')
 
