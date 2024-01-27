@@ -191,7 +191,7 @@ class RequestDataParse:
             except _RequestDataParamGetError:
                 retry = None
         if retry is not None:
-            if isinstance(retry, int):
+            if not isinstance(retry, int):
                 raise RequestDataParseError(_error_msg('参数 config:request:retry 不是有效的 int 类型'))
         return retry
 
@@ -654,12 +654,16 @@ class RequestDataParse:
                 )
         return wait_time
 
-    def get_request_data_parsed(self) -> dict:
+    def get_request_data_parsed(self, relate_log: bool = False) -> dict:
         """
         获取所有解析后的请求数据
 
+        :param relate_log:
         :return:
         """
+        case_id = self.case_id
+        if not relate_log:
+            log.info(f'🏷️ ID: {case_id}')
         # 自动解析 headers
         headers = self.headers
         body_type = self.body_type
