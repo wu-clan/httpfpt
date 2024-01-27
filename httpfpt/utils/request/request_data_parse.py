@@ -184,7 +184,7 @@ class RequestDataParse:
     @property
     def retry(self) -> int | None:
         try:
-            retry = self.request_data['test_steps']['request']['retry']
+            retry = self.request_data['test_steps']['retry']
         except _RequestDataParamGetError:
             try:
                 retry = self.request_data['config']['request']['retry']
