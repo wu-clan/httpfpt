@@ -39,7 +39,6 @@ class StepsRequestData(BaseModel):
     body_type: Literal['form', 'x_form', 'binary', 'GraphQL', 'text', 'js', 'json', 'html', 'xml'] | None
     body: Any | None
     files: Dict[str, str | List[str]] | None
-    retry: int | None = None
 
 
 class SetupTestCaseData(BaseModel):
