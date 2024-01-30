@@ -13,7 +13,7 @@ import cappa
 from cappa import Subcommands
 from pydantic import ValidationError
 from rich.prompt import Confirm
-from typing_extensions import Annotated  # noqa: TCH002
+from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 

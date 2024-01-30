@@ -17,10 +17,10 @@ jobs:
         python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -36,10 +36,10 @@ jobs:
           extra_args: --all-files --verbose
 
       - name: pyright
-        uses: jakebailey/pyright-action@v1
+        uses: jakebailey/pyright-action@v2
         with:
           python-version: ${{ matrix.python-version }}
-          version: 1.1.343
+          version: 1.1.349
           project: .
           verbose: true
 
