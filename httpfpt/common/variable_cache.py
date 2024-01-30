@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from cache3 import SafeCache
+from cache3 import Cache
 
 from httpfpt.common.log import log
 
 
 class VariableCache:
-    def __init__(self, cache: SafeCache = SafeCache()) -> None:
+    def __init__(self, cache: Cache = Cache('httpfpt_cache_vars')) -> None:
         self.cache = cache
 
     def get(self, key: str, **kwargs) -> Any:
