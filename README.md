@@ -5,6 +5,7 @@
 [![GitHub](https://img.shields.io/github/license/wu-clan/httpfpt)](https://github.com/wu-clan/httpfpt/blob/master/LICENSE)
 ![Static Badge](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/wu-clan/httpfpt)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 基于 HTTP 请求的快速数据驱动 pytest 接口自动化测试框架
 
@@ -74,8 +75,7 @@ git clone https://github.com/wu-clan/httpfpt.git
 
 ## 互动
 
-- [Telegram](https://t.me/+ZlPhIFkPp7E4NGI1)
-- [QQ](https://pd.qq.com/s/8rwhzt4ox)
+- [wu-clan](https://github.com/wu-clan)
 
 ## 状态
 
