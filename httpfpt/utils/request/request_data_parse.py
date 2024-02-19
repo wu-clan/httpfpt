@@ -378,6 +378,17 @@ class RequestDataParse:
             return headers
 
     @property
+    def cookies(self) -> dict | None:
+        try:
+            cookies = self.request_data['test_steps']['request']['cookies']
+        except _RequestDataParamGetError:
+            cookies = None
+        if cookies is not None:
+            if not isinstance(cookies, dict):
+                raise RequestDataParseError(_error_msg('参数 test_steps:request:cookies 不是有效的 dict 类型'))
+        return cookies
+
+    @property
     def body_type(self) -> str | None:
         try:
             data_type = self.request_data['test_steps']['request']['body_type']
@@ -714,6 +725,7 @@ class RequestDataParse:
             'url': self.url,
             'params': self.params,
             'headers': headers,
+            'cookies': self.cookies,
             'body_type': body_type,
             'body': body,
             'files': files,
