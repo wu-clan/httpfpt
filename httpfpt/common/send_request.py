@@ -193,15 +193,16 @@ class SendRequests:
             'verify': parsed_data['verify'],
             'proxies': parsed_data['proxies'],
             'allow_redirects': parsed_data['redirects'],
+            'retry': parsed_data['retry'],
         }
         request_data_parsed = {
             'method': parsed_data['method'],
             'url': parsed_data['url'],
             'params': parsed_data['params'],
             'headers': parsed_data['headers'],
+            'cookies': parsed_data['cookies'],
             'data': parsed_data['body'],
             'files': parsed_data['files'],
-            'retry': parsed_data['retry'],
         }
         if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
             request_data_parsed.update({'json': request_data_parsed.pop('data')})
