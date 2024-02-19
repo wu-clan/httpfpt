@@ -8,11 +8,11 @@ from typing import Any, Dict, Optional
 import yaml
 
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import TEST_DATA_PATH, YAML_DATA_PATH, YAML_REPORT_PATH
+from httpfpt.core.path_conf import CASE_DATA_PATH, TEST_DATA_PATH, YAML_REPORT_PATH
 from httpfpt.utils.time_control import get_current_time
 
 
-def read_yaml(filepath: Optional[str] = YAML_DATA_PATH, *, filename: str) -> Dict[str, Any]:
+def read_yaml(filepath: Optional[str] = CASE_DATA_PATH, *, filename: str) -> Dict[str, Any]:
     """
     读取 yaml 文件
 
@@ -113,7 +113,7 @@ def write_yaml_vars(data: dict) -> None:
         log.info(f'写入全局变量成功: global_vars.yaml -> {data}')
 
 
-def get_yaml_file(filepath: str = YAML_DATA_PATH, *, filename: str) -> str:
+def get_yaml_file(filepath: str = CASE_DATA_PATH, *, filename: str) -> str:
     """
     获取 yaml 测试数据文件
 

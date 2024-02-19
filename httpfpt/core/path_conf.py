@@ -11,7 +11,7 @@ LOG_PATH = os.path.join(BASE_DIR, 'log')
 TEST_DATA_PATH = os.path.join(BASE_DIR, 'data')
 
 # Yaml测试数据路径
-YAML_DATA_PATH = os.path.join(TEST_DATA_PATH, 'test_data')
+CASE_DATA_PATH = os.path.join(TEST_DATA_PATH, 'test_data')
 
 # 测试报告路径
 TEST_REPORT_PATH = os.path.join(BASE_DIR, 'report')

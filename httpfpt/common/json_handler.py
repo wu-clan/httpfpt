@@ -6,9 +6,10 @@ import os
 from typing import Any, Optional
 
 from httpfpt.common.log import log
+from httpfpt.core.path_conf import CASE_DATA_PATH
 
 
-def read_json_file(filepath: Optional[str] = None, *, filename: str, **kwargs) -> dict:
+def read_json_file(filepath: Optional[str] = CASE_DATA_PATH, *, filename: str, **kwargs) -> dict:
     """
     读取 json 文件
 
@@ -21,6 +22,9 @@ def read_json_file(filepath: Optional[str] = None, *, filename: str, **kwargs) -
         _file = os.path.join(filepath, filename)
     else:
         _file = filename
+    if not _file:
+        log.error('读取 yaml 文件失败，文件名为空')
+        raise FileNotFoundError('读取 yaml 文件失败，文件名为空')
     try:
         with open(_file, encoding='utf-8') as f:
             data = json.load(f, **kwargs)

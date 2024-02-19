@@ -175,7 +175,7 @@ def startup(
         )  # type: ignore
 
 
-def run(*args, pydantic_verify: bool = True, clean_cache: bool = False, **kwargs) -> None:
+def run(*args, pydantic_verify: bool = True, clean_cache: bool = True, **kwargs) -> None:
     """
     运行入口
 

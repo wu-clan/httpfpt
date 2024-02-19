@@ -6,7 +6,7 @@ from pathlib import Path
 
 from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import TEST_CASE_PATH
-from httpfpt.utils.file_control import get_file_property, search_all_case_yaml_files, search_all_testcase_files
+from httpfpt.utils.file_control import get_file_property, search_all_case_data_files, search_all_testcase_files
 from httpfpt.utils.rich_console import console
 
 
@@ -18,19 +18,19 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
     :return:
     """
     # 获取所用用例数据文件
-    yaml_datafiles = search_all_case_yaml_files()
-    if len(yaml_datafiles) == 0:
+    case_data_files = search_all_case_data_files()
+    if len(case_data_files) == 0:
         raise FileNotFoundError('自动生成用例失败，未在指定项目下找到测试用例数据文件，请检查项目目录是否正确')
 
     # 获取所有测试用例文件
     testcase_files = search_all_testcase_files()
 
     # 获取所有用例文件名
-    yaml_filenames = []
-    yaml_file_root_names = []
-    for _ in yaml_datafiles:
-        yaml_filenames.append(_)
-        yaml_file_root_names.append(get_file_property(_)[1])
+    case_filenames = []
+    case_file_root_names = []
+    for _ in case_data_files:
+        case_filenames.append(_)
+        case_file_root_names.append(get_file_property(_)[1])
 
     # 获取所有测试用例数据文件名
     testcase_filenames = []
@@ -39,7 +39,7 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
 
     # 获取需要创建的测试用例文件名
     create_file_root_names = []
-    for root_name in yaml_file_root_names:
+    for root_name in case_file_root_names:
         if not rewrite:
             if (
                 (root_name if root_name.startswith('test_') else 'test_' + root_name) + '.py'
@@ -54,8 +54,8 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
     console.print('⏳ 疯狂自动生成中...')
 
     for create_file_root_name in create_file_root_names:
-        for yaml_filename in yaml_filenames:
-            file_property = get_file_property(yaml_filename)
+        for case_filename in case_filenames:
+            file_property = get_file_property(case_filename)
             if create_file_root_name == file_property[1]:
                 testcase_class_name = ''.join(name.title() for name in create_file_root_name.split('_'))
                 testcase_func_name = create_file_root_name
@@ -88,7 +88,7 @@ class {testcase_class_name}:
         send_request.send_request(data)
 '''
                 # 创建测试用例文件
-                tag = yaml_filename.split(config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
+                tag = case_filename.split(config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
                 new_testcase_filename = testcase_func_name + '.py'
                 if tag:
                     case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, *tag, new_testcase_filename)

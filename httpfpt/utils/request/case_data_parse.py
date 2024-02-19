@@ -16,7 +16,7 @@ from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.db.redis_db import redis_client
 from httpfpt.schemas.case_data import CaseData
-from httpfpt.utils.file_control import get_file_hash, get_file_property, search_all_case_yaml_files
+from httpfpt.utils.file_control import get_file_hash, get_file_property, search_all_case_data_files
 from httpfpt.utils.pydantic_parser import parse_error
 
 
@@ -38,11 +38,11 @@ def case_data_init(pydantic_verify: bool) -> None:
     :param pydantic_verify:
     :return:
     """
-    all_case_yaml_file = search_all_case_yaml_files()
-    for case_yaml_file in all_case_yaml_file:
-        case_data = read_yaml(None, filename=case_yaml_file)
-        filename = get_file_property(case_yaml_file)[0]
-        file_hash = get_file_hash(case_yaml_file)
+    all_case_data_files = search_all_case_data_files()
+    for case_data_file in all_case_data_files:
+        case_data = read_yaml(None, filename=case_data_file)
+        filename = get_file_property(case_data_file)[0]
+        file_hash = get_file_hash(case_data_file)
         case_data.update({'filename': filename, 'file_hash': file_hash})
         redis_case_data = redis_client.get(f'{redis_client.case_data_prefix}:{filename}', logging=False)
         if redis_case_data is None:
@@ -128,17 +128,11 @@ def get_request_data(*, filename: str) -> List[Dict[str, Any]]:
     case_data = json.loads(redis_client.get(f'{redis_client.case_data_prefix}:{filename}'))
     config_error = f'请求测试用例数据文件 {filename} 缺少 config 信息, 请检查测试用例文件内容'
     test_steps_error = f'请求测试用例数据文件 {filename} 缺少 test_steps 信息, 请检查测试用例文件内容'
-    try:
-        config = case_data['config']
-    except KeyError:
-        raise RequestDataParseError(config_error)
-    if config is None:
+
+    if case_data.get('config') is None:
         raise RequestDataParseError(config_error)
 
-    try:
-        cases = case_data['test_steps']
-    except KeyError:
-        raise RequestDataParseError(test_steps_error)
+    cases = case_data.get('test_steps')
     if cases is None:
         raise RequestDataParseError(test_steps_error)
 

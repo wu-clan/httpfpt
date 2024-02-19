@@ -7,7 +7,7 @@ from httpfpt.common.send_request import send_request
 from httpfpt.utils.request.case_data_parse import get_request_data
 from httpfpt.utils.request.ids_extract import get_ids
 
-request_data = get_request_data(filename='upload_file.yaml')
+request_data = get_request_data(filename='upload_file.json')
 allure_text = request_data[0]['config']['allure']
 request_ids = get_ids(request_data)
 
