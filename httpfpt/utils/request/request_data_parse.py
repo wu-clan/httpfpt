@@ -326,16 +326,17 @@ class RequestDataParse:
         except _RequestDataParamGetError:
             raise RequestDataParseError(_error_msg('缺少 test_steps:request:url 参数'))
         else:
-            env = self.env
-            try:
-                env_file = os.path.join(RUN_ENV_PATH, env)
-                env_dict = get_env_dict(env_file)
-            except Exception as e:
-                raise RequestDataParseError(f'环境变量 {env} 读取失败: {e}')
-            host = env_dict.get('host') or env_dict.get('HOST')
-            if host is None:
-                raise RequestDataParseError(f'环境变量 {env_file} 读取失败, 缺少 HOST 参数')
-            url = host + str(url)
+            if not url.startswith('http'):
+                _env = self.env
+                try:
+                    env_file = os.path.join(RUN_ENV_PATH, _env)
+                    env_dict = get_env_dict(env_file)
+                except Exception as e:
+                    raise RequestDataParseError(f'环境变量 {_env} 读取失败: {e}')
+                host = env_dict.get('host') or env_dict.get('HOST')
+                if host is None:
+                    raise RequestDataParseError(f'环境变量 {env_file} 读取失败, 缺少 HOST 参数')
+                url = host + url
             return url
 
     @property
