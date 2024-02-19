@@ -5,9 +5,11 @@ import shutil
 
 from pydantic import ValidationError
 
+from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import read_yaml
+from httpfpt.enums.case_data_type import CaseDataType
 from httpfpt.schemas.case_data import CaseData
-from httpfpt.utils.file_control import search_all_case_yaml_files
+from httpfpt.utils.file_control import get_file_property, search_all_case_data_files
 from httpfpt.utils.pydantic_parser import parse_error
 from httpfpt.utils.rich_console import console
 
@@ -32,6 +34,7 @@ class GitRepoPaser:
                 shutil.rmtree(online_dir_path)
             os.makedirs(online_dir_path)
             result = os.system(f'cd {online_dir_path} && git clone {src}')
+            shutil.rmtree(os.path.join(online_dir_path, '.git'))
         except Exception as e:
             raise RuntimeError(f'❌ Git 仓库测试数据拉取失败：{e}')
         if result == 0:
@@ -40,13 +43,17 @@ class GitRepoPaser:
             raise RuntimeError('❌ Git 仓库测试数据拉取失败，请检查 Git 地址是否正确')
 
         console.print('\n🔥 开始自动验证测试数据结构...')
-        all_yaml_file = search_all_case_yaml_files(online_dir_path)
-        if len(all_yaml_file) == 0:
+        all_case_data_file = search_all_case_data_files(online_dir_path)
+        if len(all_case_data_file) == 0:
             raise FileNotFoundError('❌ 未在拉取的 Git 仓库中找到测试用例数据文件，请检查 Git 地址是否正确')
         all_case_data = []
-        for file in all_yaml_file:
-            read_data = read_yaml(None, filename=file)
-            all_case_data.append(read_data)
+        for file in all_case_data_file:
+            file_type = get_file_property(file)[2]
+            if file_type == CaseDataType.JSON:
+                file_data = read_json_file(None, filename=file)
+            else:
+                file_data = read_yaml(None, filename=file)
+            all_case_data.append(file_data)
         count: int = 0
         for case_data in all_case_data:
             try:

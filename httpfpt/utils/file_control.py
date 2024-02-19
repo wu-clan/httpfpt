@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from httpfpt.core.get_conf import config
-from httpfpt.core.path_conf import TEST_CASE_PATH, YAML_DATA_PATH
+from httpfpt.core.path_conf import CASE_DATA_PATH, TEST_CASE_PATH
 
 
 def get_file_property(filepath: str) -> Tuple[str, str, str]:
@@ -24,15 +24,17 @@ def get_file_property(filepath: str) -> Tuple[str, str, str]:
     return filename, file_root_name, filetype
 
 
-def search_all_case_yaml_files(filepath: Optional[str] = None) -> list:
+def search_all_case_data_files(filepath: Optional[str] = None) -> list:
     """
     搜索指定项目目录下(包括子目录)所有测试用例数据文件
 
     :return:
     """
-    yaml_filepath = os.path.join(YAML_DATA_PATH, f'{config.PROJECT_NAME}') if filepath is None else filepath
-    files = glob.glob(os.path.join(yaml_filepath, '**', '*.yaml'), recursive=True) + glob.glob(
-        os.path.join(yaml_filepath, '**', '*.yml'), recursive=True
+    case_data_filepath = os.path.join(CASE_DATA_PATH, f'{config.PROJECT_NAME}') if filepath is None else filepath
+    files = (
+        glob.glob(os.path.join(case_data_filepath, '**', '*.yaml'), recursive=True)
+        + glob.glob(os.path.join(case_data_filepath, '**', '*.yml'), recursive=True)
+        + glob.glob(os.path.join(case_data_filepath, '**', '*.json'), recursive=True)
     )
     return files
 

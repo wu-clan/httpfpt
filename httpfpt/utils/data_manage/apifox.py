@@ -10,7 +10,7 @@ from typing import Optional
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
 from httpfpt.core.get_conf import config
-from httpfpt.core.path_conf import YAML_DATA_PATH
+from httpfpt.core.path_conf import CASE_DATA_PATH
 from httpfpt.utils.data_manage.base_format import format_value
 from httpfpt.utils.file_control import get_file_property
 from httpfpt.utils.rich_console import console
@@ -65,7 +65,7 @@ class ApiFoxParser:
                     case_config['allure']['feature'] = case_config['module'] = k
                     case_file_data = {'config': case_config, 'test_steps': v}
                     write_yaml(
-                        YAML_DATA_PATH,
+                        CASE_DATA_PATH,
                         os.sep.join([project or config.PROJECT_NAME, k, get_file_property(source)[1] + '.yaml']),
                         case_file_data,
                         mode='w',
@@ -75,7 +75,7 @@ class ApiFoxParser:
                 for _, v in root_case.items():
                     case_file_data = {'config': case_config, 'test_steps': v}
                     write_yaml(
-                        YAML_DATA_PATH,
+                        CASE_DATA_PATH,
                         os.sep.join([project or config.PROJECT_NAME, get_file_property(source)[1] + '.yaml']),
                         case_file_data,
                         mode='w',

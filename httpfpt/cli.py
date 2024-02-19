@@ -15,6 +15,9 @@ from pydantic import ValidationError
 from rich.prompt import Confirm
 from typing_extensions import Annotated
 
+from httpfpt.common.json_handler import read_json_file
+from httpfpt.enums.case_data_type import CaseDataType
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from httpfpt.common.yaml_handler import read_yaml
@@ -24,7 +27,7 @@ from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.data_manage.apifox import ApiFoxParser
 from httpfpt.utils.data_manage.git_repo import GitRepoPaser
 from httpfpt.utils.data_manage.openapi import SwaggerParser
-from httpfpt.utils.file_control import search_all_case_yaml_files
+from httpfpt.utils.file_control import get_file_property, search_all_case_data_files
 from httpfpt.utils.rich_console import console
 
 if TYPE_CHECKING:
@@ -48,9 +51,13 @@ def testcase_data_verify(verify: str) -> None:
         count: int = 0
         if verify.lower() == 'all':
             console.print('\n🔥 开始验证所有测试数据结构...')
-            file_list = search_all_case_yaml_files()
+            file_list = search_all_case_data_files()
             for file in file_list:
-                file_data = read_yaml(None, filename=file)
+                file_type = get_file_property(file)[2]
+                if file_type == CaseDataType.JSON:
+                    file_data = read_json_file(None, filename=file)
+                else:
+                    file_data = read_yaml(None, filename=file)
                 CaseData.model_validate(file_data)
         else:
             console.print(f'🔥 开始验证 {verify} 测试数据结构...')
