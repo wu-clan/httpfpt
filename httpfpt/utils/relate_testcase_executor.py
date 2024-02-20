@@ -48,34 +48,33 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
     relate_count = 0
     # 用例中 testcase 参数为设置变量时
     if isinstance(setup_testcase, dict):
-        relate_count += 1
-        relate_case_id = setup_testcase['case_id']
-        relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{relate_case_id}')
-        case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
-        case_data = json.loads(case_data)
-        case_data_test_steps = case_data['test_steps']
-        if isinstance(case_data_test_steps, list):
-            for case_test_steps in case_data_test_steps:
-                if relate_case_id == case_test_steps['case_id']:
-                    relate_case_steps = case_test_steps
-                    is_circular_relate(parsed_case_id, relate_case_steps)
-                    # 重新组合测试用例
-                    testcase_data = {
-                        'test_steps': relate_case_steps,
-                        'set_var_key': setup_testcase['key'],
-                        'set_var_jsonpath': setup_testcase['jsonpath'],
-                    }
-                    case_data.update(testcase_data)
-                    relate_testcase_set_var(case_data)
-        else:
-            relate_case_steps = case_data_test_steps
-            is_circular_relate(parsed_case_id, relate_case_steps)
-            testcase_data = {
-                'set_var_key': setup_testcase['key'],
-                'set_var_jsonpath': setup_testcase['jsonpath'],
-            }
-            case_data.update(testcase_data)
-            relate_testcase_set_var(case_data)
+        if setup_testcase.get('response') is not None:
+            relate_count += 1
+            relate_case_id = setup_testcase['case_id']
+            relate_case_filename = redis_client.get(f'{redis_client.case_id_file_prefix}:{relate_case_id}')
+            case_data = redis_client.get(f'{redis_client.case_data_prefix}:{relate_case_filename}')
+            case_data = json.loads(case_data)
+            case_data_test_steps = case_data['test_steps']
+            if isinstance(case_data_test_steps, list):
+                for case_test_steps in case_data_test_steps:
+                    if relate_case_id == case_test_steps['case_id']:
+                        relate_case_steps = case_test_steps
+                        is_circular_relate(parsed_case_id, relate_case_steps)
+                        # 重新组合测试用例
+                        testcase_data = {
+                            'test_steps': relate_case_steps,
+                            'set_var_response': setup_testcase['response'],
+                        }
+                        case_data.update(testcase_data)
+                        relate_testcase_set_var(case_data)
+            else:
+                relate_case_steps = case_data_test_steps
+                is_circular_relate(parsed_case_id, relate_case_steps)
+                testcase_data = {
+                    'set_var_response': setup_testcase['response'],
+                }
+                case_data.update(testcase_data)
+                relate_testcase_set_var(case_data)
 
     # 用例中 testcase 参数为直接关联测试用例时
     elif isinstance(setup_testcase, str):
@@ -145,12 +144,13 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     log.debug(msg)
     allure_step(msg, '此文件为空')
     response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
-    value = findall(testcase_data['set_var_jsonpath'], response)
-    if value:
-        variable_cache.set(testcase_data['set_var_key'], value[0], tag='relate_testcase')
-        log.info('<<< 关联测试用例变量提取执行完成')
-    else:
-        raise JsonPathFindError('jsonpath 取值失败，表达式: {}'.format(testcase_data['set_var_jsonpath']))
+    for s in testcase_data['set_var_response']:
+        value = findall(s['jsonpath'], response)
+        if value:
+            variable_cache.set(s['key'], value[0], tag='relate_testcase')
+        else:
+            raise JsonPathFindError('jsonpath 取值失败，表达式: {}'.format(s['jsonpath']))
+    log.info('<<< 关联测试用例变量提取执行完成')
 
 
 def relate_testcase_exec(testcase_data: dict) -> None:

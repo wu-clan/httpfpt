@@ -31,8 +31,9 @@ test_steps:
     setup:
       - testcase:
           case_id: event_query_002
-          key: rcode
-          jsonpath: $.status_code
+          response:
+            - key: rcode
+              jsonpath: $.status_code
       - testcase: event_query_002
       - hook:
       - wait_time: 0
