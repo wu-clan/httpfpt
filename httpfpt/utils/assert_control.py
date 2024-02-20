@@ -352,7 +352,7 @@ class Asserter:
         else:
             raise ValueError(f'断言表达式格式错误, 含有不支持的断言类型: {assert_type}')
 
-    def exec_asserter(self, response: dict, assert_text: str | list | dict | None) -> None:
+    def exec_asserter(self, response: dict, assert_text: str | dict | None) -> None:
         """
         根据断言内容自动选择断言器执行
 

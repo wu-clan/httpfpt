@@ -46,8 +46,8 @@ test_steps:
           jsonpath: $.status_code
       - assert:
           check:
-          value: ^rcode
           type: str_eq
+          value: ^rcode
           jsonpath: $.status_code
       - wait_time: 0
 
