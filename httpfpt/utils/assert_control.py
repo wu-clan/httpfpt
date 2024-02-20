@@ -154,7 +154,7 @@ class Asserter:
         try:
             assert_check = assert_text['check']
             assert_type = assert_text['type']
-            assert_schema = assert_text['jsonschema']
+            assert_jsonschema = assert_text['jsonschema']
             assert_jsonpath = assert_text['jsonpath']
         except KeyError as e:
             raise AssertSyntaxError(f'jsonschema 断言格式错误, 请检查: {e}')
@@ -165,7 +165,7 @@ class Asserter:
             if response_value:
                 log.info(f'执行 jsonschema 断言：{assert_text}')
                 try:
-                    validate(response_value[0], assert_schema)
+                    validate(response_value[0], assert_jsonschema)
                 except ValidationError as e:
                     log.error(f'{assert_check or e}')
                     raise e
