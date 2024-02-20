@@ -36,15 +36,26 @@ class StepsRequestData(BaseModel):
     url: str
     params: dict | List[tuple] | bytes | None
     headers: dict | None
+    cookies: dict | None = None
     body_type: Literal['form', 'x_form', 'binary', 'GraphQL', 'text', 'js', 'json', 'html', 'xml'] | None
     body: Any | None
     files: Dict[str, str | List[str]] | None
 
 
-class SetupTestCaseData(BaseModel):
-    case_id: str
+class SetupTestCaseRequest(BaseModel):
+    value: Any
+    jsonpath: str
+
+
+class SetupTestCaseResponse(BaseModel):
     key: str
     jsonpath: str
+
+
+class SetupTestCaseData(BaseModel):
+    case_id: str
+    request: List[SetupTestCaseRequest]
+    response: List[SetupTestCaseResponse]
 
 
 class SetupSqlData(BaseModel):

@@ -523,10 +523,16 @@ class RequestDataParse:
         if testcase is not None:
             if isinstance(testcase, dict):
                 for k, v in testcase.items():
-                    if not isinstance(v, str):
-                        raise RequestDataParseError(
-                            _error_msg(f'参数 test_steps:setup:testcase[{index}] 不是有效的 str 类型')
-                        )
+                    if k == 'request':
+                        if not isinstance(v, list):
+                            raise RequestDataParseError(
+                                _error_msg(f'参数 test_steps:setup:testcase[{index}]:request 不是有效的 str 类型')
+                            )
+                    elif k == 'response':
+                        if not isinstance(v, list):
+                            raise RequestDataParseError(
+                                _error_msg(f'参数 test_steps:setup:testcase[{index}]:response 不是有效的 str 类型')
+                            )
             else:
                 if not isinstance(testcase, str):
                     raise RequestDataParseError(
