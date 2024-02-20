@@ -6,6 +6,8 @@ from decimal import Decimal
 from typing import Any
 
 from jsonpath import findall
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 
 from httpfpt.common.errors import AssertSyntaxError, JsonPathFindError
 from httpfpt.common.log import log
@@ -98,11 +100,11 @@ class Asserter:
             raise AssertSyntaxError(f'json 断言格式错误, 请检查: {e}')
         else:
             response_value = findall(assert_jsonpath, response)
-        if response_value:
-            log.info(f'执行 json 断言：{assert_text}')
-            self._exec_json_assert(assert_check, assert_value, assert_type, response_value[0])
-        else:
-            raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
+            if response_value:
+                log.info(f'执行 json 断言：{assert_text}')
+                self._exec_json_assert(assert_check, assert_value, assert_type, response_value[0])
+            else:
+                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
 
     def _sql_asserter(self, assert_text: dict) -> None:
         """
@@ -122,17 +124,51 @@ class Asserter:
             assert_sql = assert_text['sql']
             assert_jsonpath = assert_text['jsonpath']
         except KeyError as e:
-            raise AssertSyntaxError(f'sql 断言格式错误, 请检查: {e}')
+            raise AssertSyntaxError(f'SQL 断言格式错误, 请检查: {e}')
         else:
             if assert_sql.split(' ')[0].upper() != SqlType.select:
-                raise AssertSyntaxError(f'sql 断言 {assert_check}:{assert_type} 执行失败，请检查 sql 是否为 DQL 类型')
+                raise AssertSyntaxError(f'SQL 断言 {assert_check}:{assert_type} 执行失败，请检查 SQL 是否为 DQL 类型')
             sql_data = mysql_client.exec_case_sql(assert_sql)
             if not isinstance(sql_data, dict):
-                raise JsonPathFindError('jsonpath 取值失败, sql 语句执行结果不是有效的 dict 类型')
+                raise JsonPathFindError('jsonpath 取值失败, SQL 语句执行结果不是有效的 dict 类型')
             sql_value = findall(assert_jsonpath, sql_data)
             if sql_value:
-                log.info(f'执行断言：{assert_text}')
+                log.info(f'执行 SQL 断言：{assert_text}')
                 self._exec_json_assert(assert_check, assert_value, assert_type, sql_value[0])
+            else:
+                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
+
+    @staticmethod
+    def _json_schema_asserter(response: dict, assert_text: dict) -> None:
+        """
+        **json_schema 断言器**
+
+        提取方法与 json 断言器相同
+
+        :param response:
+        :param assert_text:
+        :return:
+        """
+        if not isinstance(assert_text, dict):
+            raise AssertSyntaxError('jsonschema 断言内容格式错误, 请检查断言脚本是否为 dict 格式')
+        try:
+            assert_check = assert_text['check']
+            assert_type = assert_text['type']
+            assert_schema = assert_text['jsonschema']
+            assert_jsonpath = assert_text['jsonpath']
+        except KeyError as e:
+            raise AssertSyntaxError(f'jsonschema 断言格式错误, 请检查: {e}')
+        else:
+            if assert_type != 'jsonschema':
+                raise AssertSyntaxError(f'jsonschema 断言类型错误，类型必须为 {assert_type}')
+            response_value = findall(assert_jsonpath, response)
+            if response_value:
+                log.info(f'执行 jsonschema 断言：{assert_text}')
+                try:
+                    validate(response_value[0], assert_schema)
+                except ValidationError as e:
+                    log.error(f'{assert_check or e}')
+                    raise e
             else:
                 raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
 
@@ -360,15 +396,17 @@ class Asserter:
         :param assert_text:
         :return:
         """
-        if not assert_text:
-            return
         if isinstance(assert_text, str):
             self._code_asserter(response, assert_text)
         elif isinstance(assert_text, dict):
-            if assert_text.get('sql') is None:
-                self._json_asserter(response, assert_text)
-            else:
+            sql = assert_text.get('sql')
+            schema = assert_text.get('schema')
+            if sql:
                 self._sql_asserter(assert_text)
+            if schema:
+                self._json_schema_asserter(response, assert_text)
+            else:
+                self._json_asserter(response, assert_text)
         else:
             raise AssertSyntaxError(f'断言表达式格式错误: {assert_text}')
 

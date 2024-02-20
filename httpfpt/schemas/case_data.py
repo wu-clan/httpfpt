@@ -109,8 +109,8 @@ class TeardownSqlAssertData(TeardownJsonAssertData):
 
 class TeardownJsonSchemaData(BaseModel):
     check: str | None = None
-    type: Literal['json_schema']
-    schema: dict
+    type: Literal['jsonschema']
+    jsonschema: dict
     jsonpath: str
 
 
