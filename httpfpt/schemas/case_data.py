@@ -54,8 +54,8 @@ class SetupTestCaseResponse(BaseModel):
 
 class SetupTestCaseData(BaseModel):
     case_id: str
-    request: List[SetupTestCaseRequest]
-    response: List[SetupTestCaseResponse]
+    request: List[SetupTestCaseRequest] | None = None
+    response: List[SetupTestCaseResponse] | None = None
 
 
 class SetupSqlData(BaseModel):
