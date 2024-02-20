@@ -78,9 +78,8 @@ class TeardownExtractData(BaseModel):
     jsonpath: str
 
 
-class TeardownAssertData(BaseModel):
+class TeardownJsonAssertData(BaseModel):
     check: str | None = None
-    value: Any
     type: Literal[
         'eq',
         'not_eq',
@@ -100,6 +99,18 @@ class TeardownAssertData(BaseModel):
         'startswith',
         'endswith',
     ]
+    value: Any
+    jsonpath: str
+
+
+class TeardownSqlAssertData(TeardownJsonAssertData):
+    sql: str
+
+
+class TeardownJsonSchemaData(BaseModel):
+    check: str | None = None
+    type: Literal['jsonschema']
+    jsonschema: dict
     jsonpath: str
 
 
@@ -107,7 +118,9 @@ class StepsTearDownData(BaseModel):
     sql: str | SetupSqlData | None = None
     hook: str | None = None
     extract: TeardownExtractData | None = None
-    assert_: str | TeardownAssertData | None = Field(None, alias='assert')
+    assert_: str | TeardownJsonAssertData | TeardownSqlAssertData | TeardownJsonSchemaData | None = Field(
+        None, alias='assert'
+    )
     wait_time: int | None = None
 
 
