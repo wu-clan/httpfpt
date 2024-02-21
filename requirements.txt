@@ -14,7 +14,7 @@ cffi==1.16.0
 cfgv==3.4.0
 charset-normalizer==3.3.2
 colorama==0.4.6; sys_platform == "win32"
-cryptography==41.0.6
+cryptography==42.0.4
 dbutils==3.0.2
 dirty-equals==0.7.1
 distlib==0.3.8
