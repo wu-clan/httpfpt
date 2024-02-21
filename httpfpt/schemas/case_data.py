@@ -107,10 +107,17 @@ class TeardownSqlAssertData(TeardownJsonAssertData):
     sql: str
 
 
-class TeardownJsonSchemaData(BaseModel):
+class TeardownJsonSchemaAssertData(BaseModel):
     check: str | None = None
     type: Literal['jsonschema']
     jsonschema: dict
+    jsonpath: str
+
+
+class TeardownRegexAssertData(BaseModel):
+    check: str | None = None
+    type: Literal['re']
+    pattern: str
     jsonpath: str
 
 
@@ -118,9 +125,14 @@ class StepsTearDownData(BaseModel):
     sql: str | SetupSqlData | None = None
     hook: str | None = None
     extract: TeardownExtractData | None = None
-    assert_: str | TeardownJsonAssertData | TeardownSqlAssertData | TeardownJsonSchemaData | None = Field(
-        None, alias='assert'
-    )
+    assert_: (
+        str
+        | TeardownJsonAssertData
+        | TeardownSqlAssertData
+        | TeardownJsonSchemaAssertData
+        | TeardownRegexAssertData
+        | None
+    ) = Field(None, alias='assert')
     wait_time: int | None = None
 
 
