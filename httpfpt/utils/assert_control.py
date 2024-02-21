@@ -194,7 +194,7 @@ class Asserter:
             raise AssertSyntaxError(f'正则断言格式错误, 请检查: {e}')
         else:
             if assert_type != 're':
-                raise AssertSyntaxError('正则断言类型错误，类型必须为 “re”')
+                raise AssertSyntaxError('正则断言类型错误，类型必须为 "re"')
             response_value = findall(assert_jsonpath, response)
             if response_value:
                 log.info(f'执行正则断言：{assert_text}')
