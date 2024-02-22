@@ -6,6 +6,8 @@ config:
   request:
     env: dev.env
   module: test
+  # 此处设置跳过将跳过执行当前文件内所有测试用例
+  # is_run:
 
 test_steps:
   # 因为只是测试跳过用例，所以没写其他内容
