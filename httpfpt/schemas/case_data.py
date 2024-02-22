@@ -44,7 +44,7 @@ class StepsRequestData(BaseModel):
 
 class SetupTestCaseRequest(BaseModel):
     value: Any
-    jsonpath: str
+    jsonpath: str = Field(pattern=r'^\$\.[a-zA-Z]+(?:\.[a-zA-Z]+)*$')  # $.xxx
 
 
 class SetupTestCaseResponse(BaseModel):
