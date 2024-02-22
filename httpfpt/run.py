@@ -46,8 +46,6 @@ def startup(
     # extra
     maxfail: int = 0,
     x: bool = False,
-    n: Literal['auto', 'logical'] | int | None = None,
-    dist: Literal['load', 'loadscope', 'loadfile', 'loadgroup', 'worksteal', 'no'] | None = None,
     strict_markers: bool = False,
     capture: bool = True,
     disable_warnings: bool = True,
@@ -64,8 +62,6 @@ def startup(
     :param allure_serve: 自动打开 allure 测试报告服务， 默认关闭
     :param maxfail: 用例运行失败数量，到达数量上限后终止运行，默认为 0，即不终止
     :param x: 用例运行失败, 终止运行, 默认关闭
-    :param n: 分布式运行, 默认关闭
-    :param dist: 分布式运行方式, 默认关闭, 详情: https://pytest-xdist.readthedocs.io/en/latest/distribution.html
     :param strict_markers: markers 严格模式, 对于使用了自定义 marker 的用例, 如果 marker 未在 pytest.ini 注册, 用例将报错
     :param capture: 避免在使用输出模式为"v"和"s"时，html报告中的表格日志为空的情况, 默认开启
     :param disable_warnings: 关闭控制台警告信息, 默认开启
@@ -109,12 +105,6 @@ def startup(
 
     if x:
         run_args.append('-x')
-
-    if n:
-        run_args.append(f'-n={n}')
-
-    if dist:
-        run_args.append(f'--dist={dist}')
 
     if strict_markers:
         run_args.append('--strict-markers')
