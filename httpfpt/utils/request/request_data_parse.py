@@ -257,7 +257,9 @@ class RequestDataParse:
 
     def _is_run(self) -> None:
         try:
-            is_run = self.request_data['test_steps']['is_run']
+            is_run = self.request_data['config'].get('is_run')
+            if is_run is None:
+                is_run = self.request_data['test_steps']['is_run']
         except _RequestDataParamGetError:
             pass
         else:
