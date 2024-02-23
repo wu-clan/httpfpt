@@ -178,12 +178,14 @@ def relate_testcase_exec_with_new_request_data(testcase_data: dict) -> None:
     allure_step(msg, '此文件为空')
     for u in testcase_data['update_request_data']:
         keys = u['jsonpath'].split('.')[1:]
-        nested_request_data = {}
-        for key in keys[:-1]:
-            nested_request_data[key] = {}
-            nested_request_data = nested_request_data[key]
-        nested_request_data[keys[-1]] = u['value']
-        testcase_data['test_steps']['request'].update(nested_request_data)
+        new_request_data = {}
+        current_level = new_request_data
+        for key in keys:
+            current_level[key] = {}
+            current_level = current_level[key]
+        current_level[keys[-1]] = u['value']
+        testcase_data['test_steps']['request'].update(new_request_data)
+        log.info(f'更新关联测试用例请求体：{new_request_data}')
     send_request.send_request(testcase_data, log_data=False, relate_log=True)
     log.info('<<< 关联测试用例（使用新请求体）执行完成')
 
