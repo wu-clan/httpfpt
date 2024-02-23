@@ -189,21 +189,21 @@ def relate_testcase_exec_with_new_request_data(testcase_data: dict) -> dict:
     """
     from httpfpt.common.send_request import send_request
 
-    msg = f'>>> 执行关联测试用例（使用新请求体）：{testcase_data["test_steps"]["case_id"]}'
+    msg = f'>>> 执行关联测试用例（使用新请求数据）：{testcase_data["test_steps"]["case_id"]}'
     log.debug(msg)
     allure_step(msg, '此文件为空')
     for u in testcase_data['update_request_data']:
         keys = u['jsonpath'].split('.')[1:]
         new_request_data = {}
         current_level = new_request_data
-        for key in keys:
+        for key in keys[:-1]:
             current_level[key] = {}
             current_level = current_level[key]
         current_level[keys[-1]] = u['value']
         testcase_data['test_steps']['request'].update(new_request_data)
         log.info(f'更新关联测试用例请求体：{new_request_data}')
     response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
-    log.info('<<< 关联测试用例（使用新请求体）执行完成')
+    log.info('<<< 关联测试用例（使用新请求数据）执行完成')
     return response
 
 

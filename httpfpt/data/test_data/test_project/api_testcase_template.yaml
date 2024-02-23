@@ -121,7 +121,7 @@ test_steps:
       body:
       files:
 
-  - name: super_relate_testcase
+  - name: 跨文件关联用例
     case_id: event_relate_001
     description: 测试跨文件关联用例
     is_run:
