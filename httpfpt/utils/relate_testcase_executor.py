@@ -65,27 +65,39 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                             'update_request_data': setup_testcase['request'],
                         }
                         case_data.update(testcase_data)
-                        relate_testcase_exec_with_new_request_data(case_data)
+                        response = relate_testcase_exec_with_new_request_data(case_data)
+                        # 使用新请求体响应设置变量
+                        if setup_testcase.get('response') is not None:
+                            testcase_data = {
+                                'set_var_response': setup_testcase['response'],
+                            }
+                            relate_testcase_extract_with_response(testcase_data, response)
                     if setup_testcase.get('response') is not None:
                         testcase_data = {
                             'test_steps': relate_case_steps,
                             'set_var_response': setup_testcase['response'],
                         }
                         case_data.update(testcase_data)
-                        relate_testcase_set_var(case_data)
+                        relate_testcase_extract(case_data)
         else:
             relate_case_steps = case_data_test_steps
             is_circular_relate(parsed_case_id, relate_case_steps)
             if setup_testcase.get('request') is not None:
                 testcase_data = {'update_request_data': setup_testcase['request']}
                 case_data.update(testcase_data)
-                relate_testcase_exec_with_new_request_data(case_data)
+                response = relate_testcase_exec_with_new_request_data(case_data)
+                # 使用新请求体响应设置变量
+                if setup_testcase.get('response') is not None:
+                    testcase_data = {
+                        'set_var_response': setup_testcase['response'],
+                    }
+                    relate_testcase_extract_with_response(testcase_data, response)
             if setup_testcase.get('response') is not None:
                 testcase_data = {
                     'set_var_response': setup_testcase['response'],
                 }
                 case_data.update(testcase_data)
-                relate_testcase_set_var(case_data)
+                relate_testcase_extract(case_data)
 
     # 用例中 testcase 参数为直接关联测试用例时
     elif isinstance(setup_testcase, str):
@@ -142,7 +154,7 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
                     raise CorrelateTestCaseError(text)
 
 
-def relate_testcase_set_var(testcase_data: dict) -> None:
+def relate_testcase_extract(testcase_data: dict) -> None:
     """
     关联测试用例设置变量
 
@@ -155,16 +167,20 @@ def relate_testcase_set_var(testcase_data: dict) -> None:
     log.debug(msg)
     allure_step(msg, '此文件为空')
     response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
+    relate_testcase_extract_with_response(testcase_data, response)
+    log.info('<<< 关联测试用例变量提取执行完成')
+
+
+def relate_testcase_extract_with_response(testcase_data: dict, response: dict) -> None:
     for s in testcase_data['set_var_response']:
         value = findall(s['jsonpath'], response)
         if value:
             variable_cache.set(s['key'], value[0], tag='relate_testcase')
         else:
             raise JsonPathFindError('jsonpath 取值失败，表达式: {}'.format(s['jsonpath']))
-    log.info('<<< 关联测试用例变量提取执行完成')
 
 
-def relate_testcase_exec_with_new_request_data(testcase_data: dict) -> None:
+def relate_testcase_exec_with_new_request_data(testcase_data: dict) -> dict:
     """
     关联测试用例（使用新请求数据）执行
 
@@ -186,8 +202,9 @@ def relate_testcase_exec_with_new_request_data(testcase_data: dict) -> None:
         current_level[keys[-1]] = u['value']
         testcase_data['test_steps']['request'].update(new_request_data)
         log.info(f'更新关联测试用例请求体：{new_request_data}')
-    send_request.send_request(testcase_data, log_data=False, relate_log=True)
+    response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
     log.info('<<< 关联测试用例（使用新请求体）执行完成')
+    return response
 
 
 def relate_testcase_exec(testcase_data: dict) -> None:
