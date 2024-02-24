@@ -141,9 +141,9 @@ class Asserter:
                 raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
 
     @staticmethod
-    def _json_schema_asserter(response: dict, assert_text: dict) -> None:
+    def _jsonschema_asserter(response: dict, assert_text: dict) -> None:
         """
-        **json_schema 断言器**
+        **jsonschema 断言器**
 
         提取方法与 json 断言器相同
 
@@ -157,22 +157,17 @@ class Asserter:
             assert_check = assert_text['check']
             assert_type = assert_text['type']
             assert_jsonschema = assert_text['jsonschema']
-            assert_jsonpath = assert_text['jsonpath']
         except KeyError as e:
             raise AssertSyntaxError(f'jsonschema 断言格式错误, 请检查: {e}')
         else:
             if assert_type != 'jsonschema':
                 raise AssertSyntaxError('jsonschema 断言类型错误，类型必须为 "jsonschema"')
-            response_value = findall(assert_jsonpath, response)
-            if response_value:
-                log.info(f'执行 jsonschema 断言：{assert_text}')
-                try:
-                    validate(response_value[0], assert_jsonschema)
-                except ValidationError as e:
-                    log.error(f'{assert_check or e}')
-                    raise e
-            else:
-                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
+            log.info(f'执行 jsonschema 断言：{assert_text}')
+            try:
+                validate(response['json'], assert_jsonschema)
+            except ValidationError as e:
+                log.error(f'{assert_check or e}')
+                raise e
 
     @staticmethod
     def _re_asserter(response: dict, assert_text: dict) -> None:
@@ -197,11 +192,10 @@ class Asserter:
                 raise AssertSyntaxError('正则断言类型错误，类型必须为 "re"')
             response_value = findall(assert_jsonpath, response)
             if response_value:
-                log.info(f'执行正则断言：{assert_text}')
-                result = re.match(assert_pattern, response_value[0])  # type: ignore
+                log.info(f'执行 re 断言：{assert_text}')
+                result = re.match(assert_pattern, str(response_value[0]))  # type: ignore
                 if not result:
                     e = assert_check or '正则断言失败，响应内容与正则表达式不相符'
-                    log.error(e)
                     raise AssertionError(e)
             else:
                 raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {assert_jsonpath}')
@@ -439,7 +433,7 @@ class Asserter:
             if sql:
                 self._sql_asserter(assert_text)
             elif jsonschema:
-                self._json_schema_asserter(response, assert_text)
+                self._jsonschema_asserter(response, assert_text)
             elif pattern:
                 self._re_asserter(response, assert_text)
             else:
