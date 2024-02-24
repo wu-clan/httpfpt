@@ -30,11 +30,19 @@ test_steps:
       files:
     setup:
       - testcase:
-          case_id: event_query_002
+          case_id: event_linked_001
+          request:
+            - value: 2
+              jsonpath: $.params.postId
           response:
             - key: rcode
               jsonpath: $.status_code
-      - testcase: event_query_002
+      - testcase:
+          case_id: event_linked_001
+          response:
+              - key: rcode
+                jsonpath: $.status_code
+      - testcase: event_linked_001
       - hook:
       - wait_time: 0
     teardown:
@@ -57,15 +65,13 @@ test_steps:
     is_run:
     request:
       method: GET
-      url: /comments
+      url: /albums/1
       params:
-        postId: 1
       headers:
       body_type:
       body:
       files:
     setup:
-      - testcase:
       - wait_time: 0
     teardown:
       - extract:
@@ -101,7 +107,21 @@ test_steps:
       - hook: ${random_phone()}
       - assert: assert 200 == pm.response.get('status_code')
 
-  - name: super_relate_testcase
+  - name: 被关联用例
+    case_id: event_linked_001
+    description: 作为被关联简易用例而存在
+    is_run:
+    request:
+      method: GET
+      url: /comments
+      params:
+        postId: 1
+      headers:
+      body_type:
+      body:
+      files:
+
+  - name: 跨文件关联用例
     case_id: event_relate_001
     description: 测试跨文件关联用例
     is_run:

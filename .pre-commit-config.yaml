@@ -4,8 +4,9 @@ repos:
     hooks:
       - id: check-added-large-files
       - id: end-of-file-fixer
-      - id: check-yaml
       - id: check-toml
+      - id: check-yaml
+      - id: check-json
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.1.15
