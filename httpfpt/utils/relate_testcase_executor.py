@@ -72,13 +72,14 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                                 'set_var_response': setup_testcase['response'],
                             }
                             relate_testcase_extract_with_response(testcase_data, response)
-                    if setup_testcase.get('response') is not None:
-                        testcase_data = {
-                            'test_steps': relate_case_steps,
-                            'set_var_response': setup_testcase['response'],
-                        }
-                        case_data.update(testcase_data)
-                        relate_testcase_extract(case_data)
+                    else:
+                        if setup_testcase.get('response') is not None:
+                            testcase_data = {
+                                'test_steps': relate_case_steps,
+                                'set_var_response': setup_testcase['response'],
+                            }
+                            case_data.update(testcase_data)
+                            relate_testcase_extract(case_data)
         else:
             relate_case_steps = case_data_test_steps
             is_circular_relate(parsed_case_id, relate_case_steps)
@@ -92,12 +93,13 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                         'set_var_response': setup_testcase['response'],
                     }
                     relate_testcase_extract_with_response(testcase_data, response)
-            if setup_testcase.get('response') is not None:
-                testcase_data = {
-                    'set_var_response': setup_testcase['response'],
-                }
-                case_data.update(testcase_data)
-                relate_testcase_extract(case_data)
+            else:
+                if setup_testcase.get('response') is not None:
+                    testcase_data = {
+                        'set_var_response': setup_testcase['response'],
+                    }
+                    case_data.update(testcase_data)
+                    relate_testcase_extract(case_data)
 
     # 用例中 testcase 参数为直接关联测试用例时
     elif isinstance(setup_testcase, str):
