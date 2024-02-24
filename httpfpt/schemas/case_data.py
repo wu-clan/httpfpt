@@ -111,7 +111,6 @@ class TeardownJsonSchemaAssertData(BaseModel):
     check: str | None = None
     type: Literal['jsonschema']
     jsonschema: dict
-    jsonpath: str
 
 
 class TeardownRegexAssertData(BaseModel):

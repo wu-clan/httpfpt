@@ -83,7 +83,29 @@ test_steps:
           type: global
           jsonpath: $.status_code
       - assert: assert 200 == pm.response.get('status_code')
+      - assert: assert pm.response.get('status_code') == IsInt(exactly=200), '响应状态码非200'
       - assert: assert 'postId' not in str(pm.response.get('content')), '没有返回content'
+      - assert:
+          check:
+          type: jsonschema
+          jsonschema:
+            type: object
+            properties:
+              userId:
+                type: integer
+              id:
+                type: integer
+              title:
+                type: string
+            required:
+              - userId
+              - id
+              - title
+      - assert:
+          check:
+          type: re
+          pattern: '^\b200\b'
+          jsonpath: $.status_code
 
   - name: hook
     case_id: event_create_001
