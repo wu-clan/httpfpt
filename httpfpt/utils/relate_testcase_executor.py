@@ -46,7 +46,7 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
 
     # 执行关联测试用例
     relate_count = 0
-    # 用例中 testcase 参数为更新请求参数或设置变量时
+    # 用例中 testcase 参数为更新请求数据或提取变量时
     if isinstance(setup_testcase, dict):
         relate_count += 1
         relate_case_id = setup_testcase['case_id']
@@ -66,7 +66,7 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                         }
                         case_data.update(testcase_data)
                         response = relate_testcase_exec_with_new_request_data(case_data)
-                        # 使用替换请求数据后的请求响应提取变量
+                        # 使用更新请求数据后的请求响应提取变量
                         if setup_testcase.get('response') is not None:
                             testcase_data = {
                                 'set_var_response': setup_testcase['response'],
@@ -157,7 +157,7 @@ def is_circular_relate(current_case_id: str, relate_case_steps: dict) -> None:
 
 def relate_testcase_extract(testcase_data: dict) -> None:
     """
-    关联测试用例设置变量
+    关联测试用例提取变量
 
     :param testcase_data:
     :return:
@@ -173,6 +173,13 @@ def relate_testcase_extract(testcase_data: dict) -> None:
 
 
 def relate_testcase_extract_with_response(testcase_data: dict, response: dict) -> None:
+    """
+    关联测试用例提取变量（基于请求响应）
+
+    :param testcase_data:
+    :param response:
+    :return:
+    """
     for s in testcase_data['set_var_response']:
         value = findall(s['jsonpath'], response)
         if value:
