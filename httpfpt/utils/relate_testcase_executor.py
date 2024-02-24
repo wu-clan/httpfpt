@@ -66,7 +66,7 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                         }
                         case_data.update(testcase_data)
                         response = relate_testcase_exec_with_new_request_data(case_data)
-                        # 使用新请求体响应设置变量
+                        # 使用替换请求数据后的请求响应提取变量
                         if setup_testcase.get('response') is not None:
                             testcase_data = {
                                 'set_var_response': setup_testcase['response'],
@@ -87,7 +87,6 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                 testcase_data = {'update_request_data': setup_testcase['request']}
                 case_data.update(testcase_data)
                 response = relate_testcase_exec_with_new_request_data(case_data)
-                # 使用新请求体响应设置变量
                 if setup_testcase.get('response') is not None:
                     testcase_data = {
                         'set_var_response': setup_testcase['response'],
@@ -203,7 +202,7 @@ def relate_testcase_exec_with_new_request_data(testcase_data: dict) -> dict:
             current_level = current_level[key]
         current_level[keys[-1]] = u['value']
         testcase_data['test_steps']['request'].update(new_request_data)
-        log.info(f'更新关联测试用例请求体：{new_request_data}')
+        log.info(f'更新关联测试用例请求数据：{new_request_data}')
     response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
     log.info('<<< 关联测试用例（使用新请求数据）执行完成')
     return response
