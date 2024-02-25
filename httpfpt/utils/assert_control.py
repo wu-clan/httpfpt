@@ -193,7 +193,7 @@ class Asserter:
             response_value = findall(assert_jsonpath, response)
             if response_value:
                 log.info(f'执行 re 断言：{assert_text}')
-                result = re.match(assert_pattern, str(response_value[0]))  # type: ignore
+                result = re.match(assert_pattern, str(response_value[0]))
                 if not result:
                     e = assert_check or '正则断言失败，响应内容与正则表达式不相符'
                     raise AssertionError(e)

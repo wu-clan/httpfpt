@@ -6,7 +6,7 @@ import os
 import shutil
 import sys
 
-from typing import Literal, Optional
+from typing import Literal
 
 import pytest
 
@@ -33,40 +33,20 @@ from httpfpt.utils.time_control import get_current_time
 
 def startup(
     *args,
-    # log level
-    log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
-    # case path
-    case_path: Optional[str] = None,
-    # html report
-    html_report: bool = True,
-    # allure
-    allure: bool = True,
-    allure_clear: bool = True,
-    allure_serve: bool = False,
-    # extra
-    maxfail: int = 0,
-    x: bool = False,
-    strict_markers: bool = False,
-    capture: bool = True,
-    disable_warnings: bool = True,
+    log_level: Literal['-q', '-s', '-v', '-vs'],
+    case_path: str | None,
+    html_report: bool,
+    allure: bool,
+    allure_clear: bool,
+    allure_serve: bool,
+    maxfail: int,
+    x: bool,
+    strict_markers: bool,
+    capture: bool,
+    disable_warnings: bool,
     **kwargs,
 ) -> None:
-    """
-    运行启动程序
-
-    :param log_level: 控制台打印输出级别, 默认"-v"
-    :param case_path: 指定测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
-    :param html_report: 生成 HTML 测试报告, 默认开启
-    :param allure: 生成 allure 测试报告, 默认开启
-    :param allure_clear: 清空 allure 报告历史记录, 默认开启
-    :param allure_serve: 自动打开 allure 测试报告服务， 默认关闭
-    :param maxfail: 用例运行失败数量，到达数量上限后终止运行，默认为 0，即不终止
-    :param x: 用例运行失败, 终止运行, 默认关闭
-    :param strict_markers: markers 严格模式, 对于使用了自定义 marker 的用例, 如果 marker 未在 pytest.ini 注册, 用例将报错
-    :param capture: 避免在使用输出模式为"v"和"s"时，html报告中的表格日志为空的情况, 默认开启
-    :param disable_warnings: 关闭控制台警告信息, 默认开启
-    :return:
-    """  # noqa: E501
+    """运行启动程序"""
     run_args = [log_level]
 
     default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', config.PROJECT_NAME])
@@ -165,13 +145,46 @@ def startup(
         )  # type: ignore
 
 
-def run(*args, pydantic_verify: bool = True, clean_cache: bool = True, **kwargs) -> None:
+def run(
+    *args,
+    # init
+    clean_cache: bool = False,
+    pydantic_verify: bool = True,
+    # log level
+    log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
+    # case path
+    case_path: str | None = None,
+    # html report
+    html_report: bool = True,
+    # allure
+    allure: bool = True,
+    allure_clear: bool = True,
+    allure_serve: bool = False,
+    # extra
+    maxfail: int = 0,
+    x: bool = False,
+    strict_markers: bool = False,
+    capture: bool = True,
+    disable_warnings: bool = True,
+    **kwargs,
+) -> None:
     """
     运行入口
 
-    :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
+    :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
+    :param log_level: 控制台打印输出级别, 默认"-v"
+    :param case_path: 指定测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
+    :param html_report: 生成 HTML 测试报告, 默认开启
+    :param allure: 生成 allure 测试报告, 默认开启
+    :param allure_clear: 清空 allure 报告历史记录, 默认开启
+    :param allure_serve: 自动打开 allure 测试报告服务， 默认关闭
+    :param maxfail: 用例运行失败数量，到达数量上限后终止运行，默认为 0，即不终止
+    :param x: 用例运行失败, 终止运行, 默认关闭
+    :param strict_markers: markers 严格模式, 对于设置 marker 装饰器的用例, 如果 marker 未在 pytest.ini 注册, 用例将报错
+    :param capture: 避免在使用输出模式为"v"和"s"时，html报告中的表格日志为空的情况, 默认开启
+    :param disable_warnings: 关闭控制台警告信息, 默认开启
     :param kwargs: pytest 运行参数
     :return:
     """
@@ -193,7 +206,21 @@ def run(*args, pydantic_verify: bool = True, clean_cache: bool = True, **kwargs)
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
         case_data.case_id_unique_verify()
-        startup(*args, **kwargs)
+        startup(
+            *args,
+            log_level=log_level,
+            case_path=case_path,
+            html_report=html_report,
+            allure=allure,
+            allure_clear=allure_clear,
+            allure_serve=allure_serve,
+            maxfail=maxfail,
+            x=x,
+            strict_markers=strict_markers,
+            capture=capture,
+            disable_warnings=disable_warnings,
+            **kwargs,
+        )
     except Exception as e:
         log.error(f'运行异常：{e}')
         import traceback
