@@ -6,7 +6,8 @@ import os
 import re
 import sys
 
-from typing import TYPE_CHECKING, List, Tuple
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 import cappa
 
@@ -15,12 +16,11 @@ from pydantic import ValidationError
 from rich.prompt import Confirm
 from typing_extensions import Annotated
 
-from httpfpt.common.json_handler import read_json_file
-from httpfpt.enums.case_data_type import CaseDataType
-
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
+from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import read_yaml
+from httpfpt.enums.case_data_type import CaseDataType
 from httpfpt.run import run
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
@@ -41,7 +41,7 @@ def get_version() -> None:
     if mob:
         console.print('\n🔥 HttpFpt', mob.group(1))
     else:
-        raise RuntimeError('未查询到版本号')
+        raise cappa.Exit('未查询到版本号', code=1)
 
 
 def testcase_data_verify(verify: str) -> None:
@@ -165,6 +165,7 @@ def cmd_run_test_parse(value: Value) -> bool | Value:
 
 
 @cappa.command(name='httpfpt-cli')
+@dataclass
 class HttpFptCLI:
     version: Annotated[
         bool,
@@ -176,7 +177,7 @@ class HttpFptCLI:
         ),
     ]
     run_test: Annotated[
-        List[str] | None,
+        Optional[List[str]],
         cappa.Arg(
             value_name='<PYTEST ARGS / NONE>',
             short='-r',
@@ -188,7 +189,7 @@ class HttpFptCLI:
             num_args=-1,
         ),
     ]
-    subcmd: Subcommands[TestCaseCLI | ImportCLI | None] = None
+    subcmd: Subcommands[Union[TestCaseCLI, ImportCLI, None]] = None
 
     def __call__(self) -> None:
         if self.version:
@@ -201,6 +202,7 @@ class HttpFptCLI:
 
 
 @cappa.command(name='testcase', help='Test case tools.')
+@dataclass
 class TestCaseCLI:
     data_verify: Annotated[
         str,
@@ -232,6 +234,7 @@ class TestCaseCLI:
 
 
 @cappa.command(name='import', help='Import test case data.')
+@dataclass
 class ImportCLI:
     openai: Annotated[
         Tuple[str, str],
