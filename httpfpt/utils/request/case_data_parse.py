@@ -7,7 +7,7 @@ import json
 import sys
 
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any
 
 from pydantic import ValidationError
 
@@ -71,7 +71,7 @@ def case_id_unique_verify() -> None:
 
     :return:
     """
-    all_case_id_dict: List[Dict[str, str | List[str]]] = []
+    all_case_id_dict: list[dict[str, str | list[str]]] = []
     all_case_id = []
     case_id_count = defaultdict(int)
     case_data_list = redis_client.get_prefix(f'{redis_client.case_data_prefix}:')
@@ -118,7 +118,7 @@ def case_id_unique_verify() -> None:
         redis_client.rset(f'{redis_client.prefix}:case_id_list', str(all_case_id))
 
 
-def get_request_data(*, filename: str) -> List[Dict[str, Any]]:
+def get_request_data(*, filename: str) -> list[dict[str, Any]]:
     """
     获取用于测试用例数据驱动的请求数据
 

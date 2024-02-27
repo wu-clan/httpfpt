@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import yaml
 
@@ -12,7 +14,7 @@ from httpfpt.core.path_conf import CASE_DATA_PATH, TEST_DATA_PATH, YAML_REPORT_P
 from httpfpt.utils.time_control import get_current_time
 
 
-def read_yaml(filepath: Optional[str] = CASE_DATA_PATH, *, filename: str) -> Dict[str, Any]:
+def read_yaml(filepath: str | None = CASE_DATA_PATH, *, filename: str) -> dict[str, Any]:
     """
     读取 yaml 文件
 

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import json
 import os
 
-from typing import Any, Optional
+from typing import Any
 
 from httpfpt.common.log import log
 from httpfpt.core.path_conf import CASE_DATA_PATH
 
 
-def read_json_file(filepath: Optional[str] = CASE_DATA_PATH, *, filename: str, **kwargs) -> dict:
+def read_json_file(filepath: str | None = CASE_DATA_PATH, *, filename: str, **kwargs) -> dict:
     """
     读取 json 文件
 
@@ -39,7 +41,7 @@ def read_json_file(filepath: Optional[str] = CASE_DATA_PATH, *, filename: str, *
 
 
 def write_json_file(
-    filepath: Optional[str] = None,
+    filepath: str | None = None,
     *,
     filename: str,
     data: Any = None,

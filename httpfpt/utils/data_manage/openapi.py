@@ -6,8 +6,6 @@ import copy
 import os
 import warnings
 
-from typing import Optional
-
 import requests
 
 from rich.prompt import Confirm
@@ -23,7 +21,7 @@ from httpfpt.utils.time_control import get_current_timestamp
 
 
 class SwaggerParser:
-    def __init__(self, version: Optional[int] = None, data: Optional[dict] = None):
+    def __init__(self, version: int | None = None, data: dict | None = None):
         """
         初始化参数
 
@@ -33,7 +31,7 @@ class SwaggerParser:
         self.version = version
         self.data = data
 
-    def import_openapi_to_yaml(self, openapi_source: str, project: Optional[str] = None) -> None:
+    def import_openapi_to_yaml(self, openapi_source: str, project: str | None = None) -> None:
         """
         导入 openapi 数据到 yaml
 

@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal
+from typing import Any
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
+from typing_extensions import Literal
 
 __all__ = ['CaseData']
 
@@ -22,7 +23,7 @@ class ConfigRequestData(BaseModel):
     timeout: int | None = Field(None, ge=0)
     verify: bool | None = None
     redirects: bool | None = None
-    proxies: Dict[Literal['http', 'https', 'http://', 'https://'], AnyHttpUrl | None] | None = None
+    proxies: dict[Literal['http', 'https', 'http://', 'https://'], AnyHttpUrl | None] | None = None
 
 
 class Config(BaseModel):
@@ -34,12 +35,12 @@ class Config(BaseModel):
 class StepsRequestData(BaseModel):
     method: Literal['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
     url: str
-    params: dict | List[tuple] | bytes | None
+    params: dict | list[tuple] | bytes | None
     headers: dict | None
     cookies: dict | None = None
     body_type: Literal['form', 'x_form', 'binary', 'GraphQL', 'text', 'js', 'json', 'html', 'xml'] | None
     body: Any | None
-    files: Dict[str, str | List[str]] | None
+    files: dict[str, str | list[str]] | None
 
 
 class SetupTestCaseRequest(BaseModel):
@@ -54,8 +55,8 @@ class SetupTestCaseResponse(BaseModel):
 
 class SetupTestCaseData(BaseModel):
     case_id: str
-    request: List[SetupTestCaseRequest] | None = None
-    response: List[SetupTestCaseResponse] | None = None
+    request: list[SetupTestCaseRequest] | None = None
+    response: list[SetupTestCaseResponse] | None = None
 
 
 class SetupSqlData(BaseModel):
@@ -142,14 +143,14 @@ class Steps(BaseModel):
     is_run: bool | dict | None = None
     retry: int | None = None
     request: StepsRequestData
-    setup: List[StepsSetUpData] | None = None
-    teardown: List[StepsTearDownData] | None = None
+    setup: list[StepsSetUpData] | None = None
+    teardown: list[StepsTearDownData] | None = None
 
 
 class CaseData(BaseModel):
     model_config = ConfigDict(extra='forbid', strict=True)
 
     config: Config
-    test_steps: Steps | List[Steps]
+    test_steps: Steps | list[Steps]
     filename: str | None = None
     file_hash: str | None = None

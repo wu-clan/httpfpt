@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import xlrd
 
 from httpfpt.common.log import log
 
 
-def read_excel(filepath: str, *, filename: str, sheet: str = 'Sheet1') -> List[Dict[str, Optional[Any]]]:
+def read_excel(filepath: str, *, filename: str, sheet: str = 'Sheet1') -> list[dict[str, Any | None]]:
     """
     读取 xlsx 文件
 

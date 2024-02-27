@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from json import dumps as json_dumps
-from typing import Any, Optional
+from typing import Any
 
 import allure
 
@@ -29,7 +29,7 @@ def allure_step(step: str, var: str | dict) -> None:
 
 
 def allure_attach(
-    body: Any = None, name: Optional[str] = None, attachment_type: str = 'JSON', extension: Any = None
+    body: Any = None, name: str | None = None, attachment_type: str = 'JSON', extension: Any = None
 ) -> None:
     """
     allure 报告上传附件
@@ -48,7 +48,7 @@ def allure_attach(
     )
 
 
-def allure_attach_file(filepath: str, name: Optional[str] = None, extension: Any = None) -> None:
+def allure_attach_file(filepath: str, name: str | None = None, extension: Any = None) -> None:
     """
     allure 报告上传附件
 

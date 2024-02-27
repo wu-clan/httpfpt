@@ -5,8 +5,6 @@ from __future__ import annotations
 import copy
 import os
 
-from typing import Optional
-
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
 from httpfpt.core.get_conf import config
@@ -17,7 +15,7 @@ from httpfpt.utils.rich_console import console
 
 
 class ApiFoxParser:
-    def import_apifox_to_yaml(self, source: str, project: Optional[str] = None) -> None:
+    def import_apifox_to_yaml(self, source: str, project: str | None = None) -> None:
         """
         导入 apifox 数据到 yaml
 

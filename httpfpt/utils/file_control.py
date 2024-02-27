@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import glob
 import os.path
 
 from pathlib import Path
-from typing import Optional, Tuple
 
 from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import CASE_DATA_PATH, TEST_CASE_PATH
 
 
-def get_file_property(filepath: str) -> Tuple[str, str, str]:
+def get_file_property(filepath: str) -> tuple[str, str, str]:
     """
     获取文件属性
 
@@ -24,7 +25,7 @@ def get_file_property(filepath: str) -> Tuple[str, str, str]:
     return filename, file_root_name, filetype
 
 
-def search_all_case_data_files(filepath: Optional[str] = None) -> list:
+def search_all_case_data_files(filepath: str | None = None) -> list:
     """
     搜索指定项目目录下(包括子目录)所有测试用例数据文件
 
