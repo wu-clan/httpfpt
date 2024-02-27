@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:546bdec9832a57a6021f3f530eef080d4dc412bbb1c971b3b427aba2a5ac8fa2"
+content_hash = "sha256:52e12d5ea67b80354cd7d4381b805a42d5c5aa0eea6044b155f54164d7cfcfd0"
 
 [[package]]
 name = "allure-pytest"
@@ -93,17 +93,18 @@ files = [
 
 [[package]]
 name = "cappa"
-version = "0.15.2"
+version = "0.16.3"
 requires_python = ">=3.8,<4"
 summary = "Declarative CLI argument parser."
 dependencies = [
+    "eval-type-backport; python_version < \"3.10\"",
     "rich",
     "typing-extensions>=4.7.1",
     "typing-inspect>=0.9.0",
 ]
 files = [
-    {file = "cappa-0.15.2-py3-none-any.whl", hash = "sha256:3264b37a5898c09b5f921ebf2ebc9070ec9c93f9297ea9c10a9b1bd1884d1050"},
-    {file = "cappa-0.15.2.tar.gz", hash = "sha256:4f85f3ff28a955be835e93fb0c0f894ccf5e0139b02eed8f4cb2c13d22a87cca"},
+    {file = "cappa-0.16.3-py3-none-any.whl", hash = "sha256:3f2feb5564028c7923d0ef4b53308e4fe9f1eff7a05017083a2117a015b82e24"},
+    {file = "cappa-0.16.3.tar.gz", hash = "sha256:72f27ea1765deb7d9fd00b786af392ead30344571ecda1d4bd79cf0c9fb82450"},
 ]
 
 [[package]]
