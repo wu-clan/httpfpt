@@ -7,7 +7,7 @@ import re
 import sys
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING
 
 import cappa
 
@@ -99,7 +99,7 @@ def generate_testcases() -> None:
         raise cappa.Exit(code=1)
 
 
-def import_openapi_case_data(openapi: Tuple[str, str]) -> None:
+def import_openapi_case_data(openapi: tuple[str, str]) -> None:
     """导入 openapi 测试用例数据"""
     console.print(f'\n📩 正在导入测试用例数据到项目: [#0087ff]{openapi[1]}[/#0087ff]')
     result = Confirm.ask('❓ 确认执行此操作吗?', default=False)
@@ -112,7 +112,7 @@ def import_openapi_case_data(openapi: Tuple[str, str]) -> None:
             raise e
 
 
-def import_apifox_case_data(apifox: Tuple[str, str]) -> None:
+def import_apifox_case_data(apifox: tuple[str, str]) -> None:
     """导入 apifox 测试用例数据"""
     console.print(
         '\n'
@@ -130,17 +130,17 @@ def import_apifox_case_data(apifox: Tuple[str, str]) -> None:
             raise e
 
 
-def import_har_case_data(har: Tuple[str, str]) -> None:
+def import_har_case_data(har: tuple[str, str]) -> None:
     """导入 har 测试用例数据"""
     console.print('\n🚧 此功能暂未开发')
 
 
-def import_jmeter_case_data(jmeter: Tuple[str, str]) -> None:
+def import_jmeter_case_data(jmeter: tuple[str, str]) -> None:
     """导入 jmeter 测试用例数据"""
     console.print('\n🚧 此功能暂未开发')
 
 
-def import_postman_case_data(postman: Tuple[str, str]) -> None:
+def import_postman_case_data(postman: tuple[str, str]) -> None:
     """导入 postman 测试用例数据"""
     console.print('\n🚧 此功能暂未开发')
 
@@ -177,7 +177,7 @@ class HttpFptCLI:
         ),
     ]
     run_test: Annotated[
-        Optional[List[str]],
+        list[str] | None,
         cappa.Arg(
             value_name='<PYTEST ARGS / NONE>',
             short='-r',
@@ -189,7 +189,7 @@ class HttpFptCLI:
             num_args=-1,
         ),
     ]
-    subcmd: Subcommands[Union[TestCaseCLI, ImportCLI, None]] = None
+    subcmd: Subcommands[TestCaseCLI | ImportCLI | None] = None
 
     def __call__(self) -> None:
         if self.version:
@@ -237,7 +237,7 @@ class TestCaseCLI:
 @dataclass
 class ImportCLI:
     openai: Annotated[
-        Tuple[str, str],
+        tuple[str, str],
         cappa.Arg(
             value_name='<JSONFILE / URL> <PROJECT>',
             short='-io',
@@ -248,7 +248,7 @@ class ImportCLI:
         ),
     ]
     apifox: Annotated[
-        Tuple[str, str],
+        tuple[str, str],
         cappa.Arg(
             value_name='<JSONFILE> <PROJECT>',
             short='-ia',
@@ -259,7 +259,7 @@ class ImportCLI:
         ),
     ]
     har: Annotated[
-        Tuple[str, str],
+        tuple[str, str],
         cappa.Arg(
             short='-ih',
             long='--import-har',
@@ -269,7 +269,7 @@ class ImportCLI:
         ),
     ]
     jmeter: Annotated[
-        Tuple[str, str],
+        tuple[str, str],
         cappa.Arg(
             short='-ij',
             long='--import-jmeter',
@@ -279,7 +279,7 @@ class ImportCLI:
         ),
     ]
     postman: Annotated[
-        Tuple[str, str],
+        tuple[str, str],
         cappa.Arg(
             short='-ip',
             long='--import-postman',
