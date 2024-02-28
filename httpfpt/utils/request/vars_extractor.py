@@ -39,7 +39,6 @@ class VarsExtractor:
         """
         str_target = json.dumps(target, ensure_ascii=False)
 
-        # 变量预搜索
         match = self.vars_re.search(str_target) or self.sql_vars_re.search(str_target)
         if not match:
             return target

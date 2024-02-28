@@ -6,7 +6,6 @@ from datetime import datetime
 
 import pytest
 
-from filelock import FileLock
 from py._xmlgen import html
 
 from httpfpt.common.log import log
