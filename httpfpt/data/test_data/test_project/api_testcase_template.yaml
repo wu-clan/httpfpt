@@ -120,7 +120,7 @@ test_steps:
       body_type: json
       body:
         title: foo
-        body: sum(a+b)=${sum_a_b(1,2)}; $test_cache; $test_env; ${test_global}.
+        body: sum(a+b)=${sum_a_b(1,2)}; $test_cache ; $test_env ; ${test_global}.
         userId: 1
       files:
     setup:

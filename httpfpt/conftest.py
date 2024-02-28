@@ -16,19 +16,8 @@ from httpfpt.core.get_conf import config as sys_config
 
 
 @pytest.fixture(scope='session', autouse=True)
-def session_fixture(tmp_path_factory, worker_id):
-    # 避免分布式执行用例循环执行此fixture
-    data = 'some data'
-    if worker_id == 'master':
-        return data
-    root_tmp_dir = tmp_path_factory.getbasetemp().parent
-    fn = root_tmp_dir / 'data.txt'
-    with FileLock(str(fn) + '.lock'):
-        if fn.is_file():
-            data = fn.read_text('utf-8')
-        else:
-            fn.write_text(data, 'utf-8')
-    return data
+def session_fixture(tmp_path_factory):
+    pass
 
 
 @pytest.fixture(scope='package', autouse=True)

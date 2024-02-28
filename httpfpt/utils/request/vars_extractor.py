@@ -19,15 +19,15 @@ from httpfpt.enums.var_type import VarType
 
 class VarsExtractor:
     def __init__(self) -> None:
+        # 变量通用规则：
+        # 1. 开头必须为 a-zA-Z_
+        # 2. 变量有 {} 包住时，允许变量值前后存在任何内容，相反，则不允许变量值前后存在任何内容
         # 变量表达: ${var} 或 $var
-        # 变量开头: a-zA-Z_
-        self.vars_re = r'\$([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)\}'
+        self.vars_re = re.compile(r'\${([a-zA-Z_]\w*)}|(?<!\S)\$([a-zA-Z_]\w*)(?!\S)')
         # 关联变量表达: ^{var} 或 ^var
-        # 关联变量开头: a-zA-Z_
-        self.relate_vars_re = r'\^([a-zA-Z_]\w*)|\^{([a-zA-Z_]\w*)\}'
+        self.relate_vars_re = re.compile(r'\^{([a-zA-Z_]\w*)}|(?<!\S)\^([a-zA-Z_]\w*)(?!\S)')
         # SQL 变量语法: :{var} 或 :var
-        # SQL 变量开头: a-zA-Z_
-        self.sql_vars_re = r'\:([a-zA-Z_]\w*)|\:{([a-zA-Z_]\w*)\}'
+        self.sql_vars_re = re.compile(r':{([a-zA-Z_]\w*)}|(?<!\S):([a-zA-Z_]\w*)(?!\S)')
 
     def vars_replace(self, target: dict, env_filename: str | None = None) -> dict:
         """
@@ -40,8 +40,8 @@ class VarsExtractor:
         str_target = json.dumps(target, ensure_ascii=False)
 
         # 变量预搜索
-        key = re.search(self.vars_re, str_target) or re.search(self.sql_vars_re, str_target)
-        if not key:
+        match = self.vars_re.search(str_target) or self.sql_vars_re.search(str_target)
+        if not match:
             return target
 
         # 获取环境名称
@@ -58,29 +58,27 @@ class VarsExtractor:
         global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
         # 获取 re 规则字符串
-        re_str = self.sql_vars_re if env_filename else self.vars_re
-
-        while re.findall(re_str, str_target):
-            key = re.search(re_str, str_target)
-            var_key = key.group(1) or key.group(2)
-            # 替换: 临时变量 > 环境变量 > 全局变量
+        var_re = self.sql_vars_re if env_filename else self.vars_re
+        for match in var_re.finditer(str_target):
+            var_key = match.group(1) or match.group(2)
             if var_key is not None:
                 log_type = '请求数据'
                 try:
                     # 设置默认值为特殊字符, 避免变量值为 None 时错误判断
                     default = '`AE86`'
+                    # 替换: 临时变量 > 环境变量 > 全局变量
                     cache_value = variable_cache.get(var_key, default=default)
                     if cache_value == default:
                         var_value = env_vars.get(var_key.upper(), global_vars.get(var_key, default))
                         if var_value != default:
                             if env_filename is not None:
                                 log_type = 'SQL '
-                            str_target = re.sub(re_str, str(var_value), str_target, 1)
+                            str_target = var_re.sub(str(var_value), str_target, 1)
                             log.info(f'{log_type}变量 {var_key} 替换完成')
                         else:
                             raise VariableError(var_key)
                     else:
-                        str_target = re.sub(re_str, str(cache_value), str_target, 1)
+                        str_target = var_re.sub(str(cache_value), str_target, 1)
                         log.info(f'{log_type}变量 {var_key} 替换完成')
                 except Exception as e:
                     raise VariableError(f'{log_type}变量 {var_key} 替换失败: {e}')
@@ -96,20 +94,23 @@ class VarsExtractor:
         :param target:
         :return:
         """
-        str_target = json.dumps(target)
+        str_target = json.dumps(target, ensure_ascii=False)
+
+        match = self.relate_vars_re.search(str_target)
+        if not match:
+            return target
 
         var_keys = []
         log.info('执行关联测试用例变量替换...')
-        while re.findall(self.relate_vars_re, str_target):
-            key = re.search(self.relate_vars_re, str_target)
-            var_key = key.group(1) or key.group(2)
+        for match in self.relate_vars_re.finditer(str_target):
+            var_key = match.group(1) or match.group(2)
             if var_key is not None:
                 var_keys.append(var_key)
                 default = '`AE86`'
                 cache_value = variable_cache.get(var_key, default=default, tag='relate_testcase')
                 if cache_value != default:
                     try:
-                        str_target = re.sub(self.relate_vars_re, str(cache_value), str_target, 1)
+                        str_target = self.relate_vars_re.sub(str(cache_value), str_target, 1)
                         log.info(f'请求数据关联变量 {var_key} 替换完成')
                     except Exception as e:
                         raise VariableError(f'请求数据关联变量 {var_key} 替换失败: {e}')
