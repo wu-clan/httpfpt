@@ -14,8 +14,8 @@ from httpfpt.enums.teardown_type import TeardownType
 
 class HookExecutor:
     def __init__(self) -> None:
-        # hook 表达: ${func()} 或 ${func(1, 2)}
         # hook 开头: a-zA-Z_
+        # hook 表达: ${func()} 或 ${func(1, 2)}
         self.func_re = re.compile(r'\${([a-zA-Z_]\w*\([$\w.\-/\s=,]*\))}')
 
     def hook_func_value_replace(self, target: dict) -> Any:
@@ -25,12 +25,6 @@ class HookExecutor:
         :param target:
         :return:
         """
-        str_target = json.dumps(target, ensure_ascii=False)
-
-        match = self.func_re.search(str_target)
-        if not match:
-            return target
-
         # 数据排除
         setup = target['test_steps'].get('setup')
         teardown = target['test_steps'].get('teardown')
@@ -52,6 +46,12 @@ class HookExecutor:
                 target['test_steps']['teardown'] = [
                     item for item in target['test_steps']['teardown'] if item.get(TeardownType.HOOK) is None
                 ]
+
+        str_target = json.dumps(target, ensure_ascii=False)
+
+        match = self.func_re.search(str_target)
+        if not match:
+            return target
 
         # hook 返回值替换
         exec('from httpfpt.data.hooks import *')
