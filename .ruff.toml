@@ -1,3 +1,8 @@
+line-length = 120
+cache-dir = "./httpfpt/.ruff_cache"
+unsafe-fixes = true
+
+[lint]
 select = [
     "E",
     "F",
@@ -16,9 +21,6 @@ select = [
     "ANN205",
     "ANN206",
 ]
-line-length = 120
-cache-dir = "./httpfpt/.ruff_cache"
-unsafe-fixes = true
 
 [lint.flake8-pytest-style]
 mark-parentheses = false

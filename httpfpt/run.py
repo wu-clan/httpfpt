@@ -175,7 +175,7 @@ def run(
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
     :param log_level: 控制台打印输出级别, 默认"-v"
-    :param case_path: 指定测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
+    :param case_path: 指定当前项目下的测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
     :param html_report: 生成 HTML 测试报告, 默认开启
     :param allure: 生成 allure 测试报告, 默认开启
     :param allure_clear: 清空 allure 报告历史记录, 默认开启

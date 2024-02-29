@@ -14,22 +14,9 @@ from httpfpt.enums.teardown_type import TeardownType
 
 class HookExecutor:
     def __init__(self) -> None:
-        # hook 表达: ${func()} 或 ${func(1, 2)}
         # hook 开头: a-zA-Z_
-        self.func_re = r'\${([a-zA-Z_]\w*\([\$\w\.\-/\s=,]*\))}'
-
-    def hook_func_extract(self, target: str) -> str:
-        """
-        提取用例中的函数
-
-        :return:
-        """
-        while re.findall(self.func_re, target):
-            key = re.search(self.func_re, target)
-            hook = key.group(1)
-            if hook is not None:
-                target.replace(hook, '')
-        return target
+        # hook 表达: ${func()} 或 ${func(1, 2)}
+        self.func_re = re.compile(r'\${([a-zA-Z_]\w*\([$\w.\-/\s=,]*\))}')
 
     def hook_func_value_replace(self, target: dict) -> Any:
         """
@@ -60,22 +47,27 @@ class HookExecutor:
                     item for item in target['test_steps']['teardown'] if item.get(TeardownType.HOOK) is None
                 ]
 
-        # hook 返回值替换
         str_target = json.dumps(target, ensure_ascii=False)
+
+        match = self.func_re.search(str_target)
+        if not match:
+            return target
+
+        # hook 返回值替换
         exec('from httpfpt.data.hooks import *')
-        while re.findall(self.func_re, str_target):
-            key = re.search(self.func_re, str_target)
-            hook_key = key.group(1)
+        for match in self.func_re.finditer(str_target):
+            hook_key = match.group(1)
             try:
                 # locals() 获取到执行函数内所有变量并以字典形式返回
                 loc = locals()
                 exec(f'result = {hook_key}')
                 value = str(loc['result'])
-                str_target = re.sub(self.func_re, value, str_target, 1)
+                str_target = self.func_re.sub(value, str_target, 1)
                 log.info(f'请求数据函数 {hook_key} 返回值替换完成')
             except Exception as e:
                 log.error(f'请求数据函数 {hook_key} 返回值替换失败: {e}')
                 raise e
+
         dict_target = json.loads(str_target)
 
         # 数据还原
@@ -97,7 +89,8 @@ class HookExecutor:
         :param hook_var:
         :return:
         """
-        func = self.hook_func_extract(hook_var)
+        key = self.func_re.search(hook_var)
+        func = key.group(1)
         exec('from httpfpt.data.hooks import *')
         log.info(f'执行 hook：{func}')
         exec(func)
