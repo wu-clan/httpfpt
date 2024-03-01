@@ -1,96 +1,108 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from functools import lru_cache
-from pathlib import Path
+from __future__ import annotations
 
 from httpfpt.common.toml_handler import read_toml
 
+__all__ = ['config', 'init_config']
 
-class Config:
-    def __init__(self) -> None:
-        self.__config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
+# global config
+config = None
+
+
+class HttpFptConfig:
+    def __init__(self, settings: dict) -> None:
+        """
+        初始化配置
+
+        :param settings:
+        """
 
         # 项目目录名
-        self.PROJECT_NAME = self.__config['project']['project']
+        self.PROJECT_NAME = settings['project']['project']
 
         # 测试报告
-        self.TEST_REPORT_TITLE = self.__config['report']['title']
-        self.TESTER_NAME = self.__config['report']['tester_name']
+        self.TEST_REPORT_TITLE = settings['report']['title']
+        self.TESTER_NAME = settings['report']['tester_name']
 
         # mysql 数据库
-        self.MYSQL_HOST = self.__config['mysql']['host']
-        self.MYSQL_PORT = self.__config['mysql']['port']
-        self.MYSQL_USER = self.__config['mysql']['user']
-        self.MYSQL_PASSWORD = self.__config['mysql']['password']
-        self.MYSQL_DATABASE = self.__config['mysql']['database']
-        self.MYSQL_CHARSET = self.__config['mysql']['charset']
+        self.MYSQL_HOST = settings['mysql']['host']
+        self.MYSQL_PORT = settings['mysql']['port']
+        self.MYSQL_USER = settings['mysql']['user']
+        self.MYSQL_PASSWORD = settings['mysql']['password']
+        self.MYSQL_DATABASE = settings['mysql']['database']
+        self.MYSQL_CHARSET = settings['mysql']['charset']
 
         # redis 数据库
-        self.REDIS_HOST = self.__config['redis']['host']
-        self.REDIS_PORT = self.__config['redis']['port']
-        self.REDIS_PASSWORD = self.__config['redis']['password']
-        self.REDIS_DATABASE = self.__config['redis']['database']
-        self.REDIS_TIMEOUT = self.__config['redis']['timeout']
+        self.REDIS_HOST = settings['redis']['host']
+        self.REDIS_PORT = settings['redis']['port']
+        self.REDIS_PASSWORD = settings['redis']['password']
+        self.REDIS_DATABASE = settings['redis']['database']
+        self.REDIS_TIMEOUT = settings['redis']['timeout']
 
         # 邮件
-        self.EMAIL_SERVER = self.__config['email']['host_server']
-        self.EMAIL_PORT = self.__config['email']['port']
-        self.EMAIL_USER = self.__config['email']['user']
-        self.EMAIL_PASSWORD = self.__config['email']['password']
-        self.EMAIL_SEND_TO = self.__config['email']['send_to']
-        self.EMAIL_SSL = self.__config['email']['ssl']
-        self.EMAIL_REPORT_SEND = self.__config['email']['send_report']
+        self.EMAIL_SERVER = settings['email']['host_server']
+        self.EMAIL_PORT = settings['email']['port']
+        self.EMAIL_USER = settings['email']['user']
+        self.EMAIL_PASSWORD = settings['email']['password']
+        self.EMAIL_SEND_TO = settings['email']['send_to']
+        self.EMAIL_SSL = settings['email']['ssl']
+        self.EMAIL_REPORT_SEND = settings['email']['send_report']
 
         # 钉钉
-        self.DING_TALK_WEBHOOK = self.__config['ding_talk']['webhook']
+        self.DING_TALK_WEBHOOK = settings['ding_talk']['webhook']
         self.DING_TALK_PROXY = {
-            'http': self.__config['ding_talk']['proxies']['http']
-            if self.__config['ding_talk']['proxies']['http'] != ''
+            'http': settings['ding_talk']['proxies']['http']
+            if settings['ding_talk']['proxies']['http'] != ''
             else None,
-            'https': self.__config['ding_talk']['proxies']['https']
-            if self.__config['ding_talk']['proxies']['https'] != ''
+            'https': settings['ding_talk']['proxies']['https']
+            if settings['ding_talk']['proxies']['https'] != ''
             else None,
         }
-        self.DING_TALK_REPORT_SEND = self.__config['ding_talk']['send_report']
+        self.DING_TALK_REPORT_SEND = settings['ding_talk']['send_report']
 
         # 飞书
-        self.LARK_TALK_WEBHOOK = self.__config['lark_talk']['webhook']
+        self.LARK_TALK_WEBHOOK = settings['lark_talk']['webhook']
         self.LARK_TALK_PROXY = {
-            'http': self.__config['lark_talk']['proxies']['http']
-            if self.__config['lark_talk']['proxies']['http'] != ''
+            'http': settings['lark_talk']['proxies']['http']
+            if settings['lark_talk']['proxies']['http'] != ''
             else None,
-            'https': self.__config['lark_talk']['proxies']['https']
-            if self.__config['lark_talk']['proxies']['https'] != ''
+            'https': settings['lark_talk']['proxies']['https']
+            if settings['lark_talk']['proxies']['https'] != ''
             else None,
         }
-        self.LARK_TALK_REPORT_SEND = self.__config['lark_talk']['send_report']
+        self.LARK_TALK_REPORT_SEND = settings['lark_talk']['send_report']
 
         # 请求发送
-        self.REQUEST_TIMEOUT = self.__config['request']['timeout']
-        self.REQUEST_VERIFY = self.__config['request']['verify']
-        self.REQUEST_REDIRECTS = self.__config['request']['redirects']
+        self.REQUEST_TIMEOUT = settings['request']['timeout']
+        self.REQUEST_VERIFY = settings['request']['verify']
+        self.REQUEST_REDIRECTS = settings['request']['redirects']
         self.REQUEST_PROXIES_REQUESTS = {
-            'http': self.__config['request']['proxies']['http']
-            if self.__config['request']['proxies']['http'] != ''
-            else None,
-            'https': self.__config['request']['proxies']['https']
-            if self.__config['request']['proxies']['https'] != ''
-            else None,
+            'http': settings['request']['proxies']['http'] if settings['request']['proxies']['http'] != '' else None,
+            'https': settings['request']['proxies']['https'] if settings['request']['proxies']['https'] != '' else None,
         }
         self.REQUEST_PROXIES_HTTPX = {
-            'http://': self.__config['request']['proxies']['http']
-            if self.__config['request']['proxies']['http'] != ''
-            else None,
-            'https://': self.__config['request']['proxies']['https']
-            if self.__config['request']['proxies']['https'] != ''
+            'http://': settings['request']['proxies']['http'] if settings['request']['proxies']['http'] != '' else None,
+            'https://': settings['request']['proxies']['https']
+            if settings['request']['proxies']['https'] != ''
             else None,
         }
-        self.REQUEST_RETRY = self.__config['request']['retry']
+        self.REQUEST_RETRY = settings['request']['retry']
 
 
-@lru_cache(maxsize=None)
-def cache_config() -> Config:
-    return Config()
+def init_config(settings: str | dict, config_filename: str | None = None) -> None:
+    """
+    初始化配置
 
+    :param settings: 项目配置，字典或指定 toml 配置路径文件
+    :param config_filename:
+    :return:
+    """
+    global config
 
-config = cache_config()
+    if isinstance(settings, str):
+        conf = read_toml(settings, config_filename)
+    else:
+        conf = settings
+
+    config = HttpFptConfig(conf)

@@ -31,7 +31,7 @@ class Logger:
         if not os.path.join(LOG_PATH):
             os.makedirs(LOG_PATH)
 
-        log_file = os.path.join(LOG_PATH, 'api_test.log')
+        log_file = os.path.join(LOG_PATH, 'httpfpt.log')
 
         # 清除 logger 配置
         logger.remove()

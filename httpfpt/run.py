@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import config, init_config
 from httpfpt.core.path_conf import (
     ALLURE_ENV_FILE,
     ALLURE_REPORT_ENV_FILE,
@@ -148,6 +148,8 @@ def startup(
 def run(
     *args,
     # init
+    settings: str | dict,
+    config_filename: str | None = None,
     clean_cache: bool = False,
     pydantic_verify: bool = True,
     # log level
@@ -171,6 +173,9 @@ def run(
     """
     运行入口
 
+    :param args: pytest 运行参数
+    :param settings: 项目核心配置，字典或指定配置路径文件
+    :param config_filename: 当 settings 指定配置路径时，可单独指定配置文件名
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
@@ -185,7 +190,7 @@ def run(
     :param strict_markers: markers 严格模式, 对于设置 marker 装饰器的用例, 如果 marker 未在 pytest.ini 注册, 用例将报错
     :param capture: 避免在使用输出模式为"v"和"s"时，html报告中的表格日志为空的情况, 默认开启
     :param disable_warnings: 关闭控制台警告信息, 默认开启
-    :param kwargs: pytest 运行参数
+    :param kwargs: pytest 运行关键字参数
     :return:
     """
     try:
@@ -201,6 +206,7 @@ def run(
 
             """
         log.info(logo)
+        init_config(settings, config_filename)
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
