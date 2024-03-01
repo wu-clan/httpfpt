@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
+import operator
 
 from faker import Faker
 
@@ -22,4 +23,4 @@ def random_phone() -> str:
 
 
 def sum_a_b(a: int, b: int) -> int:
-    return a + b
+    return operator.add(a, b)

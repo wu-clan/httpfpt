@@ -64,5 +64,6 @@ def get_file_hash(filepath: str) -> str:
     import hashlib
 
     with open(filepath, 'rb') as f:
-        file_hash = hashlib.sha256(f.read()).hexdigest()
+        contents = f.read()
+        file_hash = hashlib.sha256(contents).hexdigest()
     return file_hash

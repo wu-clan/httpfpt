@@ -46,6 +46,9 @@ select = [
     "RUF013",
     "RUF027",
 ]
+preview = true
+ignore-init-module-imports = true
+ignore = ["FURB101"]
 
 [lint.flake8-pytest-style]
 mark-parentheses = false
@@ -72,4 +75,3 @@ mypy-init-return = true
 [format]
 quote-style = "single"
 docstring-code-format = true
-skip-magic-trailing-comma = true

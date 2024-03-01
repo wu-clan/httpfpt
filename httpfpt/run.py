@@ -65,8 +65,9 @@ def startup(
     if html_report:
         if not os.path.exists(path_config.HTML_REPORT_PATH):
             os.makedirs(path_config.HTML_REPORT_PATH)
-        run_args.append(f'--html={os.path.join(path_config.HTML_REPORT_PATH, html_report_filename)}')
-        run_args.append('--self-contained-html')
+        run_args.extend(
+            (f'--html={os.path.join(path_config.HTML_REPORT_PATH, html_report_filename)}', '--self-contained-html')
+        )
 
     if allure:
         run_args.append(f'--alluredir={path_config.ALLURE_REPORT_PATH}')
