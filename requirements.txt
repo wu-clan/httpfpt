@@ -8,7 +8,7 @@ anyio==3.7.1
 async-timeout==4.0.3; python_full_version <= "3.11.2"
 attrs==23.2.0
 cache3==0.4.3
-cappa==0.16.4
+cappa==0.16.5
 certifi==2023.11.17
 cffi==1.16.0
 cfgv==3.4.0
@@ -67,7 +67,7 @@ rfc3986==1.5.0
 rich==13.6.0
 rpds-py==0.18.0
 rtoml==0.9.0
-ruff==0.2.2
+ruff==0.3.0
 setuptools==69.0.3
 six==1.16.0
 sniffio==1.3.0
