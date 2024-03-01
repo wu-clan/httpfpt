@@ -13,18 +13,15 @@ config = None
 class HttpFptConfig:
     def __init__(self, settings: dict) -> None:
         """
-        初始化配置
+        项目配置初始化
 
         :param settings:
         """
-
         # 项目目录名
         self.PROJECT_NAME = settings['project']['project']
-
         # 测试报告
         self.TEST_REPORT_TITLE = settings['report']['title']
         self.TESTER_NAME = settings['report']['tester_name']
-
         # mysql 数据库
         self.MYSQL_HOST = settings['mysql']['host']
         self.MYSQL_PORT = settings['mysql']['port']
@@ -32,14 +29,12 @@ class HttpFptConfig:
         self.MYSQL_PASSWORD = settings['mysql']['password']
         self.MYSQL_DATABASE = settings['mysql']['database']
         self.MYSQL_CHARSET = settings['mysql']['charset']
-
         # redis 数据库
         self.REDIS_HOST = settings['redis']['host']
         self.REDIS_PORT = settings['redis']['port']
         self.REDIS_PASSWORD = settings['redis']['password']
         self.REDIS_DATABASE = settings['redis']['database']
         self.REDIS_TIMEOUT = settings['redis']['timeout']
-
         # 邮件
         self.EMAIL_SERVER = settings['email']['host_server']
         self.EMAIL_PORT = settings['email']['port']
@@ -48,7 +43,6 @@ class HttpFptConfig:
         self.EMAIL_SEND_TO = settings['email']['send_to']
         self.EMAIL_SSL = settings['email']['ssl']
         self.EMAIL_REPORT_SEND = settings['email']['send_report']
-
         # 钉钉
         self.DING_TALK_WEBHOOK = settings['ding_talk']['webhook']
         self.DING_TALK_PROXY = {
@@ -60,7 +54,6 @@ class HttpFptConfig:
             else None,
         }
         self.DING_TALK_REPORT_SEND = settings['ding_talk']['send_report']
-
         # 飞书
         self.LARK_TALK_WEBHOOK = settings['lark_talk']['webhook']
         self.LARK_TALK_PROXY = {
@@ -72,7 +65,6 @@ class HttpFptConfig:
             else None,
         }
         self.LARK_TALK_REPORT_SEND = settings['lark_talk']['send_report']
-
         # 请求发送
         self.REQUEST_TIMEOUT = settings['request']['timeout']
         self.REQUEST_VERIFY = settings['request']['verify']

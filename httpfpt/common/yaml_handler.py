@@ -10,11 +10,11 @@ from typing import Any
 import yaml
 
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import CASE_DATA_PATH, TEST_DATA_PATH, YAML_REPORT_PATH
+from httpfpt.core.path_conf import path_config
 from httpfpt.utils.time_control import get_current_time
 
 
-def read_yaml(filepath: str | None = CASE_DATA_PATH, *, filename: str) -> dict[str, Any]:
+def read_yaml(filepath: str | None = path_config.CASE_DATA_PATH, *, filename: str) -> dict[str, Any]:
     """
     读取 yaml 文件
 
@@ -83,9 +83,10 @@ def write_yaml_report(
     :param mode: 文件写入模式
     :return
     """
-    if not os.path.exists(YAML_REPORT_PATH):
-        os.makedirs(YAML_REPORT_PATH)
-    _file = os.path.join(YAML_REPORT_PATH, filename)
+    yaml_report_path = path_config.YAML_REPORT_PATH
+    if not os.path.exists(yaml_report_path):
+        os.makedirs(yaml_report_path)
+    _file = os.path.join(yaml_report_path, filename)
     try:
         with open(_file, encoding=encoding, mode=mode) as f:
             yaml.dump(data, f, allow_unicode=True)
@@ -103,9 +104,9 @@ def write_yaml_vars(data: dict) -> None:
     :param data:
     :return:
     """
-    _file = os.path.join(TEST_DATA_PATH, 'global_vars.yaml')
+    _file = os.path.join(path_config.TEST_DATA_PATH, 'global_vars.yaml')
     try:
-        _vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
+        _vars = read_yaml(path_config.TEST_DATA_PATH, filename='global_vars.yaml')
         _vars.update(data)
         with open(_file, encoding='utf-8', mode='w') as f:
             yaml.dump(_vars, f, allow_unicode=True)
@@ -115,7 +116,7 @@ def write_yaml_vars(data: dict) -> None:
         log.info(f'写入全局变量成功: global_vars.yaml -> {data}')
 
 
-def get_yaml_file(filepath: str = CASE_DATA_PATH, *, filename: str) -> str:
+def get_yaml_file(filepath: str = path_config.CASE_DATA_PATH, *, filename: str) -> str:
     """
     获取 yaml 测试数据文件
 

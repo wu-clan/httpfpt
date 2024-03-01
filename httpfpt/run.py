@@ -15,14 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.get_conf import config, init_config
-from httpfpt.core.path_conf import (
-    ALLURE_ENV_FILE,
-    ALLURE_REPORT_ENV_FILE,
-    ALLURE_REPORT_HTML_PATH,
-    ALLURE_REPORT_PATH,
-    HTML_REPORT_PATH,
-    YAML_REPORT_PATH,
-)
+from httpfpt.core.path_conf import init_path_config, path_config
 from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.ding_talk import DingTalk
@@ -70,13 +63,13 @@ def startup(
 
     html_report_filename = f'{config.PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
     if html_report:
-        if not os.path.exists(HTML_REPORT_PATH):
-            os.makedirs(HTML_REPORT_PATH)
-        run_args.append(f'--html={os.path.join(HTML_REPORT_PATH, html_report_filename)}')
+        if not os.path.exists(path_config.HTML_REPORT_PATH):
+            os.makedirs(path_config.HTML_REPORT_PATH)
+        run_args.append(f'--html={os.path.join(path_config.HTML_REPORT_PATH, html_report_filename)}')
         run_args.append('--self-contained-html')
 
     if allure:
-        run_args.append(f'--alluredir={ALLURE_REPORT_PATH}')
+        run_args.append(f'--alluredir={path_config.ALLURE_REPORT_PATH}')
         if allure_clear:
             run_args.append('--clean-alluredir')
 
@@ -122,9 +115,9 @@ def startup(
     pytest.main(run_args)
     log.info('🏁 FINISH')
 
-    yaml_report_files = os.listdir(YAML_REPORT_PATH)
+    yaml_report_files = os.listdir(path_config.YAML_REPORT_PATH)
     yaml_report_files.sort()
-    test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
+    test_result = read_yaml(path_config.YAML_REPORT_PATH, filename=yaml_report_files[-1])
 
     if html_report and config.EMAIL_REPORT_SEND:
         SendMail(test_result, html_report_filename).send_report()
@@ -136,13 +129,13 @@ def startup(
         LarkTalk(test_result).send()
 
     if allure:
-        if not os.path.exists(ALLURE_REPORT_ENV_FILE):
-            shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE)
+        if not os.path.exists(path_config.ALLURE_REPORT_ENV_FILE):
+            shutil.copyfile(path_config.ALLURE_ENV_FILE, path_config.ALLURE_REPORT_ENV_FILE)
 
     if allure and allure_serve:
-        os.popen(f'allure generate {ALLURE_REPORT_PATH} -o {ALLURE_REPORT_HTML_PATH} --clean') and os.popen(
-            f'allure serve {ALLURE_REPORT_PATH}'
-        )  # type: ignore
+        os.popen(
+            f'allure generate {path_config.ALLURE_REPORT_PATH} -o {path_config.ALLURE_REPORT_HTML_PATH} --clean'
+        ) and os.popen(f'allure serve {path_config.ALLURE_REPORT_PATH}')  # type: ignore
 
 
 def run(
@@ -207,6 +200,7 @@ def run(
             """
         log.info(logo)
         init_config(settings, config_filename)
+        init_path_config('TODO: httpfpt startproject xxx; xxx is base_dir')
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)

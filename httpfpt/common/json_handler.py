@@ -8,10 +8,10 @@ import os
 from typing import Any
 
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import CASE_DATA_PATH
+from httpfpt.core.path_conf import path_config
 
 
-def read_json_file(filepath: str | None = CASE_DATA_PATH, *, filename: str, **kwargs) -> dict:
+def read_json_file(filepath: str | None = path_config.CASE_DATA_PATH, *, filename: str, **kwargs) -> dict:
     """
     读取 json 文件
 

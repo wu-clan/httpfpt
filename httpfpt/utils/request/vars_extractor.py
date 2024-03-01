@@ -13,7 +13,7 @@ from httpfpt.common.errors import JsonPathFindError, RequestDataParseError, Vari
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import read_yaml, write_yaml_vars
-from httpfpt.core.path_conf import RUN_ENV_PATH, TEST_DATA_PATH
+from httpfpt.core.path_conf import path_config
 from httpfpt.enums.var_type import VarType
 
 
@@ -48,13 +48,13 @@ class VarsExtractor:
         if not env or not isinstance(env, str):
             raise RequestDataParseError('运行环境获取失败, 测试用例数据缺少 config:request:env 参数')
         try:
-            env_file = os.path.join(RUN_ENV_PATH, env)
+            env_file = os.path.join(path_config.RUN_ENV_PATH, env)
             env_vars = get_env_dict(env_file)
         except OSError:
             raise RequestDataParseError('运行环境获取失败, 请检查测试用例环境配置')
 
         # 获取全局变量
-        global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
+        global_vars = read_yaml(path_config.TEST_DATA_PATH, filename='global_vars.yaml')
 
         # 获取 re 规则字符串
         var_re = self.sql_vars_re if env_filename else self.vars_re
@@ -149,7 +149,7 @@ class VarsExtractor:
         if set_type == VarType.CACHE:
             variable_cache.set(key, value_str)
         elif set_type == VarType.ENV:
-            write_env_vars(RUN_ENV_PATH, env, key, value_str)
+            write_env_vars(path_config.RUN_ENV_PATH, env, key, value_str)
         elif set_type == VarType.GLOBAL:
             write_yaml_vars({key: value_str})
         else:

@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 
-from httpfpt.core.path_conf import LOG_PATH
+from httpfpt.core.path_conf import path_config
 
 if TYPE_CHECKING:
     import loguru
@@ -28,10 +28,12 @@ class Logger:
 
         :return:
         """
-        if not os.path.join(LOG_PATH):
-            os.makedirs(LOG_PATH)
+        log_path = path_config.LOG_PATH
 
-        log_file = os.path.join(LOG_PATH, 'httpfpt.log')
+        if not os.path.join(log_path):
+            os.makedirs(log_path)
+
+        log_file = os.path.join(log_path, 'httpfpt.log')
 
         # 清除 logger 配置
         logger.remove()
