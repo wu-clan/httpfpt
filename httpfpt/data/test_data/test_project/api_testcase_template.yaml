@@ -84,6 +84,7 @@ test_steps:
           jsonpath: $.status_code
       - assert: assert 200 == pm.response.get('status_code')
       - assert: assert pm.response.get('status_code') == IsInt(exactly=200), '响应状态码非200'
+      - assert: assert int(pm.response.get('status_code')) == IsInt, '响应状态码错误'
       - assert: assert 'postId' not in str(pm.response.get('content')), '没有返回content'
       - assert:
           check:

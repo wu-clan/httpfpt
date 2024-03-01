@@ -217,14 +217,9 @@ class Asserter:
         if len(assert_split) < 4 or len(assert_split) > 6:
             raise AssertSyntaxError(f'code 断言取值表达式格式错误, 不符合语法规范: {assert_text}')
         else:
-            # 是否 dirty-equals 断言表达式
-            if assert_split[1].startswith('pm.response.get'):
-                if assert_split[2] not in ['==', '!=']:
-                    raise AssertSyntaxError(f'code 断言取值表达式格式错误, 含有不支持的断言类型 {assert_split[2]}')
-                if not assert_split[3].startswith('Is'):
-                    raise AssertSyntaxError('code 断言取值表达式格式错误, 不符合 dirty-equals 断言表达式规范')
-                # 处理比较值获取代码
-                pm_code = assert_split[1]
+
+            def exec_assertion() -> None:
+                """执行断言（闭包函数）"""
                 get_code = pm_code.split('.')[2:]
                 if len(get_code) == 1:
                     use_code = get_code[0]
@@ -245,14 +240,38 @@ class Asserter:
                         raise AssertSyntaxError(f'code 断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}')
                     else:
                         # 执行断言
-                        format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
+                        py_conversion_functions_exec_re = re.compile(
+                            rf'(\b(?:{py_conversion_functions_re_str}))\((.*?)\)(?=[^)]*$)'  # noqa: ignore
+                        )
+                        format_assert_text = py_conversion_functions_exec_re.sub(
+                            lambda x: x.group(1) + f'("""{response_value}""")', assert_text
+                        )
+                        if 'pm.response.get' in format_assert_text:
+                            format_assert_text = format_assert_text.replace(pm_code, '{}', 1).format(response_value)
                         if len(assert_split) == 4:
                             # stdout 作为没有自定义断言错误时的信息补充
                             # 当断言错误触发时, 如果错误信息中包含自定义错误, 此项可忽略
-                            print('Warning: 未自定义 code 断言错误信息的断言:')
-                            print(f'-> {format_assert_text}')
-                        exec('from dirty_equals import *')
+                            log.warning('Warning: 此 code 断言未自定义错误提示信息')
+                        if dirty_equals_assert:
+                            exec('from dirty_equals import *')
                         exec(format_assert_text)
+
+            py_conversion_functions_re_str = 'str|int|float|bool|list|tuple|set|dict'
+            py_conversion_functions_pm_get_re = re.compile(rf'^({py_conversion_functions_re_str})\(pm\.response\.get')
+            # 是否 dirty-equals 断言表达式
+            dirty_equals_assert = True
+            if not assert_split[1].startswith('pm.response.get'):
+                if not py_conversion_functions_pm_get_re.match(assert_split[1]):
+                    dirty_equals_assert = False
+            if dirty_equals_assert:
+                if assert_split[2] not in ['==', '!=']:
+                    raise AssertSyntaxError(
+                        f'code 断言取值表达式格式错误, 含有不支持的 dirty-equals 断言类型 {assert_split[2]}'
+                    )
+                # 处理比较值获取代码
+                pm_code = assert_split[1]
+                # 执行断言
+                exec_assertion()
             else:
                 assert_expr_type = ['==', '!=', '>', '<', '>=', '<=', 'in', 'not']
                 if assert_split[2] not in assert_expr_type:
@@ -266,10 +285,11 @@ class Asserter:
                                 f'code 断言表达式格式错误, 含有不支持的断言类型: {" ".join(assert_split[2:4])}'
                             )
                         else:
-                            if 'pm.response.get' not in assert_split[4]:
-                                raise AssertSyntaxError(
-                                    f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[4]}'
-                                )
+                            if not assert_split[4].startswith('pm.response.get'):
+                                if not py_conversion_functions_pm_get_re.match(assert_split[4]):
+                                    raise AssertSyntaxError(
+                                        f'code 断言取值表达式格式错误, 含有不支持的断言取值表达式: {assert_split[4]}'
+                                    )
                             # 如果包含自定义错误信息
                             if len(assert_split) == 6:
                                 pm_code = assert_split[4].replace(',', '')
@@ -277,43 +297,17 @@ class Asserter:
                                 pm_code = assert_split[4]
                     else:
                         # 非 dirty-equals 或 not in 断言表达式
-                        if 'pm.response.get' not in assert_split[3]:
-                            raise AssertSyntaxError(
-                                f'code 断言取值表达式格式错误, 含有不支持的取值表达式: {assert_split[3]}'
-                            )
+                        if not assert_split[3].startswith('pm.response.get'):
+                            if not py_conversion_functions_pm_get_re.match(assert_split[3]):
+                                raise AssertSyntaxError(
+                                    f'code 断言取值表达式格式错误, 含有不支持的断言取值表达式: {assert_split[3]}'
+                                )
                         if len(assert_split) == 5:
                             pm_code = assert_split[3].replace(',', '')
                         else:
                             pm_code = assert_split[3]
-                    # 处理取值代码执行断言
-                    get_code = pm_code.split('.')[2:]
-                    if len(get_code) == 1:
-                        use_code = get_code[0]
-                    else:
-                        use_code = '.'.join(get_code)
-                    if use_code.endswith('))'):
-                        use_code = use_code.replace('))', ')')
-                    if not use_code.startswith('get('):
-                        raise AssertSyntaxError(
-                            'code 断言取值表达式格式错误, 取值表达式条件不允许, 请在首位改用 get() 方法取值'
-                        )
-                    else:
-                        try:
-                            response_value = eval(f'{response}.{use_code}')
-                        except Exception as e:
-                            err_msg = str(e.args).replace("'", '"').replace('\\', '')
-                            raise AssertSyntaxError(
-                                f'code 断言取值表达式格式错误, {use_code} 取值失败, 详情: {err_msg}'
-                            )
-                        else:
-                            # 执行断言
-                            format_assert_text = assert_text.replace(pm_code, '{}', 1).format(response_value)
-                            if len(assert_split) == 4:
-                                # stdout 作为没有自定义断言错误时的信息补充
-                                # 当断言错误触发时, 如果错误信息中包含自定义错误, 此项可忽略
-                                print('Warning: 未自定义断言错误信息的断言:')
-                                print(f'-> {format_assert_text}')
-                            exec(format_assert_text)
+                    # 执行断言
+                    exec_assertion()
 
     @staticmethod
     def _exec_json_assert(assert_check: str | None, expected_value: Any, assert_type: str, actual_value: Any) -> None:
