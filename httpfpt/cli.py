@@ -167,15 +167,7 @@ def cmd_run_test_parse(value: Value) -> bool | Value:
 @cappa.command(name='httpfpt-cli')
 @dataclass
 class HttpFptCLI:
-    version: Annotated[
-        bool,
-        cappa.Arg(
-            short='-V',
-            long=True,
-            default=False,
-            help='Print version information.',
-        ),
-    ]
+    version: Annotated[bool, cappa.Arg(short='-V', long=True, default=False, help='Print version information.')]
     run_test: Annotated[
         list[str] | None,
         cappa.Arg(
@@ -216,14 +208,7 @@ class TestCaseCLI:
         ),
     ]
     generate: Annotated[
-        bool,
-        cappa.Arg(
-            short='-gt',
-            long=True,
-            default=False,
-            help='自动生成测试用例.',
-            required=False,
-        ),
+        bool, cappa.Arg(short='-gt', long=True, default=False, help='自动生成测试用例.', required=False)
     ]
 
     def __call__(self) -> None:
@@ -260,33 +245,15 @@ class ImportCLI:
     ]
     har: Annotated[
         tuple[str, str],
-        cappa.Arg(
-            short='-ih',
-            long='--import-har',
-            default=(),
-            help='TODO: Not started yet.',
-            required=False,
-        ),
+        cappa.Arg(short='-ih', long='--import-har', default=(), help='TODO: Not started yet.', required=False),
     ]
     jmeter: Annotated[
         tuple[str, str],
-        cappa.Arg(
-            short='-ij',
-            long='--import-jmeter',
-            default=(),
-            help='TODO: Not started yet.',
-            required=False,
-        ),
+        cappa.Arg(short='-ij', long='--import-jmeter', default=(), help='TODO: Not started yet.', required=False),
     ]
     postman: Annotated[
         tuple[str, str],
-        cappa.Arg(
-            short='-ip',
-            long='--import-postman',
-            default=(),
-            help='TODO: Not started yet.',
-            required=False,
-        ),
+        cappa.Arg(short='-ip', long='--import-postman', default=(), help='TODO: Not started yet.', required=False),
     ]
     git: Annotated[
         str,

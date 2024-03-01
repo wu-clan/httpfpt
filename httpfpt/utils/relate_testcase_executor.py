@@ -68,9 +68,7 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                         response = relate_testcase_exec_with_new_request_data(case_data)
                         # 使用更新请求数据后的请求响应提取变量
                         if setup_testcase.get('response') is not None:
-                            testcase_data = {
-                                'set_var_response': setup_testcase['response'],
-                            }
+                            testcase_data = {'set_var_response': setup_testcase['response']}
                             relate_testcase_extract_with_response(testcase_data, response)
                     else:
                         if setup_testcase.get('response') is not None:
@@ -88,15 +86,11 @@ def exec_setup_testcase(parsed_data: dict, setup_testcase: str | dict) -> dict |
                 case_data.update(testcase_data)
                 response = relate_testcase_exec_with_new_request_data(case_data)
                 if setup_testcase.get('response') is not None:
-                    testcase_data = {
-                        'set_var_response': setup_testcase['response'],
-                    }
+                    testcase_data = {'set_var_response': setup_testcase['response']}
                     relate_testcase_extract_with_response(testcase_data, response)
             else:
                 if setup_testcase.get('response') is not None:
-                    testcase_data = {
-                        'set_var_response': setup_testcase['response'],
-                    }
+                    testcase_data = {'set_var_response': setup_testcase['response']}
                     case_data.update(testcase_data)
                     relate_testcase_extract(case_data)
 

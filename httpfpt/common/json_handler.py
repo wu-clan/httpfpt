@@ -41,13 +41,7 @@ def read_json_file(filepath: str | None = CASE_DATA_PATH, *, filename: str, **kw
 
 
 def write_json_file(
-    filepath: str | None = None,
-    *,
-    filename: str,
-    data: Any = None,
-    encoding: str = 'utf-8',
-    mode: str = 'a',
-    **kwargs,
+    filepath: str | None = None, *, filename: str, data: Any = None, encoding: str = 'utf-8', mode: str = 'a', **kwargs
 ) -> None:
     """
     写入 json 文件

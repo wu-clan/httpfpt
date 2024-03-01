@@ -167,7 +167,7 @@ class RequestDataParse:
                     raise RequestDataParseError(
                         _error_msg('测试用例数据解析失败，参数 config:request:proxies 不符合规范')
                     )
-                for k, v in proxies.items():
+                for v in proxies.values():
                     if v is not None:
                         if not isinstance(v, str):
                             raise RequestDataParseError(
@@ -555,9 +555,7 @@ class RequestDataParse:
                         mysql_client.sql_verify(v)
             else:
                 if not isinstance(sql, str):
-                    raise RequestDataParseError(
-                        _error_msg(f'参数 test_steps:setup:sql[{index}] 不是有效的 str 类型'),
-                    )
+                    raise RequestDataParseError(_error_msg(f'参数 test_steps:setup:sql[{index}] 不是有效的 str 类型'))
                 else:
                     mysql_client.sql_verify(sql)
         return sql
@@ -566,9 +564,7 @@ class RequestDataParse:
     def _setup_hook(index: int, hook: str | None) -> str | None:
         if hook is not None:
             if not isinstance(hook, str):
-                raise RequestDataParseError(
-                    _error_msg(f'参数 test_steps:setup:hook[{index}] 不是有效的 str 类型'),
-                )
+                raise RequestDataParseError(_error_msg(f'参数 test_steps:setup:hook[{index}] 不是有效的 str 类型'))
         return hook
 
     @staticmethod
@@ -621,14 +617,14 @@ class RequestDataParse:
                 for k, v in sql.items():
                     if not isinstance(v, str):
                         raise RequestDataParseError(
-                            _error_msg(f'参数 test_steps:teardown:sql[{index}]:{k} 不是有效的 str 类型'),
+                            _error_msg(f'参数 test_steps:teardown:sql[{index}]:{k} 不是有效的 str 类型')
                         )
                     if k == 'sql':
                         mysql_client.sql_verify(v)
             else:
                 if not isinstance(sql, str):
                     raise RequestDataParseError(
-                        _error_msg(f'参数 test_steps:teardown:sql[{index}] 不是有效的 str 类型'),
+                        _error_msg(f'参数 test_steps:teardown:sql[{index}] 不是有效的 str 类型')
                     )
                 else:
                     mysql_client.sql_verify(sql)
@@ -638,9 +634,7 @@ class RequestDataParse:
     def _teardown_hook(index: int, hook: str | None) -> str | None:
         if hook is not None:
             if not isinstance(hook, str):
-                raise RequestDataParseError(
-                    _error_msg(f'参数 test_steps:teardown:hook[{index}] 不是有效的 str 类型'),
-                )
+                raise RequestDataParseError(_error_msg(f'参数 test_steps:teardown:hook[{index}] 不是有效的 str 类型'))
         return hook
 
     @staticmethod

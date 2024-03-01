@@ -70,7 +70,7 @@ class ApiFoxParser:
                     )
             # 写入项目根目录
             if len(root_case) > 0:
-                for _, v in root_case.items():
+                for v in root_case.values():
                     case_file_data = {'config': case_config, 'test_steps': v}
                     write_yaml(
                         CASE_DATA_PATH,
