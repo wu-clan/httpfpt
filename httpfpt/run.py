@@ -142,8 +142,8 @@ def startup(
 def run(
     *args,
     # init
+    project_dir: str,
     settings: str | dict,
-    config_filename: str | None = None,
     clean_cache: bool = False,
     pydantic_verify: bool = True,
     # log level
@@ -168,8 +168,8 @@ def run(
     运行入口
 
     :param args: pytest 运行参数
-    :param settings: 项目核心配置，字典或指定配置路径文件
-    :param config_filename: 当 settings 指定配置路径时，可单独指定配置文件名
+    :param project_dir: 项目根目录
+    :param settings: 项目核心配置，字典或指定配置文件
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
@@ -200,8 +200,8 @@ def run(
 
             """
         log.info(logo)
-        init_config(settings, config_filename)
-        init_path_config('TODO: httpfpt startproject xxx; xxx is base_dir')
+        init_path_config(project_dir)
+        init_config(settings)
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
@@ -226,7 +226,3 @@ def run(
         import traceback
 
         SendMail({'error': traceback.format_exc()}).send_error()
-
-
-if __name__ == '__main__':
-    run()

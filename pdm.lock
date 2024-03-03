@@ -93,7 +93,7 @@ files = [
 
 [[package]]
 name = "cappa"
-version = "0.16.5"
+version = "0.16.6"
 requires_python = ">=3.8,<4"
 summary = "Declarative CLI argument parser."
 dependencies = [
@@ -103,8 +103,8 @@ dependencies = [
     "typing-inspect>=0.9.0",
 ]
 files = [
-    {file = "cappa-0.16.5-py3-none-any.whl", hash = "sha256:8dd0547c962aa249d271ac47cc6f0a0b1819e92d5e715a7a5ec8019ab60e39c1"},
-    {file = "cappa-0.16.5.tar.gz", hash = "sha256:bfe803368812433897ccfe953db4fa11b0c800be58387e588531e9a23ff83ba4"},
+    {file = "cappa-0.16.6-py3-none-any.whl", hash = "sha256:d3195edba6109e49597a46fc632ffca036f0ffcc8ed9c157e983fd0581c73df1"},
+    {file = "cappa-0.16.6.tar.gz", hash = "sha256:14a534d58b909624623ae72547e0c09a1ef4e76bbc14592c3bb4ecc6ef394e65"},
 ]
 
 [[package]]

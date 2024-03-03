@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import sys
 
 from dataclasses import dataclass
@@ -21,7 +22,6 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.enums.case_data_type import CaseDataType
-from httpfpt.run import run
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.data_manage.apifox import ApiFoxParser
@@ -164,6 +164,36 @@ def cmd_run_test_parse(value: Value) -> bool | Value:
         return value
 
 
+def create_new_project(start_project: tuple[str | None, str | None]) -> None:
+    name = start_project[0]
+    path = start_project[1]
+    if path != '.':
+        if not os.path.isdir(path):
+            raise cappa.Exit(f'"{path}" is not a directory', code=1)
+    project_path = os.path.join(path, name)
+    if os.path.exists(project_path):
+        raise cappa.Exit('The project directory is not empty', code=1)
+    os.makedirs(project_path)
+    shutil.copytree('./core', project_path, ignore=shutil.ignore_patterns('get_conf.py', 'path_conf.py'))
+    shutil.copytree('./data', project_path)
+    shutil.copytree('./testcases', project_path)
+    shutil.copyfile('conftest.py', project_path)
+    shutil.copyfile('pytest.ini', project_path)
+    os.makedirs(os.path.join(project_path, '__init__.py'))
+    run_settings_path = os.path.join(project_path, 'core', 'conf.toml')
+    run_tpl = f"""#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from httpfpt import run
+
+BASE_DIR = Path(__file__).resolve().parent
+
+
+run(settings={run_settings_path}, path_dir=str(BASE_DIR))
+"""
+    with open(os.path.join(project_path, 'run.py'), 'w', encoding='utf-8') as f:
+        f.write(run_tpl)
+
+
 @cappa.command(name='httpfpt-cli')
 @dataclass
 class HttpFptCLI:
@@ -176,29 +206,44 @@ class HttpFptCLI:
             help='Print version information.',
         ),
     ]
-    run_test: Annotated[
-        list[str] | None,
+    start_project: Annotated[
+        tuple[str | None, str | None],
         cappa.Arg(
-            value_name='<PYTEST ARGS / NONE>',
-            short='-r',
-            long='--run',
-            default=None,
-            help='Run test cases, do not support use with other commands, but support custom pytest running parameters,'
-            ' default parameters see `httpfpt/run.py`.',
-            parse=cmd_run_test_parse,
-            num_args=-1,
+            value_name='<PROJECT NAME, PROJECT PATH>',
+            short=False,
+            long='--startproject',
+            default=('httpfpt_project', '.'),
+            help='Create a new project.',
+            required=False,
         ),
     ]
+    # run_test: Annotated[
+    #     list[str] | None,
+    #     cappa.Arg(
+    #         value_name='<PYTEST ARGS / NONE>',
+    #         short='-r',
+    #         long='--run',
+    #         default=None,
+    #         help='Run test cases, do not support use with other commands,
+    #         but support custom pytest running parameters,'
+    #         ' default parameters see `httpfpt/run.py`.',
+    #         parse=cmd_run_test_parse,
+    #         num_args=-1,
+    #     ),
+    # ]
     subcmd: Subcommands[TestCaseCLI | ImportCLI | None] = None
 
     def __call__(self) -> None:
         if self.version:
             get_version()
-        if self.run_test:
-            if self.version or self.subcmd:
-                console.print('\n❌ 暂不支持 -r/--run 命令与其他 CLI 命令同时使用')
-                raise cappa.Exit(code=1)
-            run(*self.run_test) if isinstance(self.run_test, list) else run()
+        if self.start_project:
+            pass
+            # create_new_project(self.start_project)
+        # if self.run_test:
+        #     if self.version or self.subcmd:
+        #         console.print('\n❌ 暂不支持 -r/--run 命令与其他 CLI 命令同时使用')
+        #         raise cappa.Exit(code=1)
+        #     run(*self.run_test) if isinstance(self.run_test, list) else run()
 
 
 @cappa.command(name='testcase', help='Test case tools.')
