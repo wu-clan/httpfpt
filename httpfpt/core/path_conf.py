@@ -106,7 +106,10 @@ def set_project_dir(base_dir: str) -> HttpFptPathConfig:
     :param base_dir: 项目根路径
     :return:
     """
-    return HttpFptPathConfig(base_dir)
+    global httpfpt_path_config
+
+    httpfpt_path_config = HttpFptPathConfig(base_dir)
+    return httpfpt_path_config
 
 
 # global path_config
