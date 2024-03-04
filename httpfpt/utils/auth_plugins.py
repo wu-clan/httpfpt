@@ -8,7 +8,7 @@ from jsonpath import findall
 
 from httpfpt.common.errors import AuthError
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.path_conf import path_config
+from httpfpt.core.path_conf import httpfpt_path_config
 from httpfpt.db.redis_db import redis_client
 from httpfpt.enums.request.auth import AuthType
 from httpfpt.utils.enum_control import get_enum_values
@@ -24,7 +24,7 @@ class AuthPlugins:
 
     @lru_cache
     def get_auth_data(self) -> dict:
-        auth_data = read_yaml(path_config.AUTH_CONF_PATH, filename='auth.yaml')
+        auth_data = read_yaml(httpfpt_path_config.auth_conf_dir, filename='auth.yaml')
         return auth_data
 
     @property

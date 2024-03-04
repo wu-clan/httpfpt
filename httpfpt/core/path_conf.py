@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 
-__all__ = ['path_config', 'init_path_config']
+from httpfpt.common.errors import ConfigInitError
 
-# global path_config
-path_config = None
+__all__ = [
+    'httpfpt_path_config',
+    'set_project_dir',
+]
 
 
 class HttpFptPathConfig:
@@ -15,42 +19,95 @@ class HttpFptPathConfig:
 
         :param base_dir:
         """
-        self.BASE_DIR = base_dir
-        # 获取日志路径
-        self.LOG_PATH = os.path.join(self.BASE_DIR, 'log')
-        # 测试数据路径
-        self.TEST_DATA_PATH = os.path.join(self.BASE_DIR, 'data')
-        # Yaml测试数据路径
-        self.CASE_DATA_PATH = os.path.join(self.TEST_DATA_PATH, 'test_data')
-        # 测试报告路径
-        self.TEST_REPORT_PATH = os.path.join(self.BASE_DIR, 'report')
-        # allure测试报告路径
-        self.ALLURE_REPORT_PATH = os.path.join(self.TEST_REPORT_PATH, 'allure_report')
-        # allure html测试报告路径
-        self.ALLURE_REPORT_HTML_PATH = os.path.join(self.ALLURE_REPORT_PATH, 'html')
-        # HTML测试报告路径
-        self.HTML_REPORT_PATH = os.path.join(self.TEST_REPORT_PATH, 'html_report')
-        # YAML测试报告路径
-        self.YAML_REPORT_PATH = os.path.join(self.TEST_REPORT_PATH, 'yaml_report')
-        # allure环境文件
-        self.ALLURE_ENV_FILE = os.path.join(self.BASE_DIR, 'core', 'allure_env', 'environment.properties')
-        # allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失
-        self.ALLURE_REPORT_ENV_FILE = os.path.join(self.ALLURE_REPORT_PATH, 'environment.properties')
-        # 运行环境文件路径
-        self.RUN_ENV_PATH = os.path.join(self.BASE_DIR, 'core', 'run_env')
-        # 测试用例路径
-        self.TEST_CASE_PATH = os.path.join(self.BASE_DIR, 'testcases')
-        # AUTH配置文件路径
-        self.AUTH_CONF_PATH = os.path.join(self.BASE_DIR, 'core')
+        self.base_dir = base_dir
+
+    @property
+    def project_dir(self) -> str:
+        """项目根路径"""
+        if self.base_dir is None or not os.path.exists(self.base_dir):
+            self.base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
+        if self.base_dir is None:
+            raise ConfigInitError(
+                '运行失败：在访问 httpfpt API 前，请先通过 set_project_dir() 方法设置项目根路径，'
+                '或配置 HTTPFPT_PROJECT_PATH 环境变量'
+            )
+        return self.base_dir
+
+    @property
+    def log_dir(self) -> str:
+        """日志路径"""
+        return os.path.join(self.project_dir, 'log')
+
+    @property
+    def data_path(self) -> str:
+        """数据路径"""
+        return os.path.join(self.project_dir, 'data')
+
+    @property
+    def case_data_dir(self) -> str:
+        """用例数据路径"""
+        return os.path.join(self.data_path, 'test_data')
+
+    @property
+    def report_dir(self) -> str:
+        """测试报告路径"""
+        return os.path.join(self.project_dir, 'report')
+
+    @property
+    def allure_report_dir(self) -> str:
+        """allure测试报告路径"""
+        return os.path.join(self.report_dir, 'allure_report')
+
+    @property
+    def allure_html_report_dir(self) -> str:
+        """allure html测试报告路径"""
+        return os.path.join(self.allure_report_dir, 'html')
+
+    @property
+    def html_report_dir(self) -> str:
+        """HTML测试报告路径"""
+        return os.path.join(self.report_dir, 'html_report')
+
+    @property
+    def yaml_report_dir(self) -> str:
+        """YAML测试报告路径"""
+        return os.path.join(self.report_dir, 'yaml_report')
+
+    @property
+    def allure_env_file(self) -> str:
+        """allure环境文件"""
+        return os.path.join(self.project_dir, 'core', 'allure_env', 'environment.properties')
+
+    @property
+    def allure_report_env_file(self) -> str:
+        """allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失"""
+        return os.path.join(self.allure_report_dir, 'environment.properties')
+
+    @property
+    def run_env_dir(self) -> str:
+        """运行环境文件路径"""
+        return os.path.join(self.project_dir, 'core', 'run_env')
+
+    @property
+    def testcase_dir(self) -> str:
+        """测试用例路径"""
+        return os.path.join(self.project_dir, 'testcases')
+
+    @property
+    def auth_conf_dir(self) -> str:
+        """AUTH配置文件路径"""
+        return os.path.join(self.project_dir, 'core')
 
 
-def init_path_config(base_dir: str) -> None:
+def set_project_dir(base_dir: str) -> HttpFptPathConfig:
     """
-    初始化配置
+    设置项目目录
 
-    :param base_dir: 项目根目录
+    :param base_dir: 项目根路径
     :return:
     """
-    global path_config
+    return HttpFptPathConfig(base_dir)
 
-    path_config = HttpFptPathConfig(base_dir)
+
+# global path_config
+httpfpt_path_config: HttpFptPathConfig = set_project_dir('')

@@ -12,7 +12,7 @@ class HttpFptErrorMixin:
         return self.msg
 
 
-class ConfigInitError(HttpFptErrorMixin, FileNotFoundError):
+class ConfigInitError(HttpFptErrorMixin, RuntimeError):
     """配置初始化错误"""
 
     def __init__(self, msg: str) -> None:

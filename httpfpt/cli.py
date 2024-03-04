@@ -164,7 +164,7 @@ def cmd_run_test_parse(value: Value) -> bool | Value:
         return value
 
 
-def create_new_project(start_project: tuple[str | None, str | None]) -> None:
+def create_new_project(start_project: tuple[str, str]) -> None:
     name = start_project[0]
     path = start_project[1]
     if path != '.':
@@ -179,17 +179,27 @@ def create_new_project(start_project: tuple[str | None, str | None]) -> None:
     shutil.copytree('./testcases', project_path)
     shutil.copyfile('conftest.py', project_path)
     shutil.copyfile('pytest.ini', project_path)
-    os.makedirs(os.path.join(project_path, '__init__.py'))
     run_settings_path = os.path.join(project_path, 'core', 'conf.toml')
+    init_tpl = """#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from pathlib import Path
+
+from httpfpt import set_project_dir
+
+
+BASE_DIR = Path(__file__).resolve().parent
+set_project_dir(BASE_DIR)
+"""
     run_tpl = f"""#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from httpfpt import run
 
-BASE_DIR = Path(__file__).resolve().parent
 
 
 run(settings={run_settings_path}, path_dir=str(BASE_DIR))
 """
+    with open(os.path.join(project_path, '__init__.py'), 'w', encoding='utf-8') as f:
+        f.write(init_tpl)
     with open(os.path.join(project_path, 'run.py'), 'w', encoding='utf-8') as f:
         f.write(run_tpl)
 
@@ -207,7 +217,7 @@ class HttpFptCLI:
         ),
     ]
     start_project: Annotated[
-        tuple[str | None, str | None],
+        tuple[str, str],
         cappa.Arg(
             value_name='<PROJECT NAME, PROJECT PATH>',
             short=False,
@@ -237,8 +247,7 @@ class HttpFptCLI:
         if self.version:
             get_version()
         if self.start_project:
-            pass
-            # create_new_project(self.start_project)
+            create_new_project(self.start_project)
         # if self.run_test:
         #     if self.version or self.subcmd:
         #         console.print('\n❌ 暂不支持 -r/--run 命令与其他 CLI 命令同时使用')

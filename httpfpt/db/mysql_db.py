@@ -18,7 +18,7 @@ from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import write_yaml_vars
 from httpfpt.core.get_conf import config
-from httpfpt.core.path_conf import path_config
+from httpfpt.core.path_conf import httpfpt_path_config
 from httpfpt.enums.query_fetch_type import QueryFetchType
 from httpfpt.enums.sql_type import SqlType
 from httpfpt.enums.var_type import VarType
@@ -171,7 +171,7 @@ class MysqlDB:
             if set_type == VarType.CACHE:
                 variable_cache.set(key, value_str)
             elif set_type == VarType.ENV:
-                write_env_vars(path_config.RUN_ENV_PATH, env_filename, key, value_str)  # type: ignore
+                write_env_vars(httpfpt_path_config.run_env_dir, env_filename, key, value_str)  # type: ignore
             elif set_type == VarType.GLOBAL:
                 write_yaml_vars({key: value_str})
             else:
