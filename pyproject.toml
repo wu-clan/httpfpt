@@ -51,6 +51,9 @@ test = [
     "ruff>=0.2.0",
 ]
 
+[tool.pdm.scripts]
+httpfpt = { cmd = "python cli.py" }
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
