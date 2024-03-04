@@ -14,6 +14,7 @@ from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
+from httpfpt import set_project_dir
 from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
 from httpfpt.utils.cli.import_case_data import (
     import_apifox_case_data,
@@ -39,6 +40,17 @@ class HttpFptCLI:
             help='Print version information.',
         ),
     ]
+    project_dir: Annotated[
+        str,
+        cappa.Arg(
+            value_name='<PROJECT PATH>',
+            short=True,
+            long=True,
+            default='.',
+            help='Set the project directory path.',
+            required=False,
+        ),
+    ]
     start_project: Annotated[
         tuple[str, str],
         cappa.Arg(
@@ -55,6 +67,8 @@ class HttpFptCLI:
     def __call__(self) -> None:
         if self.version:
             get_version()
+        if self.project_dir:
+            set_project_dir(self.project_dir)
         if self.start_project:
             create_new_project(self.start_project)
 
