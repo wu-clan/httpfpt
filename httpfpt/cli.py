@@ -180,23 +180,20 @@ def create_new_project(start_project: tuple[str, str]) -> None:
     shutil.copyfile('conftest.py', project_path)
     shutil.copyfile('pytest.ini', project_path)
     run_settings_path = os.path.join(project_path, 'core', 'conf.toml')
-    init_tpl = """#!/usr/bin/env python3
+    init_tpl = f"""#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pathlib import Path
-
 from httpfpt import set_project_dir
+from httpfpt import set_project_config
 
-
-BASE_DIR = Path(__file__).resolve().parent
-set_project_dir(BASE_DIR)
+set_project_dir({project_path})
+set_project_config({run_settings_path})
 """
-    run_tpl = f"""#!/usr/bin/env python3
+    run_tpl = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from httpfpt import run
 
 
-
-run(settings={run_settings_path}, path_dir=str(BASE_DIR))
+run()
 """
     with open(os.path.join(project_path, '__init__.py'), 'w', encoding='utf-8') as f:
         f.write(init_tpl)
@@ -227,20 +224,6 @@ class HttpFptCLI:
             required=False,
         ),
     ]
-    # run_test: Annotated[
-    #     list[str] | None,
-    #     cappa.Arg(
-    #         value_name='<PYTEST ARGS / NONE>',
-    #         short='-r',
-    #         long='--run',
-    #         default=None,
-    #         help='Run test cases, do not support use with other commands,
-    #         but support custom pytest running parameters,'
-    #         ' default parameters see `httpfpt/run.py`.',
-    #         parse=cmd_run_test_parse,
-    #         num_args=-1,
-    #     ),
-    # ]
     subcmd: Subcommands[TestCaseCLI | ImportCLI | None] = None
 
     def __call__(self) -> None:
@@ -248,11 +231,6 @@ class HttpFptCLI:
             get_version()
         if self.start_project:
             create_new_project(self.start_project)
-        # if self.run_test:
-        #     if self.version or self.subcmd:
-        #         console.print('\n❌ 暂不支持 -r/--run 命令与其他 CLI 命令同时使用')
-        #         raise cappa.Exit(code=1)
-        #     run(*self.run_test) if isinstance(self.run_test, list) else run()
 
 
 @cappa.command(name='testcase', help='Test case tools.')

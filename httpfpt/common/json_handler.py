@@ -21,14 +21,9 @@ def read_json_file(filepath: str | None = httpfpt_path_config.case_data_dir, *, 
     :return:
     """
     if filepath is not None:
-        _file = os.path.join(filepath, filename)
-    else:
-        _file = filename
-    if not _file:
-        log.error('读取 yaml 文件失败，文件名为空')
-        raise FileNotFoundError('读取 yaml 文件失败，文件名为空')
+        filepath = os.path.join(filepath, filename)
     try:
-        with open(_file, encoding='utf-8') as f:
+        with open(filepath, encoding='utf-8') as f:  # type: ignore
             data = json.load(f, **kwargs)
     except Exception as e:
         log.error(f'文件 {filename} 读取错误: {e}')

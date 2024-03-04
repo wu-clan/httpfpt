@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import config, init_config
+from httpfpt.core.get_conf import config
 from httpfpt.core.path_conf import httpfpt_path_config
 from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.request import case_data_parse as case_data
@@ -146,7 +146,6 @@ def startup(
 def run(
     *args,
     # init
-    settings: str | dict,
     clean_cache: bool = False,
     pydantic_verify: bool = True,
     # log level
@@ -171,7 +170,6 @@ def run(
     运行入口
 
     :param args: pytest 运行参数
-    :param settings: 项目核心配置，字典或指定配置文件
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
@@ -202,7 +200,6 @@ def run(
 
             """
         log.info(logo)
-        init_config(settings)
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
