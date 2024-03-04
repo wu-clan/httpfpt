@@ -51,8 +51,8 @@ test = [
     "ruff>=0.2.0",
 ]
 
-[tool.pdm.scripts]
-httpfpt = { cmd = "python cli.py" }
+[project.scripts]
+httpfpt = "httpfpt.cli:cappa_invoke"
 
 [build-system]
 requires = ["pdm-backend"]

@@ -3,202 +3,28 @@
 from __future__ import annotations
 
 import os
-import re
-import shutil
 import sys
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 import cappa
 
 from cappa import Subcommands
-from pydantic import ValidationError
-from rich.prompt import Confirm
 from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from httpfpt.common.json_handler import read_json_file
-from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.enums.case_data_type import CaseDataType
-from httpfpt.schemas.case_data import CaseData
-from httpfpt.utils.case_auto_generator import auto_generate_testcases
-from httpfpt.utils.data_manage.apifox import ApiFoxParser
-from httpfpt.utils.data_manage.git_repo import GitRepoPaser
-from httpfpt.utils.data_manage.openapi import SwaggerParser
-from httpfpt.utils.file_control import get_file_property, search_all_case_data_files
-from httpfpt.utils.rich_console import console
-
-if TYPE_CHECKING:
-    from cappa.parser import Value
-
-
-def get_version() -> None:
-    """获取版本号"""
-    ver = open('./__init__.py', 'rt').read()
-    mob = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", ver, re.MULTILINE)
-    if mob:
-        console.print('\n🔥 HttpFpt', mob.group(1))
-    else:
-        raise cappa.Exit('未查询到版本号', code=1)
-
-
-def testcase_data_verify(verify: str) -> None:
-    """测试数据验证"""
-    msg: str = ''
-    try:
-        count: int = 0
-        if verify.lower() == 'all':
-            console.print('\n🔥 开始验证所有测试数据结构...')
-            file_list = search_all_case_data_files()
-            for file in file_list:
-                file_type = get_file_property(file)[2]
-                if file_type == CaseDataType.JSON:
-                    file_data = read_json_file(None, filename=file)
-                else:
-                    file_data = read_yaml(None, filename=file)
-                CaseData.model_validate(file_data)
-        else:
-            console.print(f'🔥 开始验证 {verify} 测试数据结构...')
-            file_data = read_yaml(None, filename=verify)
-            CaseData.model_validate(file_data)
-    except ValidationError as e:
-        count = e.error_count()
-        msg += str(e)
-    except Exception as e:
-        console.print(f'❌ 验证测试数据 {verify} 结构失败: {e}')
-        raise cappa.Exit(code=1)
-    if count > 0:
-        console.print(f'❌ 验证测试数据 {verify} 结构失败: {msg}')
-        raise cappa.Exit(code=1)
-    else:
-        console.print('✅ 验证测试数据结构成功')
-
-
-def generate_testcases() -> None:
-    """生成测试用例"""
-    console.print(
-        '\n'
-        'Warning: 此操作生成的测试用例是依赖测试数据文件而决定的,\n'
-        '         如果你手动创建的测试用例与测试数据文件名称相吻合,\n'
-        '         那么此操作将不能完全保证你的手动创建测试用例继续保留,\n'
-        '         如果你依然执行此操作, 请谨慎选择重新生成所有测试用例。\n',
-        style='bold #ffd700',
-    )
-    result = Confirm.ask('⚠️ 是否重新生成所有测试用例?', default=False)
-    try:
-        if result:
-            console.print('🔥 开始重新生成所有测试用例...')
-            auto_generate_testcases(rewrite=True)
-        else:
-            console.print('🔥 开始生成新测试用例...')
-            auto_generate_testcases()
-    except Exception as e:
-        console.print(f'❌ 自动生成测试用例失败: {e}')
-        raise cappa.Exit(code=1)
-
-
-def import_openapi_case_data(openapi: tuple[str, str]) -> None:
-    """导入 openapi 测试用例数据"""
-    console.print(f'\n📩 正在导入测试用例数据到项目: [#0087ff]{openapi[1]}[/#0087ff]')
-    result = Confirm.ask('❓ 确认执行此操作吗?', default=False)
-    if result:
-        console.print('🔥 开始导入 openapi 数据...')
-        try:
-            SwaggerParser().import_openapi_to_yaml(openapi[0], openapi[1])
-        except Exception as e:
-            console.print('❌ 导入 openapi 数据失败')
-            raise e
-
-
-def import_apifox_case_data(apifox: tuple[str, str]) -> None:
-    """导入 apifox 测试用例数据"""
-    console.print(
-        '\n'
-        'Beta: 此命令目前处于测试阶段, 请谨慎使用。\n'
-        'Warning: 如果现有文件名与导入文件名相同, 此命令目前会覆盖写入用例数据, 请谨慎操作。\n',
-        style='bold #ffd700',
-    )
-    result = Confirm.ask('⚠️ 确认执行此操作吗?', default=False)
-    if result:
-        console.print('🔥 开始导入 apifox 数据...')
-        try:
-            ApiFoxParser().import_apifox_to_yaml(apifox[0], apifox[1])
-        except Exception as e:
-            console.print('❌ 导入 apifox 数据失败:')
-            raise e
-
-
-def import_har_case_data(har: tuple[str, str]) -> None:
-    """导入 har 测试用例数据"""
-    console.print('\n🚧 此功能暂未开发')
-
-
-def import_jmeter_case_data(jmeter: tuple[str, str]) -> None:
-    """导入 jmeter 测试用例数据"""
-    console.print('\n🚧 此功能暂未开发')
-
-
-def import_postman_case_data(postman: tuple[str, str]) -> None:
-    """导入 postman 测试用例数据"""
-    console.print('\n🚧 此功能暂未开发')
-
-
-def import_git_case_data(src: str) -> None:
-    """导入 git 仓库测试数据"""
-    console.print(f'\n🚀 正在导入 git 仓库测试数据到本地: {src}')
-    console.print('🔥 开始导入 git 仓库测试数据...\n')
-    try:
-        GitRepoPaser.import_git_to_local(src)
-    except Exception as e:
-        console.print(f'❌ 导入 git 仓库测试数据失败: {e}')
-        raise e
-
-
-def cmd_run_test_parse(value: Value) -> bool | Value:
-    """运行测试命令参数解析"""
-    if len(value) == 0:  # type: ignore
-        return True
-    else:
-        return value
-
-
-def create_new_project(start_project: tuple[str, str]) -> None:
-    name = start_project[0]
-    path = start_project[1]
-    if path != '.':
-        if not os.path.isdir(path):
-            raise cappa.Exit(f'"{path}" is not a directory', code=1)
-    project_path = os.path.join(path, name)
-    if os.path.exists(project_path):
-        raise cappa.Exit('The project directory is not empty', code=1)
-    os.makedirs(project_path)
-    shutil.copytree('./core', project_path, ignore=shutil.ignore_patterns('get_conf.py', 'path_conf.py'))
-    shutil.copytree('./data', project_path)
-    shutil.copytree('./testcases', project_path)
-    shutil.copyfile('conftest.py', project_path)
-    shutil.copyfile('pytest.ini', project_path)
-    run_settings_path = os.path.join(project_path, 'core', 'conf.toml')
-    init_tpl = f"""#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from httpfpt import set_project_dir
-from httpfpt import set_project_config
-
-set_project_dir({project_path})
-set_project_config({run_settings_path})
-"""
-    run_tpl = """#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from httpfpt import run
-
-
-run()
-"""
-    with open(os.path.join(project_path, '__init__.py'), 'w', encoding='utf-8') as f:
-        f.write(init_tpl)
-    with open(os.path.join(project_path, 'run.py'), 'w', encoding='utf-8') as f:
-        f.write(run_tpl)
+from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
+from httpfpt.utils.cli.import_case_data import (
+    import_apifox_case_data,
+    import_git_case_data,
+    import_har_case_data,
+    import_jmeter_case_data,
+    import_openapi_case_data,
+    import_postman_case_data,
+)
+from httpfpt.utils.cli.new_project import create_new_project
+from httpfpt.utils.cli.version import get_version
 
 
 @cappa.command(name='httpfpt-cli')
@@ -347,5 +173,10 @@ class ImportCLI:
             import_git_case_data(self.git)
 
 
-if __name__ == '__main__':
+def cappa_invoke() -> None:
+    """cli 执行程序"""
     cappa.invoke(HttpFptCLI)
+
+
+if __name__ == '__main__':
+    cappa_invoke()
