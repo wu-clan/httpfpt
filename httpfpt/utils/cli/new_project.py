@@ -34,10 +34,10 @@ set_project_config({run_settings_path})
 """
     run_tpl = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from httpfpt import run
+from httpfpt.run import run as httpfpt_run
 
 
-run()
+httpfpt_run()
 """
     with open(os.path.join(project_path, '__init__.py'), 'w', encoding='utf-8') as f:
         f.write(init_tpl)
