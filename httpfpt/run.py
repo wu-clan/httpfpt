@@ -33,7 +33,7 @@ from httpfpt.utils.time_control import get_current_time
 
 def startup(
     *args,
-    log_level: Literal['-q', '-s', '-v', '-vs'],
+    log_level: Literal['-q', '-s', '-v', '-vv'],
     case_path: str | None,
     html_report: bool,
     allure: bool,
@@ -151,7 +151,7 @@ def run(
     clean_cache: bool = False,
     pydantic_verify: bool = True,
     # log level
-    log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
+    log_level: Literal['-q', '-s', '-v', '-vv'] = '-v',
     # case path
     case_path: str | None = None,
     # html report
