@@ -151,7 +151,7 @@ def run(
     clean_cache: bool = False,
     pydantic_verify: bool = True,
     # log level
-    log_level: Literal['-q', '-s', '-v', '-vs'] = '-v',
+    log_level: Literal['-q', '-s', '-v', '-vv'] = '-v',
     # case path
     case_path: str | None = None,
     # html report
