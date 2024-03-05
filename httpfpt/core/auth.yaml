@@ -2,7 +2,9 @@
 is_auth: false
 # 认证类型，请填写为认证方式的键值，如：bearer_token
 auth_type: bearer_token
-# token认证
+###############
+## token 认证
+###############
 bearer_token:
   url: https://api.pity.fun/auth/login
   username: tester
@@ -12,5 +14,16 @@ bearer_token:
     User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36
   # jsonpath表达式，用于从响应中提取token
   token_key: $.data.token
-  # token有效期，单位秒
+  # token有效期，单位: 秒
+  timeout: 100000
+################
+## cookie 认证
+################
+header_cookie:
+  url: xxx
+  username: xxx
+  password: xxx
+  headers:
+    Content-Type: application/json
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36
   timeout: 100000
