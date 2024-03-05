@@ -4,4 +4,5 @@ from httpfpt.enums import StrEnum
 
 
 class AuthType(StrEnum):
-    bearer_token = 'bearer_token'
+    TOKEN = 'bearer_token'
+    COOKIE = 'header_cookie'
