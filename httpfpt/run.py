@@ -33,7 +33,7 @@ from httpfpt.utils.time_control import get_current_time
 
 def startup(
     *args,
-    log_level: Literal['-q', '-s', '-v', '-vs'],
+    log_level: Literal['-q', '-s', '-v', '-vv'],
     case_path: str | None,
     html_report: bool,
     allure: bool,
