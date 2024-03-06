@@ -22,6 +22,7 @@ class RedisDB(Redis):
         )
         self.prefix = 'httpfpt'
         self.token_prefix = f'{self.prefix}:token'
+        self.cookie_prefix = f'{self.prefix}:cookie'
         self.case_data_prefix = f'{self.prefix}:case_data'
         self.case_id_file_prefix = f'{self.prefix}:case_id_file'
 

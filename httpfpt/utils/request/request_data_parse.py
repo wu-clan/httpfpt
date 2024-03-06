@@ -373,9 +373,8 @@ class RequestDataParse:
                     raise RequestDataParseError(_error_msg('参数 test_steps:request:headers 为空'))
             auth = AuthPlugins()
             if auth.is_auth:
-                if auth.auth_type == AuthType.bearer_token:
-                    token = auth.bearer_token
-                    bearer_token = {'Authorization': f'Bearer {token}'}
+                if auth.auth_type == AuthType.TOKEN:
+                    bearer_token = {'Authorization': f'Bearer {auth.bearer_token}'}
                     headers = headers.update(bearer_token) if headers else bearer_token
             return headers
 
@@ -388,6 +387,11 @@ class RequestDataParse:
         if cookies is not None:
             if not isinstance(cookies, dict):
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:cookies 不是有效的 dict 类型'))
+        auth = AuthPlugins()
+        if auth.is_auth:
+            if auth.auth_type == AuthType.COOKIE:
+                header_cookie = auth.header_cookie
+                cookies = cookies.update(header_cookie) if cookies else header_cookie
         return cookies
 
     @property
