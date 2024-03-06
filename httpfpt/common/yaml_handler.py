@@ -109,17 +109,3 @@ def write_yaml_vars(data: dict) -> None:
         log.error(f'写入 global_vars.yaml 全局变量 {data} 错误: {e}')
     else:
         log.info(f'写入全局变量成功: global_vars.yaml -> {data}')
-
-
-def get_yaml_file(filepath: str = httpfpt_path.case_data_dir, *, filename: str) -> str:
-    """
-    获取 yaml 测试数据文件
-
-    :param filepath: 文件路径
-    :param filename: 文件名
-    :return:
-    """
-    _file = os.path.join(filepath, filename)
-    if not os.path.exists(_file):
-        raise FileNotFoundError(f'测试数据文件 {filename} 不存在')
-    return _file

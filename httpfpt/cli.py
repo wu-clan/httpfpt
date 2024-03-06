@@ -14,7 +14,6 @@ from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from httpfpt import set_httpfpt_dir
 from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
 from httpfpt.utils.cli.import_case_data import (
     import_apifox_case_data,
@@ -24,7 +23,6 @@ from httpfpt.utils.cli.import_case_data import (
     import_openapi_case_data,
     import_postman_case_data,
 )
-from httpfpt.utils.cli.new_project import create_new_project
 from httpfpt.utils.cli.version import get_version
 
 
@@ -38,17 +36,6 @@ class HttpFptCLI:
             long=True,
             default=False,
             help='Print version information.',
-        ),
-    ]
-    project_dir: Annotated[
-        str,
-        cappa.Arg(
-            value_name='<PROJECT PATH>',
-            short=True,
-            long=True,
-            default='.',
-            help='Set the project directory path.',
-            required=False,
         ),
     ]
     start_project: Annotated[
@@ -67,10 +54,10 @@ class HttpFptCLI:
     def __call__(self) -> None:
         if self.version:
             get_version()
-        if self.project_dir:
-            set_httpfpt_dir(self.project_dir)
         if self.start_project:
-            create_new_project(self.start_project)
+            pass
+            # https://github.com/DanCardin/cappa/issues/106
+            # create_new_project(self.start_project)
 
 
 @cappa.command(name='testcase', help='Test case tools.')
@@ -83,7 +70,7 @@ class TestCaseCLI:
             short='-dv',
             long=True,
             default='',
-            help='验证测试数据结构；当指定文件时, 仅验证指定文件, 当指定 "all" 时, 验证所有文件.',
+            help='验证测试数据结构；当指定文件（文件名/完整路径）时, 仅验证指定文件, 当指定 "all" 时, 验证所有文件.',
             required=False,
         ),
     ]
@@ -105,7 +92,7 @@ class TestCaseCLI:
             generate_testcases()
 
 
-@cappa.command(name='import', help='Import test case data.')
+@cappa.command(name='import', help='Import testcase data.')
 @dataclass
 class ImportCLI:
     openai: Annotated[
