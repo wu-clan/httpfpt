@@ -26,15 +26,15 @@ def create_new_project(start_project: tuple[str, str]) -> None:
     run_settings_path = os.path.join(project_path, 'core', 'conf.toml')
     init_tpl = f"""#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from httpfpt import set_project_dir
-from httpfpt import set_project_config
+from httpfpt import set_httpfpt_dir
+from httpfpt import set_httpfpt_config
 
-set_project_dir({project_path})
-set_project_config({run_settings_path})
+set_httpfpt_dir({project_path})
+set_httpfpt_config({run_settings_path})
 """
     run_tpl = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from httpfpt.run import run as httpfpt_run
+from httpfpt import httpfpt_run
 
 
 httpfpt_run()
