@@ -24,7 +24,7 @@ class HttpFptPathConfig:
     @property
     def project_dir(self) -> str:
         """项目根路径"""
-        if not os.path.exists(self.base_dir):
+        if not self.base_dir or not os.path.exists(self.base_dir):
             self.base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
         if not self.base_dir:
             raise ConfigInitError(
@@ -36,7 +36,7 @@ class HttpFptPathConfig:
     @property
     def log_dir(self) -> str:
         """日志路径"""
-        if not os.path.exists(self.base_dir):
+        if not self.base_dir or not os.path.exists(self.base_dir):
             return os.path.join(os.path.expanduser('~'), '.httpfpt')
         return os.path.join(self.project_dir, 'log')
 
