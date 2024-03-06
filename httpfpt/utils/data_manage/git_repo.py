@@ -50,9 +50,9 @@ class GitRepoPaser:
         for file in all_case_data_file:
             file_type = get_file_property(file)[2]
             if file_type == CaseDataType.JSON:
-                file_data = read_json_file(None, filename=file)
+                file_data = read_json_file(file)
             else:
-                file_data = read_yaml(None, filename=file)
+                file_data = read_yaml(file)
             all_case_data.append(file_data)
         count: int = 0
         for case_data in all_case_data:

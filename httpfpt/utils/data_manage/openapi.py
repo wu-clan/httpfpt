@@ -12,8 +12,8 @@ from rich.prompt import Confirm
 
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
-from httpfpt.core.get_conf import config
-from httpfpt.core.path_conf import httpfpt_path_config
+from httpfpt.core.get_conf import httpfpt_config
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.utils.data_manage.base_format import format_value
 from httpfpt.utils.file_control import get_file_property
 from httpfpt.utils.rich_console import console
@@ -138,7 +138,7 @@ class SwaggerParser:
                     for k, v in tag_case.items():
                         tag_filename = os.sep.join(
                             [
-                                project or config.PROJECT_NAME,
+                                project or httpfpt_config.PROJECT_NAME,
                                 k,
                                 get_file_property(openapi_source)[1] + '.yaml'
                                 if not openapi_source.startswith('http')
@@ -151,7 +151,7 @@ class SwaggerParser:
                         if k == 'root':
                             root_filename = os.sep.join(
                                 [
-                                    project or config.PROJECT_NAME,
+                                    project or httpfpt_config.PROJECT_NAME,
                                     get_file_property(openapi_source)[1] + '.yaml'
                                     if not openapi_source.startswith('http')
                                     else f'openapi_{get_current_timestamp()}.yaml',
@@ -160,7 +160,7 @@ class SwaggerParser:
                         else:
                             root_filename = os.sep.join(
                                 [
-                                    project or config.PROJECT_NAME,
+                                    project or httpfpt_config.PROJECT_NAME,
                                     get_file_property(openapi_source)[1] + '.yaml'
                                     if not openapi_source.startswith('http')
                                     else f'openapi_{k}.yaml',
@@ -183,10 +183,10 @@ class SwaggerParser:
                             case_config['allure']['feature'] = case_config['module'] = k
                             case_file_data = {'config': case_config, 'test_steps': v}
                             write_yaml(
-                                httpfpt_path_config.case_data_dir,
+                                httpfpt_path.case_data_dir,
                                 os.sep.join(
                                     [
-                                        project or config.PROJECT_NAME,
+                                        project or httpfpt_config.PROJECT_NAME,
                                         k,
                                         get_file_property(openapi_source)[1] + '.yaml'
                                         if not openapi_source.startswith('http')
@@ -213,8 +213,8 @@ class SwaggerParser:
                                 )
                             case_file_data = {'config': case_config, 'test_steps': v}
                             write_yaml(
-                                httpfpt_path_config.case_data_dir,
-                                os.sep.join([project or config.PROJECT_NAME, filename]),
+                                httpfpt_path.case_data_dir,
+                                os.sep.join([project or httpfpt_config.PROJECT_NAME, filename]),
                                 case_file_data,
                                 mode='w',
                             )
@@ -230,7 +230,7 @@ class SwaggerParser:
                                 case_file_data = {'config': case_config, 'test_steps': v}
                                 tag_filename = os.sep.join(
                                     [
-                                        project or config.PROJECT_NAME,
+                                        project or httpfpt_config.PROJECT_NAME,
                                         k,
                                         get_file_property(openapi_source)[1] + '.yaml'
                                         if not openapi_source.startswith('http')
@@ -239,9 +239,7 @@ class SwaggerParser:
                                 )
                                 is_write = Confirm.ask(f'❓ 是否需要创建 {tag_filename} 数据文件?', default=True)
                                 if is_write:
-                                    write_yaml(
-                                        httpfpt_path_config.case_data_dir, tag_filename, case_file_data, mode='w'
-                                    )
+                                    write_yaml(httpfpt_path.case_data_dir, tag_filename, case_file_data, mode='w')
                         # 写入项目根目录
                         if len(root_case) > 0:
                             for k, v in root_case.items():
@@ -261,8 +259,8 @@ class SwaggerParser:
                                 if is_write:
                                     case_file_data = {'config': case_config, 'test_steps': v}
                                     write_yaml(
-                                        httpfpt_path_config.case_data_dir,
-                                        os.sep.join([project or config.PROJECT_NAME, root_filename]),
+                                        httpfpt_path.case_data_dir,
+                                        os.sep.join([project or httpfpt_config.PROJECT_NAME, root_filename]),
                                         case_file_data,
                                         mode='w',
                                     )
@@ -286,7 +284,7 @@ class SwaggerParser:
             if not (openapi or swagger):
                 raise ValueError('请输入正确的 openapi 地址')
         else:
-            data = read_json_file(None, filename=openapi_source)
+            data = read_json_file(openapi_source)
             openapi = data.get('openapi')
             swagger = data.get('swagger')
             if not (openapi or swagger):

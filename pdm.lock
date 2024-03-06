@@ -93,7 +93,7 @@ files = [
 
 [[package]]
 name = "cappa"
-version = "0.16.6"
+version = "0.17.0"
 requires_python = ">=3.8,<4"
 summary = "Declarative CLI argument parser."
 dependencies = [
@@ -103,8 +103,8 @@ dependencies = [
     "typing-inspect>=0.9.0",
 ]
 files = [
-    {file = "cappa-0.16.6-py3-none-any.whl", hash = "sha256:d3195edba6109e49597a46fc632ffca036f0ffcc8ed9c157e983fd0581c73df1"},
-    {file = "cappa-0.16.6.tar.gz", hash = "sha256:14a534d58b909624623ae72547e0c09a1ef4e76bbc14592c3bb4ecc6ef394e65"},
+    {file = "cappa-0.17.0-py3-none-any.whl", hash = "sha256:3e620a9e947c784bc327d58cce9f6f8f824b51782ef3cfaccb06cef9d1f458a7"},
+    {file = "cappa-0.17.0.tar.gz", hash = "sha256:9a3c45255e2da19c397343dff0164dd0bbdaec9a1ca4721b692421b0c7b6cdd4"},
 ]
 
 [[package]]
@@ -372,7 +372,7 @@ files = [
 
 [[package]]
 name = "faker"
-version = "23.3.0"
+version = "24.0.0"
 requires_python = ">=3.8"
 summary = "Faker is a Python package that generates fake data for you."
 dependencies = [
@@ -380,8 +380,8 @@ dependencies = [
     "typing-extensions>=3.10.0.1; python_version <= \"3.8\"",
 ]
 files = [
-    {file = "Faker-23.3.0-py3-none-any.whl", hash = "sha256:117ce1a2805c1bc5ca753b3dc6f9d567732893b2294b827d3164261ee8f20267"},
-    {file = "Faker-23.3.0.tar.gz", hash = "sha256:458d93580de34403a8dec1e8d5e6be2fee96c4deca63b95d71df7a6a80a690de"},
+    {file = "Faker-24.0.0-py3-none-any.whl", hash = "sha256:2456d674f40bd51eb3acbf85221277027822e529a90cc826453d9a25dff932b1"},
+    {file = "Faker-24.0.0.tar.gz", hash = "sha256:ea6f784c40730de0f77067e49e78cdd590efb00bec3d33f577492262206c17fc"},
 ]
 
 [[package]]

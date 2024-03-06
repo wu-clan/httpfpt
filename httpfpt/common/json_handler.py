@@ -8,10 +8,9 @@ import os
 from typing import Any
 
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import httpfpt_path_config
 
 
-def read_json_file(filepath: str | None = httpfpt_path_config.case_data_dir, *, filename: str, **kwargs) -> dict:
+def read_json_file(filepath: str, filename: str | None = None, **kwargs) -> dict:
     """
     读取 json 文件
 
@@ -20,10 +19,10 @@ def read_json_file(filepath: str | None = httpfpt_path_config.case_data_dir, *, 
     :param kwargs:
     :return:
     """
-    if filepath is not None:
+    if filename:
         filepath = os.path.join(filepath, filename)
     try:
-        with open(filepath, encoding='utf-8') as f:  # type: ignore
+        with open(filepath, encoding='utf-8') as f:
             data = json.load(f, **kwargs)
     except Exception as e:
         log.error(f'文件 {filename} 读取错误: {e}')

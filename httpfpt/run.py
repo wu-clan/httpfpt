@@ -14,8 +14,8 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import config
-from httpfpt.core.path_conf import httpfpt_path_config
+from httpfpt.core.get_conf import httpfpt_config
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.ding_talk import DingTalk
@@ -42,7 +42,7 @@ def startup(
     """运行启动程序"""
     run_args = [log_level]
 
-    default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', config.PROJECT_NAME])
+    default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', httpfpt_config.PROJECT_NAME])
     if case_path:
         if '::' not in case_path:
             raise ValueError(
@@ -61,19 +61,19 @@ def startup(
         run_path = default_case_path
     run_args.append(run_path)
 
-    html_report_filename = f'{config.PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
+    html_report_filename = f'{httpfpt_config.PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
     if html_report:
-        if not os.path.exists(httpfpt_path_config.html_report_dir):
-            os.makedirs(httpfpt_path_config.html_report_dir)
+        if not os.path.exists(httpfpt_path.html_report_dir):
+            os.makedirs(httpfpt_path.html_report_dir)
         run_args.extend(
             (
-                f'--html={os.path.join(httpfpt_path_config.html_report_dir, html_report_filename)}',
+                f'--html={os.path.join(httpfpt_path.html_report_dir, html_report_filename)}',
                 '--self-contained-html',
             )
         )
 
     if allure:
-        run_args.append(f'--alluredir={httpfpt_path_config.allure_report_dir}')
+        run_args.append(f'--alluredir={httpfpt_path.allure_report_dir}')
         if allure_clear:
             run_args.append('--clean-alluredir')
 
@@ -113,34 +113,35 @@ def startup(
             format_run_args.append(i)
     run_pytest_command_args = ' '.join(_ for _ in format_run_args)
 
-    log.info(f'开始运行项目：{config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}')
+    log.info(
+        f'开始运行项目：{httpfpt_config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}'
+    )
     log.info(f'Pytest CLI: pytest {run_pytest_command_args}')
     log.info('🚀 START')
     pytest.main(run_args)
     log.info('🏁 FINISH')
 
-    yaml_report_files = os.listdir(httpfpt_path_config.yaml_report_dir)
+    yaml_report_files = os.listdir(httpfpt_path.yaml_report_dir)
     yaml_report_files.sort()
-    test_result = read_yaml(httpfpt_path_config.yaml_report_dir, filename=yaml_report_files[-1])
+    test_result = read_yaml(httpfpt_path.yaml_report_dir, filename=yaml_report_files[-1])
 
-    if html_report and config.EMAIL_REPORT_SEND:
+    if html_report and httpfpt_config.EMAIL_REPORT_SEND:
         SendMail(test_result, html_report_filename).send_report()
 
-    if config.DING_TALK_REPORT_SEND:
+    if httpfpt_config.DING_TALK_REPORT_SEND:
         DingTalk(test_result).send()
 
-    if config.LARK_TALK_REPORT_SEND:
+    if httpfpt_config.LARK_TALK_REPORT_SEND:
         LarkTalk(test_result).send()
 
     if allure:
-        if not os.path.exists(httpfpt_path_config.allure_report_env_file):
-            shutil.copyfile(httpfpt_path_config.allure_env_file, httpfpt_path_config.allure_report_env_file)
+        if not os.path.exists(httpfpt_path.allure_report_env_file):
+            shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
 
     if allure and allure_serve:
         os.popen(
-            f'allure generate {httpfpt_path_config.allure_report_dir} -o {httpfpt_path_config.allure_html_report_dir} '
-            + '--clean'
-        ) and os.popen(f'allure serve {httpfpt_path_config.allure_report_dir}')  # type: ignore
+            f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} ' + '--clean'
+        ) and os.popen(f'allure serve {httpfpt_path.allure_report_dir}')  # type: ignore
 
 
 def run(

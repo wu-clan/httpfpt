@@ -14,7 +14,7 @@ from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from httpfpt import set_project_dir
+from httpfpt import set_httpfpt_dir
 from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
 from httpfpt.utils.cli.import_case_data import (
     import_apifox_case_data,
@@ -68,7 +68,7 @@ class HttpFptCLI:
         if self.version:
             get_version()
         if self.project_dir:
-            set_project_dir(self.project_dir)
+            set_httpfpt_dir(self.project_dir)
         if self.start_project:
             create_new_project(self.start_project)
 

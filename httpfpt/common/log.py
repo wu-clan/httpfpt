@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 
-from httpfpt.core.path_conf import httpfpt_path_config
+from httpfpt.core.path_conf import httpfpt_path
 
 if TYPE_CHECKING:
     import loguru
@@ -28,7 +28,7 @@ class Logger:
 
         :return:
         """
-        log_path = httpfpt_path_config.log_dir
+        log_path = httpfpt_path.log_dir
 
         if not os.path.join(log_path):
             os.makedirs(log_path)

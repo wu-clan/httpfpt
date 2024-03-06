@@ -9,7 +9,7 @@ import rtoml
 from httpfpt.common.log import log
 
 
-def read_toml(filepath: str, filename: str | None, encoding: str = 'utf-8') -> dict:
+def read_toml(filepath: str, filename: str | None = None, encoding: str = 'utf-8') -> dict:
     """
     读取 toml 文件
 

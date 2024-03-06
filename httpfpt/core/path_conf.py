@@ -7,8 +7,8 @@ import os
 from httpfpt.common.errors import ConfigInitError
 
 __all__ = [
-    'httpfpt_path_config',
-    'set_project_dir',
+    'httpfpt_path',
+    'set_httpfpt_dir',
 ]
 
 
@@ -24,9 +24,9 @@ class HttpFptPathConfig:
     @property
     def project_dir(self) -> str:
         """项目根路径"""
-        if self.base_dir is None or not os.path.exists(self.base_dir):
+        if not os.path.exists(self.base_dir):
             self.base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
-        if self.base_dir is None:
+        if not self.base_dir:
             raise ConfigInitError(
                 '运行失败：在访问 httpfpt API 前，请先通过 set_project_dir() 方法设置项目根路径，'
                 '或配置 HTTPFPT_PROJECT_PATH 环境变量'
@@ -36,6 +36,8 @@ class HttpFptPathConfig:
     @property
     def log_dir(self) -> str:
         """日志路径"""
+        if not os.path.exists(self.base_dir):
+            return os.path.join(os.path.expanduser('~'), '.httpfpt')
         return os.path.join(self.project_dir, 'log')
 
     @property
@@ -99,18 +101,18 @@ class HttpFptPathConfig:
         return os.path.join(self.project_dir, 'core')
 
 
-def set_project_dir(base_dir: str) -> HttpFptPathConfig:
+def set_httpfpt_dir(base_dir: str) -> HttpFptPathConfig:
     """
     设置项目目录
 
     :param base_dir: 项目根路径
     :return:
     """
-    global httpfpt_path_config
+    global httpfpt_path
 
-    httpfpt_path_config = HttpFptPathConfig(base_dir)
-    return httpfpt_path_config
+    httpfpt_path = HttpFptPathConfig(base_dir)
+    return httpfpt_path
 
 
 # global path_config
-httpfpt_path_config: HttpFptPathConfig = set_project_dir('')
+httpfpt_path: HttpFptPathConfig = set_httpfpt_dir('')

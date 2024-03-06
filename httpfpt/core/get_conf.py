@@ -7,12 +7,12 @@ import os.path
 from httpfpt.common.errors import ConfigInitError
 
 __all__ = [
-    'config',
-    'set_project_config',
+    'httpfpt_config',
+    'set_httpfpt_config',
 ]
 
 # global config
-config = None
+httpfpt_config = None
 
 
 class HttpFptConfig:
@@ -94,12 +94,12 @@ class HttpFptConfig:
             self.REQUEST_RETRY = settings['request']['retry']
         except KeyError as e:
             raise ConfigInitError(
-                f'配置文件解析失败：缺失参数 "{str(e)}"。请核对配置文件或字典。若尚未配置，可通过'
+                f'配置文件解析失败：缺失参数 "{str(e)}"，请核对配置文件或字典，若尚未配置，可通过'
                 f'set_project_config() 设置项目配置，或将 HTTPFPT_PROJECT_CONFIG 环境变量指向配置文件路径'
             )
 
 
-def set_project_config(settings: str | dict, config_filename: str | None = None) -> HttpFptConfig:
+def set_httpfpt_config(settings: str | dict, config_filename: str | None = None) -> HttpFptConfig:
     """
     设置项目配置
 
@@ -107,7 +107,7 @@ def set_project_config(settings: str | dict, config_filename: str | None = None)
     :param config_filename:
     :return:
     """
-    global config
+    global httpfpt_config
 
     if isinstance(settings, str):
         from httpfpt.common.toml_handler import read_toml
@@ -118,5 +118,5 @@ def set_project_config(settings: str | dict, config_filename: str | None = None)
     else:
         conf = settings
 
-    config = HttpFptConfig(conf)
-    return config
+    httpfpt_config = HttpFptConfig(conf)
+    return httpfpt_config

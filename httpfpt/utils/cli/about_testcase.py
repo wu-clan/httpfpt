@@ -25,13 +25,13 @@ def testcase_data_verify(verify: str) -> None:
             for file in file_list:
                 file_type = get_file_property(file)[2]
                 if file_type == CaseDataType.JSON:
-                    file_data = read_json_file(None, filename=file)
+                    file_data = read_json_file(file)
                 else:
-                    file_data = read_yaml(None, filename=file)
+                    file_data = read_yaml(file)
                 CaseData.model_validate(file_data)
         else:
             console.print(f'🔥 开始验证 {verify} 测试数据结构...')
-            file_data = read_yaml(None, filename=verify)
+            file_data = read_yaml(verify)
             CaseData.model_validate(file_data)
     except ValidationError as e:
         count = e.error_count()
