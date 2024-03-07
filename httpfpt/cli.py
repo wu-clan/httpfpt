@@ -23,6 +23,7 @@ from httpfpt.utils.cli.import_case_data import (
     import_openapi_case_data,
     import_postman_case_data,
 )
+from httpfpt.utils.cli.new_project import create_new_project
 from httpfpt.utils.cli.version import get_version
 
 
@@ -55,9 +56,9 @@ class HttpFptCLI:
         if self.version:
             get_version()
         if self.start_project:
-            pass
-            # https://github.com/DanCardin/cappa/issues/106
-            # create_new_project(self.start_project)
+            # pass
+            # # https://github.com/DanCardin/cappa/issues/106
+            create_new_project(self.start_project)
 
 
 @cappa.command(name='testcase', help='Test case tools.')

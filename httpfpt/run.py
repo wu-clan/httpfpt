@@ -17,6 +17,7 @@ from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.redis_db import redis_client
+from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.ding_talk import DingTalk
 from httpfpt.utils.send_report.lark_talk import LarkTalk
@@ -26,6 +27,7 @@ from httpfpt.utils.time_control import get_current_time
 
 def startup(
     *args,
+    testcase_generate: bool,
     log_level: Literal['-q', '-s', '-v', '-vv'],
     case_path: str | None,
     html_report: bool,
@@ -40,6 +42,9 @@ def startup(
     **kwargs,
 ) -> None:
     """运行启动程序"""
+    if testcase_generate:
+        auto_generate_testcases(testcase_generate)
+
     run_args = [log_level]
 
     default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', httpfpt_config.PROJECT_NAME])
@@ -146,6 +151,8 @@ def startup(
 
 def run(
     *args,
+    # auto testcases
+    testcase_generate: bool = False,
     # init
     clean_cache: bool = False,
     pydantic_verify: bool = True,
@@ -171,6 +178,7 @@ def run(
     运行入口
 
     :param args: pytest 运行参数
+    :param testcase_generate: 自动生成测试用例（危险行为，自动强制覆盖同名文件），建议通过 CLI 手动执行，默认关闭
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
@@ -207,6 +215,7 @@ def run(
         case_data.case_id_unique_verify()
         startup(
             *args,
+            testcase_generate=testcase_generate,
             log_level=log_level,
             case_path=case_path,
             html_report=html_report,
