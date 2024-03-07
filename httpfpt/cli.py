@@ -44,7 +44,6 @@ class HttpFptCLI:
         bool,
         cappa.Arg(
             value_name='<PROJECT NAME, PROJECT PATH>',
-            short=False,
             long='--startproject',
             default=False,
             help='Create a new project.',
@@ -67,7 +66,7 @@ class TestCaseCLI:
         str,
         cappa.Arg(
             value_name='<FILENAME / ALL>',
-            short='-dv',
+            short='-c',
             long=True,
             default='',
             help='验证测试数据结构；当指定文件（文件名/完整路径）时, 仅验证指定文件, 当指定 "all" 时, 验证所有文件.',
@@ -77,7 +76,7 @@ class TestCaseCLI:
     generate: Annotated[
         bool,
         cappa.Arg(
-            short='-gt',
+            short='-g',
             long=True,
             default=False,
             help='自动生成测试用例.',
@@ -99,7 +98,7 @@ class ImportCLI:
         tuple[str, str],
         cappa.Arg(
             value_name='<JSONFILE / URL> <PROJECT>',
-            short='-io',
+            short='-o',
             long='--import-openapi',
             default=(),
             help='导入 openapi 数据到 yaml 数据文件; 支持 json 文件 / url 导入, 需要指定 project 项目名.',
@@ -110,7 +109,7 @@ class ImportCLI:
         tuple[str, str],
         cappa.Arg(
             value_name='<JSONFILE> <PROJECT>',
-            short='-ia',
+            short='-a',
             long='--import-apifox',
             default=(),
             help='Beta: 导入 apifox 数据到 yaml 数据文件; 支持 json 文件导入, 需要指定 project 项目名.',
@@ -120,7 +119,7 @@ class ImportCLI:
     har: Annotated[
         tuple[str, str],
         cappa.Arg(
-            short='-ih',
+            short='-h',
             long='--import-har',
             default=(),
             help='TODO: Not started yet.',
@@ -130,7 +129,7 @@ class ImportCLI:
     jmeter: Annotated[
         tuple[str, str],
         cappa.Arg(
-            short='-ij',
+            short='-j',
             long='--import-jmeter',
             default=(),
             help='TODO: Not started yet.',
@@ -140,7 +139,7 @@ class ImportCLI:
     postman: Annotated[
         tuple[str, str],
         cappa.Arg(
-            short='-ip',
+            short='-p',
             long='--import-postman',
             default=(),
             help='TODO: Not started yet.',
@@ -151,7 +150,6 @@ class ImportCLI:
         str,
         cappa.Arg(
             value_name='<GIT HTTPS>',
-            short='-ig',
             long='--import-git',
             default='',
             help='导入 git 仓库测试数据到本地.',

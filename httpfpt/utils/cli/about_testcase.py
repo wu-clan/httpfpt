@@ -50,11 +50,10 @@ def testcase_data_verify(verify: str) -> None:
         count = e.error_count()
         msg += str(e)
     except Exception as e:
-        console.print(f'❌ 验证测试数据 {verify} 结构失败: {e}')
-        raise cappa.Exit(code=1)
+        console.print(f'\n❌ 验证测试数据 {verify} 结构失败: {e}')
+        raise e
     if count > 0:
-        console.print(f'❌ 验证测试数据 {verify} 结构失败: {msg}')
-        raise cappa.Exit(code=1)
+        raise cappa.Exit(f'\n❌ 验证测试数据 {verify} 结构失败: {msg}', code=1)
     else:
         console.print('✅ 验证测试数据结构成功')
 
@@ -78,5 +77,5 @@ def generate_testcases() -> None:
             console.print('🔥 开始生成新测试用例...')
             auto_generate_testcases()
     except Exception as e:
-        console.print(f'❌ 自动生成测试用例失败: {e}')
-        raise cappa.Exit(code=1)
+        console.print(f'\n❌ 自动生成测试用例失败: {e}')
+        raise e

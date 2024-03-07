@@ -15,18 +15,18 @@ from httpfpt.utils.rich_console import console
 
 
 def create_new_project() -> None:
-    name = Prompt.ask('Set your project a name', default='httpfpt_project')
-    path = Prompt.ask('Set your project path (relative or absolute path, which automatically parses.)', default='.')
+    name = Prompt.ask('❓ Set your project a name', default='httpfpt_project')
+    path = Prompt.ask('❓ Set your project path (relative or absolute path, which automatically parses.)', default='.')
     if path != '.':
         if not os.path.isdir(path):
-            raise cappa.Exit(f'\nThe "{path}" is not a directory', code=1)
+            raise cappa.Exit(f'\n❌ The "{path}" is not a directory', code=1)
     project_path = os.path.abspath(os.sep.join([path, name]))
     core_path = os.path.join(project_path, 'core')
     data_path = os.path.join(project_path, 'data')
     conftest_file = os.path.join(project_path, 'conftest.py')
     pytest_file = os.path.join(project_path, 'pytest.ini')
     if os.path.exists(project_path):
-        raise cappa.Exit(f'\nThe "{name}" directory is not empty', code=1)
+        raise cappa.Exit(f'\n❌ The "{name}" directory is not empty', code=1)
     os.makedirs(project_path)
     with import_path('httpfpt.core', '') as core_data:
         shutil.copytree(core_data, core_path, ignore=shutil.ignore_patterns('get_conf.py', 'path_conf.py'))

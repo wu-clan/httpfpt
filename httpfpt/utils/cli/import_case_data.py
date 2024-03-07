@@ -19,7 +19,7 @@ def import_openapi_case_data(openapi: tuple[str, str]) -> None:
         try:
             SwaggerParser().import_openapi_to_yaml(openapi[0], openapi[1])
         except Exception as e:
-            console.print('❌ 导入 openapi 数据失败')
+            console.print('\n❌ 导入 openapi 数据失败')
             raise e
 
 
@@ -37,7 +37,7 @@ def import_apifox_case_data(apifox: tuple[str, str]) -> None:
         try:
             ApiFoxParser().import_apifox_to_yaml(apifox[0], apifox[1])
         except Exception as e:
-            console.print('❌ 导入 apifox 数据失败:')
+            console.print('\n❌ 导入 apifox 数据失败:')
             raise e
 
 
@@ -63,5 +63,5 @@ def import_git_case_data(src: str) -> None:
     try:
         GitRepoPaser.import_git_to_local(src)
     except Exception as e:
-        console.print(f'❌ 导入 git 仓库测试数据失败: {e}')
+        console.print(f'\n❌ 导入 git 仓库测试数据失败: {e}')
         raise e
