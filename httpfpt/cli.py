@@ -10,6 +10,7 @@ from dataclasses import dataclass
 import cappa
 
 from cappa import Subcommands
+from rich.traceback import install as rich_install
 from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -40,12 +41,12 @@ class HttpFptCLI:
         ),
     ]
     start_project: Annotated[
-        tuple[str, str],
+        bool,
         cappa.Arg(
             value_name='<PROJECT NAME, PROJECT PATH>',
             short=False,
             long='--startproject',
-            default=(),
+            default=False,
             help='Create a new project.',
             required=False,
         ),
@@ -56,7 +57,7 @@ class HttpFptCLI:
         if self.version:
             get_version()
         if self.start_project:
-            create_new_project(self.start_project)
+            create_new_project()
 
 
 @cappa.command(name='testcase', help='Test case tools.')
@@ -175,6 +176,7 @@ class ImportCLI:
 
 def cappa_invoke() -> None:
     """cli 执行程序"""
+    rich_install()
     cappa.invoke(HttpFptCLI)
 
 

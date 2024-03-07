@@ -9,15 +9,17 @@ from importlib.resources import path as import_path
 
 import cappa
 
+from rich.prompt import Prompt
+
 from httpfpt.utils.rich_console import console
 
 
-def create_new_project(start_project: tuple[str, str]) -> None:
-    name = start_project[0]
-    path = start_project[1]
+def create_new_project() -> None:
+    name = Prompt.ask('Set your project a name', default='httpfpt_project')
+    path = Prompt.ask('Set your project path (relative or absolute path, which automatically parses.)', default='.')
     if path != '.':
         if not os.path.isdir(path):
-            raise cappa.Exit(f'\n"{path}" is not a directory', code=1)
+            raise cappa.Exit(f'\nThe "{path}" is not a directory', code=1)
     project_path = os.path.abspath(os.sep.join([path, name]))
     core_path = os.path.join(project_path, 'core')
     data_path = os.path.join(project_path, 'data')
@@ -69,4 +71,7 @@ httpfpt_run()
         f.write(init_tpl)
     with open(os.path.join(project_path, 'run.py'), 'w', encoding='utf-8') as f:
         f.write(run_tpl)
-    console.print(f'\n🎉 The project "{name}" has been created')
+    console.print(
+        f'\n🎉 The project "{name}" has been created.'
+        f'\n🌴 The project is located in the directory: [cyan]{project_path}[/]'
+    )
