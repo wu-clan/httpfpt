@@ -56,8 +56,6 @@ class HttpFptCLI:
         if self.version:
             get_version()
         if self.start_project:
-            # pass
-            # # https://github.com/DanCardin/cappa/issues/106
             create_new_project(self.start_project)
 
 

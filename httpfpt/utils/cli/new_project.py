@@ -5,7 +5,11 @@ from __future__ import annotations
 import os
 import shutil
 
+from importlib.resources import path as import_path
+
 import cappa
+
+from httpfpt.utils.rich_console import console
 
 
 def create_new_project(start_project: tuple[str, str]) -> None:
@@ -13,28 +17,50 @@ def create_new_project(start_project: tuple[str, str]) -> None:
     path = start_project[1]
     if path != '.':
         if not os.path.isdir(path):
-            raise cappa.Exit(f'"{path}" is not a directory', code=1)
-    project_path = os.path.join(path, name)
+            raise cappa.Exit(f'\n"{path}" is not a directory', code=1)
+    project_path = os.path.abspath(os.sep.join([path, name]))
+    core_path = os.path.join(project_path, 'core')
+    data_path = os.path.join(project_path, 'data')
+    conftest_file = os.path.join(project_path, 'conftest.py')
+    pytest_file = os.path.join(project_path, 'pytest.ini')
     if os.path.exists(project_path):
-        raise cappa.Exit('The project directory is not empty', code=1)
+        raise cappa.Exit(f'\nThe "{name}" directory is not empty', code=1)
     os.makedirs(project_path)
-    shutil.copytree('./core', project_path, ignore=shutil.ignore_patterns('get_conf.py', 'path_conf.py'))
-    shutil.copytree('./data', project_path)
-    shutil.copytree('./testcases', project_path)
-    shutil.copyfile('conftest.py', project_path)
-    shutil.copyfile('pytest.ini', project_path)
+    with import_path('httpfpt.core', '') as core_data:
+        shutil.copytree(core_data, core_path, ignore=shutil.ignore_patterns('get_conf.py', 'path_conf.py'))
+    with import_path('httpfpt.data', '') as case_data:
+        shutil.copytree(case_data, data_path)
+    with import_path('httpfpt', 'conftest.py') as conftest:
+        shutil.copyfile(conftest, conftest_file)
+    with import_path('httpfpt', 'pytest.ini') as pytest_ini:
+        shutil.copyfile(pytest_ini, pytest_file)
     run_settings_path = os.path.join(project_path, 'core', 'conf.toml')
     init_tpl = f"""#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from functools import wraps
+from typing import Any, Callable
+
 from httpfpt import set_httpfpt_dir
 from httpfpt import set_httpfpt_config
 
-set_httpfpt_dir({project_path})
-set_httpfpt_config({run_settings_path})
+
+# Init setup
+set_httpfpt_dir('{project_path}')
+set_httpfpt_config('{run_settings_path}')
+
+
+def ensure_httpfpt_setup(func: Callable) -> Any:
+    @wraps(func)
+    def wrapper(*args, **kwargs) -> Callable:
+        set_httpfpt_dir('{project_path}')
+        set_httpfpt_config('{run_settings_path}')
+        return func(*args, **kwargs)
+
+    return wrapper
 """
     run_tpl = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from httpfpt import httpfpt_run
+from httpfpt.run import run as httpfpt_run
 
 
 httpfpt_run()
@@ -43,3 +69,4 @@ httpfpt_run()
         f.write(init_tpl)
     with open(os.path.join(project_path, 'run.py'), 'w', encoding='utf-8') as f:
         f.write(run_tpl)
+    console.print(f'\n🎉 The project "{name}" has been created')
