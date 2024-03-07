@@ -45,7 +45,7 @@ class HttpFptCLI:
             value_name='<PROJECT NAME, PROJECT PATH>',
             short=False,
             long='--startproject',
-            default=('httpfpt_project', '.'),
+            default=(),
             help='Create a new project.',
             required=False,
         ),

@@ -8,6 +8,7 @@ import time
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from importlib.resources import open_text
 
 from jinja2 import Template
 
@@ -34,7 +35,7 @@ class SendMail:
         self.content.update({'tester_name': httpfpt_config.TESTER_NAME})
 
         # 邮件正文
-        with open('../../templates/email_notification.html', 'r', encoding='utf-8') as f:
+        with open_text('httpfpt.templates', 'email_notification.html') as f:
             html = Template(f.read())
 
         mail_body = MIMEText(html.render(**self.content), _subtype='html', _charset='utf-8')
@@ -62,7 +63,7 @@ class SendMail:
         msg['date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
 
         # 邮件正文
-        with open('../../templates/email_notification.html', 'r', encoding='utf-8') as f:
+        with open_text('httpfpt.templates', 'email_notification.html') as f:
             html = Template(f.read())
 
         mail_body = MIMEText(html.render(**self.content), _subtype='html', _charset='utf-8')
