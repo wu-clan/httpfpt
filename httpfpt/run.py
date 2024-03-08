@@ -236,5 +236,6 @@ def run(
         SendEmail({'error': traceback.format_exc()}).send_error()
 
 
+# DEBUG for SDK
 if __name__ == '__main__':
     run(testcase_generate=True)

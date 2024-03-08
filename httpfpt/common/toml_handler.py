@@ -23,8 +23,8 @@ def read_toml(filepath: str, filename: str | None = None, encoding: str = 'utf-8
     try:
         with open(filepath, encoding=encoding) as f:
             data = rtoml.load(f)
-    except ValueError as e:
-        log.error(f'文件 {filename} 内容在格式错误 \n {e}')
+    except Exception as e:
+        log.error(f'文件 {filename} 读取错误: {e}')
         raise e
     else:
         return data

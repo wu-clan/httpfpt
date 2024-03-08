@@ -15,14 +15,9 @@ __all__ = [
 
 
 class HttpFptPathConfig:
-    def __init__(self) -> None:
-        self._base_dir = None
-
     def __call__(self, base_dir: str) -> Self:
         self._base_dir = base_dir
-        global httpfpt_path
-        httpfpt_path = HttpFptPathConfig()
-        return httpfpt_path
+        return self
 
     @property
     def project_dir(self) -> str:
@@ -42,8 +37,6 @@ class HttpFptPathConfig:
     @property
     def log_dir(self) -> str:
         """日志路径"""
-        if not self._base_dir:
-            return os.path.join(os.path.expanduser('~'), '.httpfpt')
         return os.path.join(self.project_dir, 'log')
 
     @property
