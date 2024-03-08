@@ -4,7 +4,7 @@ from httpfpt.common.log import log
 from httpfpt.core.get_conf import httpfpt_config
 
 
-class LarkTalk:
+class FeiShu:
     def __init__(self, content: dict):
         self.content = content
 
@@ -36,10 +36,10 @@ class LarkTalk:
                 },
             }
             response = requests.session().post(
-                url=httpfpt_config.LARK_TALK_WEBHOOK,
+                url=httpfpt_config.FEISHU_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=httpfpt_config.LARK_TALK_PROXY,  # type: ignore
+                proxies=httpfpt_config.FEISHU_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:

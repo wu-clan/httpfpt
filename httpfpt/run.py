@@ -19,9 +19,9 @@ from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.request import case_data_parse as case_data
-from httpfpt.utils.send_report.ding_talk import DingTalk
-from httpfpt.utils.send_report.lark_talk import LarkTalk
-from httpfpt.utils.send_report.send_email import SendMail
+from httpfpt.utils.send_report.ding import DingDing
+from httpfpt.utils.send_report.email import SendEmail
+from httpfpt.utils.send_report.feishu import FeiShu
 from httpfpt.utils.time_control import get_current_time
 
 
@@ -130,14 +130,14 @@ def startup(
     yaml_report_files.sort()
     test_result = read_yaml(httpfpt_path.yaml_report_dir, filename=yaml_report_files[-1])
 
-    if html_report and httpfpt_config.EMAIL_REPORT_SEND:
-        SendMail(test_result, html_report_filename).send_report()
+    if html_report and httpfpt_config.EMAIL_SEND:
+        SendEmail(test_result, html_report_filename).send_report()
 
-    if httpfpt_config.DING_TALK_REPORT_SEND:
-        DingTalk(test_result).send()
+    if httpfpt_config.DINGDING_SEND:
+        DingDing(test_result).send()
 
-    if httpfpt_config.LARK_TALK_REPORT_SEND:
-        LarkTalk(test_result).send()
+    if httpfpt_config.FEISHU_SEND:
+        FeiShu(test_result).send()
 
     if allure:
         if not os.path.exists(httpfpt_path.allure_report_env_file):
@@ -233,4 +233,8 @@ def run(
         log.error(f'运行异常：{e}')
         import traceback
 
-        SendMail({'error': traceback.format_exc()}).send_error()
+        SendEmail({'error': traceback.format_exc()}).send_error()
+
+
+if __name__ == '__main__':
+    run(testcase_generate=True)

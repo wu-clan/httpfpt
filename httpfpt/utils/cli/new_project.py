@@ -36,36 +36,32 @@ def create_new_project() -> None:
         shutil.copyfile(conftest, conftest_file)
     with import_path('httpfpt', 'pytest.ini') as pytest_ini:
         shutil.copyfile(pytest_ini, pytest_file)
-    run_settings_path = os.path.join(project_path, 'core', 'conf.toml')
     init_tpl = f"""#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from functools import wraps
 from typing import Any, Callable
 
 from httpfpt import set_httpfpt_dir
-from httpfpt import set_httpfpt_config
-
 
 # Init setup
 set_httpfpt_dir('{project_path}')
-set_httpfpt_config('{run_settings_path}')
 
 
 def ensure_httpfpt_setup(func: Callable) -> Any:
     @wraps(func)
     def wrapper(*args, **kwargs) -> Callable:
         set_httpfpt_dir('{project_path}')
-        set_httpfpt_config('{run_settings_path}')
         return func(*args, **kwargs)
 
     return wrapper
+
 """
     run_tpl = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from httpfpt.run import run as httpfpt_run
 
+httpfpt_run(testcase_generate=True)
 
-httpfpt_run()
 """
     with open(os.path.join(project_path, '__init__.py'), 'w', encoding='utf-8') as f:
         f.write(init_tpl)

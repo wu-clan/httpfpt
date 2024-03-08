@@ -4,39 +4,45 @@ from __future__ import annotations
 
 import os
 
+from typing_extensions import Self
+
 from httpfpt.common.errors import ConfigInitError
 
 __all__ = [
-    'httpfpt_path',
     'set_httpfpt_dir',
+    'httpfpt_path',
 ]
 
 
 class HttpFptPathConfig:
-    def __init__(self, base_dir: str) -> None:
-        """
-        路径配置初始化
+    def __init__(self) -> None:
+        self._base_dir = None
 
-        :param base_dir:
-        """
-        self.base_dir = base_dir
+    def __call__(self, base_dir: str) -> Self:
+        self._base_dir = base_dir
+        global httpfpt_path
+        httpfpt_path = HttpFptPathConfig()
+        return httpfpt_path
 
     @property
     def project_dir(self) -> str:
         """项目根路径"""
-        if not self.base_dir or not os.path.exists(self.base_dir):
-            self.base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
-        if not self.base_dir:
-            raise ConfigInitError(
-                '运行失败：在访问 httpfpt API 前，请先通过 set_project_dir() 方法设置项目根路径，'
-                '或配置 HTTPFPT_PROJECT_PATH 环境变量'
-            )
-        return self.base_dir
+        if not self._base_dir:
+            self._base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
+            if not self._base_dir:
+                raise ConfigInitError(
+                    '运行失败：在访问 httpfpt API 前，请先通过 set_project_dir() 方法设置项目根路径，'
+                    '或配置 HTTPFPT_PROJECT_PATH 环境变量'
+                )
+        else:
+            if not os.path.exists(self._base_dir):
+                raise ConfigInitError(f'运行失败，项目路径 {self._base_dir} 不存在，请检查路径配置是否正确')
+        return self._base_dir
 
     @property
     def log_dir(self) -> str:
         """日志路径"""
-        if not self.base_dir or not os.path.exists(self.base_dir):
+        if not self._base_dir:
             return os.path.join(os.path.expanduser('~'), '.httpfpt')
         return os.path.join(self.project_dir, 'log')
 
@@ -100,18 +106,13 @@ class HttpFptPathConfig:
         """AUTH配置文件路径"""
         return os.path.join(self.project_dir, 'core')
 
+    @property
+    def settings_file_file(self) -> str:
+        """核心配置文件路径"""
+        return os.path.join(self.project_dir, 'core', 'conf.toml')
 
-def set_httpfpt_dir(base_dir: str) -> HttpFptPathConfig:
-    """
-    设置项目目录
 
-    :param base_dir: 项目根路径
-    :return:
-    """
-    global httpfpt_path
-
-    httpfpt_path = HttpFptPathConfig(base_dir)
-    return httpfpt_path
+set_httpfpt_dir = HttpFptPathConfig()
 
 
 # global path_config

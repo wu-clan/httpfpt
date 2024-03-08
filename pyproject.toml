@@ -38,6 +38,7 @@ dependencies = [
     "stamina==24.1.0",
     "jsonschema>=4.21.1",
     "pygments>=2.17.2",
+    "glom>=23.5.0",
 ]
 requires-python = ">=3.8"
 readme = "README.md"
@@ -50,6 +51,16 @@ version = { source = "file", path = "httpfpt/__init__.py" }
 test = [
     "pyright==1.1.349",
     "ruff>=0.2.0",
+]
+
+[tool.pdm.build]
+excludes = [
+    "**/__pycache__",
+    "**/.git",
+    "**/.pytest_cache",
+    "**/.ruff_cache",
+    "**/log",
+    "**/report"
 ]
 
 [project.scripts]
