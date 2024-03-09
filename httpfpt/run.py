@@ -10,7 +10,7 @@ from typing import Literal
 
 import pytest
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml

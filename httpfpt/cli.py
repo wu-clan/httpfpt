@@ -13,7 +13,7 @@ from cappa import Subcommands
 from rich.traceback import install as rich_install
 from typing_extensions import Annotated
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
 from httpfpt.utils.cli.import_case_data import (
@@ -69,7 +69,7 @@ class TestCaseCLI:
             short='-c',
             long=True,
             default='',
-            help='验证测试数据结构；当指定文件（文件名/完整路径）时, 仅验证指定文件, 当指定 "all" 时, 验证所有文件.',
+            help='验证测试数据结构；当指定文件（文件名/绝对路径）时, 仅验证指定文件, 当指定 "all" 时, 验证所有文件.',
             required=False,
         ),
     ]

@@ -48,7 +48,9 @@ class SendRequests:
             'json': None,
             'content': None,
             'text': None,
-            'stat': {'execute_time': None},
+            'stat': {
+                'execute_time': None,
+            },
         }
         return response_metadata
 
