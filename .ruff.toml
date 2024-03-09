@@ -1,26 +1,54 @@
 line-length = 120
 cache-dir = "./httpfpt/.ruff_cache"
 unsafe-fixes = true
+target-version = "py310"  # 代码风格版本
 
 [lint]
 select = [
     "E",
     "F",
     "I",
+    "W",
+    "N",
+    "FA",
     "TCH",
-    "W505",
-    "PT018",
-    "SIM101",
-    "SIM114",
-    "PGH004",
-    "RUF100",
+    "T20",
+    "FURB",
+    # UP
+    "UP004",
+    "UP006",
+    "UP007",
+    "UP008",
+    "UP034",
+    "UP037",
+    "UP039",
+    # ANN
     "ANN001",
     "ANN201",
     "ANN202",
     "ANN204",
     "ANN205",
     "ANN206",
+    # PIE
+    "PIE810",
+    # PT
+    "PT018",
+    # SIM
+    "SIM101",
+    "SIM114",
+    # PGH
+    "PGH004",
+    # PRF
+    "PERF101",
+    "PERF102",
+    # RUF
+    "RUF100",
+    "RUF013",
+    "RUF027",
 ]
+preview = true
+ignore-init-module-imports = true
+ignore = ["FURB101"]
 
 [lint.flake8-pytest-style]
 mark-parentheses = false
@@ -46,3 +74,4 @@ mypy-init-return = true
 
 [format]
 quote-style = "single"
+docstring-code-format = true

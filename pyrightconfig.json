@@ -4,11 +4,11 @@
     "**/.*",
     "venv/**",
     "httpfpt/testcases/**",
-    "httpfpt/utils/data_manage/**.py"
+    "httpfpt/utils/data_manage/**.py",
+    "httpfpt/conftest.py"
   ],
   "ignore": [
-    "httpfpt/utils/auth_plugins.py",
-    "httpfpt/conftest.py"
+    "httpfpt/utils/auth_plugins.py"
   ],
   "reportUnusedImport": "error",
   "reportOptionalMemberAccess": false,

@@ -9,4 +9,4 @@ httpfpt/report/
 httpfpt/log/
 .idea/
 httpfpt/data/online*
-httpfpt/.ruff_cache/
+.ruff_cache/

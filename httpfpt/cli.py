@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 def get_version() -> None:
     """获取版本号"""
     ver = open('./__init__.py', 'rt').read()
-    mob = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", ver, re.M)
+    mob = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", ver, re.MULTILINE)
     if mob:
         console.print('\n🔥 HttpFpt', mob.group(1))
     else:

@@ -72,8 +72,7 @@ def startup(
     if html_report:
         if not os.path.exists(HTML_REPORT_PATH):
             os.makedirs(HTML_REPORT_PATH)
-        run_args.append(f'--html={os.path.join(HTML_REPORT_PATH, html_report_filename)}')
-        run_args.append('--self-contained-html')
+        run_args.extend((f'--html={os.path.join(HTML_REPORT_PATH, html_report_filename)}', '--self-contained-html'))
 
     if allure:
         run_args.append(f'--alluredir={ALLURE_REPORT_PATH}')
@@ -192,15 +191,14 @@ def run(
         logo = """\n
          /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
         | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
-        | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$   
-        | $$$$$$$$   | $$      | $$   | $$$$$$$/| $$$$$$  | $$$$$$$/   | $$   
-        | $$__  $$   | $$      | $$   | $$____/ | $$___/  | $$____/    | $$   
-        | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
-        | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$   
-        |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/   
-    
+        | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$
+        | $$$$$$$$   | $$      | $$   | $$$$$$$/| $$$$$$  | $$$$$$$/   | $$
+        | $$__  $$   | $$      | $$   | $$____/ | $$___/  | $$____/    | $$
+        | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$
+        | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$
+        |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/
+
             """
-        print(logo)
         log.info(logo)
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
