@@ -43,7 +43,7 @@ def startup(
 ) -> None:
     """运行启动程序"""
     if testcase_generate:
-        auto_generate_testcases(testcase_generate)
+        auto_generate_testcases()
 
     run_args = [log_level]
 
@@ -178,7 +178,7 @@ def run(
     运行入口
 
     :param args: pytest 运行参数
-    :param testcase_generate: 自动生成测试用例（危险行为，自动强制覆盖同名文件），建议通过 CLI 手动执行，默认关闭
+    :param testcase_generate: 自动生成测试用例（跳过同名文件），建议通过 CLI 手动执行，默认关闭
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
