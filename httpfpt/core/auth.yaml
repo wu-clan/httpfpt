@@ -2,9 +2,9 @@
 is_auth: false
 # 认证类型，请填写为认证方式的键值，如：bearer_token
 auth_type: bearer_token
-###############
-## token 认证
-###############
+##
+## bearer token 认证（自动登录获取）
+##
 bearer_token:
   url: https://api.pity.fun/auth/login
   username: tester
@@ -16,9 +16,15 @@ bearer_token:
   token_key: $.data.token
   # token有效期，单位: 秒
   timeout: 100000
-################
+##
+## bearer token 认证（自定义）
+##
+bearer_token_custom:
+  token: xxx
+  timeout: 100000
+##
 ## cookie 认证
-################
+##
 header_cookie:
   url: xxx
   username: xxx

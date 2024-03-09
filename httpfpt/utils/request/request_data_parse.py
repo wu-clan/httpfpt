@@ -375,6 +375,9 @@ class RequestDataParse:
                 if auth.auth_type == AuthType.TOKEN:
                     bearer_token = {'Authorization': f'Bearer {auth.bearer_token}'}
                     headers = headers.update(bearer_token) if headers else bearer_token
+                elif auth.auth_type == AuthType.TOKEN_CUSTOM:
+                    bearer_token = {'Authorization': f'Bearer {auth.bearer_token_custom}'}
+                    headers = headers.update(bearer_token) if headers else bearer_token
             return headers
 
     @property

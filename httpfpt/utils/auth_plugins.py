@@ -22,11 +22,6 @@ class AuthPlugins:
         self.is_auth = self.auth_data['is_auth']
         self.auth_type = self.auth_data['auth_type']
         self.auth_type_verify()
-        # 授权接口请求参数
-        self.url = self.auth_data[f'{self.auth_type}']['url']
-        self.username = self.auth_data[f'{self.auth_type}']['username']
-        self.password = self.auth_data[f'{self.auth_type}']['password']
-        self.headers = self.auth_data[f'{self.auth_type}']['headers']
         self.timeout = self.auth_data[f'{self.auth_type}']['timeout'] or 86400
 
     @lru_cache
@@ -42,13 +37,17 @@ class AuthPlugins:
 
     def request_auth(self) -> requests.Response:
         try:
+            url = self.auth_data[f'{self.auth_type}']['url']
+            username = self.auth_data[f'{self.auth_type}']['username']
+            password = self.auth_data[f'{self.auth_type}']['password']
+            headers = self.auth_data[f'{self.auth_type}']['headers']
             request_data = {
-                'url': self.url,
-                'data': {'username': self.username, 'password': self.password},
-                'headers': self.headers,
+                'url': url,
+                'data': {'username': username, 'password': password},
+                'headers': headers,
                 'proxies': {'http': None, 'https': None},
             }
-            if 'application/json' in str(self.headers):
+            if 'application/json' in str(headers):
                 request_data.update({'json': request_data.pop('data')})
             response = requests.post(**request_data)
             response.raise_for_status()
@@ -58,8 +57,7 @@ class AuthPlugins:
 
     @property
     def bearer_token(self) -> str:
-        self.headers.update({'Connection': 'close'})
-        cache_bearer_token = redis_client.get(f'{redis_client.token_prefix}:{self.url}', logging=False)
+        cache_bearer_token = redis_client.get(f'{redis_client.token_prefix}:bearer_token', logging=False)
         if cache_bearer_token:
             token = cache_bearer_token
         else:
@@ -68,12 +66,22 @@ class AuthPlugins:
             token = jp_token[0]
             if not token:
                 raise AuthError('Token 获取失败，请检查登录接口响应或 token 提取表达式')
-            redis_client.set(f'{redis_client.token_prefix}:{self.url}', token, ex=self.timeout)
+            redis_client.set(f'{redis_client.token_prefix}:bearer_token', token, ex=self.timeout)
+        return token
+
+    @property
+    def bearer_token_custom(self) -> str:
+        cache_bearer_token_custom = redis_client.get(f'{redis_client.token_prefix}:bearer_token_custom', logging=False)
+        if cache_bearer_token_custom:
+            token = cache_bearer_token_custom
+        else:
+            token = self.auth_data[f'{self.auth_type}']['token']
+            redis_client.set(f'{redis_client.token_prefix}:bearer_token_custom', token, ex=self.timeout)
         return token
 
     @property
     def header_cookie(self) -> dict:
-        cache_cookie = redis_client.get(f'{redis_client.cookie_prefix}:{self.url}', logging=False)
+        cache_cookie = redis_client.get(f'{redis_client.cookie_prefix}:header_cookie', logging=False)
         if cache_cookie:
             cookies = json.loads(cache_cookie)
         else:
@@ -83,7 +91,7 @@ class AuthPlugins:
             if not cookies:
                 raise AuthError('Cookie 获取失败，请检查登录接口响应')
             redis_client.set(
-                f'{redis_client.cookie_prefix}:{self.url}', json.dumps(cookies, ensure_ascii=False), ex=self.timeout
+                f'{redis_client.cookie_prefix}:header_cookie', json.dumps(cookies, ensure_ascii=False), ex=self.timeout
             )
         return cookies
 
