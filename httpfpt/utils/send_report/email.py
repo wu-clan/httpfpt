@@ -19,7 +19,7 @@ from httpfpt.enums.email_type import EmailType
 from httpfpt.utils.file_control import get_file_property
 
 
-class SendMail:
+class SendEmail:
     def __init__(self, content: dict, filename: str | None = None):
         self.content = content
         self.filename = filename

@@ -4,7 +4,7 @@ from httpfpt.common.log import log
 from httpfpt.core.get_conf import config
 
 
-class DingTalk:
+class DingDing:
     def __init__(self, content: dict):
         self.content = content
 
@@ -30,10 +30,10 @@ class DingTalk:
                 },
             }
             response = requests.session().post(
-                url=config.DING_TALK_WEBHOOK,
+                url=config.DINGDING_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=config.DING_TALK_PROXY,  # type: ignore
+                proxies=config.DINGDING_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:
