@@ -1,6 +1,6 @@
 # 测试项目
 [project]
-project = 'test_project'
+name = 'test_project'
 
 # 测试报告
 [report]
@@ -26,27 +26,27 @@ timeout = 10
 
 # 邮件
 [email]
-host_server = 'smtp.qq.com'
+host = 'smtp.qq.com'
 port = 465
 user = '12345678@qq.com'
 password = '12345678'
-send_to = '87654321@qq.com'  # if more, use: [str]
+receiver = '87654321@qq.com'  # if more, use: [str]
 ssl = true
-send_report = false
+send = false
 
 # 钉钉
-[ding_talk]
+[dingding]
 webhook = ''
 proxies.http = ''
 proxies.https = ''
-send_report = false
+send = false
 
 # 飞书
-[lark_talk]
+[feishu]
 webhook = ''
 proxies.http = ''
 proxies.https = ''
-send_report = false
+send = false
 
 
 # 请求发送

@@ -11,7 +11,7 @@ class Config:
         self.__config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
 
         # 项目目录名
-        self.PROJECT_NAME = self.__config['project']['project']
+        self.PROJECT_NAME = self.__config['project']['name']
 
         # 测试报告
         self.TEST_REPORT_TITLE = self.__config['report']['title']
@@ -33,37 +33,37 @@ class Config:
         self.REDIS_TIMEOUT = self.__config['redis']['timeout']
 
         # 邮件
-        self.EMAIL_SERVER = self.__config['email']['host_server']
+        self.EMAIL_SERVER = self.__config['email']['host']
         self.EMAIL_PORT = self.__config['email']['port']
         self.EMAIL_USER = self.__config['email']['user']
         self.EMAIL_PASSWORD = self.__config['email']['password']
-        self.EMAIL_SEND_TO = self.__config['email']['send_to']
+        self.EMAIL_SEND_TO = self.__config['email']['receiver']
         self.EMAIL_SSL = self.__config['email']['ssl']
-        self.EMAIL_REPORT_SEND = self.__config['email']['send_report']
+        self.EMAIL_SEND = self.__config['email']['send']
 
         # 钉钉
-        self.DING_TALK_WEBHOOK = self.__config['ding_talk']['webhook']
-        self.DING_TALK_PROXY = {
-            'http': self.__config['ding_talk']['proxies']['http']
-            if self.__config['ding_talk']['proxies']['http'] != ''
+        self.DINGDING_WEBHOOK = self.__config['dingding']['webhook']
+        self.DINGDING_PROXY = {
+            'http': self.__config['dingding']['proxies']['http']
+            if self.__config['dingding']['proxies']['http'] != ''
             else None,
-            'https': self.__config['ding_talk']['proxies']['https']
-            if self.__config['ding_talk']['proxies']['https'] != ''
+            'https': self.__config['dingding']['proxies']['https']
+            if self.__config['dingding']['proxies']['https'] != ''
             else None,
         }
-        self.DING_TALK_REPORT_SEND = self.__config['ding_talk']['send_report']
+        self.DINGDING_SEND = self.__config['dingding']['send']
 
         # 飞书
-        self.LARK_TALK_WEBHOOK = self.__config['lark_talk']['webhook']
-        self.LARK_TALK_PROXY = {
-            'http': self.__config['lark_talk']['proxies']['http']
-            if self.__config['lark_talk']['proxies']['http'] != ''
+        self.FEISHU_WEBHOOK = self.__config['feishu']['webhook']
+        self.FEISHU_PROXY = {
+            'http': self.__config['feishu']['proxies']['http']
+            if self.__config['feishu']['proxies']['http'] != ''
             else None,
-            'https': self.__config['lark_talk']['proxies']['https']
-            if self.__config['lark_talk']['proxies']['https'] != ''
+            'https': self.__config['feishu']['proxies']['https']
+            if self.__config['feishu']['proxies']['https'] != ''
             else None,
         }
-        self.LARK_TALK_REPORT_SEND = self.__config['lark_talk']['send_report']
+        self.FEISHU_SEND = self.__config['feishu']['send']
 
         # 请求发送
         self.REQUEST_TIMEOUT = self.__config['request']['timeout']
