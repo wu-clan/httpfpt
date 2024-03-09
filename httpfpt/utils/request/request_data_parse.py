@@ -167,7 +167,7 @@ class RequestDataParse:
                     raise RequestDataParseError(
                         _error_msg('测试用例数据解析失败，参数 config:request:proxies 不符合规范')
                     )
-                for k, v in proxies.items():
+                for v in proxies.values():
                     if v is not None:
                         if not isinstance(v, str):
                             raise RequestDataParseError(

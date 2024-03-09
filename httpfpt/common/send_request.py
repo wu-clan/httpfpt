@@ -327,7 +327,7 @@ class SendRequests:
     def log_request_down(response_data: dict) -> None:
         log.info(f"请求发送时间: {response_data['stat']['execute_time']}")
         str_status_code = str(response_data['status_code'])
-        if str_status_code.startswith('4') or str_status_code.startswith('5'):
+        if str_status_code.startswith(('4', '5')):
             log.error(f"响应状态码: {response_data['status_code']}")
         else:
             log.info(f"响应状态码: {response_data['status_code']}")
@@ -379,7 +379,7 @@ class SendRequests:
         if parsed_data['allure_severity'] is not None:
             allure.dynamic.severity(parsed_data['allure_severity'])
         if parsed_data['files_no_parse'] is not None:
-            for k, v in parsed_data['files_no_parse'].items():
+            for v in parsed_data['files_no_parse'].values():
                 if isinstance(v, list):
                     for path in v:
                         allure_attach_file(path)
