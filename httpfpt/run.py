@@ -19,7 +19,7 @@ from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.request import case_data_parse as case_data
-from httpfpt.utils.send_report.ding import DingDing
+from httpfpt.utils.send_report.dingding import DingDing
 from httpfpt.utils.send_report.email import SendEmail
 from httpfpt.utils.send_report.feishu import FeiShu
 from httpfpt.utils.time_control import get_current_time
