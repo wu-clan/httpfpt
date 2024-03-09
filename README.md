@@ -66,9 +66,10 @@ git clone https://github.com/wu-clan/httpfpt.git
    [Docker](https://hub.docker.com/_/mysql)
 
 > [!WARNING]
-> allure 测试报告默认使用 allure-pytest
-> 生成，但是不能直接访问，你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
-> 本地程序和 [Java JDK](https://adoptopenjdk.net/archive.html?variant=openjdk8&jvmVariant=hotspot) 才能进行可视化浏览
+> allure 测试报告默认使用 allure-pytest 生成，但是不能直接访问，有以下选择
+> 1. 本地访问：你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
+     程序和 [Java JDK](https://adoptopenjdk.net/archive.html?variant=openjdk8&jvmVariant=hotspot) 才能进行本地可视化浏览
+> 2. Jenkins（文档内包含集成教程）: 将 allure 测试报告集成到到 Jenkins 中，通过 Jenkins 进行浏览
 
 ## 帮助
 
