@@ -7,6 +7,9 @@
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/wu-clan/httpfpt)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
+> [!IMPORTANT]  
+> 当前分支为 SDK 版本，如需修改源码进行功能定制，请切换到 [master](https://github.com/wu-clan/httpfpt) 分支，以获取更简易的本地定制化
+
 基于 HTTP 请求的快速数据驱动 pytest 接口自动化测试框架
 
 我在掘金发表了关于 `HttpFpt` 的前身和由来，包括部分功能点的说明， 感兴趣
@@ -66,9 +69,10 @@ git clone https://github.com/wu-clan/httpfpt.git
    [Docker](https://hub.docker.com/_/mysql)
 
 > [!WARNING]
-> allure 测试报告默认使用 allure-pytest
-> 生成，但是不能直接访问，你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
-> 本地程序和 [Java JDK](https://adoptopenjdk.net/archive.html?variant=openjdk8&jvmVariant=hotspot) 才能进行可视化浏览
+> allure 测试报告默认使用 allure-pytest 生成，但是不能直接访问，有以下选择
+> 1. 本地访问：你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
+     程序和 [Java JDK](https://adoptopenjdk.net/archive.html?variant=openjdk8&jvmVariant=hotspot) 才能进行本地可视化浏览
+> 2. Jenkins（文档内包含集成教程）: 将 allure 测试报告集成到到 Jenkins 中，通过 Jenkins 进行浏览
 
 ## 帮助
 
