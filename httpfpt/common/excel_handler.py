@@ -11,7 +11,7 @@ import xlrd
 from httpfpt.common.log import log
 
 
-def read_excel(filepath: str, *, filename: str, sheet: str = 'Sheet1') -> list[dict[str, Any | None]]:
+def read_excel(filepath: str, *, filename: str, sheet: str) -> list[dict[str, Any | None] | None]:
     """
     读取 xlsx 文件
 

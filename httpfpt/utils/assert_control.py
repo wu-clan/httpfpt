@@ -208,8 +208,6 @@ class Asserter:
         :return:
         """
         assert_split = assert_text.split(' ')
-        if assert_text.startswith(("'{", "'[")):
-            raise AssertSyntaxError('code 断言内容语法错误, 请查看是否为 str / list 类型, 并检查断言语法是否符合规范')
         if not assert_text.startswith('assert '):
             raise AssertSyntaxError(f'code 断言取值表达式格式错误, 不符合语法规范: {assert_text}')
         if len(assert_split) < 4 or len(assert_split) > 6:

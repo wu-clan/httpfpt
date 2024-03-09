@@ -23,7 +23,7 @@ class ApiFoxParser:
         :param project:
         :return:
         """
-        data = read_json_file(None, filename=source)
+        data = read_json_file(source)
         apifox = data.get('apifoxProject')
         if not apifox:
             raise ValueError('获取 apifox 数据失败，请使用合法的 apifox 文件')

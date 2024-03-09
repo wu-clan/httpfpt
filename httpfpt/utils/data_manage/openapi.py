@@ -284,7 +284,7 @@ class SwaggerParser:
             if not (openapi or swagger):
                 raise ValueError('请输入正确的 openapi 地址')
         else:
-            data = read_json_file(None, filename=openapi_source)
+            data = read_json_file(openapi_source)
             openapi = data.get('openapi')
             swagger = data.get('swagger')
             if not (openapi or swagger):
