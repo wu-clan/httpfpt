@@ -13,7 +13,7 @@ from cappa import Subcommands
 from rich.traceback import install as rich_install
 from typing_extensions import TYPE_CHECKING, Annotated
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from httpfpt.run import run
 from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
