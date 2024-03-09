@@ -35,14 +35,14 @@ ssl = true
 send = false
 
 # 钉钉
-[ding]
+[dingding]
 webhook = ''
 proxies.http = ''
 proxies.https = ''
 send = false
 
 # 飞书
-[lark]
+[feishu]
 webhook = ''
 proxies.http = ''
 proxies.https = ''
