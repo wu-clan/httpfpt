@@ -10,11 +10,11 @@ from typing import Any
 import yaml
 
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import CASE_DATA_PATH, TEST_DATA_PATH, YAML_REPORT_PATH
+from httpfpt.core.path_conf import TEST_DATA_PATH, YAML_REPORT_PATH
 from httpfpt.utils.time_control import get_current_time
 
 
-def read_yaml(filepath: str | None = CASE_DATA_PATH, *, filename: str) -> dict[str, Any]:
+def read_yaml(filepath: str, filename: str | None = None) -> dict[str, Any]:
     """
     读取 yaml 文件
 
@@ -22,15 +22,10 @@ def read_yaml(filepath: str | None = CASE_DATA_PATH, *, filename: str) -> dict[s
     :param filename: 文件名
     :return:
     """
-    if filepath is not None:
-        _file = os.path.join(filepath, filename)
-    else:
-        _file = filename
-    if not _file:
-        log.error('读取 yaml 文件失败，文件名为空')
-        raise FileNotFoundError('读取 yaml 文件失败，文件名为空')
+    if filename:
+        filepath = os.path.join(filepath, filename)
     try:
-        with open(_file, encoding='utf-8') as f:
+        with open(filepath, encoding='utf-8') as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
     except Exception as e:
         log.error(f'文件 {filename} 读取错误: {e}')
@@ -83,9 +78,10 @@ def write_yaml_report(
     :param mode: 文件写入模式
     :return
     """
-    if not os.path.exists(YAML_REPORT_PATH):
-        os.makedirs(YAML_REPORT_PATH)
-    _file = os.path.join(YAML_REPORT_PATH, filename)
+    _yaml_report_path = YAML_REPORT_PATH
+    if not os.path.exists(_yaml_report_path):
+        os.makedirs(_yaml_report_path)
+    _file = os.path.join(_yaml_report_path, filename)
     try:
         with open(_file, encoding=encoding, mode=mode) as f:
             yaml.dump(data, f, allow_unicode=True)
@@ -113,17 +109,3 @@ def write_yaml_vars(data: dict) -> None:
         log.error(f'写入 global_vars.yaml 全局变量 {data} 错误: {e}')
     else:
         log.info(f'写入全局变量成功: global_vars.yaml -> {data}')
-
-
-def get_yaml_file(filepath: str = CASE_DATA_PATH, *, filename: str) -> str:
-    """
-    获取 yaml 测试数据文件
-
-    :param filepath: 文件路径
-    :param filename: 文件名
-    :return:
-    """
-    _file = os.path.join(filepath, filename)
-    if not os.path.exists(_file):
-        raise FileNotFoundError(f'测试数据文件 {filename} 不存在')
-    return _file

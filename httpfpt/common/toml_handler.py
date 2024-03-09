@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 
 import rtoml
@@ -7,7 +9,7 @@ import rtoml
 from httpfpt.common.log import log
 
 
-def read_toml(filepath: str, filename: str, encoding: str = 'utf-8') -> dict:
+def read_toml(filepath: str, filename: str | None = None, encoding: str = 'utf-8') -> dict:
     """
     读取 toml 文件
 
@@ -16,12 +18,13 @@ def read_toml(filepath: str, filename: str, encoding: str = 'utf-8') -> dict:
     :param encoding: 文件内容编码格式
     :return:
     """
-    _filename = os.path.join(filepath, filename)
+    if filename:
+        filepath = os.path.join(filepath, filename)
     try:
-        with open(_filename, encoding=encoding) as f:
+        with open(filepath, encoding=encoding) as f:
             data = rtoml.load(f)
-    except ValueError as e:
-        log.error(f'文件 {filename} 内容在格式错误 \n {e}')
+    except Exception as e:
+        log.error(f'文件 {filename} 读取错误: {e}')
         raise e
     else:
         return data

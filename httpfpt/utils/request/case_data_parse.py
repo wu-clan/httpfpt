@@ -40,7 +40,7 @@ def case_data_init(pydantic_verify: bool) -> None:
     """
     all_case_data_files = search_all_case_data_files()
     for case_data_file in all_case_data_files:
-        case_data = read_yaml(None, filename=case_data_file)
+        case_data = read_yaml(case_data_file)
         filename = get_file_property(case_data_file)[0]
         file_hash = get_file_hash(case_data_file)
         case_data.update({'filename': filename, 'file_hash': file_hash})
