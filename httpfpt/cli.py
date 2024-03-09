@@ -84,7 +84,7 @@ class TestCaseCLI:
         str,
         cappa.Arg(
             value_name='<FILENAME / ALL>',
-            short='-dv',
+            short='-c',
             long=True,
             default='',
             help='验证测试数据结构；当指定文件（文件名/绝对路径）时, 仅验证指定文件, 当指定 "all" 时, 验证所有文件.',
@@ -168,7 +168,6 @@ class ImportCLI:
         str,
         cappa.Arg(
             value_name='<GIT HTTPS>',
-            short='-ig',
             long='--import-git',
             default='',
             help='导入 git 仓库测试数据到本地.',
