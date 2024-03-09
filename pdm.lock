@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:584cdade0732d5f68c74c6c997d24533e9f387aaab5d748f37905519e739d1e7"
+content_hash = "sha256:248015b4d43b74a109b81c00bffdd1535e6d0f4bcbbaeb54cbf5b2d227bad1d3"
 
 [[package]]
 name = "allure-pytest"
@@ -80,6 +80,15 @@ summary = "Classes Without Boilerplate"
 files = [
     {file = "attrs-23.2.0-py3-none-any.whl", hash = "sha256:99b87a485a5820b23b879f04c2305b44b951b502fd64be915879d77a7e8fc6f1"},
     {file = "attrs-23.2.0.tar.gz", hash = "sha256:935dc3b529c262f6cf76e50877d35a4bd3c1de194fd41f47a2b7ae8f19971f30"},
+]
+
+[[package]]
+name = "boltons"
+version = "23.1.1"
+summary = "When they're not builtins, they're boltons."
+files = [
+    {file = "boltons-23.1.1-py2.py3-none-any.whl", hash = "sha256:80a8cd930ff21fbf03545b9863e5799d0c3e7e0e3b2546bdaf2efccd7b3708cc"},
+    {file = "boltons-23.1.1.tar.gz", hash = "sha256:d2cb2fa83cf2ebe791be1e284183e8a43a1031355156a968f8e0a333ad2448fc"},
 ]
 
 [[package]]
@@ -371,6 +380,18 @@ files = [
 ]
 
 [[package]]
+name = "face"
+version = "20.1.1"
+summary = "A command-line application framework (and CLI parser). Friendly for users, full-featured for developers."
+dependencies = [
+    "boltons>=20.0.0",
+]
+files = [
+    {file = "face-20.1.1-py3-none-any.whl", hash = "sha256:ca3a1d8b8b6aa8e61d62a300e9ee24e09c062aceda549e9a640128e4fa0f4559"},
+    {file = "face-20.1.1.tar.gz", hash = "sha256:7d59ca5ba341316e58cf72c6aff85cca2541cf5056c4af45cb63af9a814bed3e"},
+]
+
+[[package]]
 name = "faker"
 version = "24.1.0"
 requires_python = ">=3.8"
@@ -392,6 +413,20 @@ summary = "A platform independent file lock."
 files = [
     {file = "filelock-3.12.4-py3-none-any.whl", hash = "sha256:08c21d87ded6e2b9da6728c3dff51baf1dcecf973b768ef35bcbc3447edb9ad4"},
     {file = "filelock-3.12.4.tar.gz", hash = "sha256:2e6f249f1f3654291606e046b09f1fd5eac39b360664c27f5aad072012f8bcbd"},
+]
+
+[[package]]
+name = "glom"
+version = "23.5.0"
+summary = "A declarative object transformer and formatter, for conglomerating nested data."
+dependencies = [
+    "attrs",
+    "boltons>=19.3.0",
+    "face==20.1.1",
+]
+files = [
+    {file = "glom-23.5.0-py3-none-any.whl", hash = "sha256:fe4e9be4dc93c11a99f8277042e4bee95419c02cda4b969f504508b0a1aa6a66"},
+    {file = "glom-23.5.0.tar.gz", hash = "sha256:06af5e3486aacc59382ba34e53ebeabd7a9345d78f7dbcbee26f03baa4b83bac"},
 ]
 
 [[package]]
