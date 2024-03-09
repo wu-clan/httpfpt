@@ -37,26 +37,26 @@ class HttpFptConfig:
             self.EMAIL_SEND_TO = glom(self.settings, 'email.receiver')
             self.EMAIL_SSL = glom(self.settings, 'email.ssl')
             self.EMAIL_SEND = glom(self.settings, 'email.send')
-            self.DINGDING_WEBHOOK = glom(self.settings, 'ding.webhook')
+            self.DINGDING_WEBHOOK = glom(self.settings, 'dingding.webhook')
             self.DINGDING_PROXY = {
-                'http': glom(self.settings, 'ding.proxies.http')
-                if glom(self.settings, 'ding.proxies.http') != ''
+                'http': glom(self.settings, 'dingding.proxies.http')
+                if glom(self.settings, 'dingding.proxies.http') != ''
                 else None,
-                'https': glom(self.settings, 'ding.proxies.https')
-                if glom(self.settings, 'ding.proxies.https') != ''
+                'https': glom(self.settings, 'dingding.proxies.https')
+                if glom(self.settings, 'dingding.proxies.https') != ''
                 else None,
             }
-            self.DINGDING_SEND = glom(self.settings, 'ding.send')
-            self.FEISHU_WEBHOOK = glom(self.settings, 'lark.webhook')
+            self.DINGDING_SEND = glom(self.settings, 'dingding.send')
+            self.FEISHU_WEBHOOK = glom(self.settings, 'feishu.webhook')
             self.FEISHU_PROXY = {
-                'http': glom(self.settings, 'lark.proxies.http')
-                if glom(self.settings, 'lark.proxies.http') != ''
+                'http': glom(self.settings, 'feishu.proxies.http')
+                if glom(self.settings, 'feishu.proxies.http') != ''
                 else None,
-                'https': glom(self.settings, 'lark.proxies.https')
-                if glom(self.settings, 'lark.proxies.https') != ''
+                'https': glom(self.settings, 'feishu.proxies.https')
+                if glom(self.settings, 'feishu.proxies.https') != ''
                 else None,
             }
-            self.FEISHU_SEND = glom(self.settings, 'lark.send')
+            self.FEISHU_SEND = glom(self.settings, 'feishu.send')
             self.REQUEST_TIMEOUT = glom(self.settings, 'request.timeout')
             self.REQUEST_VERIFY = glom(self.settings, 'request.verify')
             self.REQUEST_REDIRECTS = glom(self.settings, 'request.redirects')
