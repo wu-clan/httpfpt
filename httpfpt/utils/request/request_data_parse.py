@@ -24,7 +24,7 @@ from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.request.method import MethodType
 from httpfpt.enums.setup_type import SetupType
 from httpfpt.enums.teardown_type import TeardownType
-from httpfpt.utils.auth_plugins import AuthPlugins
+from httpfpt.utils.auth_plugins import auth
 from httpfpt.utils.enum_control import get_enum_values
 from httpfpt.utils.request.hook_executor import hook_executor
 from httpfpt.utils.request.vars_extractor import var_extractor
@@ -371,7 +371,6 @@ class RequestDataParse:
             if headers is not None:
                 if len(headers) == 0:
                     raise RequestDataParseError(_error_msg('参数 test_steps:request:headers 为空'))
-            auth = AuthPlugins()
             if auth.is_auth:
                 if auth.auth_type == AuthType.TOKEN:
                     bearer_token = {'Authorization': f'Bearer {auth.bearer_token}'}
@@ -387,7 +386,6 @@ class RequestDataParse:
         if cookies is not None:
             if not isinstance(cookies, dict):
                 raise RequestDataParseError(_error_msg('参数 test_steps:request:cookies 不是有效的 dict 类型'))
-        auth = AuthPlugins()
         if auth.is_auth:
             if auth.auth_type == AuthType.COOKIE:
                 header_cookie = auth.header_cookie

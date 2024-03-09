@@ -21,8 +21,8 @@ class AuthPlugins:
         self.auth_data = self.get_auth_data()
         self.is_auth = self.auth_data['is_auth']
         self.auth_type = self.auth_data['auth_type']
-        if not getattr(AuthType, self.auth_type, None):
-            raise AuthError(f'认证类型错误, 允许 {get_enum_values(AuthType)} 之一, 请检查认证配置文件')
+        self.auth_type_verify()
+        # 授权接口请求参数
         self.url = self.auth_data[f'{self.auth_type}']['url']
         self.username = self.auth_data[f'{self.auth_type}']['username']
         self.password = self.auth_data[f'{self.auth_type}']['password']
@@ -31,8 +31,15 @@ class AuthPlugins:
 
     @lru_cache
     def get_auth_data(self) -> dict:
+        """获取授权数据"""
         auth_data = read_yaml(AUTH_CONF_PATH, filename='auth.yaml')
         return auth_data
+
+    def auth_type_verify(self) -> None:
+        """授权类型检查"""
+        _allow_auth_type = get_enum_values(AuthType)
+        if self.auth_type not in _allow_auth_type:
+            raise AuthError(f'认证类型错误, 允许 {_allow_auth_type} 之一, 请检查认证配置文件')
 
     def request_auth(self) -> requests.Response:
         try:
@@ -80,3 +87,6 @@ class AuthPlugins:
                 f'{redis_client.cookie_prefix}:{self.url}', json.dumps(cookies, ensure_ascii=False), ex=self.timeout
             )
         return cookies
+
+
+auth = AuthPlugins()
