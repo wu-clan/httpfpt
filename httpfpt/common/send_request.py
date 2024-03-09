@@ -361,7 +361,13 @@ class SendRequests:
 
     @staticmethod
     def allure_request_down(response_data: dict) -> None:
-        allure_step('响应数据', {'status_code': response_data['status_code'], 'elapsed': response_data['elapsed']})
+        allure_step(
+            '响应数据',
+            {
+                'status_code': response_data['status_code'],
+                'elapsed': response_data['elapsed'],
+            },
+        )
 
     @staticmethod
     def allure_dynamic_data(parsed_data: dict) -> None:
