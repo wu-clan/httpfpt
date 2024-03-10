@@ -21,6 +21,7 @@ def create_new_project() -> None:
     if path != '.':
         if not os.path.isdir(path):
             raise cappa.Exit(f'\n❌ The "{path}" is not a directory', code=1)
+    # TODO: 添加 rich 创建过程进度打印
     project_path = os.path.abspath(os.sep.join([path, name]))
     core_path = os.path.join(project_path, 'core')
     data_path = os.path.join(project_path, 'data')
