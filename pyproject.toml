@@ -41,9 +41,22 @@ dependencies = [
     "pygments>=2.17.2",
     "glom>=23.5.0",
 ]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 requires-python = ">=3.8"
 readme = "README.md"
 license = {text = "MIT"}
+
+[project.urls]
+homepage = "https://github.com/wu-clan/httpfpt"
+repository = "https://github.com/wu-clan/httpfpt"
 
 [tool.pdm]
 version = { source = "file", path = "httpfpt/__init__.py" }
@@ -56,12 +69,12 @@ test = [
 
 [tool.pdm.build]
 excludes = [
-    "**/__pycache__",
-    "**/.git",
-    "**/.pytest_cache",
-    "**/.ruff_cache",
-    "**/log",
-    "**/report"
+    "**/__pycache__/",
+    "**/.git/",
+    "**/.pytest_cache/",
+    "**/.ruff_cache/",
+    "**/log/",
+    "**/report/"
 ]
 
 [project.scripts]
