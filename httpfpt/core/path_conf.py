@@ -4,34 +4,25 @@ from __future__ import annotations
 
 import os
 
-from typing_extensions import Self
-
 from httpfpt.common.errors import ConfigInitError
 
-__all__ = [
-    'set_httpfpt_dir',
-    'httpfpt_path',
-]
+__all__ = ['httpfpt_path']
 
 
 class HttpFptPathConfig:
-    def __call__(self, base_dir: str) -> Self:
-        self._base_dir = base_dir
-        return self
-
     @property
     def project_dir(self) -> str:
         """项目根路径"""
-        _base_dir = self._base_dir if os.path.isdir(self._base_dir) else os.getenv('HTTPFPT_PROJECT_PATH')
+        _base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
         if not _base_dir:
             raise ConfigInitError(
                 '运行失败：在访问 HTTPFPT API 前，请先通过 `httpfpt` 命令创建新项目；'
                 '如果已经创建，请确保配置了 `HTTPFPT_PROJECT_PATH` 环境变量为项目目录'
             )
         else:
-            if not os.path.exists(self._base_dir):
-                raise ConfigInitError(f'运行失败，项目路径 {self._base_dir} 不存在，请检查路径配置是否正确')
-        return self._base_dir
+            if not os.path.exists(_base_dir):
+                raise ConfigInitError(f'运行失败，项目路径 {_base_dir} 不存在，请检查环境变量配置是否正确')
+        return _base_dir
 
     @property
     def log_dir(self) -> str:
@@ -104,8 +95,5 @@ class HttpFptPathConfig:
         return os.path.join(self.project_dir, 'core', 'conf.toml')
 
 
-set_httpfpt_dir = HttpFptPathConfig()
-
-
 # global path_config
-httpfpt_path = set_httpfpt_dir('')
+httpfpt_path = HttpFptPathConfig()

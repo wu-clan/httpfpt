@@ -25,39 +25,23 @@ def create_new_project() -> None:
     project_path = os.path.abspath(os.sep.join([path, name]))
     core_path = os.path.join(project_path, 'core')
     data_path = os.path.join(project_path, 'data')
+    init_file = os.path.join(project_path, '__init__.py')
     conftest_file = os.path.join(project_path, 'conftest.py')
     pytest_file = os.path.join(project_path, 'pytest.ini')
     if os.path.exists(project_path):
         raise cappa.Exit(f'\n❌ The "{name}" directory is not empty', code=1)
     os.makedirs(project_path)
     with import_path('httpfpt.core', '') as core_data:
-        shutil.copytree(core_data, core_path, ignore=shutil.ignore_patterns('get_conf.py', 'path_conf.py'))
+        patterns = ['__init__.py', 'get_conf.py', 'path_conf.py']
+        shutil.copytree(core_data, core_path, ignore=shutil.ignore_patterns(*patterns))
     with import_path('httpfpt.data', '') as case_data:
         shutil.copytree(case_data, data_path)
+    with import_path('httpfpt', '__init__.py') as pytest_init:
+        shutil.copyfile(pytest_init, init_file)
     with import_path('httpfpt', 'conftest.py') as conftest:
         shutil.copyfile(conftest, conftest_file)
     with import_path('httpfpt', 'pytest.ini') as pytest_ini:
         shutil.copyfile(pytest_ini, pytest_file)
-    init_tpl = f"""#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from functools import wraps
-from typing import Any, Callable
-
-from httpfpt import set_httpfpt_dir
-
-# Init setup
-set_httpfpt_dir('{project_path}')
-
-
-def ensure_httpfpt_setup(func: Callable) -> Any:
-    @wraps(func)
-    def wrapper(*args, **kwargs) -> Callable:
-        set_httpfpt_dir('{project_path}')
-        return func(*args, **kwargs)
-
-    return wrapper
-
-"""
     run_tpl = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from httpfpt.run import run as httpfpt_run
@@ -65,13 +49,14 @@ from httpfpt.run import run as httpfpt_run
 httpfpt_run(testcase_generate=True)
 
 """
-    with open(os.path.join(project_path, '__init__.py'), 'w', encoding='utf-8') as f:
-        f.write(init_tpl)
     with open(os.path.join(project_path, 'run.py'), 'w', encoding='utf-8') as f:
         f.write(run_tpl)
     console.print(
         f'\n🎉 The project "{name}" has been created.'
         f'\n🌴 The project is located in the directory: [cyan]{project_path}[/]'
         f'\n⚠️ Before accessing HTTPFPT, be sure to set the environment variable '
-        f'HTTPFPT_PROJECT_PATH to the current project directory'
+        f'[yellow]HTTPFPT_PROJECT_PATH[/] to the current project directory'
+        f'\n   Windows: setx HTTPFPT_PROJECT_PATH "{project_path}"'
+        f'\n   Unix: vim ~/.bashrc'
+        f'\n\t export PATH=$PATH:{project_path}'
     )

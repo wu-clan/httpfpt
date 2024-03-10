@@ -47,7 +47,7 @@ def startup(
 
     run_args = [log_level]
 
-    default_case_path = os.sep.join([os.path.dirname(__file__), 'testcases', httpfpt_config.PROJECT_NAME])
+    default_case_path = os.sep.join([httpfpt_path.testcase_dir, httpfpt_config.PROJECT_NAME])
     if case_path:
         if '::' not in case_path:
             raise ValueError(
