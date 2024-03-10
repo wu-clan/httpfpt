@@ -22,13 +22,12 @@ class HttpFptPathConfig:
     @property
     def project_dir(self) -> str:
         """项目根路径"""
-        if not self._base_dir:
-            self._base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
-            if not self._base_dir:
-                raise ConfigInitError(
-                    '运行失败：在访问 httpfpt API 前，请先通过 set_project_dir() 方法设置项目根路径，'
-                    '或配置 HTTPFPT_PROJECT_PATH 环境变量'
-                )
+        _base_dir = self._base_dir if os.path.isdir(self._base_dir) else os.getenv('HTTPFPT_PROJECT_PATH')
+        if not _base_dir:
+            raise ConfigInitError(
+                '运行失败：在访问 HTTPFPT API 前，请先通过 `httpfpt` 命令创建新项目；'
+                '如果已经创建，请确保配置了 `HTTPFPT_PROJECT_PATH` 环境变量为项目目录'
+            )
         else:
             if not os.path.exists(self._base_dir):
                 raise ConfigInitError(f'运行失败，项目路径 {self._base_dir} 不存在，请检查路径配置是否正确')
@@ -109,4 +108,4 @@ set_httpfpt_dir = HttpFptPathConfig()
 
 
 # global path_config
-httpfpt_path: HttpFptPathConfig = set_httpfpt_dir('')
+httpfpt_path = set_httpfpt_dir('')

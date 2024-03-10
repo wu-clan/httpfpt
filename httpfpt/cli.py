@@ -15,15 +15,7 @@ from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
-from httpfpt.utils.cli.import_case_data import (
-    import_apifox_case_data,
-    import_git_case_data,
-    import_har_case_data,
-    import_jmeter_case_data,
-    import_openapi_case_data,
-    import_postman_case_data,
-)
+
 from httpfpt.utils.cli.new_project import create_new_project
 from httpfpt.utils.cli.version import get_version
 
@@ -85,6 +77,8 @@ class TestCaseCLI:
     ]
 
     def __call__(self) -> None:
+        from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
+
         if self.data_verify:
             testcase_data_verify(self.data_verify)
         if self.generate:
@@ -158,6 +152,15 @@ class ImportCLI:
     ]
 
     def __call__(self) -> None:
+        from httpfpt.utils.cli.import_case_data import (
+            import_apifox_case_data,
+            import_git_case_data,
+            import_har_case_data,
+            import_jmeter_case_data,
+            import_openapi_case_data,
+            import_postman_case_data,
+        )
+
         if self.openai:
             import_openapi_case_data(self.openai)
         if self.apifox:
