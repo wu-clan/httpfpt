@@ -17,6 +17,7 @@ from httpfpt.utils.rich_console import console
 def create_new_project() -> None:
     name = Prompt.ask('❓ Set your project a name', default='httpfpt_project')
     path = Prompt.ask('❓ Set your project path (relative or absolute path, which automatically parses.)', default='.')
+    console.print('\n⏳ The project is being created automatically...')
     if path != '.':
         if not os.path.isdir(path):
             raise cappa.Exit(f'\n❌ The "{path}" is not a directory', code=1)
@@ -70,4 +71,6 @@ httpfpt_run(testcase_generate=True)
     console.print(
         f'\n🎉 The project "{name}" has been created.'
         f'\n🌴 The project is located in the directory: [cyan]{project_path}[/]'
+        f'\n⚠️ Before accessing HTTPFPT, be sure to set the environment variable '
+        f'HTTPFPT_PROJECT_PATH to the current project directory'
     )
