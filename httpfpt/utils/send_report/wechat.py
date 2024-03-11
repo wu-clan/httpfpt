@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from httpfpt.common.log import log
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 
 
 class WeChat:
@@ -18,8 +17,8 @@ class WeChat:
             data = {
                 'msgtype': 'markdown',
                 'markdown': {
-                    'content': f"# {config.TEST_REPORT_TITLE}\n"
-                    f"> 👤 测试人员: **{config.TESTER_NAME}**\n"
+                    'content': f"# {httpfpt_config.TEST_REPORT_TITLE}\n"
+                    f"> 👤 测试人员: **{httpfpt_config.TESTER_NAME}**\n"
                     f"> 🤖 测试结果: **{self.content['result']}**\n"
                     f"> ✅ 通过用例: <font color='info'>**{self.content['passed']}**</font>\n"
                     f"> 🔧 失败用例: **{self.content['failed']}**\n"
@@ -31,10 +30,10 @@ class WeChat:
                 },
             }
             response = requests.session().post(
-                url=config.WECHAT_WEBHOOK,
+                url=httpfpt_config.WECHAT_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=config.WECHAT_PROXY,  # type: ignore
+                proxies=httpfpt_config.WECHAT_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:
