@@ -18,10 +18,10 @@ charset = 'utf8mb4'
 
 # redis 数据库
 [redis]
-host = '127.0.0.1'
+host = '192.168.1.243'
 port = 6379
-password = ''
-database = 0
+password = '123456'
+database = 11
 timeout = 10
 
 # 邮件
@@ -47,6 +47,13 @@ webhook = ''
 proxies.http = ''
 proxies.https = ''
 send = false
+
+# 企业微信
+[wechat_talk]
+webhook = ''
+proxies.http = ''
+proxies.https = ''
+send_report = false
 
 
 # 请求发送
