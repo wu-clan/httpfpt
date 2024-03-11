@@ -67,6 +67,18 @@ class Config:
         }
         self.FEISHU_SEND = glom(self.__config, 'feishu.send')
 
+        # 企业微信
+        self.WECHAT_WEBHOOK = glom(self.__config, 'wechat.webhook')
+        self.WECHAT_PROXY = {
+            'http': glom(self.__config, 'wechat.proxies.http')
+            if glom(self.__config, 'wechat.proxies.http') != ''
+            else None,
+            'https': glom(self.__config, 'wechat.proxies.https')
+            if glom(self.__config, 'wechat.proxies.https') != ''
+            else None,
+        }
+        self.WECHAT_SEND = glom(self.__config, 'wechat.send')
+
         # 请求发送
         self.REQUEST_TIMEOUT = glom(self.__config, 'request.timeout')
         self.REQUEST_VERIFY = glom(self.__config, 'request.verify')

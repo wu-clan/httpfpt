@@ -48,6 +48,13 @@ proxies.http = ''
 proxies.https = ''
 send = false
 
+# 企业微信
+[wechat]
+webhook = ''
+proxies.http = ''
+proxies.https = ''
+send = false
+
 
 # 请求发送
 [request]
