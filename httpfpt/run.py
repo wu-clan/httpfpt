@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import subprocess
 import sys
 
 from typing import Literal
@@ -22,6 +23,7 @@ from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.dingding import DingDing
 from httpfpt.utils.send_report.email import SendEmail
 from httpfpt.utils.send_report.feishu import FeiShu
+from httpfpt.utils.send_report.wechat import WeChat
 from httpfpt.utils.time_control import get_current_time
 
 
@@ -139,14 +141,18 @@ def startup(
     if httpfpt_config.FEISHU_SEND:
         FeiShu(test_result).send()
 
+    if httpfpt_config.WECHAT_SEND:
+        WeChat(test_result).send()
+
     if allure:
         if not os.path.exists(httpfpt_path.allure_report_env_file):
             shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
 
-    if allure and allure_serve:
-        os.popen(
-            f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} ' + '--clean'
-        ) and os.popen(f'allure serve {httpfpt_path.allure_report_dir}')  # type: ignore
+    if allure_serve:
+        subprocess.run(
+            f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} --clean'
+        )
+        subprocess.run(f'allure serve {httpfpt_path.allure_report_dir}')
 
 
 def run(
@@ -157,7 +163,7 @@ def run(
     clean_cache: bool = False,
     pydantic_verify: bool = True,
     # log level
-    log_level: Literal['-q', '-s', '-v', '-vv'] = '-v',
+    log_level: Literal['-q', '-s', '-v', '-vv'] = '-s',
     # case path
     case_path: str | None = None,
     # html report
@@ -182,7 +188,7 @@ def run(
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
-    :param log_level: 控制台打印输出级别, 默认"-v"
+    :param log_level: 控制台打印输出级别, 默认"-s"
     :param case_path: 指定当前项目下的测试用例函数, 默认为空，如果指定，则执行指定用例，否则执行全部
     :param html_report: 生成 HTML 测试报告, 默认开启
     :param allure: 生成 allure 测试报告, 默认开启
