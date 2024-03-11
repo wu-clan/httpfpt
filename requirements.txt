@@ -54,7 +54,7 @@ pydantic-core==2.16.3
 pygments==2.17.2
 pymysql==0.9.3
 pyright==1.1.349
-pytest==8.1.1
+pytest==8.0.2
 pytest-html==4.0.0
 pytest-metadata==3.0.0
 pytest-pretty==1.2.0
