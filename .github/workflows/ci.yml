@@ -61,9 +61,9 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [ check ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Check whether the GITHUB release matches the package version
+      - name: Check the package version
         uses: samuelcolvin/check-python-version@v4
         with:
           version_file_path: httpfpt/__init__.py
