@@ -51,6 +51,7 @@ class SendRequests:
             'stat': {
                 'execute_time': None,
             },
+            'request': None,
         }
         return response_metadata
 
@@ -201,14 +202,16 @@ class SendRequests:
             'params': parsed_data['params'],
             'headers': parsed_data['headers'],
             'cookies': parsed_data['cookies'],
-            'data': parsed_data['body'],
+            'body': parsed_data['body'],
             'files': parsed_data['files'],
         }
         if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
-            request_data_parsed.update({'json': request_data_parsed.pop('data')})
+            request_data_parsed.update({'json': request_data_parsed.pop('body')})
         elif parsed_data['body_type'] == BodyType.binary:
             if request_engin == EnginType.httpx:
-                request_data_parsed.update({'content': request_data_parsed.pop('data')})
+                request_data_parsed.update({'content': request_data_parsed.pop('body')})
+        else:
+            request_data_parsed.update({'data': request_data_parsed.pop('body')})
 
         # 发送请求
         response_data = self.init_response_metadata
@@ -234,6 +237,7 @@ class SendRequests:
         response_data['json'] = json_data
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
+        response_data['request'] = request_data_parsed
 
         # 日志记录响应数据
         teardown = parsed_data['teardown']
