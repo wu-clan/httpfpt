@@ -18,10 +18,10 @@ charset = 'utf8mb4'
 
 # redis 数据库
 [redis]
-host = '192.168.1.243'
+host = '127.0.0.1'
 port = 6379
-password = '123456'
-database = 11
+password = ''
+database = 0
 timeout = 10
 
 # 邮件
