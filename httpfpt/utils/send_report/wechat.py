@@ -5,7 +5,7 @@ from httpfpt.common.log import log
 from httpfpt.core.get_conf import config
 
 
-class Wechat:
+class WeChat:
     def __init__(self, content: dict):
         self.content = content
 
@@ -18,35 +18,23 @@ class Wechat:
             data = {
                 'msgtype': 'markdown',
                 'markdown': {
-                    "content": "# {}\n"
-                               "> 👤 测试人员:**{}**\n"
-                               "> 🤖 测试结果:**{}**\n"
-                               "> ✅ 通过用例:  <font color='info'>**{}**</font>\n"
-                               "> 🔧 失败用例:  <font color='warning'>**{}**</font>\n"
-                               "> ❌ 错误用例:  **{}**\n"
-                               "> ⚠️ 跳过用例:  **{}**\n"
-                               "> 🈴 总数用例:  **{}**\n"
-                               "> ⌛ 开始时间:  **{}**\n"
-                               "> ⏱️ 执行耗时:  **{}**\n"
-                               "> ➡️ 查看报告: [点击跳转](https://foryourself)".format(
-                        config.TEST_REPORT_TITLE,
-                        config.TESTER_NAME,
-                        self.content["result"],
-                        self.content["passed"],
-                        self.content['failed'],
-                        self.content['error'],
-                        self.content['skipped'],
-                        self.content['total'],
-                        self.content['started_time'],
-                        self.content['elapsed'],
-                    )
+                    'content': f"# {config.TEST_REPORT_TITLE}\n"
+                    f"> 👤 测试人员: **{config.TESTER_NAME}**\n"
+                    f"> 🤖 测试结果: **{self.content['result']}**\n"
+                    f"> ✅ 通过用例: <font color='info'>**{self.content['passed']}**</font>\n"
+                    f"> 🔧 失败用例: **{self.content['failed']}**\n"
+                    f"> ❌ 错误用例: **{self.content['error']}**\n"
+                    f"> ⚠️ 跳过用例: **{self.content['skipped']}**\n"
+                    f"> ⌛ 开始时间: **{self.content['started_time']}**\n"
+                    f"> ⏱️ 执行耗时: **{self.content['elapsed']}**\n"
+                    "> ➡️ 查看报告: [点击跳转](https://foryourself)"
                 },
             }
             response = requests.session().post(
-                url=config.WECHAT_TALK_WEBHOOK,
+                url=config.WECHAT_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=config.WECHAT_TALK_PROXY,  # type: ignore
+                proxies=config.WECHAT_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:
