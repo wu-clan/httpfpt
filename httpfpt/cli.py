@@ -10,7 +10,6 @@ from dataclasses import dataclass
 import cappa
 
 from cappa import Subcommands
-from rich.traceback import install as rich_install
 from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -177,7 +176,6 @@ class ImportCLI:
 
 def cappa_invoke() -> None:
     """cli 执行程序"""
-    rich_install()
     cappa.invoke(HttpFptCLI)
 
 

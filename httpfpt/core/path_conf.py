@@ -21,7 +21,13 @@ class HttpFptPathConfig:
             )
         else:
             if not os.path.exists(_base_dir):
-                raise ConfigInitError(f'运行失败，项目路径 {_base_dir} 不存在，请检查环境变量配置是否正确')
+                raise ConfigInitError(f"""
+                错误：操作失败 - 未找到项目路径 '{_base_dir}'。
+                请确保以下几点：
+                1. 环境变量是否已正确配置
+                2. 检查指定的项目路径是否存在。如果项目还未创建，你需要先创建一个新项目
+                完成上述检查后，请重新尝试执行此操作
+                """)
         return _base_dir
 
     @property
