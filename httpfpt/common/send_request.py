@@ -51,7 +51,7 @@ class SendRequests:
             'stat': {
                 'execute_time': None,
             },
-            'request': None
+            'request': None,
         }
         return response_metadata
 
