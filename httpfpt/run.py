@@ -31,6 +31,7 @@ from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.dingding import DingDing
 from httpfpt.utils.send_report.email import SendEmail
 from httpfpt.utils.send_report.feishu import FeiShu
+from httpfpt.utils.send_report.wechat import WeChat
 from httpfpt.utils.time_control import get_current_time
 
 
@@ -140,6 +141,9 @@ def startup(
 
     if config.FEISHU_SEND:
         FeiShu(test_result).send()
+
+    if config.WECHAT_SEND:
+        WeChat(test_result).send()
 
     if allure:
         if not os.path.exists(ALLURE_REPORT_ENV_FILE):
