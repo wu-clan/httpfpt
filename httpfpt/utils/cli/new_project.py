@@ -79,7 +79,7 @@ httpfpt_run(testcase_generate=True)
         f'\n🌳 The project is located in the directory: [cyan]{project_path}[/]'
         f'\n⚠️ Before accessing HTTPFPT, be sure to set the environment variable '
         '[yellow]HTTPFPT_PROJECT_PATH[/] to the current project directory',
-        end='\n\n'
+        end='\n\n',
     )
     if platform.system().lower() == 'windows':
         env_var_cmd = f"""

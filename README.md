@@ -8,7 +8,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 > [!IMPORTANT]  
-> 当前分支为 SDK 版本，如需修改源码进行功能定制，请切换到 [master](https://github.com/wu-clan/httpfpt) 分支，以获取更简易的本地定制化
+> 当前分支为 SDK 版本，如需修改源码进行功能定制，建议切换到 [master](https://github.com/wu-clan/httpfpt) 分支
 
 基于 HTTP 请求的快速数据驱动 pytest 接口自动化测试框架
 
@@ -40,21 +40,13 @@
 
 ## ⬇️ 下载
 
-克隆:
-
 ```shell
-git clone https://github.com/wu-clan/httpfpt.git
+pip install httpfpt
 ```
 
 ## 🧑‍💻 Use
 
-1. 安装依赖:
-
-    ```shell
-    pip install -r requirements.txt
-    ```
-
-2. 安装 redis 数据库并启动服务
+1. 安装 redis 数据库并启动服务
 
    [Redis Windows](https://github.com/redis-windows/redis-windows)
 
@@ -62,7 +54,7 @@ git clone https://github.com/wu-clan/httpfpt.git
 
    [Docker](https://hub.docker.com/_/redis)
 
-3. 安装 mysql 数据库（可选，如果你需要本地数据库）
+2. 安装 mysql 数据库（可选，如果你需要本地数据库）
 
    [Windows / Linux / macOS](https://dev.mysql.com/downloads/installer/)
 
