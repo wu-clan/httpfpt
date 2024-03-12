@@ -169,7 +169,8 @@ class SendRequests:
                                 if relate_parsed_data:
                                     parsed_data = relate_parsed_data
                             elif key == SetupType.SQL:
-                                mysql_client.exec_case_sql(value, parsed_data['env'])
+                                sql = var_extractor.vars_replace({'sql': value})['sql']
+                                mysql_client.exec_case_sql(sql, parsed_data['env'])
                             elif key == SetupType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             elif key == SetupType.WAIT_TIME:
@@ -179,9 +180,6 @@ class SendRequests:
                 log.error(f'请求前置处理异常: {e}')
                 raise e
             log.info('请求前置处理完成')
-
-        # 确保用例数据变量已全部替换
-        parsed_data = var_extractor.vars_replace(parsed_data)
 
         # 日志记录请求数据
         if log_data:
@@ -217,6 +215,7 @@ class SendRequests:
             request_data_parsed.update({'data': request_data_parsed.pop('body')})
 
         # 发送请求
+        request_data_parsed = var_extractor.vars_replace(request_data_parsed)
         response_data = self.init_response_metadata
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
@@ -258,13 +257,15 @@ class SendRequests:
                     for key, value in item.items():
                         if value is not None:
                             if key == TeardownType.SQL:
-                                mysql_client.exec_case_sql(value, parsed_data['env'])
+                                sql = var_extractor.vars_replace({'sql': value})['sql']
+                                mysql_client.exec_case_sql(sql, parsed_data['env'])
                             if key == TeardownType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             if key == TeardownType.EXTRACT:
                                 var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
                             if key == TeardownType.ASSERT:
-                                asserter.exec_asserter(response_data, assert_text=value)
+                                assert_text = var_extractor.vars_replace({'assert_text': value})['assert_text']
+                                asserter.exec_asserter(response_data, assert_text)
                             elif key == TeardownType.WAIT_TIME:
                                 log.info(f'执行请求后等待：{value} s')
                                 time.sleep(value)
