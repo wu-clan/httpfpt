@@ -154,7 +154,7 @@ class MysqlDB:
             query_data = self.query(sql_text)
             if not query_data:
                 raise SQLSyntaxError('变量提取失败，SQL 查询结果为空')
-            record_variables(json_path, query_data, key, set_type, env)
+            record_variables(json_path, query_data, key, set_type, env)  # type: ignore
 
     @staticmethod
     def sql_verify(sql: str) -> None:
