@@ -10,3 +10,4 @@ httpfpt/log/
 .idea/
 httpfpt/data/online*
 .ruff_cache/
+testcases/

@@ -10,7 +10,7 @@ from typing import Any
 import yaml
 
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import TEST_DATA_PATH, YAML_REPORT_PATH
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.utils.time_control import get_current_time
 
 
@@ -78,7 +78,7 @@ def write_yaml_report(
     :param mode: 文件写入模式
     :return
     """
-    _yaml_report_path = YAML_REPORT_PATH
+    _yaml_report_path = httpfpt_path.yaml_report_dir
     if not os.path.exists(_yaml_report_path):
         os.makedirs(_yaml_report_path)
     _file = os.path.join(_yaml_report_path, filename)
@@ -99,9 +99,9 @@ def write_yaml_vars(data: dict) -> None:
     :param data:
     :return:
     """
-    _file = os.path.join(TEST_DATA_PATH, 'global_vars.yaml')
+    _file = os.path.join(httpfpt_path.data_path, 'global_vars.yaml')
     try:
-        _vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
+        _vars = read_yaml(httpfpt_path.data_path, filename='global_vars.yaml')
         _vars.update(data)
         with open(_file, encoding='utf-8', mode='w') as f:
             yaml.dump(_vars, f, allow_unicode=True)

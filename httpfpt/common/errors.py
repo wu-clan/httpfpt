@@ -12,6 +12,13 @@ class HttpFptErrorMixin:
         return self.msg
 
 
+class ConfigInitError(HttpFptErrorMixin, RuntimeError):
+    """配置初始化错误"""
+
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+
+
 class AuthError(HttpFptErrorMixin, ValueError):
     """认证错误"""
 

@@ -15,7 +15,7 @@ from requests import Response as RequestsResponse
 
 from httpfpt.common.errors import AssertError, SendRequestError
 from httpfpt.common.log import log
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.db.mysql_db import mysql_client
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
@@ -63,11 +63,11 @@ class SendRequests:
         :param kwargs:
         :return:
         """
-        kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
-        kwargs['verify'] = kwargs['verify'] or config.REQUEST_VERIFY
-        kwargs['proxies'] = kwargs['proxies'] or config.REQUEST_PROXIES_REQUESTS
-        kwargs['allow_redirects'] = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
-        request_retry = kwargs['retry'] or config.REQUEST_RETRY
+        kwargs['timeout'] = kwargs['timeout'] or httpfpt_config.REQUEST_TIMEOUT
+        kwargs['verify'] = kwargs['verify'] or httpfpt_config.REQUEST_VERIFY
+        kwargs['proxies'] = kwargs['proxies'] or httpfpt_config.REQUEST_PROXIES_REQUESTS
+        kwargs['allow_redirects'] = kwargs['allow_redirects'] or httpfpt_config.REQUEST_REDIRECTS
+        request_retry = kwargs['retry'] or httpfpt_config.REQUEST_RETRY
         del kwargs['retry']
         # 消除安全警告
         requests.packages.urllib3.disable_warnings()  # type: ignore
@@ -93,11 +93,11 @@ class SendRequests:
         :param kwargs:
         :return:
         """
-        kwargs['timeout'] = kwargs['timeout'] or config.REQUEST_TIMEOUT
-        verify = kwargs['verify'] or config.REQUEST_VERIFY
-        proxies = kwargs['proxies'] or config.REQUEST_PROXIES_HTTPX
-        redirects = kwargs['allow_redirects'] or config.REQUEST_REDIRECTS
-        request_retry = kwargs['retry'] or config.REQUEST_RETRY
+        kwargs['timeout'] = kwargs['timeout'] or httpfpt_config.REQUEST_TIMEOUT
+        verify = kwargs['verify'] or httpfpt_config.REQUEST_VERIFY
+        proxies = kwargs['proxies'] or httpfpt_config.REQUEST_PROXIES_HTTPX
+        redirects = kwargs['allow_redirects'] or httpfpt_config.REQUEST_REDIRECTS
+        request_retry = kwargs['retry'] or httpfpt_config.REQUEST_RETRY
         del kwargs['verify']
         del kwargs['proxies']
         del kwargs['allow_redirects']

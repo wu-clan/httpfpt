@@ -1,47 +1,103 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+from httpfpt.common.errors import ConfigInitError
 
-# 获取日志路径
-LOG_PATH = os.path.join(BASE_DIR, 'log')
+__all__ = ['httpfpt_path']
 
-# 测试数据路径
-TEST_DATA_PATH = os.path.join(BASE_DIR, 'data')
 
-# Yaml测试数据路径
-CASE_DATA_PATH = os.path.join(TEST_DATA_PATH, 'test_data')
+class HttpFptPathConfig:
+    @property
+    def project_dir(self) -> str:
+        """项目根路径"""
+        _base_dir = os.getenv('HTTPFPT_PROJECT_PATH')
+        if not _base_dir:
+            raise ConfigInitError(
+                '运行失败：在访问 HTTPFPT API 前，请先通过 `httpfpt` 命令创建新项目；'
+                '如果已经创建，请确保配置了 `HTTPFPT_PROJECT_PATH` 环境变量为项目目录'
+            )
+        else:
+            if not os.path.exists(_base_dir):
+                raise ConfigInitError(
+                    f"操作失败 - 未找到项目路径 '{_base_dir}'。请确保以下几点："
+                    f'1. 环境变量是否已正确配置；2. 检查指定的项目路径是否存在。'
+                    f'如果项目还未创建，你需要先创建一个新项目；完成上述检查后，请重新尝试执行此操作'
+                )
+        return _base_dir
 
-# 测试报告路径
-TEST_REPORT_PATH = os.path.join(BASE_DIR, 'report')
+    @property
+    def log_dir(self) -> str:
+        """日志路径"""
+        return os.path.join(self.project_dir, 'log')
 
-# allure测试报告路径
-ALLURE_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'allure_report')
+    @property
+    def data_path(self) -> str:
+        """数据路径"""
+        return os.path.join(self.project_dir, 'data')
 
-# allure html测试报告路径
-ALLURE_REPORT_HTML_PATH = os.path.join(ALLURE_REPORT_PATH, 'html')
+    @property
+    def case_data_dir(self) -> str:
+        """用例数据路径"""
+        return os.path.join(self.data_path, 'test_data')
 
-# HTML测试报告路径
-HTML_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'html_report')
+    @property
+    def report_dir(self) -> str:
+        """测试报告路径"""
+        return os.path.join(self.project_dir, 'report')
 
-# HTML测试报告路径
-HTML_EMAIL_REPORT_PATH = os.path.join(BASE_DIR, 'templates')
+    @property
+    def allure_report_dir(self) -> str:
+        """allure测试报告路径"""
+        return os.path.join(self.report_dir, 'allure_report')
 
-# YAML测试报告路径
-YAML_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'yaml_report')
+    @property
+    def allure_html_report_dir(self) -> str:
+        """allure html测试报告路径"""
+        return os.path.join(self.allure_report_dir, 'html')
 
-# allure环境文件
-ALLURE_ENV_FILE = os.path.join(BASE_DIR, 'core', 'allure_env', 'environment.properties')
+    @property
+    def html_report_dir(self) -> str:
+        """HTML测试报告路径"""
+        return os.path.join(self.report_dir, 'html_report')
 
-# allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失
-ALLURE_REPORT_ENV_FILE = os.path.join(ALLURE_REPORT_PATH, 'environment.properties')
+    @property
+    def yaml_report_dir(self) -> str:
+        """YAML测试报告路径"""
+        return os.path.join(self.report_dir, 'yaml_report')
 
-# 运行环境文件路径
-RUN_ENV_PATH = os.path.join(BASE_DIR, 'core', 'run_env')
+    @property
+    def allure_env_file(self) -> str:
+        """allure环境文件"""
+        return os.path.join(self.project_dir, 'core', 'allure_env', 'environment.properties')
 
-# 测试用例路径
-TEST_CASE_PATH = os.path.join(BASE_DIR, 'testcases')
+    @property
+    def allure_report_env_file(self) -> str:
+        """allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失"""
+        return os.path.join(self.allure_report_dir, 'environment.properties')
 
-# AUTH配置文件路径
-AUTH_CONF_PATH = os.path.join(BASE_DIR, 'core')
+    @property
+    def run_env_dir(self) -> str:
+        """运行环境文件路径"""
+        return os.path.join(self.project_dir, 'core', 'run_env')
+
+    @property
+    def testcase_dir(self) -> str:
+        """测试用例路径"""
+        return os.path.join(self.project_dir, 'testcases')
+
+    @property
+    def auth_conf_dir(self) -> str:
+        """AUTH配置文件路径"""
+        return os.path.join(self.project_dir, 'core')
+
+    @property
+    def settings_file_file(self) -> str:
+        """核心配置文件路径"""
+        return os.path.join(self.project_dir, 'core', 'conf.toml')
+
+
+# global path_config
+httpfpt_path = HttpFptPathConfig()
