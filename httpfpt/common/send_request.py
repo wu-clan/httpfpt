@@ -181,7 +181,7 @@ class SendRequests:
             log.info('请求前置处理完成')
 
         # 确保用例数据变量已全部替换
-        var_extractor.vars_replace(parsed_data)
+        parsed_data = var_extractor.vars_replace(parsed_data)
 
         # 日志记录请求数据
         if log_data:
