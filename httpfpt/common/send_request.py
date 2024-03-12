@@ -139,7 +139,7 @@ class SendRequests:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
-        log.info('开始解析请求数据...' if not relate_log else '开始解析关联请求数据...')
+        log.info('开始解析用例数据...' if not relate_log else '开始解析关联用例数据...')
         try:
             request_data_parse = RequestDataParse(request_data, request_engin)
             parsed_data = request_data_parse.get_request_data_parsed(relate_log)
@@ -147,9 +147,9 @@ class SendRequests:
             raise e
         except Exception as e:
             if not relate_log:
-                log.error(f'请求数据解析失败: {e}')
+                log.error(f'用例数据解析失败: {e}')
             raise e
-        log.info('请求数据解析完成' if not relate_log else '关联请求数据解析完成')
+        log.info('用例数据解析完成' if not relate_log else '关联用例数据解析完成')
 
         # 记录请求前置数据; 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         setup = parsed_data['setup']
@@ -179,6 +179,9 @@ class SendRequests:
                 log.error(f'请求前置处理异常: {e}')
                 raise e
             log.info('请求前置处理完成')
+
+        # 确保用例数据变量已全部替换
+        var_extractor.vars_replace(parsed_data)
 
         # 日志记录请求数据
         if log_data:

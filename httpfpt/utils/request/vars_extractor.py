@@ -29,12 +29,13 @@ class VarsExtractor:
         # SQL 变量语法: :{var} 或 :var
         self.sql_vars_re = re.compile(r':{([a-zA-Z_]\w*)}|(?<!\S):([a-zA-Z_]\w*)(?!\S)')
 
-    def vars_replace(self, target: dict, env_filename: str | None = None) -> dict:
+    def vars_replace(self, target: dict, env: str | None = None, exception: bool = True) -> dict:
         """
         变量替换
 
         :param target:
-        :param env_filename:
+        :param env:
+        :param exception:
         :return:
         """
         str_target = json.dumps(target, ensure_ascii=False)
@@ -44,11 +45,11 @@ class VarsExtractor:
             return target
 
         # 获取环境名称
-        env = env_filename or target.get('config', {}).get('request', {}).get('env')
-        if not env or not isinstance(env, str):
+        _env = env or target.get('config', {}).get('request', {}).get('env')
+        if not _env or not isinstance(_env, str):
             raise RequestDataParseError('运行环境获取失败, 测试用例数据缺少 config:request:env 参数')
         try:
-            env_file = os.path.join(RUN_ENV_PATH, env)
+            env_file = os.path.join(RUN_ENV_PATH, _env)
             env_vars = get_env_dict(env_file)
         except OSError:
             raise RequestDataParseError('运行环境获取失败, 请检查测试用例环境配置')
@@ -57,7 +58,7 @@ class VarsExtractor:
         global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
 
         # 获取 re 规则字符串
-        var_re = self.sql_vars_re if env_filename else self.vars_re
+        var_re = self.sql_vars_re if env else self.vars_re
         for match in var_re.finditer(str_target):
             var_key = match.group(1) or match.group(2)
             if var_key is not None:
@@ -70,7 +71,7 @@ class VarsExtractor:
                     if cache_value == default:
                         var_value = env_vars.get(var_key.upper(), global_vars.get(var_key, default))
                         if var_value != default:
-                            if env_filename is not None:
+                            if env is not None:
                                 log_type = 'SQL '
                             str_target = var_re.sub(str(var_value), str_target, 1)
                             log.info(f'{log_type}变量 {var_key} 替换完成')
@@ -80,7 +81,8 @@ class VarsExtractor:
                         str_target = var_re.sub(str(cache_value), str_target, 1)
                         log.info(f'{log_type}变量 {var_key} 替换完成')
                 except Exception as e:
-                    raise VariableError(f'{log_type}变量 {var_key} 替换失败: {e}')
+                    if exception:
+                        raise VariableError(f'{log_type}变量 {var_key} 替换失败: {e}')
 
         dict_target = json.loads(str_target)
 
