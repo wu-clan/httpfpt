@@ -65,15 +65,15 @@ class VarsExtractor:
                         var_value = env_vars.get(var_key.upper(), global_vars.get(var_key, default))
                         if var_value != default:
                             str_target = var_re.sub(str(var_value), str_target, 1)
-                            log.info(f'请求数据变量 {var_key} 替换完成')
+                            log.info(f'用例数据变量 {var_key} 替换完成')
                         else:
                             raise VariableError(var_key)
                     else:
                         str_target = var_re.sub(str(cache_value), str_target, 1)
-                        log.info(f'请求数据变量 {var_key} 替换完成')
+                        log.info(f'用例数据变量 {var_key} 替换完成')
                 except Exception as e:
                     if exception:
-                        raise VariableError(f'请求数据变量 {var_key} 替换失败: {e}')
+                        raise VariableError(f'用例数据变量 {var_key} 替换失败: {e}')
 
         dict_target = json.loads(str_target)
 
@@ -103,11 +103,11 @@ class VarsExtractor:
                 if cache_value != default:
                     try:
                         str_target = self.relate_vars_re.sub(str(cache_value), str_target, 1)
-                        log.info(f'请求数据关联变量 {var_key} 替换完成')
+                        log.info(f'用例数据关联变量 {var_key} 替换完成')
                     except Exception as e:
-                        raise VariableError(f'请求数据关联变量 {var_key} 替换失败: {e}')
+                        raise VariableError(f'用例数据关联变量 {var_key} 替换失败: {e}')
                 else:
-                    raise VariableError(f'请求数据关联变量替换失败，临时变量池不存在变量: "{var_key}"')
+                    raise VariableError(f'用例数据关联变量替换失败，临时变量池不存在变量: "{var_key}"')
 
         log.info('关联测试用例变量替换完毕')
         # TODO: https://github.com/StKali/cache3/issues/18

@@ -213,9 +213,13 @@ class SendRequests:
                 request_data_parsed.update({'content': request_data_parsed.pop('body')})
         else:
             request_data_parsed.update({'data': request_data_parsed.pop('body')})
+        try:
+            request_data_parsed = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])
+        except Exception as e:
+            log.error(e)
+            raise e
 
         # 发送请求
-        request_data_parsed = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])
         response_data = self.init_response_metadata
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
