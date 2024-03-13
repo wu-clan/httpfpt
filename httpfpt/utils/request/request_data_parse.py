@@ -39,7 +39,10 @@ def _error_msg(info: str) -> str:
 
 class RequestDataParse:
     def __init__(self, request_data: dict, request_engin: str):
-        self.request_data = var_extractor.vars_replace(hook_executor.hook_func_value_replace(request_data))
+        self.request_data = var_extractor.vars_replace(
+            hook_executor.hook_func_value_replace(request_data),
+            exception=False,
+        )
         self.request_engin = request_engin
         self._is_run()  # put bottom
 

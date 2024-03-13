@@ -10,20 +10,14 @@ from typing import Any
 import pymysql
 
 from dbutils.pooled_db import PooledDB
-from jsonpath import findall
 
-from httpfpt.common.env_handler import write_env_vars
-from httpfpt.common.errors import JsonPathFindError, SQLSyntaxError, VariableError
+from httpfpt.common.errors import SQLSyntaxError
 from httpfpt.common.log import log
-from httpfpt.common.variable_cache import variable_cache
-from httpfpt.common.yaml_handler import write_yaml_vars
 from httpfpt.core.get_conf import config
-from httpfpt.core.path_conf import RUN_ENV_PATH
 from httpfpt.enums.query_fetch_type import QueryFetchType
 from httpfpt.enums.sql_type import SqlType
-from httpfpt.enums.var_type import VarType
 from httpfpt.utils.enum_control import get_enum_values
-from httpfpt.utils.request.vars_extractor import var_extractor
+from httpfpt.utils.request.vars_recorder import record_variables
 
 
 class MysqlDB:
@@ -134,18 +128,16 @@ class MysqlDB:
         finally:
             self.close(conn, cursor)
 
-    def exec_case_sql(self, sql: str, env_filename: str | None = None) -> dict | list | int | None:
+    def exec_case_sql(self, sql: str, env: str | None = None) -> dict | list | int | None:
         """
         执行用例 sql
 
         :param sql:
-        :param env_filename:
+        :param env:
         :return:
         """
         # 获取返回数据
         if isinstance(sql, str):
-            if env_filename is not None:
-                sql = var_extractor.vars_replace({'sql': sql}, env_filename)['sql']
             log.info(f'执行 SQL: {sql}')
             if sql.startswith(SqlType.select):
                 return self.query(sql)
@@ -159,25 +151,10 @@ class MysqlDB:
             set_type = sql['type']
             sql_text = sql['sql']
             json_path = sql['jsonpath']
-            if env_filename is not None:
-                sql_text = var_extractor.vars_replace({'sql': sql_text}, env_filename)['sql']
             query_data = self.query(sql_text)
             if not query_data:
                 raise SQLSyntaxError('变量提取失败，SQL 查询结果为空')
-            value = findall(json_path, query_data)
-            if not value:
-                raise JsonPathFindError(f'jsonpath 取值失败, 表达式: {json_path}')
-            value_str = str(value[0])
-            if set_type == VarType.CACHE:
-                variable_cache.set(key, value_str)
-            elif set_type == VarType.ENV:
-                write_env_vars(RUN_ENV_PATH, env_filename, key, value_str)  # type: ignore
-            elif set_type == VarType.GLOBAL:
-                write_yaml_vars({key: value_str})
-            else:
-                raise VariableError(
-                    f'前置 SQL 设置变量失败, 用例参数 "type: {set_type}" 值错误, 请使用 cache / env / global'
-                )
+            record_variables(json_path, query_data, key, set_type, env)  # type: ignore
 
     @staticmethod
     def sql_verify(sql: str) -> None:

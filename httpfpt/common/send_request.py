@@ -139,7 +139,7 @@ class SendRequests:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎')
 
         # 获取解析后的请求数据
-        log.info('开始解析请求数据...' if not relate_log else '开始解析关联请求数据...')
+        log.info('开始解析用例数据...' if not relate_log else '开始解析关联用例数据...')
         try:
             request_data_parse = RequestDataParse(request_data, request_engin)
             parsed_data = request_data_parse.get_request_data_parsed(relate_log)
@@ -147,9 +147,9 @@ class SendRequests:
             raise e
         except Exception as e:
             if not relate_log:
-                log.error(f'请求数据解析失败: {e}')
+                log.error(f'用例数据解析失败: {e}')
             raise e
-        log.info('请求数据解析完成' if not relate_log else '关联请求数据解析完成')
+        log.info('用例数据解析完成' if not relate_log else '关联用例数据解析完成')
 
         # 记录请求前置数据; 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         setup = parsed_data['setup']
@@ -169,7 +169,8 @@ class SendRequests:
                                 if relate_parsed_data:
                                     parsed_data = relate_parsed_data
                             elif key == SetupType.SQL:
-                                mysql_client.exec_case_sql(value, parsed_data['env'])
+                                sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])['sql']
+                                mysql_client.exec_case_sql(sql, parsed_data['env'])
                             elif key == SetupType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             elif key == SetupType.WAIT_TIME:
@@ -212,6 +213,11 @@ class SendRequests:
                 request_data_parsed.update({'content': request_data_parsed.pop('body')})
         else:
             request_data_parsed.update({'data': request_data_parsed.pop('body')})
+        try:
+            request_data_parsed = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])
+        except Exception as e:
+            log.error(e)
+            raise e
 
         # 发送请求
         response_data = self.init_response_metadata
@@ -255,13 +261,17 @@ class SendRequests:
                     for key, value in item.items():
                         if value is not None:
                             if key == TeardownType.SQL:
-                                mysql_client.exec_case_sql(value, parsed_data['env'])
+                                sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])['sql']
+                                mysql_client.exec_case_sql(sql, parsed_data['env'])
                             if key == TeardownType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             if key == TeardownType.EXTRACT:
                                 var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
                             if key == TeardownType.ASSERT:
-                                asserter.exec_asserter(response_data, assert_text=value)
+                                assert_text = var_extractor.vars_replace(
+                                    target={'assert_text': value}, env=parsed_data['env']
+                                )['assert_text']
+                                asserter.exec_asserter(response_data, assert_text)
                             elif key == TeardownType.WAIT_TIME:
                                 log.info(f'执行请求后等待：{value} s')
                                 time.sleep(value)
