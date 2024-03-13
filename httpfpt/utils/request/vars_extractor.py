@@ -25,11 +25,12 @@ class VarsExtractor:
         # 关联变量表达: ^{var} 或 ^var
         self.relate_vars_re = re.compile(r'\^{([a-zA-Z_]\w*)}|(?<!\S)\^([a-zA-Z_]\w*)(?!\S)')
 
-    def vars_replace(self, target: dict, exception: bool = True) -> dict:
+    def vars_replace(self, target: dict, env: str | None = None, exception: bool = True) -> dict:
         """
         变量替换
 
         :param target:
+        :param env:
         :param exception:
         :return:
         """
@@ -40,7 +41,7 @@ class VarsExtractor:
             return target
 
         # 获取环境名称
-        _env = target.get('config', {}).get('request', {}).get('env')
+        _env = env or target.get('config', {}).get('request', {}).get('env')
         if not _env or not isinstance(_env, str):
             raise RequestDataParseError('运行环境获取失败, 测试用例数据缺少 config:request:env 参数')
         try:
