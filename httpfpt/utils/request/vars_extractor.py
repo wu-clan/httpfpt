@@ -62,7 +62,6 @@ class VarsExtractor:
                     cache_value = variable_cache.get(var_key, default=default)
                     if cache_value == default:
                         global_vars = read_yaml(httpfpt_path.data_dir, filename='global_vars.yaml')
-                        global_vars = read_yaml(httpfpt_path.data_dir, filename='global_vars.yaml')
                         var_value = env_vars.get(var_key.upper(), global_vars.get(var_key, default))
                         if var_value != default:
                             str_target = var_re.sub(str(var_value), str_target, 1)
