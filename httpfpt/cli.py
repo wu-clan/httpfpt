@@ -2,18 +2,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import os
-import sys
-
 from dataclasses import dataclass
 
 import cappa
 
 from cappa import Subcommands
 from typing_extensions import Annotated
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 from httpfpt.utils.cli.new_project import create_new_project
 from httpfpt.utils.cli.version import get_version

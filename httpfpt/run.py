@@ -5,13 +5,10 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
-import sys
 
 from typing import Literal
 
 import pytest
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml

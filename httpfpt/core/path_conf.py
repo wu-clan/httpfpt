@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import os
 
+from functools import lru_cache
+
 from httpfpt.common.errors import ConfigInitError
 
 __all__ = ['httpfpt_path']
@@ -34,14 +36,14 @@ class HttpFptPathConfig:
         return os.path.join(self.project_dir, 'log')
 
     @property
-    def data_path(self) -> str:
+    def data_dir(self) -> str:
         """数据路径"""
         return os.path.join(self.project_dir, 'data')
 
     @property
     def case_data_dir(self) -> str:
         """用例数据路径"""
-        return os.path.join(self.data_path, 'test_data')
+        return os.path.join(self.data_dir, 'test_data')
 
     @property
     def report_dir(self) -> str:
@@ -94,10 +96,14 @@ class HttpFptPathConfig:
         return os.path.join(self.project_dir, 'core')
 
     @property
-    def settings_file_file(self) -> str:
+    def settings_dir(self) -> str:
         """核心配置文件路径"""
-        return os.path.join(self.project_dir, 'core', 'conf.toml')
+        return self.auth_conf_dir
 
 
-# global path_config
-httpfpt_path = HttpFptPathConfig()
+@lru_cache(maxsize=None)
+def cache_httpfpt_path() -> HttpFptPathConfig:
+    return HttpFptPathConfig()
+
+
+httpfpt_path = cache_httpfpt_path()

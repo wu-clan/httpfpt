@@ -55,7 +55,7 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.urls]
-homepage = "https://github.com/wu-clan/httpfpt"
+homepage = "https://wu-clan.github.io/httpfpt_docs/"
 repository = "https://github.com/wu-clan/httpfpt"
 
 [tool.pdm]

@@ -2,19 +2,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+from functools import lru_cache
+
 from glom import glom
 
 from httpfpt.common.errors import ConfigInitError
+from httpfpt.common.toml_handler import read_toml
 from httpfpt.core.path_conf import httpfpt_path
 
 __all__ = ['httpfpt_config']
 
 
 class HttpFptConfig:
-    def __call__(self) -> HttpFptConfig:
-        from httpfpt.common.toml_handler import read_toml
-
-        self.settings = read_toml(httpfpt_path.settings_file_file)
+    def __init__(self) -> None:
+        self.settings = read_toml(httpfpt_path.settings_dir, 'conf.toml')
         try:
             # 项目目录名
             self.PROJECT_NAME = glom(self.settings, 'project.name')
@@ -107,10 +108,10 @@ class HttpFptConfig:
         except KeyError as e:
             raise ConfigInitError(f'配置解析失败：缺失参数 {str(e)}，请核对配置文件或字典')
 
-        return self
+
+@lru_cache(maxsize=None)
+def cache_httpfpt_config() -> HttpFptConfig:
+    return HttpFptConfig()
 
 
-set_httpfpt_config = HttpFptConfig()
-
-# global config
-httpfpt_config = set_httpfpt_config()
+httpfpt_config = cache_httpfpt_config()
