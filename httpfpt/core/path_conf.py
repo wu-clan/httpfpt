@@ -4,6 +4,8 @@ import os
 
 from functools import lru_cache
 
+__all__ = ['httpfpt_path']
+
 
 class HttpFptPathConfig:
     @property

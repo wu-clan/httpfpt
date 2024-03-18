@@ -73,7 +73,10 @@ def startup(
         if not os.path.exists(httpfpt_path.html_report_dir):
             os.makedirs(httpfpt_path.html_report_dir)
         run_args.extend(
-            (f'--html={os.path.join(httpfpt_path.html_report_dir, html_report_filename)}', '--self-contained-html')
+            (
+                f'--html={os.path.join(httpfpt_path.html_report_dir, html_report_filename)}',
+                '--self-contained-html',
+            )
         )
 
     if allure:
