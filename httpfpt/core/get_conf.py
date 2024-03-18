@@ -106,7 +106,7 @@ class HttpFptConfig:
             }
             self.REQUEST_RETRY = glom(self.settings, 'request.retry')
         except KeyError as e:
-            raise ConfigInitError(f'配置解析失败：缺失参数 {str(e)}，请核对配置文件或字典')
+            raise ConfigInitError(f'配置解析失败：缺失参数 {str(e)}，请核对项目配置文件')
 
 
 @lru_cache(maxsize=None)
