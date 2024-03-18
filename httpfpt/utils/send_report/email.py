@@ -14,7 +14,7 @@ from jinja2 import Template
 
 from httpfpt.common.log import log
 from httpfpt.core.get_conf import httpfpt_config
-from httpfpt.core.path_conf import HTML_EMAIL_REPORT_PATH
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.enums.email_type import EmailType
 from httpfpt.utils.file_control import get_file_property
 
@@ -36,7 +36,7 @@ class SendEmail:
         self.content.update({'tester_name': httpfpt_config.TESTER_NAME})
 
         # 邮件正文
-        with open(os.path.join(HTML_EMAIL_REPORT_PATH, 'email_report.html'), 'r', encoding='utf-8') as f:
+        with open(os.path.join(httpfpt_path.html_email_report_dir, 'email_report.html'), 'r', encoding='utf-8') as f:
             html = Template(f.read())
 
         mail_body = MIMEText(html.render(**self.content), _subtype='html', _charset='utf-8')
@@ -64,7 +64,9 @@ class SendEmail:
         msg['date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
 
         # 邮件正文
-        with open(os.path.join(HTML_EMAIL_REPORT_PATH, 'email_notification.html'), 'r', encoding='utf-8') as f:
+        with open(
+            os.path.join(httpfpt_path.html_email_report_dir, 'email_notification.html'), 'r', encoding='utf-8'
+        ) as f:
             html = Template(f.read())
 
         mail_body = MIMEText(html.render(**self.content), _subtype='html', _charset='utf-8')

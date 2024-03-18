@@ -16,15 +16,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.get_conf import httpfpt_config
-from httpfpt.core.path_conf import (
-    ALLURE_ENV_FILE,
-    ALLURE_REPORT_ENV_FILE,
-    ALLURE_REPORT_HTML_PATH,
-    ALLURE_REPORT_PATH,
-    HTML_REPORT_PATH,
-    TEST_CASE_PATH,
-    YAML_REPORT_PATH,
-)
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.redis_db import redis_client
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
 from httpfpt.utils.request import case_data_parse as case_data
@@ -57,7 +49,7 @@ def startup(
 
     run_args = [log_level]
 
-    default_case_path = os.sep.join([TEST_CASE_PATH, httpfpt_config.PROJECT_NAME])
+    default_case_path = os.sep.join([httpfpt_path.testcase_dir, httpfpt_config.PROJECT_NAME])
     if case_path:
         if '::' not in case_path:
             raise ValueError(
@@ -78,12 +70,14 @@ def startup(
 
     html_report_filename = f'{httpfpt_config.PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
     if html_report:
-        if not os.path.exists(HTML_REPORT_PATH):
-            os.makedirs(HTML_REPORT_PATH)
-        run_args.extend((f'--html={os.path.join(HTML_REPORT_PATH, html_report_filename)}', '--self-contained-html'))
+        if not os.path.exists(httpfpt_path.html_report_dir):
+            os.makedirs(httpfpt_path.html_report_dir)
+        run_args.extend(
+            (f'--html={os.path.join(httpfpt_path.html_report_dir, html_report_filename)}', '--self-contained-html')
+        )
 
     if allure:
-        run_args.append(f'--alluredir={ALLURE_REPORT_PATH}')
+        run_args.append(f'--alluredir={httpfpt_path.allure_report_dir}')
         if allure_clear:
             run_args.append('--clean-alluredir')
 
@@ -131,9 +125,9 @@ def startup(
     pytest.main(run_args)
     log.info('🏁 FINISH')
 
-    yaml_report_files = os.listdir(YAML_REPORT_PATH)
+    yaml_report_files = os.listdir(httpfpt_path.yaml_report_dir)
     yaml_report_files.sort()
-    test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
+    test_result = read_yaml(httpfpt_path.yaml_report_dir, filename=yaml_report_files[-1])
 
     if html_report and httpfpt_config.EMAIL_SEND:
         SendEmail(test_result, html_report_filename).send_report()
@@ -148,12 +142,14 @@ def startup(
         WeChat(test_result).send()
 
     if allure:
-        if not os.path.exists(ALLURE_REPORT_ENV_FILE):
-            shutil.copyfile(ALLURE_ENV_FILE, ALLURE_REPORT_ENV_FILE)
+        if not os.path.exists(httpfpt_path.allure_report_env_file):
+            shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
 
         if allure_serve:
-            subprocess.run(f'allure generate {ALLURE_REPORT_PATH} -o {ALLURE_REPORT_HTML_PATH} --clean')
-            subprocess.run(f'allure serve {ALLURE_REPORT_PATH}')
+            subprocess.run(
+                f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} --clean'
+            )
+            subprocess.run(f'allure serve {httpfpt_path.allure_report_dir}')
 
 
 def run(

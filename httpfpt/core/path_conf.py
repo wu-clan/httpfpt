@@ -2,46 +2,89 @@
 # -*- coding: utf-8 -*-
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+from functools import lru_cache
 
-# 获取日志路径
-LOG_PATH = os.path.join(BASE_DIR, 'log')
 
-# 测试数据路径
-TEST_DATA_PATH = os.path.join(BASE_DIR, 'data')
+class HttpFptPathConfig:
+    @property
+    def project_dir(self) -> str:
+        _base_dir = os.path.dirname(os.path.dirname(__file__))
+        return _base_dir
 
-# Yaml测试数据路径
-CASE_DATA_PATH = os.path.join(TEST_DATA_PATH, 'test_data')
+    @property
+    def log_dir(self) -> str:
+        """日志路径"""
+        return os.path.join(self.project_dir, 'log')
 
-# 测试报告路径
-TEST_REPORT_PATH = os.path.join(BASE_DIR, 'report')
+    @property
+    def data_dir(self) -> str:
+        """数据路径"""
+        return os.path.join(self.project_dir, 'data')
 
-# allure测试报告路径
-ALLURE_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'allure_report')
+    @property
+    def case_data_dir(self) -> str:
+        """用例数据路径"""
+        return os.path.join(self.data_dir, 'test_data')
 
-# allure html测试报告路径
-ALLURE_REPORT_HTML_PATH = os.path.join(ALLURE_REPORT_PATH, 'html')
+    @property
+    def report_dir(self) -> str:
+        """测试报告路径"""
+        return os.path.join(self.project_dir, 'report')
 
-# HTML测试报告路径
-HTML_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'html_report')
+    @property
+    def allure_report_dir(self) -> str:
+        """allure测试报告路径"""
+        return os.path.join(self.report_dir, 'allure_report')
 
-# HTML测试报告路径
-HTML_EMAIL_REPORT_PATH = os.path.join(BASE_DIR, 'templates')
+    @property
+    def allure_html_report_dir(self) -> str:
+        """allure html测试报告路径"""
+        return os.path.join(self.allure_report_dir, 'html')
 
-# YAML测试报告路径
-YAML_REPORT_PATH = os.path.join(TEST_REPORT_PATH, 'yaml_report')
+    @property
+    def html_report_dir(self) -> str:
+        """HTML测试报告路径"""
+        return os.path.join(self.report_dir, 'html_report')
 
-# allure环境文件
-ALLURE_ENV_FILE = os.path.join(BASE_DIR, 'core', 'allure_env', 'environment.properties')
+    @property
+    def html_email_report_dir(self) -> str:
+        """html邮箱报告路径"""
+        return os.path.join(self.project_dir, 'templates')
 
-# allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失
-ALLURE_REPORT_ENV_FILE = os.path.join(ALLURE_REPORT_PATH, 'environment.properties')
+    @property
+    def yaml_report_dir(self) -> str:
+        """YAML测试报告路径"""
+        return os.path.join(self.report_dir, 'yaml_report')
 
-# 运行环境文件路径
-RUN_ENV_PATH = os.path.join(BASE_DIR, 'core', 'run_env')
+    @property
+    def allure_env_file(self) -> str:
+        """allure环境文件"""
+        return os.path.join(self.project_dir, 'core', 'allure_env', 'environment.properties')
 
-# 测试用例路径
-TEST_CASE_PATH = os.path.join(BASE_DIR, 'testcases')
+    @property
+    def allure_report_env_file(self) -> str:
+        """allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失"""
+        return os.path.join(self.allure_report_dir, 'environment.properties')
 
-# AUTH配置文件路径
-AUTH_CONF_PATH = os.path.join(BASE_DIR, 'core')
+    @property
+    def run_env_dir(self) -> str:
+        """运行环境文件路径"""
+        return os.path.join(self.project_dir, 'core', 'run_env')
+
+    @property
+    def testcase_dir(self) -> str:
+        """测试用例路径"""
+        return os.path.join(self.project_dir, 'testcases')
+
+    @property
+    def auth_conf_dir(self) -> str:
+        """AUTH配置文件路径"""
+        return os.path.join(self.project_dir, 'core')
+
+
+@lru_cache(maxsize=None)
+def cache_httpfpt_path() -> HttpFptPathConfig:
+    return HttpFptPathConfig()
+
+
+httpfpt_path = cache_httpfpt_path()

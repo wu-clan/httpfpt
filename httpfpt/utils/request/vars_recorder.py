@@ -6,7 +6,7 @@ from httpfpt.common.env_handler import write_env_vars
 from httpfpt.common.errors import JsonPathFindError, VariableError
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import write_yaml_vars
-from httpfpt.core.path_conf import RUN_ENV_PATH
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.enums.var_type import VarType
 
 
@@ -28,7 +28,7 @@ def record_variables(jsonpath: str, target: dict, key: str, set_type: str, env: 
     if set_type == VarType.CACHE:
         variable_cache.set(key, value_str)
     elif set_type == VarType.ENV:
-        write_env_vars(RUN_ENV_PATH, env, key, value_str)
+        write_env_vars(httpfpt_path.run_env_dir, env, key, value_str)
     elif set_type == VarType.GLOBAL:
         write_yaml_vars({key: value_str})
     else:

@@ -8,7 +8,7 @@ import os.path
 from pathlib import Path
 
 from httpfpt.core.get_conf import httpfpt_config
-from httpfpt.core.path_conf import CASE_DATA_PATH, TEST_CASE_PATH
+from httpfpt.core.path_conf import httpfpt_path
 
 
 def get_file_property(filepath: str) -> tuple[str, str, str]:
@@ -32,7 +32,7 @@ def search_all_case_data_files(filepath: str | None = None) -> list:
     :return:
     """
     case_data_filepath = (
-        os.path.join(CASE_DATA_PATH, f'{httpfpt_config.PROJECT_NAME}') if filepath is None else filepath
+        os.path.join(httpfpt_path.case_data_dir, f'{httpfpt_config.PROJECT_NAME}') if filepath is None else filepath
     )
     files = (
         glob.glob(os.path.join(case_data_filepath, '**', '*.yaml'), recursive=True)
@@ -48,7 +48,9 @@ def search_all_testcase_files() -> list:
 
     :return:
     """
-    files = glob.glob(os.path.join(TEST_CASE_PATH, f'{httpfpt_config.PROJECT_NAME}', '**', 'test_*.py'), recursive=True)
+    files = glob.glob(
+        os.path.join(httpfpt_path.testcase_dir, f'{httpfpt_config.PROJECT_NAME}', '**', 'test_*.py'), recursive=True
+    )
     return files
 
 

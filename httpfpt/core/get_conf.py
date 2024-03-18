@@ -8,7 +8,7 @@ from glom import glom
 from httpfpt.common.toml_handler import read_toml
 
 
-class Config:
+class HttpFptConfig:
     def __init__(self) -> None:
         self._config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
 
@@ -103,8 +103,8 @@ class Config:
 
 
 @lru_cache(maxsize=None)
-def cache_config() -> Config:
-    return Config()
+def cache_httpfpt_config() -> HttpFptConfig:
+    return HttpFptConfig()
 
 
-httpfpt_config = cache_config()
+httpfpt_config = cache_httpfpt_config()
