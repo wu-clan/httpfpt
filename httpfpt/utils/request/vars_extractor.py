@@ -11,7 +11,7 @@ from httpfpt.common.errors import RequestDataParseError, VariableError
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.path_conf import RUN_ENV_PATH, TEST_DATA_PATH
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.utils.request.vars_recorder import record_variables
 
 
@@ -45,7 +45,7 @@ class VarsExtractor:
         if not _env or not isinstance(_env, str):
             raise RequestDataParseError('运行环境获取失败, 测试用例数据缺少 config:request:env 参数')
         try:
-            env_file = os.path.join(RUN_ENV_PATH, _env)
+            env_file = os.path.join(httpfpt_path.run_env_dir, _env)
             env_vars = get_env_dict(env_file)
         except OSError:
             raise RequestDataParseError('运行环境获取失败, 请检查测试用例环境配置')
@@ -61,7 +61,7 @@ class VarsExtractor:
                     # 替换: 临时变量 > 环境变量 > 全局变量
                     cache_value = variable_cache.get(var_key, default=default)
                     if cache_value == default:
-                        global_vars = read_yaml(TEST_DATA_PATH, filename='global_vars.yaml')
+                        global_vars = read_yaml(httpfpt_path.data_dir, filename='global_vars.yaml')
                         var_value = env_vars.get(var_key.upper(), global_vars.get(var_key, default))
                         if var_value != default:
                             str_target = var_re.sub(str(var_value), str_target, 1)

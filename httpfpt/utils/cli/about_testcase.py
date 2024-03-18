@@ -9,8 +9,8 @@ from rich.prompt import Confirm
 
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import config
-from httpfpt.core.path_conf import CASE_DATA_PATH
+from httpfpt.core.get_conf import httpfpt_config
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.enums.case_data_type import CaseDataType
 from httpfpt.schemas.case_data import CaseData
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
@@ -37,7 +37,7 @@ def testcase_data_verify(verify: str) -> None:
             console.print(f'🔥 开始验证 {verify} 测试数据结构...')
             file_type = get_file_property(verify)[2]
             if os.path.isfile(verify):
-                data_path = os.path.join(CASE_DATA_PATH, config.PROJECT_NAME)
+                data_path = os.path.join(httpfpt_path.case_data_dir, httpfpt_config.PROJECT_NAME)
                 if file_type == CaseDataType.JSON:
                     file_data = read_json_file(str(data_path), verify)
                 else:

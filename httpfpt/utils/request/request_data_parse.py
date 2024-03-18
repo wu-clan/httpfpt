@@ -15,7 +15,7 @@ from dirty_equals import IsUrl
 from httpfpt.common.env_handler import get_env_dict
 from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
-from httpfpt.core.path_conf import RUN_ENV_PATH
+from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.mysql_db import mysql_client
 from httpfpt.enums.allure_severity_type import SeverityType
 from httpfpt.enums.request.auth import AuthType
@@ -334,7 +334,7 @@ class RequestDataParse:
             if not url.startswith('http'):
                 _env = self.env
                 try:
-                    env_file = os.path.join(RUN_ENV_PATH, _env)
+                    env_file = os.path.join(httpfpt_path.run_env_dir, _env)
                     env_dict = get_env_dict(env_file)
                 except Exception as e:
                     raise RequestDataParseError(f'环境变量 {_env} 读取失败: {e}')

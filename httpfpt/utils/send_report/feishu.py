@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from httpfpt.common.log import log
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 
 
 class FeiShu:
@@ -19,9 +19,9 @@ class FeiShu:
                 'content': {
                     'post': {
                         'zh_cn': {
-                            'title': config.TEST_REPORT_TITLE,
+                            'title': httpfpt_config.TEST_REPORT_TITLE,
                             'content': [
-                                [{'tag': 'text', 'text': f'👤 测试人员: {config.TESTER_NAME}'}],
+                                [{'tag': 'text', 'text': f'👤 测试人员: {httpfpt_config.TESTER_NAME}'}],
                                 [{'tag': 'text', 'text': f"🤖 测试结果: {self.content['result']}"}],
                                 [{'tag': 'text', 'text': f"✅ 通过用例: {self.content['passed']}"}],
                                 [{'tag': 'text', 'text': f"🔧 失败用例: {self.content['failed']}"}],
@@ -36,10 +36,10 @@ class FeiShu:
                 },
             }
             response = requests.session().post(
-                url=config.FEISHU_WEBHOOK,
+                url=httpfpt_config.FEISHU_WEBHOOK,
                 json=data,
                 headers=headers,
-                proxies=config.FEISHU_PROXY,  # type: ignore
+                proxies=httpfpt_config.FEISHU_PROXY,  # type: ignore
             )
             response.raise_for_status()
         except Exception as e:
