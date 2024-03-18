@@ -10,96 +10,96 @@ from httpfpt.common.toml_handler import read_toml
 
 class HttpFptConfig:
     def __init__(self) -> None:
-        self._config = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
+        self.settings = read_toml(str(Path(__file__).resolve().parent), 'conf.toml')
 
         # 项目目录名
-        self.PROJECT_NAME = glom(self._config, 'project.name')
+        self.PROJECT_NAME = glom(self.settings, 'project.name')
 
         # 测试报告
-        self.TEST_REPORT_TITLE = glom(self._config, 'report.title')
-        self.TESTER_NAME = glom(self._config, 'report.tester_name')
+        self.TEST_REPORT_TITLE = glom(self.settings, 'report.title')
+        self.TESTER_NAME = glom(self.settings, 'report.tester_name')
 
         # mysql 数据库
-        self.MYSQL_HOST = glom(self._config, 'mysql.host')
-        self.MYSQL_PORT = glom(self._config, 'mysql.port')
-        self.MYSQL_USER = glom(self._config, 'mysql.user')
-        self.MYSQL_PASSWORD = glom(self._config, 'mysql.password')
-        self.MYSQL_DATABASE = glom(self._config, 'mysql.database')
-        self.MYSQL_CHARSET = glom(self._config, 'mysql.charset')
+        self.MYSQL_HOST = glom(self.settings, 'mysql.host')
+        self.MYSQL_PORT = glom(self.settings, 'mysql.port')
+        self.MYSQL_USER = glom(self.settings, 'mysql.user')
+        self.MYSQL_PASSWORD = glom(self.settings, 'mysql.password')
+        self.MYSQL_DATABASE = glom(self.settings, 'mysql.database')
+        self.MYSQL_CHARSET = glom(self.settings, 'mysql.charset')
 
         # redis 数据库
-        self.REDIS_HOST = glom(self._config, 'redis.host')
-        self.REDIS_PORT = glom(self._config, 'redis.port')
-        self.REDIS_PASSWORD = glom(self._config, 'redis.password')
-        self.REDIS_DATABASE = glom(self._config, 'redis.database')
-        self.REDIS_TIMEOUT = glom(self._config, 'redis.timeout')
+        self.REDIS_HOST = glom(self.settings, 'redis.host')
+        self.REDIS_PORT = glom(self.settings, 'redis.port')
+        self.REDIS_PASSWORD = glom(self.settings, 'redis.password')
+        self.REDIS_DATABASE = glom(self.settings, 'redis.database')
+        self.REDIS_TIMEOUT = glom(self.settings, 'redis.timeout')
 
         # 邮件
-        self.EMAIL_SERVER = glom(self._config, 'email.host')
-        self.EMAIL_PORT = glom(self._config, 'email.port')
-        self.EMAIL_USER = glom(self._config, 'email.user')
-        self.EMAIL_PASSWORD = glom(self._config, 'email.password')
-        self.EMAIL_SEND_TO = glom(self._config, 'email.receiver')
-        self.EMAIL_SSL = glom(self._config, 'email.ssl')
-        self.EMAIL_SEND = glom(self._config, 'email.send')
+        self.EMAIL_SERVER = glom(self.settings, 'email.host')
+        self.EMAIL_PORT = glom(self.settings, 'email.port')
+        self.EMAIL_USER = glom(self.settings, 'email.user')
+        self.EMAIL_PASSWORD = glom(self.settings, 'email.password')
+        self.EMAIL_SEND_TO = glom(self.settings, 'email.receiver')
+        self.EMAIL_SSL = glom(self.settings, 'email.ssl')
+        self.EMAIL_SEND = glom(self.settings, 'email.send')
 
         # 钉钉
-        self.DINGDING_WEBHOOK = glom(self._config, 'dingding.webhook')
+        self.DINGDING_WEBHOOK = glom(self.settings, 'dingding.webhook')
         self.DINGDING_PROXY = {
-            'http': glom(self._config, 'dingding.proxies.http')
-            if glom(self._config, 'dingding.proxies.http') != ''
+            'http': glom(self.settings, 'dingding.proxies.http')
+            if glom(self.settings, 'dingding.proxies.http') != ''
             else None,
-            'https': glom(self._config, 'dingding.proxies.https')
-            if glom(self._config, 'dingding.proxies.https') != ''
+            'https': glom(self.settings, 'dingding.proxies.https')
+            if glom(self.settings, 'dingding.proxies.https') != ''
             else None,
         }
-        self.DINGDING_SEND = glom(self._config, 'dingding.send')
+        self.DINGDING_SEND = glom(self.settings, 'dingding.send')
 
         # 飞书
-        self.FEISHU_WEBHOOK = glom(self._config, 'feishu.webhook')
+        self.FEISHU_WEBHOOK = glom(self.settings, 'feishu.webhook')
         self.FEISHU_PROXY = {
-            'http': glom(self._config, 'feishu.proxies.http')
-            if glom(self._config, 'feishu.proxies.http') != ''
+            'http': glom(self.settings, 'feishu.proxies.http')
+            if glom(self.settings, 'feishu.proxies.http') != ''
             else None,
-            'https': glom(self._config, 'feishu.proxies.https')
-            if glom(self._config, 'feishu.proxies.https') != ''
+            'https': glom(self.settings, 'feishu.proxies.https')
+            if glom(self.settings, 'feishu.proxies.https') != ''
             else None,
         }
-        self.FEISHU_SEND = glom(self._config, 'feishu.send')
+        self.FEISHU_SEND = glom(self.settings, 'feishu.send')
 
         # 企业微信
-        self.WECHAT_WEBHOOK = glom(self._config, 'wechat.webhook')
+        self.WECHAT_WEBHOOK = glom(self.settings, 'wechat.webhook')
         self.WECHAT_PROXY = {
-            'http': glom(self._config, 'wechat.proxies.http')
-            if glom(self._config, 'wechat.proxies.http') != ''
+            'http': glom(self.settings, 'wechat.proxies.http')
+            if glom(self.settings, 'wechat.proxies.http') != ''
             else None,
-            'https': glom(self._config, 'wechat.proxies.https')
-            if glom(self._config, 'wechat.proxies.https') != ''
+            'https': glom(self.settings, 'wechat.proxies.https')
+            if glom(self.settings, 'wechat.proxies.https') != ''
             else None,
         }
-        self.WECHAT_SEND = glom(self._config, 'wechat.send')
+        self.WECHAT_SEND = glom(self.settings, 'wechat.send')
 
         # 请求发送
-        self.REQUEST_TIMEOUT = glom(self._config, 'request.timeout')
-        self.REQUEST_VERIFY = glom(self._config, 'request.verify')
-        self.REQUEST_REDIRECTS = glom(self._config, 'request.redirects')
+        self.REQUEST_TIMEOUT = glom(self.settings, 'request.timeout')
+        self.REQUEST_VERIFY = glom(self.settings, 'request.verify')
+        self.REQUEST_REDIRECTS = glom(self.settings, 'request.redirects')
         self.REQUEST_PROXIES_REQUESTS = {
-            'http': glom(self._config, 'request.proxies.http')
-            if glom(self._config, 'request.proxies.http') != ''
+            'http': glom(self.settings, 'request.proxies.http')
+            if glom(self.settings, 'request.proxies.http') != ''
             else None,
-            'https': glom(self._config, 'request.proxies.https')
-            if glom(self._config, 'request.proxies.https') != ''
+            'https': glom(self.settings, 'request.proxies.https')
+            if glom(self.settings, 'request.proxies.https') != ''
             else None,
         }
         self.REQUEST_PROXIES_HTTPX = {
-            'http://': glom(self._config, 'request.proxies.http')
-            if glom(self._config, 'request.proxies.http') != ''
+            'http://': glom(self.settings, 'request.proxies.http')
+            if glom(self.settings, 'request.proxies.http') != ''
             else None,
-            'https://': glom(self._config, 'request.proxies.https')
-            if glom(self._config, 'request.proxies.https') != ''
+            'https://': glom(self.settings, 'request.proxies.https')
+            if glom(self.settings, 'request.proxies.https') != ''
             else None,
         }
-        self.REQUEST_RETRY = glom(self._config, 'request.retry')
+        self.REQUEST_RETRY = glom(self.settings, 'request.retry')
 
 
 @lru_cache(maxsize=None)
