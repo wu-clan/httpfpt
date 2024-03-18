@@ -26,6 +26,7 @@ class AuthPlugins:
 
     @lru_cache
     def get_auth_data(self) -> dict:
+        """获取授权数据"""
         auth_data = read_yaml(httpfpt_path.auth_conf_dir, filename='auth.yaml')
         return auth_data
 

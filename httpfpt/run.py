@@ -148,11 +148,11 @@ def startup(
         if not os.path.exists(httpfpt_path.allure_report_env_file):
             shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
 
-    if allure_serve:
-        subprocess.run(
-            f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} --clean'
-        )
-        subprocess.run(f'allure serve {httpfpt_path.allure_report_dir}')
+        if allure_serve:
+            subprocess.run(
+                f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} --clean'
+            )
+            subprocess.run(f'allure serve {httpfpt_path.allure_report_dir}')
 
 
 def run(

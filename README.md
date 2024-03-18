@@ -81,3 +81,5 @@ pip install httpfpt
 ## 赞助
 
 如果此项目能够帮助到你，你可以赞助作者一些咖啡豆表示鼓励：[:coffee: Sponsor :coffee:](https://wu-clan.github.io/sponsor/)
+
+[![Stargazers over time](https://starchart.cc/wu-clan/httpfpt.svg?variant=adaptive)](https://starchart.cc/wu-clan/httpfpt)
