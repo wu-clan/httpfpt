@@ -13,7 +13,7 @@ from dbutils.pooled_db import PooledDB
 
 from httpfpt.common.errors import SQLSyntaxError
 from httpfpt.common.log import log
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.enums.query_fetch_type import QueryFetchType
 from httpfpt.enums.sql_type import SqlType
 from httpfpt.utils.enum_control import get_enum_values
@@ -24,12 +24,12 @@ class MysqlDB:
     def __init__(self) -> None:
         self._pool = PooledDB(
             pymysql,
-            host=config.MYSQL_HOST,
-            port=config.MYSQL_PORT,
-            user=config.MYSQL_USER,
-            password=config.MYSQL_PASSWORD,
-            database=config.MYSQL_DATABASE,
-            charset=config.MYSQL_CHARSET,
+            host=httpfpt_config.MYSQL_HOST,
+            port=httpfpt_config.MYSQL_PORT,
+            user=httpfpt_config.MYSQL_USER,
+            password=httpfpt_config.MYSQL_PASSWORD,
+            database=httpfpt_config.MYSQL_DATABASE,
+            charset=httpfpt_config.MYSQL_CHARSET,
             maxconnections=15,
             blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待
             autocommit=False,  # 是否自动提交

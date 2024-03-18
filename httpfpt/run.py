@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import (
     ALLURE_ENV_FILE,
     ALLURE_REPORT_ENV_FILE,
@@ -57,7 +57,7 @@ def startup(
 
     run_args = [log_level]
 
-    default_case_path = os.sep.join([TEST_CASE_PATH, config.PROJECT_NAME])
+    default_case_path = os.sep.join([TEST_CASE_PATH, httpfpt_config.PROJECT_NAME])
     if case_path:
         if '::' not in case_path:
             raise ValueError(
@@ -76,7 +76,7 @@ def startup(
         run_path = default_case_path
     run_args.append(run_path)
 
-    html_report_filename = f'{config.PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
+    html_report_filename = f'{httpfpt_config.PROJECT_NAME}_{get_current_time("%Y-%m-%d %H_%M_%S")}.html'
     if html_report:
         if not os.path.exists(HTML_REPORT_PATH):
             os.makedirs(HTML_REPORT_PATH)
@@ -123,7 +123,9 @@ def startup(
             format_run_args.append(i)
     run_pytest_command_args = ' '.join(_ for _ in format_run_args)
 
-    log.info(f'开始运行项目：{config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}')
+    log.info(
+        f'开始运行项目：{httpfpt_config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}'
+    )
     log.info(f'Pytest CLI: pytest {run_pytest_command_args}')
     log.info('🚀 START')
     pytest.main(run_args)
@@ -133,16 +135,16 @@ def startup(
     yaml_report_files.sort()
     test_result = read_yaml(YAML_REPORT_PATH, filename=yaml_report_files[-1])
 
-    if html_report and config.EMAIL_SEND:
+    if html_report and httpfpt_config.EMAIL_SEND:
         SendEmail(test_result, html_report_filename).send_report()
 
-    if config.DINGDING_SEND:
+    if httpfpt_config.DINGDING_SEND:
         DingDing(test_result).send()
 
-    if config.FEISHU_SEND:
+    if httpfpt_config.FEISHU_SEND:
         FeiShu(test_result).send()
 
-    if config.WECHAT_SEND:
+    if httpfpt_config.WECHAT_SEND:
         WeChat(test_result).send()
 
     if allure:

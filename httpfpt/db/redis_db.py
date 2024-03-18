@@ -7,17 +7,17 @@ from typing import Any
 from redis import AuthenticationError, Redis
 
 from httpfpt.common.log import log
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 
 
 class RedisDB(Redis):
     def __init__(self) -> None:
         super().__init__(
-            host=config.REDIS_HOST,
-            port=config.REDIS_PORT,
-            password=config.REDIS_PASSWORD,
-            db=config.REDIS_DATABASE,
-            socket_timeout=config.REDIS_TIMEOUT,
+            host=httpfpt_config.REDIS_HOST,
+            port=httpfpt_config.REDIS_PORT,
+            password=httpfpt_config.REDIS_PASSWORD,
+            db=httpfpt_config.REDIS_DATABASE,
+            socket_timeout=httpfpt_config.REDIS_TIMEOUT,
             decode_responses=True,  # 转码 utf-8
         )
         self.prefix = 'httpfpt'

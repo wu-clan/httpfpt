@@ -4,7 +4,7 @@ import os.path
 
 from pathlib import Path
 
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import TEST_CASE_PATH
 from httpfpt.utils.file_control import get_file_property, search_all_case_data_files, search_all_testcase_files
 from httpfpt.utils.rich_console import console
@@ -88,12 +88,12 @@ class {testcase_class_name}:
         send_request.send_request(data)
 '''
                 # 创建测试用例文件
-                tag = case_filename.split(config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
+                tag = case_filename.split(httpfpt_config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
                 new_testcase_filename = testcase_func_name + '.py'
                 if tag:
-                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, *tag, new_testcase_filename)
+                    case_path = os.path.join(TEST_CASE_PATH, httpfpt_config.PROJECT_NAME, *tag, new_testcase_filename)
                 else:
-                    case_path = os.path.join(TEST_CASE_PATH, config.PROJECT_NAME, new_testcase_filename)
+                    case_path = os.path.join(TEST_CASE_PATH, httpfpt_config.PROJECT_NAME, new_testcase_filename)
                 new_testcase_dir = Path(case_path).parent
                 if not new_testcase_dir.exists():
                     new_testcase_dir.mkdir(parents=True, exist_ok=True)

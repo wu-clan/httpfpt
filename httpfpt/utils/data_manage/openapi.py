@@ -12,7 +12,7 @@ from rich.prompt import Confirm
 
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import CASE_DATA_PATH
 from httpfpt.utils.data_manage.base_format import format_value
 from httpfpt.utils.file_control import get_file_property
@@ -138,7 +138,7 @@ class SwaggerParser:
                     for k, v in tag_case.items():
                         tag_filename = os.sep.join(
                             [
-                                project or config.PROJECT_NAME,
+                                project or httpfpt_config.PROJECT_NAME,
                                 k,
                                 get_file_property(openapi_source)[1] + '.yaml'
                                 if not openapi_source.startswith('http')
@@ -151,7 +151,7 @@ class SwaggerParser:
                         if k == 'root':
                             root_filename = os.sep.join(
                                 [
-                                    project or config.PROJECT_NAME,
+                                    project or httpfpt_config.PROJECT_NAME,
                                     get_file_property(openapi_source)[1] + '.yaml'
                                     if not openapi_source.startswith('http')
                                     else f'openapi_{get_current_timestamp()}.yaml',
@@ -160,7 +160,7 @@ class SwaggerParser:
                         else:
                             root_filename = os.sep.join(
                                 [
-                                    project or config.PROJECT_NAME,
+                                    project or httpfpt_config.PROJECT_NAME,
                                     get_file_property(openapi_source)[1] + '.yaml'
                                     if not openapi_source.startswith('http')
                                     else f'openapi_{k}.yaml',
@@ -186,7 +186,7 @@ class SwaggerParser:
                                 CASE_DATA_PATH,
                                 os.sep.join(
                                     [
-                                        project or config.PROJECT_NAME,
+                                        project or httpfpt_config.PROJECT_NAME,
                                         k,
                                         get_file_property(openapi_source)[1] + '.yaml'
                                         if not openapi_source.startswith('http')
@@ -214,7 +214,7 @@ class SwaggerParser:
                             case_file_data = {'config': case_config, 'test_steps': v}
                             write_yaml(
                                 CASE_DATA_PATH,
-                                os.sep.join([project or config.PROJECT_NAME, filename]),
+                                os.sep.join([project or httpfpt_config.PROJECT_NAME, filename]),
                                 case_file_data,
                                 mode='w',
                             )
@@ -230,7 +230,7 @@ class SwaggerParser:
                                 case_file_data = {'config': case_config, 'test_steps': v}
                                 tag_filename = os.sep.join(
                                     [
-                                        project or config.PROJECT_NAME,
+                                        project or httpfpt_config.PROJECT_NAME,
                                         k,
                                         get_file_property(openapi_source)[1] + '.yaml'
                                         if not openapi_source.startswith('http')
@@ -260,7 +260,7 @@ class SwaggerParser:
                                     case_file_data = {'config': case_config, 'test_steps': v}
                                     write_yaml(
                                         CASE_DATA_PATH,
-                                        os.sep.join([project or config.PROJECT_NAME, root_filename]),
+                                        os.sep.join([project or httpfpt_config.PROJECT_NAME, root_filename]),
                                         case_file_data,
                                         mode='w',
                                     )

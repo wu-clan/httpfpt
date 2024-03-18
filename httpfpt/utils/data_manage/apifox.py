@@ -7,7 +7,7 @@ import os
 
 from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.yaml_handler import write_yaml
-from httpfpt.core.get_conf import config
+from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import CASE_DATA_PATH
 from httpfpt.utils.data_manage.base_format import format_value
 from httpfpt.utils.file_control import get_file_property
@@ -64,7 +64,9 @@ class ApiFoxParser:
                     case_file_data = {'config': case_config, 'test_steps': v}
                     write_yaml(
                         CASE_DATA_PATH,
-                        os.sep.join([project or config.PROJECT_NAME, k, get_file_property(source)[1] + '.yaml']),
+                        os.sep.join(
+                            [project or httpfpt_config.PROJECT_NAME, k, get_file_property(source)[1] + '.yaml']
+                        ),
                         case_file_data,
                         mode='w',
                     )
@@ -74,7 +76,7 @@ class ApiFoxParser:
                     case_file_data = {'config': case_config, 'test_steps': v}
                     write_yaml(
                         CASE_DATA_PATH,
-                        os.sep.join([project or config.PROJECT_NAME, get_file_property(source)[1] + '.yaml']),
+                        os.sep.join([project or httpfpt_config.PROJECT_NAME, get_file_property(source)[1] + '.yaml']),
                         case_file_data,
                         mode='w',
                     )

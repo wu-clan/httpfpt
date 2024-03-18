@@ -5,7 +5,7 @@
 groups = ["default", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:7d4e7a7ac3a09a1bde5bc9d99002f31173e2562c86ce2109153ad5f09f23f46a"
+content_hash = "sha256:9e18448e0802c41a0bf0beb546bb530e34caaf4bb099be2a87dc2c2f5e947a07"
 
 [[package]]
 name = "allure-pytest"
