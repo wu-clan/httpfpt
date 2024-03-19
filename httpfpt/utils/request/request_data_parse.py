@@ -195,7 +195,7 @@ class RequestDataParse:
                 retry = None
         if retry is not None:
             if not isinstance(retry, int):
-                raise RequestDataParseError(_error_msg('参数 config:request:retry 不是有效的 int 类型'))
+                raise RequestDataParseError(_error_msg('参数 test_steps:retry 或 config:retry 不是有效的 int 类型'))
         return retry
 
     @property
@@ -210,6 +210,20 @@ class RequestDataParse:
             if not isinstance(module, str):
                 raise RequestDataParseError(_error_msg('参数 config:module 不是有效的 str 类型'))
             return module
+
+    @property
+    def mark(self) -> list | None:
+        try:
+            mark = self.request_data['test_steps']['mark']
+        except _RequestDataParamGetError:
+            try:
+                mark = self.request_data['config']['mark']
+            except _RequestDataParamGetError:
+                mark = None
+        if mark is not None:
+            if not isinstance(mark, list):
+                raise RequestDataParseError(_error_msg('参数 test_steps:mark 或 config:mark 不是有效的 list 类型'))
+        return mark
 
     @property
     def test_steps(self) -> dict | list:
@@ -370,7 +384,9 @@ class RequestDataParse:
                     headers = None
             else:
                 if not isinstance(headers, dict):
-                    raise RequestDataParseError(_error_msg('参数 test_steps:request:headers 不是有效的 dict 类型'))
+                    raise RequestDataParseError(
+                        _error_msg('参数 test_steps:request:headers 或 config:request:headers 不是有效的 dict 类型')
+                    )
             if headers is not None:
                 if len(headers) == 0:
                     raise RequestDataParseError(_error_msg('参数 test_steps:request:headers 为空'))

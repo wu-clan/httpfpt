@@ -15,7 +15,7 @@ from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.db.redis_db import redis_client
-from httpfpt.schemas.case_data import CaseData
+from httpfpt.schemas.case_data import CacheCaseData
 from httpfpt.utils.file_control import get_file_hash, get_file_property, search_all_case_data_files
 from httpfpt.utils.pydantic_parser import parse_error
 
@@ -58,7 +58,7 @@ def case_data_init(pydantic_verify: bool) -> None:
         count: int = 0
         for case_data in case_data_list:
             try:
-                CaseData.model_validate(json.loads(case_data))
+                CacheCaseData.model_validate(json.loads(case_data))
             except ValidationError as e:
                 count += parse_error(e)
         if count > 0:
@@ -118,7 +118,7 @@ def case_id_unique_verify() -> None:
         redis_client.rset(f'{redis_client.prefix}:case_id_list', str(all_case_id))
 
 
-def get_request_data(*, filename: str) -> list[dict[str, Any]]:
+def get_testcase_data(*, filename: str) -> list[dict[str, Any]]:
     """
     获取用于测试用例数据驱动的请求数据
 
@@ -137,7 +137,11 @@ def get_request_data(*, filename: str) -> list[dict[str, Any]]:
         raise RequestDataParseError(test_steps_error)
 
     if isinstance(cases, dict):
-        return [case_data]
+        mark = get_testcase_mark(case_data)
+        if mark is not None:
+            ...
+            # TODO
+
     elif isinstance(cases, list):
         case_list = []
         for case in cases:
@@ -151,3 +155,25 @@ def get_request_data(*, filename: str) -> list[dict[str, Any]]:
         return case_list
     else:
         raise RequestDataParseError(f'请求测试用例数据文件 {filename} 格式错误, 请检查用例数据文件内容')
+
+
+def get_testcase_mark(case_data: dict) -> list[str] | None:
+    try:
+        mark = case_data['test_steps']['mark']
+    except (KeyError, TypeError):
+        try:
+            mark = case_data['config']['mark']
+        except (KeyError, TypeError):
+            mark = None
+    if mark is not None:
+        if not isinstance(mark, list):
+            raise RequestDataParseError(
+                '测试用例数据解析失败, 参数 test_steps:mark 或 config:mark 不是有效的 list 类型'
+            )
+        else:
+            for m in mark:
+                if not isinstance(m, str):
+                    raise RequestDataParseError(
+                        '测试用例数据解析失败, 参数 test_steps:mark 或 config:mark 不是有效的 list[str] 类型'
+                    )
+    return mark

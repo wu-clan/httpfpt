@@ -7,7 +7,10 @@ from typing import Any
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 from typing_extensions import Literal
 
-__all__ = ['CaseData']
+__all__ = [
+    'CaseData',
+    'CacheCaseData',
+]
 
 
 class ConfigAllureData(BaseModel):
@@ -30,6 +33,7 @@ class Config(BaseModel):
     allure: ConfigAllureData
     request: ConfigRequestData
     module: str
+    mark: list[str] | None = None
 
 
 class StepsRequestData(BaseModel):
@@ -141,6 +145,7 @@ class Steps(BaseModel):
     case_id: str
     description: str
     is_run: bool | dict | None = None
+    mark: list[str] | None = None
     retry: int | None = None
     request: StepsRequestData
     setup: list[StepsSetUpData] | None = None
@@ -152,5 +157,8 @@ class CaseData(BaseModel):
 
     config: Config
     test_steps: Steps | list[Steps]
+
+
+class CacheCaseData(CaseData):
     filename: str | None = None
     file_hash: str | None = None
