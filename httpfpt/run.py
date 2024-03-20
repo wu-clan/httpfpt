@@ -106,16 +106,17 @@ def startup(
                 if '=' in i and k in i:
                     run_args.remove(i)
                     run_args.append(f'{k}={v}')
-    run_args = list(set(run_args))
     format_run_args = []
     for i in run_args:
         if '=' in i:
             i_split = i.split('=')
-            new_i = i.replace(i_split[1], '"' + f'{i_split[1]}' + '"')
+            new_i = i.replace(i_split[1], f'"{i_split[1]}"')
             format_run_args.append(new_i)
         else:
             format_run_args.append(i)
-    run_pytest_command_args = ' '.join(_ for _ in format_run_args)
+    run_pytest_command_args = ' '.join(
+        i if os.path.isdir(i) or i.startswith('-') else f'"{i}"' for i in format_run_args
+    )
 
     log.info(
         f'开始运行项目：{httpfpt_config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}'
