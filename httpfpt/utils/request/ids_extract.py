@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from httpfpt.common.errors import RequestDataParseError
 
 
-def get_ids(request_data: list) -> list:
+def get_ids(request_data: dict | list) -> list:
     """
     从请求数据获取数据驱动下的 ids 数据
 
@@ -11,12 +13,16 @@ def get_ids(request_data: list) -> list:
     :return:
     """
     ids = []
-    for data in request_data:
-        try:
-            module = data['config']['module']
-            name = data['test_steps']['name']
-            case_id = data['test_steps']['case_id']
-        except KeyError as e:
-            raise RequestDataParseError('测试用例 ids 获取失败, 请检查测试用例数据是否符合规范: {}'.format(e))
-        ids.append('module: {}, name: {}, case_id: {}'.format(module, name, case_id))
+    try:
+        if isinstance(request_data, dict):
+            module = request_data['config']['module']
+            case_id = request_data['test_steps']['case_id']
+            ids.append(f'module: {module}, case_id: {case_id}')
+        else:
+            for data in request_data:
+                module = data['config']['module']
+                case_id = data['test_steps']['case_id']
+                ids.append(f'module: {module}, case_id: {case_id}')
+    except KeyError as e:
+        raise RequestDataParseError('测试用例 ids 获取失败, 请检查测试用例数据是否符合规范: {}'.format(e))
     return ids

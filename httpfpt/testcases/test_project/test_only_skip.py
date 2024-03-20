@@ -4,21 +4,18 @@ import allure
 import pytest
 
 from httpfpt.common.send_request import send_request
-from httpfpt.utils.request.case_data_parse import get_request_data
-from httpfpt.utils.request.ids_extract import get_ids
+from httpfpt.utils.request.case_data_parse import get_testcase_data
 
-request_data = get_request_data(filename='only_skip.yml')
-allure_text = request_data[0]['config']['allure']
-request_ids = get_ids(request_data)
+allure_data, ddt_data, ids = get_testcase_data(filename='only_skip.yml')
 
 
-@allure.epic(allure_text['epic'])
-@allure.feature(allure_text['feature'])
+@allure.epic(allure_data['epic'])
+@allure.feature(allure_data['feature'])
 class TestOnlySkip:
     """OnlySkip"""
 
-    @allure.story(allure_text['story'])
-    @pytest.mark.parametrize('data', request_data, ids=request_ids)
+    @allure.story(allure_data['story'])
+    @pytest.mark.parametrize('data', ddt_data, ids=ids)
     def test_only_skip(self, data):
         """only_skip"""
         send_request.send_request(data)

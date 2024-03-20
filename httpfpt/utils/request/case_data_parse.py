@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import copy
 import json
 import sys
 
 from collections import defaultdict
-from typing import Any
+
+import pytest
 
 from pydantic import ValidationError
 
@@ -15,9 +15,10 @@ from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.db.redis_db import redis_client
-from httpfpt.schemas.case_data import CaseData
+from httpfpt.schemas.case_data import CaseCacheData
 from httpfpt.utils.file_control import get_file_hash, get_file_property, search_all_case_data_files
 from httpfpt.utils.pydantic_parser import parse_error
+from httpfpt.utils.request.ids_extract import get_ids
 
 
 def clean_cache_data(clean_cache: bool) -> None:
@@ -58,7 +59,7 @@ def case_data_init(pydantic_verify: bool) -> None:
         count: int = 0
         for case_data in case_data_list:
             try:
-                CaseData.model_validate(json.loads(case_data))
+                CaseCacheData.model_validate(json.loads(case_data))
             except ValidationError as e:
                 count += parse_error(e)
         if count > 0:
@@ -118,9 +119,9 @@ def case_id_unique_verify() -> None:
         redis_client.rset(f'{redis_client.prefix}:case_id_list', str(all_case_id))
 
 
-def get_request_data(*, filename: str) -> list[dict[str, Any]]:
+def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
     """
-    获取用于测试用例数据驱动的请求数据
+    获取测试用例数据
 
     :param filename: 测试用例数据文件名称
     :return:
@@ -129,25 +130,60 @@ def get_request_data(*, filename: str) -> list[dict[str, Any]]:
     config_error = f'请求测试用例数据文件 {filename} 缺少 config 信息, 请检查测试用例文件内容'
     test_steps_error = f'请求测试用例数据文件 {filename} 缺少 test_steps 信息, 请检查测试用例文件内容'
 
-    if case_data.get('config') is None:
+    config = case_data.get('config')
+    if config is None:
         raise RequestDataParseError(config_error)
 
-    cases = case_data.get('test_steps')
-    if cases is None:
+    steps = case_data.get('test_steps')
+    if steps is None:
         raise RequestDataParseError(test_steps_error)
 
-    if isinstance(cases, dict):
-        return [case_data]
-    elif isinstance(cases, list):
-        case_list = []
-        for case in cases:
+    allure_data = case_data['config']['allure']
+    if isinstance(steps, dict):
+        ids = get_ids(case_data)
+        mark = get_testcase_mark(case_data)
+        if mark is not None:
+            ddt_data = pytest.param(case_data, marks=[getattr(pytest.mark, m) for m in mark])
+        else:
+            ddt_data = case_data
+        return allure_data, [ddt_data], ids
+    elif isinstance(steps, list):
+        _ddt_data_list = []
+        marked_ddt_data_list = []
+        for case in steps:
             if isinstance(case, dict):
-                test_steps = {'test_steps': case}
-                data = copy.deepcopy(case_data)
-                data.update(test_steps)
-                case_list.append(data)
+                _case_data = {'config': config, 'test_steps': case}
+                _ddt_data_list.append(_case_data)
+                mark = get_testcase_mark(_case_data)
+                if mark is not None:
+                    marked_ddt_data_list.append(pytest.param(_case_data, marks=[getattr(pytest.mark, m) for m in mark]))
+                else:
+                    marked_ddt_data_list.append(_case_data)
             else:
                 raise RequestDataParseError(test_steps_error)
-        return case_list
+        ids = get_ids(_ddt_data_list)
+        return allure_data, marked_ddt_data_list, ids
     else:
         raise RequestDataParseError(f'请求测试用例数据文件 {filename} 格式错误, 请检查用例数据文件内容')
+
+
+def get_testcase_mark(case_data: dict) -> list[str] | None:
+    try:
+        mark = case_data['test_steps']['mark']
+    except (KeyError, TypeError):
+        try:
+            mark = case_data['config']['mark']
+        except (KeyError, TypeError):
+            mark = None
+    if mark is not None:
+        if not isinstance(mark, list):
+            raise RequestDataParseError(
+                '测试用例数据解析失败, 参数 test_steps:mark 或 config:mark 不是有效的 list 类型'
+            )
+        else:
+            for m in mark:
+                if not isinstance(m, str):
+                    raise RequestDataParseError(
+                        '测试用例数据解析失败, 参数 test_steps:mark 或 config:mark 不是有效的 list[str] 类型'
+                    )
+    return mark
