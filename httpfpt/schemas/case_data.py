@@ -9,7 +9,7 @@ from typing_extensions import Literal
 
 __all__ = [
     'CaseData',
-    'CacheCaseData',
+    'CaseCacheData',
 ]
 
 
@@ -159,6 +159,6 @@ class CaseData(BaseModel):
     test_steps: Steps | list[Steps]
 
 
-class CacheCaseData(CaseData):
+class CaseCacheData(CaseData):
     filename: str | None = None
     file_hash: str | None = None

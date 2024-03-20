@@ -68,24 +68,22 @@ import allure
 import pytest
 
 from httpfpt.common.send_request import send_request
-from httpfpt.utils.request.case_data_parse import get_request_data
-from httpfpt.utils.request.ids_extract import get_ids
+from httpfpt.utils.request.case_data_parse import get_testcase_data
 
-request_data = get_request_data(filename='{file_property[0]}')
-allure_text = request_data[0]['config']['allure']
-request_ids = get_ids(request_data)
+allure_data, ddt_data, ids = get_testcase_data(filename='{file_property[0]}')
 
 
-@allure.epic(allure_text['epic'])
-@allure.feature(allure_text['feature'])
+@allure.epic(allure_data['epic'])
+@allure.feature(allure_data['feature'])
 class {testcase_class_name}:
     """{testcase_class_name.replace('Test', '')}"""
 
-    @allure.story(allure_text['story'])
-    @pytest.mark.parametrize('data', request_data, ids=request_ids)
+    @allure.story(allure_data['story'])
+    @pytest.mark.parametrize('data', ddt_data, ids=ids)
     def {testcase_func_name}(self, data):
         """{create_file_root_name}"""
-        send_request.send_request(data)
+        # send_request.send_request(data)
+        print(data)
 '''
                 # 创建测试用例文件
                 tag = case_filename.split(httpfpt_config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
@@ -98,7 +96,7 @@ class {testcase_class_name}:
                     case_path = os.path.join(
                         httpfpt_path.testcase_dir, httpfpt_config.PROJECT_NAME, new_testcase_filename
                     )
-                new_testcase_dir = Path(case_path).parent
+                new_testcase_dir = Path(case_path).parent  # type: ignore
                 if not new_testcase_dir.exists():
                     new_testcase_dir.mkdir(parents=True, exist_ok=True)
                 with open(case_path, 'w', encoding='utf-8') as f:

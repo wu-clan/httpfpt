@@ -30,6 +30,8 @@ test_steps:
     is_run:
       skip: True
       reason: 自定义跳过
+    mark:
+      - test_mark
     request:
       method: GET
       url: /skip
