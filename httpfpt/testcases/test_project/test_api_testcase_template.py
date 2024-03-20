@@ -18,5 +18,4 @@ class TestApiTestcaseTemplate:
     @pytest.mark.parametrize('data', ddt_data, ids=ids)
     def test_api_testcase_template(self, data):
         """api_testcase_template"""
-        # send_request.send_request(data)
-        print(data)
+        send_request.send_request(data)

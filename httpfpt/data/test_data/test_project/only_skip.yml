@@ -31,7 +31,7 @@ test_steps:
       skip: True
       reason: 自定义跳过
     mark:
-      - test_mark
+      - test_api
     request:
       method: GET
       url: /skip

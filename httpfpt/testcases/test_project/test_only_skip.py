@@ -18,5 +18,4 @@ class TestOnlySkip:
     @pytest.mark.parametrize('data', ddt_data, ids=ids)
     def test_only_skip(self, data):
         """only_skip"""
-        # send_request.send_request(data)
-        print(data)
+        send_request.send_request(data)

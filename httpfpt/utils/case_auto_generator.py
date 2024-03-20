@@ -82,8 +82,7 @@ class {testcase_class_name}:
     @pytest.mark.parametrize('data', ddt_data, ids=ids)
     def {testcase_func_name}(self, data):
         """{create_file_root_name}"""
-        # send_request.send_request(data)
-        print(data)
+        send_request.send_request(data)
 '''
                 # 创建测试用例文件
                 tag = case_filename.split(httpfpt_config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
