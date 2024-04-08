@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 from typing_extensions import Literal
+
+if TYPE_CHECKING:
+    from httpfpt.enums.query_fetch_type import QueryFetchType
 
 __all__ = [
     'CaseData',
@@ -65,8 +68,9 @@ class SetupTestCaseData(BaseModel):
 
 class SetupSqlData(BaseModel):
     key: str
-    type: Literal['cache', 'wnv', 'global']
+    type: Literal['cache', 'env', 'global']
     sql: str
+    fetch: QueryFetchType | None = None
     jsonpath: str
 
 
@@ -110,6 +114,7 @@ class TeardownJsonAssertData(BaseModel):
 
 class TeardownSqlAssertData(TeardownJsonAssertData):
     sql: str
+    fetch: QueryFetchType | None = None
 
 
 class TeardownJsonSchemaAssertData(BaseModel):
