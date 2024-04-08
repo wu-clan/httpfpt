@@ -122,13 +122,14 @@ class Asserter:
             assert_value = assert_text['value']
             assert_type = assert_text['type']
             assert_sql = assert_text['sql']
+            assert_fetch = assert_text.get('fetch')
             assert_jsonpath = assert_text['jsonpath']
         except KeyError as e:
             raise AssertSyntaxError(f'SQL 断言格式错误, 请检查: {e}')
         else:
             if assert_sql.split(' ')[0].upper() != SqlType.select:
                 raise AssertSyntaxError(f'SQL 断言 {assert_check}:{assert_type} 执行失败，请检查 SQL 是否为 DQL 类型')
-            sql_data = mysql_client.exec_case_sql(assert_sql)
+            sql_data = mysql_client.exec_case_sql(assert_sql, assert_fetch)
             if not isinstance(sql_data, dict):
                 raise JsonPathFindError('jsonpath 取值失败, SQL 语句执行结果不是有效的 dict 类型')
             sql_value = findall(assert_jsonpath, sql_data)

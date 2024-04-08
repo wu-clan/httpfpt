@@ -128,11 +128,12 @@ class MysqlDB:
         finally:
             self.close(conn, cursor)
 
-    def exec_case_sql(self, sql: str, env: str | None = None) -> dict | list | int | None:
+    def exec_case_sql(self, sql: str, fetch: QueryFetchType | None, env: str | None = None) -> dict | list | int | None:
         """
         执行用例 sql
 
         :param sql:
+        :param fetch:
         :param env:
         :return:
         """
@@ -140,7 +141,9 @@ class MysqlDB:
         if isinstance(sql, str):
             log.info(f'执行 SQL: {sql}')
             if sql.startswith(SqlType.select):
-                return self.query(sql)
+                if fetch is None:
+                    fetch = QueryFetchType.ALL
+                return self.query(sql, fetch)
             else:
                 return self.execute(sql)
 

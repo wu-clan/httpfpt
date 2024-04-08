@@ -169,8 +169,10 @@ class SendRequests:
                                 if relate_parsed_data:
                                     parsed_data = relate_parsed_data
                             elif key == SetupType.SQL:
-                                sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])['sql']
-                                mysql_client.exec_case_sql(sql, parsed_data['env'])
+                                setup_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
+                                sql = setup_sql['sql']
+                                sql_fetch = setup_sql.get('fetch')
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
                             elif key == SetupType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             elif key == SetupType.WAIT_TIME:
@@ -261,8 +263,10 @@ class SendRequests:
                     for key, value in item.items():
                         if value is not None:
                             if key == TeardownType.SQL:
-                                sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])['sql']
-                                mysql_client.exec_case_sql(sql, parsed_data['env'])
+                                teardown_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
+                                sql = teardown_sql['sql']
+                                sql_fetch = teardown_sql.get('fetch')
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
                             if key == TeardownType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             if key == TeardownType.EXTRACT:
