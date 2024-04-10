@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 from typing_extensions import Literal
 
-if TYPE_CHECKING:
-    from httpfpt.enums.query_fetch_type import QueryFetchType
+from httpfpt.enums.query_fetch_type import QueryFetchType  # noqa: TCH001
 
 __all__ = [
     'CaseData',
