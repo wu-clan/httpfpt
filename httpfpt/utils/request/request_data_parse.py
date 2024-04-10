@@ -706,15 +706,11 @@ class RequestDataParse:
         headers = self.headers
         body_type = self.body_type
         body = self.body
-        files = self.files
         if not headers:
             if body_type:
                 headers = {}
                 if body_type == BodyType.form_data:
-                    if files is not None:
-                        pass  # 如果包含上传文件操作，则由引擎自动处理
-                    else:
-                        headers.update({'Content-Type': 'multipart/form-data'})
+                    pass  # 表单请求由引擎自动处理
                 elif body_type == BodyType.x_www_form_urlencoded:
                     headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
                 elif body_type == BodyType.binary:
@@ -754,7 +750,7 @@ class RequestDataParse:
             'cookies': self.cookies,
             'body_type': body_type,
             'body': body,
-            'files': files,
+            'files': self.files,
             'files_no_parse': self.files_no_parse,
             'is_setup': self.is_setup,
             'setup': self.setup,
