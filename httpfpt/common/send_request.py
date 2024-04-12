@@ -5,6 +5,7 @@ import time
 from json import JSONDecodeError
 
 import allure
+import chardet
 import httpx
 import requests
 import stamina
@@ -232,14 +233,15 @@ class SendRequests:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
         # 记录响应数据
-        res_headers = dict(response.headers)
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
+        res_headers = dict(response.headers)
         response_data['headers'] = res_headers
         response_data['cookies'] = dict(response.cookies)
+        res_content_type = res_headers.get('Content-Type')
         try:
-            if res_headers.get('content-type') == 'application/json':
+            if res_content_type == 'application/json':
                 json_data = response.json()
             else:
                 json_data = {}
@@ -248,7 +250,14 @@ class SendRequests:
             log.warning(err_msg)
             raise SendRequestError(err_msg)
         response_data['json'] = json_data
-        response_data['content'] = response.content.decode('utf-8')
+        res_content = response.content
+        res_content_encoding = 'utf-8'
+        if 'charset=' in res_content_type:
+            res_content_encoding = res_content_type.split('charset=')[-1]
+        detected_encoding = chardet.detect(res_content)['encoding']
+        if detected_encoding and detected_encoding.lower() != res_content_encoding:
+            res_content_encoding = detected_encoding
+        response_data['content'] = response.content.decode(res_content_encoding)
         response_data['text'] = response.text
         response_data['request'] = request_data_parsed
 
