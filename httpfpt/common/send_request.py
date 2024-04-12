@@ -232,16 +232,21 @@ class SendRequests:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
         # 记录响应数据
+        res_headers = dict(response.headers)
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
-        response_data['headers'] = dict(response.headers)
+        response_data['headers'] = res_headers
         response_data['cookies'] = dict(response.cookies)
         try:
-            json_data = response.json()
+            if res_headers.get('content-type') == 'application/json':
+                json_data = response.json()
+            else:
+                json_data = {}
         except JSONDecodeError:
-            log.warning('响应数据解析失败，响应数据不是有效的 json 格式')
-            json_data = {}
+            err_msg = '响应数据解析失败，响应数据不是有效的 json 格式'
+            log.warning(err_msg)
+            raise SendRequestError(err_msg)
         response_data['json'] = json_data
         response_data['content'] = response.content.decode('utf-8')
         response_data['text'] = response.text
