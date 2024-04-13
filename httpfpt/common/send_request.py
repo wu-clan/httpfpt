@@ -5,7 +5,6 @@ import time
 from json import JSONDecodeError
 
 import allure
-import chardet
 import httpx
 import requests
 import stamina
@@ -250,14 +249,7 @@ class SendRequests:
             log.warning(err_msg)
             raise SendRequestError(err_msg)
         response_data['json'] = json_data
-        res_content = response.content
-        res_content_encoding = 'utf-8'
-        if 'charset=' in res_content_type:
-            res_content_encoding = res_content_type.split('charset=')[-1]
-        detected_encoding = chardet.detect(res_content)['encoding']
-        if detected_encoding and detected_encoding.lower() != res_content_encoding:
-            res_content_encoding = detected_encoding
-        response_data['content'] = response.content.decode(res_content_encoding)
+        response_data['content'] = response.content
         response_data['text'] = response.text
         response_data['request'] = request_data_parsed
 
