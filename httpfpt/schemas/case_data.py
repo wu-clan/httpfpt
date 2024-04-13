@@ -7,6 +7,8 @@ from typing import Any
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
 from typing_extensions import Literal
 
+from httpfpt.enums.query_fetch_type import QueryFetchType  # noqa: TCH001
+
 __all__ = [
     'CaseData',
     'CaseCacheData',
@@ -65,8 +67,9 @@ class SetupTestCaseData(BaseModel):
 
 class SetupSqlData(BaseModel):
     key: str
-    type: Literal['cache', 'wnv', 'global']
+    type: Literal['cache', 'env', 'global']
     sql: str
+    fetch: QueryFetchType | None = None
     jsonpath: str
 
 
@@ -110,6 +113,7 @@ class TeardownJsonAssertData(BaseModel):
 
 class TeardownSqlAssertData(TeardownJsonAssertData):
     sql: str
+    fetch: QueryFetchType | None = None
 
 
 class TeardownJsonSchemaAssertData(BaseModel):

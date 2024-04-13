@@ -169,8 +169,10 @@ class SendRequests:
                                 if relate_parsed_data:
                                     parsed_data = relate_parsed_data
                             elif key == SetupType.SQL:
-                                sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])['sql']
-                                mysql_client.exec_case_sql(sql, parsed_data['env'])
+                                setup_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
+                                sql = setup_sql['sql']
+                                sql_fetch = setup_sql.get('fetch')
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
                             elif key == SetupType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             elif key == SetupType.WAIT_TIME:
@@ -233,15 +235,21 @@ class SendRequests:
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
-        response_data['headers'] = dict(response.headers)
+        res_headers = dict(response.headers)
+        response_data['headers'] = res_headers
         response_data['cookies'] = dict(response.cookies)
+        res_content_type = res_headers.get('Content-Type')
         try:
-            json_data = response.json()
+            if res_content_type and 'application/json' in res_content_type:
+                json_data = response.json()
+            else:
+                json_data = {}
         except JSONDecodeError:
-            log.warning('响应数据解析失败，响应数据不是有效的 json 格式')
-            json_data = {}
+            err_msg = '响应数据解析失败，响应数据不是有效的 json 格式'
+            log.warning(err_msg)
+            raise SendRequestError(err_msg)
         response_data['json'] = json_data
-        response_data['content'] = response.content.decode('utf-8')
+        response_data['content'] = response.content
         response_data['text'] = response.text
         response_data['request'] = request_data_parsed
 
@@ -261,8 +269,10 @@ class SendRequests:
                     for key, value in item.items():
                         if value is not None:
                             if key == TeardownType.SQL:
-                                sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])['sql']
-                                mysql_client.exec_case_sql(sql, parsed_data['env'])
+                                teardown_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
+                                sql = teardown_sql['sql']
+                                sql_fetch = teardown_sql.get('fetch')
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
                             if key == TeardownType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             if key == TeardownType.EXTRACT:
