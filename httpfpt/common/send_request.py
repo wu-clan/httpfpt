@@ -235,15 +235,21 @@ class SendRequests:
         response_data['url'] = str(response.url)
         response_data['status_code'] = int(response.status_code)
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
-        response_data['headers'] = dict(response.headers)
+        res_headers = dict(response.headers)
+        response_data['headers'] = res_headers
         response_data['cookies'] = dict(response.cookies)
+        res_content_type = res_headers.get('Content-Type')
         try:
-            json_data = response.json()
+            if res_content_type and 'application/json' in res_content_type:
+                json_data = response.json()
+            else:
+                json_data = {}
         except JSONDecodeError:
-            log.warning('响应数据解析失败，响应数据不是有效的 json 格式')
-            json_data = {}
+            err_msg = '响应数据解析失败，响应数据不是有效的 json 格式'
+            log.warning(err_msg)
+            raise SendRequestError(err_msg)
         response_data['json'] = json_data
-        response_data['content'] = response.content.decode('utf-8')
+        response_data['content'] = response.content
         response_data['text'] = response.text
         response_data['request'] = request_data_parsed
 
