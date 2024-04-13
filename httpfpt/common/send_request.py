@@ -240,7 +240,7 @@ class SendRequests:
         response_data['cookies'] = dict(response.cookies)
         res_content_type = res_headers.get('Content-Type')
         try:
-            if res_content_type == 'application/json':
+            if res_content_type and 'application/json' in res_content_type:
                 json_data = response.json()
             else:
                 json_data = {}
