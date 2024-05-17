@@ -1,4 +1,4 @@
-# HttpFpt
+# HttpFPT
 
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/wu-clan/httpfpt/ci.yml?logo=github)
 [![Checked with pyright](https://microsoft.github.io/pyright/img/pyright_badge.svg)](https://microsoft.github.io/pyright/)
@@ -9,7 +9,7 @@
 
 基于 HTTP 请求的快速数据驱动 pytest 接口自动化测试框架
 
-我在掘金发表了关于 `HttpFpt` 的前身和由来，包括部分功能点的说明， 感兴趣
+我在掘金发表了关于 HttpFPT 的前身和由来，包括部分功能点的说明， 感兴趣
 
 的小伙伴可以一睹为快，[点击跳转](https://juejin.cn/post/7224314619867136037)
 
@@ -37,7 +37,7 @@
 
 ## ⬇️ 下载
 
-克隆:
+Clone:
 
 ```shell
 git clone https://github.com/wu-clan/httpfpt.git
