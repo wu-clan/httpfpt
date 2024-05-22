@@ -54,6 +54,7 @@ test = [
 
 [tool.pdm.scripts]
 lint = "pre-commit run --all-files"
+typing = "pyright -p ."
 
 [build-system]
 requires = ["pdm-backend"]
