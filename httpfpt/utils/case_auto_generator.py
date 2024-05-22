@@ -98,8 +98,7 @@ class {testcase_class_name}:
                 new_testcase_dir = Path(case_path).parent  # type: ignore
                 if not new_testcase_dir.exists():
                     new_testcase_dir.mkdir(parents=True, exist_ok=True)
-                with open(case_path, 'w', encoding='utf-8') as f:
-                    f.write(case_code)
+                Path(str(case_path)).write_text(case_code, encoding='utf-8')
                 console.print(f'📄 Created: {new_testcase_filename}')
 
     console.print('✅ 测试用例自动生成完成')
