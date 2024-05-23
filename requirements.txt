@@ -81,4 +81,5 @@ typing-inspect==0.9.0
 urllib3==2.1.0
 virtualenv==20.25.0
 win32-setctime==1.1.0; sys_platform == "win32"
+xlrd==1.2.0
 zipp==3.17.0; python_version < "3.9"
