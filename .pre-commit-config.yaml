@@ -9,7 +9,7 @@ repos:
       - id: check-json
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.3.0
+    rev: v0.4.4
     hooks:
       - id: ruff
         args:
@@ -19,7 +19,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/pdm-project/pdm
-    rev: 2.12.2
+    rev: 2.15.3
     hooks:
       - id: pdm-export
         args:
