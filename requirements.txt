@@ -68,8 +68,8 @@ referencing==0.33.0
 requests==2.32.2
 rich==13.6.0
 rpds-py==0.18.0
-rtoml==0.10.0
-ruff==0.4.4
+rtoml==0.9.0
+ruff==0.4.5
 setuptools==69.0.3
 six==1.16.0
 sniffio==1.3.0
