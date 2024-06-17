@@ -78,7 +78,7 @@ tenacity==8.2.3
 tomli==2.0.1; python_version < "3.11"
 typing-extensions==4.11.0
 typing-inspect==0.9.0
-urllib3==2.1.0
+urllib3==2.2.2
 virtualenv==20.25.0
 win32-setctime==1.1.0; sys_platform == "win32"
 xlrd==1.2.0
