@@ -23,7 +23,7 @@ class ConfigAllureData(BaseModel):
 
 
 class ConfigRequestData(BaseModel):
-    env: str
+    env: str | None = None
     headers: dict | None = None
     timeout: int | None = Field(None, ge=0)
     verify: bool | None = None
