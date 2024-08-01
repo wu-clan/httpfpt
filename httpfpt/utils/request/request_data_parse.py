@@ -15,6 +15,7 @@ from dirty_equals import IsUrl
 from httpfpt.common.env_handler import get_env_dict
 from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
+from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.mysql_db import mysql_client
 from httpfpt.enums.allure_severity_type import SeverityType
@@ -112,10 +113,17 @@ class RequestDataParse:
 
     @property
     def env(self) -> str:
+        env = httpfpt_config.REQUEST_GLOBAL_ENV
+        if env:
+            if not isinstance(env, str):
+                raise RequestDataParseError(_error_msg('配置文件参数 conf.toml:request:global_env 不是有效的 str 类型'))
+            if not env.endswith('.env'):
+                raise RequestDataParseError(_error_msg('配置文件参数 conf.toml:request:global_env 输入不合法'))
+            return env
         try:
             env = self.request_data['config']['request']['env']
         except _RequestDataParamGetError:
-            raise RequestDataParseError(_error_msg('缺少 config:request:env 参数'))
+            raise RequestDataParseError(_error_msg('缺少 conf.toml:request:global_env 或 config:request:env 参数'))
         else:
             if env is None:
                 raise RequestDataParseError(_error_msg('参数 config:request:env 为空'))

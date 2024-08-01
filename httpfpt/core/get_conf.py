@@ -85,6 +85,7 @@ class HttpFptConfig:
             self.WECHAT_SEND = glom(self.settings, 'wechat.send')
 
             # 请求发送
+            self.REQUEST_GLOBAL_ENV = glom(self.settings, 'request.global_env')
             self.REQUEST_TIMEOUT = glom(self.settings, 'request.timeout')
             self.REQUEST_VERIFY = glom(self.settings, 'request.verify')
             self.REQUEST_REDIRECTS = glom(self.settings, 'request.redirects')

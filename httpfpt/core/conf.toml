@@ -58,6 +58,7 @@ send = false
 
 # 请求发送
 [request]
+global_env = ''
 timeout = 10
 verify = false
 redirects = true
