@@ -274,7 +274,7 @@ class RequestDataParse:
     def description(self) -> str | None:
         try:
             description = self.request_data['test_steps']['description']
-            if not isinstance(description, str):
+            if description and not isinstance(description, str):
                 raise RequestDataParseError(_error_msg('参数 test_steps:description 不是有效的 str 类型'))
         except _RequestDataParamGetError:
             description = None
