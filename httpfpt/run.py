@@ -151,9 +151,15 @@ def startup(
 
         if allure_serve:
             subprocess.run(
-                f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} --clean'
+                [
+                    'allure',
+                    'generate',
+                    f'{httpfpt_path.allure_report_dir}',
+                    '-o',
+                    f'{httpfpt_path.allure_html_report_dir}' '--clean',
+                ]
             )
-            subprocess.run(f'allure serve {httpfpt_path.allure_report_dir}')
+            subprocess.run(['allure', 'serve', f'{httpfpt_path.allure_report_dir}'])
 
 
 def run(
