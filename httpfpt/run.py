@@ -223,7 +223,7 @@ def run(
         |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/
 
         Starting...
-        
+
         Version: {get_version(cli=False)}
         """
         log.info(banner)
