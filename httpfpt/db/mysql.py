@@ -100,7 +100,7 @@ class MysqlDB:
                     data_list = []
                     for i in query_data:
                         format_row(i)
-                        data_list.append(data)
+                        data_list.append(i)
                     return data_list
             except Exception as e:
                 log.error(f'序列化 SQL 查询结果失败: {e}')
