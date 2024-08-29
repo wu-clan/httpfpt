@@ -26,7 +26,7 @@ class WeChat:
                     f"> ⚠️ 跳过用例: **{self.content['skipped']}**\n"
                     f"> ⌛ 开始时间: **{self.content['started_time']}**\n"
                     f"> ⏱️ 执行耗时: **{self.content['elapsed']}**\n"
-                    "> ➡️ 查看报告: [点击跳转](https://foryourself)"
+                    f"> ➡️ 查看报告: [点击跳转]({httpfpt_config.JENKINS_URL})"
                 },
             }
             response = requests.session().post(
