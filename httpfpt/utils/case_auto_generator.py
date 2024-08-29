@@ -64,25 +64,21 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
                     testcase_func_name = 'test_' + testcase_func_name
                 case_code = f'''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import allure
 import pytest
 
-from httpfpt.common.send_request import send_request
-from httpfpt.utils.request.case_data_parse import get_testcase_data
+from common.send_request import send_request
+from utils.request.case_data_parse import get_testcase_data
 
-allure_data, ddt_data, ids = get_testcase_data(filename='{file_property[0]}')
+ddt_data, ids = get_testcase_data(filename='{file_property[0]}')
 
 
-@allure.epic(allure_data['epic'])
-@allure.feature(allure_data['feature'])
 class {testcase_class_name}:
     """{testcase_class_name.replace('Test', '')}"""
 
-    @allure.story(allure_data['story'])
-    @pytest.mark.parametrize('data', ddt_data, ids=ids)
-    def {testcase_func_name}(self, data):
+    @pytest.mark.parametrize('case_data', ddt_data, ids=ids)
+    def {testcase_func_name}(self, case_data):
         """{create_file_root_name}"""
-        send_request.send_request(data)
+        send_request.send_request(case_data)
 '''
                 # 创建测试用例文件
                 tag = case_filename.split(httpfpt_config.PROJECT_NAME)[1].split(os.path.sep)[1:-1]
