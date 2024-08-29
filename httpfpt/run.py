@@ -11,6 +11,8 @@ from typing import Literal
 
 import pytest
 
+from httpfpt.utils.cli.version import get_version
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from httpfpt.common.log import log
@@ -29,7 +31,6 @@ from httpfpt.utils.time_control import get_current_time
 
 def startup(
     *args,
-    testcase_generate: bool,
     log_level: Literal['-q', '-s', '-v', '-vv'],
     case_path: str | None,
     html_report: bool,
@@ -44,8 +45,6 @@ def startup(
     **kwargs,
 ) -> None:
     """运行启动程序"""
-    if testcase_generate:
-        auto_generate_testcases()
 
     run_args = [log_level]
 
@@ -167,6 +166,7 @@ def run(
     *args,
     # auto testcases
     testcase_generate: bool = False,
+    testcase_re_generation: bool = True,
     # init
     clean_cache: bool = False,
     pydantic_verify: bool = True,
@@ -193,6 +193,7 @@ def run(
 
     :param args: pytest 运行参数
     :param testcase_generate: 自动生成测试用例（跳过同名文件），建议通过 CLI 手动执行，默认关闭
+    :param testcase_re_generation: 覆盖生成同名文件测试用例，建议通过 CLI 手动指定，默认开启
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
@@ -211,7 +212,7 @@ def run(
     :return:
     """
     try:
-        logo = """\n
+        logo = f"""\n
          /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
         | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
         | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$
@@ -221,12 +222,19 @@ def run(
         | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$
         |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/
 
-            """
+        Starting...
+        Version: {get_version(cli=False)}
+        """
         log.info(logo)
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
         case_data.case_id_unique_verify()
+        if testcase_generate:
+            if not testcase_re_generation:
+                auto_generate_testcases()
+            else:
+                auto_generate_testcases(rewrite=True)
         startup(
             *args,
             testcase_generate=testcase_generate,
