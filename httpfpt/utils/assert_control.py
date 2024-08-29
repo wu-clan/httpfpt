@@ -13,7 +13,7 @@ from jsonschema.exceptions import ValidationError
 
 from httpfpt.common.errors import AssertSyntaxError, JsonPathFindError
 from httpfpt.common.log import log
-from httpfpt.db.mysql_db import mysql_client
+from httpfpt.db.mysql import mysql_client
 from httpfpt.enums.assert_type import AssertType
 from httpfpt.enums.sql_type import SqlType
 

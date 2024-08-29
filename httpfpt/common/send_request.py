@@ -16,7 +16,7 @@ from requests import Response as RequestsResponse
 from httpfpt.common.errors import AssertError, SendRequestError
 from httpfpt.common.log import log
 from httpfpt.core.get_conf import httpfpt_config
-from httpfpt.db.mysql_db import mysql_client
+from httpfpt.db.mysql import mysql_client
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.setup_type import SetupType

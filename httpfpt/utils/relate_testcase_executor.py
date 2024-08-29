@@ -10,7 +10,7 @@ from jsonpath import findall
 from httpfpt.common.errors import CorrelateTestCaseError, JsonPathFindError
 from httpfpt.common.log import log
 from httpfpt.common.variable_cache import variable_cache
-from httpfpt.db.redis_db import redis_client
+from httpfpt.db.redis import redis_client
 from httpfpt.enums.setup_type import SetupType
 from httpfpt.utils.allure_control import allure_step
 from httpfpt.utils.request.vars_extractor import var_extractor

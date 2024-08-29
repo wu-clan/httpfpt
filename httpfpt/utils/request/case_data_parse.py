@@ -14,7 +14,7 @@ from pydantic import ValidationError
 from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.db.redis_db import redis_client
+from httpfpt.db.redis import redis_client
 from httpfpt.schemas.case_data import CaseCacheData
 from httpfpt.utils.file_control import get_file_hash, get_file_property, search_all_case_data_files
 from httpfpt.utils.pydantic_parser import parse_error
