@@ -154,7 +154,7 @@ class SendRequests:
         # 记录请求前置数据; 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         setup = parsed_data['setup']
         if log_data:
-            if setup:
+            if parsed_data['is_setup']:
                 self.log_request_setup(setup)
 
         # 前置处理
@@ -231,13 +231,8 @@ class SendRequests:
         else:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
-        # 记录响应数据
-        response_data['url'] = str(response.url)
-        response_data['status_code'] = int(response.status_code)
-        response_data['elapsed'] = response.elapsed.microseconds / 1000.0
+        # 序列化响应数据
         res_headers = dict(response.headers)
-        response_data['headers'] = res_headers
-        response_data['cookies'] = dict(response.cookies)
         res_content_type = res_headers.get('Content-Type')
         try:
             if res_content_type and 'application/json' in res_content_type:
@@ -248,6 +243,13 @@ class SendRequests:
             err_msg = '响应数据解析失败，响应数据不是有效的 json 格式'
             log.warning(err_msg)
             raise SendRequestError(err_msg)
+
+        # 记录响应数据
+        response_data['url'] = str(response.url)
+        response_data['status_code'] = int(response.status_code)
+        response_data['elapsed'] = response.elapsed.microseconds / 1000.0
+        response_data['headers'] = res_headers
+        response_data['cookies'] = dict(response.cookies)
         response_data['json'] = json_data
         response_data['content'] = response.content
         response_data['text'] = response.text
@@ -258,7 +260,7 @@ class SendRequests:
         if log_data:
             self.log_request_down(response_data)
             self.allure_request_down(response_data)
-            if teardown:
+            if parsed_data['is_teardown']:
                 self.log_request_teardown(teardown)
 
         # 后置处理
@@ -392,11 +394,18 @@ class SendRequests:
             {
                 'status_code': response_data['status_code'],
                 'elapsed': response_data['elapsed'],
+                'json': response_data['json'],
             },
         )
 
     @staticmethod
     def allure_dynamic_data(parsed_data: dict) -> None:
+        allure.dynamic.parameter('case_data', {'module': parsed_data['module'], 'id': parsed_data['case_id']})
+        allure.dynamic.id(parsed_data['case_id'])
+        allure.dynamic.tag(parsed_data['module'])
+        allure.dynamic.epic(parsed_data['allure_epic'])
+        allure.dynamic.feature(parsed_data['allure_feature'])
+        allure.dynamic.story(parsed_data['allure_story'])
         allure.dynamic.title(parsed_data['name'])
         allure.dynamic.description(parsed_data['description'])
         allure.dynamic.link(parsed_data['url'])
