@@ -146,8 +146,9 @@ def startup(
         WeChat(test_result).send()
 
     if allure:
-        if not os.path.exists(httpfpt_path.allure_report_env_file):
-            shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
+        if os.path.exists(httpfpt_path.allure_report_dir):
+            if not os.path.exists(httpfpt_path.allure_report_env_file):
+                shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
 
         if allure_serve:
             subprocess.run(
