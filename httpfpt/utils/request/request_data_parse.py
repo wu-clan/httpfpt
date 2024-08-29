@@ -17,7 +17,7 @@ from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
 from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import httpfpt_path
-from httpfpt.db.mysql_db import mysql_client
+from httpfpt.db.mysql import mysql_client
 from httpfpt.enums.allure_severity_type import SeverityType
 from httpfpt.enums.request.auth import AuthType
 from httpfpt.enums.request.body import BodyType
