@@ -212,7 +212,7 @@ def run(
     :return:
     """
     try:
-        logo = f"""\n
+        banner = f"""\n
          /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
         | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
         | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$
@@ -223,9 +223,10 @@ def run(
         |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/
 
         Starting...
+        
         Version: {get_version(cli=False)}
         """
-        log.info(logo)
+        log.info(banner)
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)

@@ -16,10 +16,10 @@ def get_version(cli: bool = True) -> str | None:
     ver = read_text('httpfpt', '__init__.py')
     mob = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", ver, re.MULTILINE)
     if mob:
-        version = f'HTTPFPT: [cyan]{mob.group(1)}[/]'
+        version = mob.group(1)
         if cli:
             console.print('')
-            console.print(version)
+            console.print(f'HTTPFPT: [cyan]{version}[/]')
         return version
     else:
         raise cappa.Exit('\n❌ 未查询到版本号', code=1)
