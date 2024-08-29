@@ -165,8 +165,8 @@ def startup(
 def run(
     *args,
     # auto testcases
-    testcase_generate: bool = False,
-    testcase_re_generation: bool = True,
+    testcase_generate: bool = True,
+    testcase_re_generation: bool = False,
     # init
     clean_cache: bool = False,
     pydantic_verify: bool = True,
