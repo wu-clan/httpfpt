@@ -6,6 +6,8 @@ name = 'test_project'
 [report]
 title = "自动化测试报告"
 tester_name = '123'
+# jenkins allure
+jenkins_url = 'https://foryourself'
 
 # mysql 数据库
 [mysql]
