@@ -119,7 +119,7 @@ def case_id_unique_verify() -> None:
         redis_client.rset(f'{redis_client.prefix}:case_id_list', str(all_case_id))
 
 
-def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
+def get_testcase_data(*, filename: str) -> tuple[list, list]:
     """
     获取测试用例数据
 
@@ -138,7 +138,6 @@ def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
     if steps is None:
         raise RequestDataParseError(test_steps_error)
 
-    allure_data = case_data['config']['allure']
     if isinstance(steps, dict):
         ids = get_ids(case_data)
         mark = get_testcase_mark(case_data)
@@ -146,7 +145,7 @@ def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
             ddt_data = pytest.param(case_data, marks=[getattr(pytest.mark, m) for m in mark])
         else:
             ddt_data = case_data
-        return allure_data, [ddt_data], ids
+        return [ddt_data], ids
     elif isinstance(steps, list):
         _ddt_data_list = []
         marked_ddt_data_list = []
@@ -162,7 +161,7 @@ def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
             else:
                 raise RequestDataParseError(test_steps_error)
         ids = get_ids(_ddt_data_list)
-        return allure_data, marked_ddt_data_list, ids
+        return marked_ddt_data_list, ids
     else:
         raise RequestDataParseError(f'请求测试用例数据文件 {filename} 格式错误, 请检查用例数据文件内容')
 
