@@ -66,8 +66,8 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
 # -*- coding: utf-8 -*-
 import pytest
 
-from common.send_request import send_request
-from utils.request.case_data_parse import get_testcase_data
+from httpfpt.common.send_request import send_request
+from httpfpt.utils.request.case_data_parse import get_testcase_data
 
 ddt_data, ids = get_testcase_data(filename='{file_property[0]}')
 
