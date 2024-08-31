@@ -183,11 +183,6 @@ class SendRequests:
                 raise e
             log.info('请求前置处理完成')
 
-        # 日志记录请求数据
-        if log_data:
-            self.log_request_up(parsed_data)
-            self.allure_request_up(parsed_data)
-
         # allure 记录动态数据
         self.allure_dynamic_data(parsed_data)
 
@@ -217,9 +212,19 @@ class SendRequests:
             request_data_parsed.update({'data': request_data_parsed.pop('body')})
         try:
             request_data_parsed = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])
+            parsed_data.update(
+                body=request_data_parsed.get('json')
+                or request_data_parsed.get('data')
+                or request_data_parsed.get('content')
+            )
         except Exception as e:
             log.error(e)
             raise e
+
+        # 日志记录请求数据
+        if log_data:
+            self.log_request_up(parsed_data)
+            self.allure_request_up(parsed_data)
 
         # 发送请求
         response_data = self.init_response_metadata
@@ -323,11 +328,8 @@ class SendRequests:
         log.info(f"请求 url: {parsed_data['url']}")
         log.info(f"请求 params: {parsed_data['params']}")
         log.info(f"请求 headers: {parsed_data['headers']}")
-        log.info(f"请求 data_type：{parsed_data['body_type']}")
-        if parsed_data['body_type'] != BodyType.JSON:
-            log.info(f"请求 data：{parsed_data['body']}")
-        else:
-            log.info(f"请求 json: {parsed_data['body']}")
+        log.info(f"请求 body_type：{parsed_data['body_type']}")
+        log.info(f"请求 body：{parsed_data['body']}")
         log.info(f"请求 files: {parsed_data['files_no_parse']}")
 
     def log_request_teardown(self, teardown: list) -> None:
@@ -377,8 +379,8 @@ class SendRequests:
                 'url': parsed_data['url'],
                 'params': parsed_data['params'],
                 'headers': parsed_data['headers'],
-                'data_type': parsed_data['body_type'],
-                'data': parsed_data['body'],
+                'body_type': parsed_data['body_type'],
+                'body': parsed_data['body'],
                 'files': parsed_data['files_no_parse'],
             },
         )
