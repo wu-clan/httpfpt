@@ -47,7 +47,7 @@ test_steps:
     is_run:
       skip_if:
         - ${random_phone()} == 2
-        - ${timeout} == None
+        - ${timeout} == 5
       reason: 条件判断为真跳过
     request:
       method: GET
