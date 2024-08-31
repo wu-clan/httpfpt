@@ -17,6 +17,7 @@ from httpfpt.common.errors import AssertError, SendRequestError
 from httpfpt.common.log import log
 from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.db.mysql import mysql_client
+from httpfpt.enums.query_fetch_type import QueryFetchType
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.setup_type import SetupType
@@ -170,9 +171,13 @@ class SendRequests:
                                     parsed_data = relate_parsed_data
                             elif key == SetupType.SQL:
                                 setup_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
-                                sql = setup_sql['sql']
-                                sql_fetch = setup_sql.get('fetch')
-                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
+                                sql_fetch = QueryFetchType.ALL
+                                if isinstance(setup_sql, dict):
+                                    sql = setup_sql.get('sql')
+                                    sql_fetch = setup_sql.get('fetch')
+                                else:
+                                    sql = setup_sql
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])  # type: ignore
                             elif key == SetupType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             elif key == SetupType.WAIT_TIME:
@@ -225,9 +230,9 @@ class SendRequests:
         response_data = self.init_response_metadata
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
-            response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
+            response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)  # type: ignore
         elif request_engin == EnginType.httpx:
-            response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
+            response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)  # type: ignore
         else:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
@@ -271,18 +276,20 @@ class SendRequests:
                     for key, value in item.items():
                         if value is not None:
                             if key == TeardownType.SQL:
-                                teardown_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
-                                sql = teardown_sql['sql']
-                                sql_fetch = teardown_sql.get('fetch')
-                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
+                                teardown_sql = var_extractor.vars_replace(value, parsed_data['env'])
+                                sql_fetch = QueryFetchType.ALL
+                                if isinstance(teardown_sql, dict):
+                                    sql = teardown_sql.get('sql')
+                                    sql_fetch = teardown_sql.get('fetch')
+                                else:
+                                    sql = teardown_sql
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])  # type: ignore
                             if key == TeardownType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             if key == TeardownType.EXTRACT:
                                 var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
                             if key == TeardownType.ASSERT:
-                                assert_text = var_extractor.vars_replace(
-                                    target={'assert_text': value}, env=parsed_data['env']
-                                )['assert_text']
+                                assert_text = var_extractor.vars_replace(value, env=parsed_data['env'])
                                 asserter.exec_asserter(response_data, assert_text)
                             elif key == TeardownType.WAIT_TIME:
                                 log.info(f'执行请求后等待：{value} s')

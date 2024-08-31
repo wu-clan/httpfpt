@@ -318,13 +318,14 @@ class RequestDataParse:
                     elif 'skip_if' in is_run.keys():
                         if isinstance(is_run['skip_if'], list):
                             for v in is_run['skip_if']:
-                                if not isinstance(v, str):
+                                if isinstance(v, str):
+                                    v = var_extractor.vars_replace(v, self.env)
+                                    if hook_executor.exec_any_code(v):  # type: ignore
+                                        skip_and_log(reason)
+                                else:
                                     raise RequestDataParseError(
                                         _error_msg(f'参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值')
                                     )
-                                v = var_extractor.vars_replace(v, self.env)
-                                if hook_executor.exec_any_code(v):
-                                    skip_and_log(reason)
                     else:
                         raise RequestDataParseError(_error_msg('参数 test_steps:is_run 缺少 skip / skip_if 参数'))
                 else:
