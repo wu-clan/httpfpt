@@ -15,7 +15,7 @@ cffi==1.16.0; platform_python_implementation != "PyPy"
 cfgv==3.4.0
 charset-normalizer==3.3.2
 colorama==0.4.6; sys_platform == "win32"
-cryptography==42.0.7
+cryptography==43.0.1
 dbutils==3.1.0
 dirty-equals==0.7.1
 distlib==0.3.8
