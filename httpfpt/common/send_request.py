@@ -216,7 +216,7 @@ class SendRequests:
         else:
             request_data_parsed.update({'data': request_data_parsed.pop('body')})
         try:
-            request_data_parsed = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])
+            request_data_parsed: dict = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])  # type: ignore # noqa: ignore
             parsed_data.update(
                 body=request_data_parsed.get('json')
                 or request_data_parsed.get('data')
@@ -235,9 +235,9 @@ class SendRequests:
         response_data = self.init_response_metadata
         response_data['stat']['execute_time'] = get_current_time()
         if request_engin == EnginType.requests:
-            response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)  # type: ignore
+            response = self._requests_engin(**request_conf, **request_data_parsed, **kwargs)
         elif request_engin == EnginType.httpx:
-            response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)  # type: ignore
+            response = self._httpx_engin(**request_conf, **request_data_parsed, **kwargs)
         else:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
