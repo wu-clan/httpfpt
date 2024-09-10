@@ -12,9 +12,11 @@ import pytest
 from pydantic import ValidationError
 
 from httpfpt.common.errors import RequestDataParseError
+from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.db.redis import redis_client
+from httpfpt.enums.case_data_type import CaseDataType
 from httpfpt.schemas.case_data import CaseCacheData
 from httpfpt.utils.file_control import get_file_hash, get_file_property, search_all_case_data_files
 from httpfpt.utils.pydantic_parser import parse_error
@@ -41,7 +43,11 @@ def case_data_init(pydantic_verify: bool) -> None:
     """
     all_case_data_files = search_all_case_data_files()
     for case_data_file in all_case_data_files:
-        case_data = read_yaml(case_data_file)
+        file_type = get_file_property(case_data_file)[2]
+        if file_type == CaseDataType.JSON:
+            case_data = read_json_file(case_data_file)
+        else:
+            case_data = read_yaml(case_data_file)
         filename = get_file_property(case_data_file)[0]
         file_hash = get_file_hash(case_data_file)
         case_data.update({'filename': filename, 'file_hash': file_hash})
