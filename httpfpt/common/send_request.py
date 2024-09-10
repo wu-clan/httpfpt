@@ -16,7 +16,8 @@ from requests import Response as RequestsResponse
 from httpfpt.common.errors import AssertError, SendRequestError
 from httpfpt.common.log import log
 from httpfpt.core.get_conf import httpfpt_config
-from httpfpt.db.mysql_db import mysql_client
+from httpfpt.db.mysql import mysql_client
+from httpfpt.enums.query_fetch_type import QueryFetchType
 from httpfpt.enums.request.body import BodyType
 from httpfpt.enums.request.engin import EnginType
 from httpfpt.enums.setup_type import SetupType
@@ -154,7 +155,7 @@ class SendRequests:
         # 记录请求前置数据; 此处数据中如果包含关联用例变量, 不会被替换为结果记录, 因为替换动作还未发生
         setup = parsed_data['setup']
         if log_data:
-            if setup:
+            if parsed_data['is_setup']:
                 self.log_request_setup(setup)
 
         # 前置处理
@@ -170,9 +171,13 @@ class SendRequests:
                                     parsed_data = relate_parsed_data
                             elif key == SetupType.SQL:
                                 setup_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
-                                sql = setup_sql['sql']
-                                sql_fetch = setup_sql.get('fetch')
-                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
+                                sql_fetch = QueryFetchType.ALL
+                                if isinstance(setup_sql, dict):
+                                    sql = setup_sql.get('sql')
+                                    sql_fetch = setup_sql.get('fetch')
+                                else:
+                                    sql = setup_sql
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])  # type: ignore
                             elif key == SetupType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             elif key == SetupType.WAIT_TIME:
@@ -182,11 +187,6 @@ class SendRequests:
                 log.error(f'请求前置处理异常: {e}')
                 raise e
             log.info('请求前置处理完成')
-
-        # 日志记录请求数据
-        if log_data:
-            self.log_request_up(parsed_data)
-            self.allure_request_up(parsed_data)
 
         # allure 记录动态数据
         self.allure_dynamic_data(parsed_data)
@@ -216,10 +216,20 @@ class SendRequests:
         else:
             request_data_parsed.update({'data': request_data_parsed.pop('body')})
         try:
-            request_data_parsed = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])
+            request_data_parsed: dict = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])  # type: ignore # noqa: ignore
+            parsed_data.update(
+                body=request_data_parsed.get('json')
+                or request_data_parsed.get('data')
+                or request_data_parsed.get('content')
+            )
         except Exception as e:
             log.error(e)
             raise e
+
+        # 日志记录请求数据
+        if log_data:
+            self.log_request_up(parsed_data)
+            self.allure_request_up(parsed_data)
 
         # 发送请求
         response_data = self.init_response_metadata
@@ -231,13 +241,8 @@ class SendRequests:
         else:
             raise SendRequestError('请求发起失败，请使用合法的请求引擎：requests / httpx')
 
-        # 记录响应数据
-        response_data['url'] = str(response.url)
-        response_data['status_code'] = int(response.status_code)
-        response_data['elapsed'] = response.elapsed.microseconds / 1000.0
+        # 序列化响应数据
         res_headers = dict(response.headers)
-        response_data['headers'] = res_headers
-        response_data['cookies'] = dict(response.cookies)
         res_content_type = res_headers.get('Content-Type')
         try:
             if res_content_type and 'application/json' in res_content_type:
@@ -248,6 +253,13 @@ class SendRequests:
             err_msg = '响应数据解析失败，响应数据不是有效的 json 格式'
             log.warning(err_msg)
             raise SendRequestError(err_msg)
+
+        # 记录响应数据
+        response_data['url'] = str(response.url)
+        response_data['status_code'] = int(response.status_code)
+        response_data['elapsed'] = response.elapsed.microseconds / 1000.0
+        response_data['headers'] = res_headers
+        response_data['cookies'] = dict(response.cookies)
         response_data['json'] = json_data
         response_data['content'] = response.content
         response_data['text'] = response.text
@@ -258,7 +270,7 @@ class SendRequests:
         if log_data:
             self.log_request_down(response_data)
             self.allure_request_down(response_data)
-            if teardown:
+            if parsed_data['is_teardown']:
                 self.log_request_teardown(teardown)
 
         # 后置处理
@@ -269,18 +281,20 @@ class SendRequests:
                     for key, value in item.items():
                         if value is not None:
                             if key == TeardownType.SQL:
-                                teardown_sql = var_extractor.vars_replace({'sql': value}, parsed_data['env'])
-                                sql = teardown_sql['sql']
-                                sql_fetch = teardown_sql.get('fetch')
-                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])
+                                teardown_sql = var_extractor.vars_replace(value, parsed_data['env'])
+                                sql_fetch = QueryFetchType.ALL
+                                if isinstance(teardown_sql, dict):
+                                    sql = teardown_sql.get('sql')
+                                    sql_fetch = teardown_sql.get('fetch')
+                                else:
+                                    sql = teardown_sql
+                                mysql_client.exec_case_sql(sql, sql_fetch, parsed_data['env'])  # type: ignore
                             if key == TeardownType.HOOK:
                                 hook_executor.exec_hook_func(value)
                             if key == TeardownType.EXTRACT:
                                 var_extractor.teardown_var_extract(response_data, value, parsed_data['env'])
                             if key == TeardownType.ASSERT:
-                                assert_text = var_extractor.vars_replace(
-                                    target={'assert_text': value}, env=parsed_data['env']
-                                )['assert_text']
+                                assert_text = var_extractor.vars_replace(value, env=parsed_data['env'])
                                 asserter.exec_asserter(response_data, assert_text)
                             elif key == TeardownType.WAIT_TIME:
                                 log.info(f'执行请求后等待：{value} s')
@@ -321,11 +335,8 @@ class SendRequests:
         log.info(f"请求 url: {parsed_data['url']}")
         log.info(f"请求 params: {parsed_data['params']}")
         log.info(f"请求 headers: {parsed_data['headers']}")
-        log.info(f"请求 data_type：{parsed_data['body_type']}")
-        if parsed_data['body_type'] != BodyType.JSON:
-            log.info(f"请求 data：{parsed_data['body']}")
-        else:
-            log.info(f"请求 json: {parsed_data['body']}")
+        log.info(f"请求 body_type：{parsed_data['body_type']}")
+        log.info(f"请求 body：{parsed_data['body']}")
         log.info(f"请求 files: {parsed_data['files_no_parse']}")
 
     def log_request_teardown(self, teardown: list) -> None:
@@ -375,8 +386,8 @@ class SendRequests:
                 'url': parsed_data['url'],
                 'params': parsed_data['params'],
                 'headers': parsed_data['headers'],
-                'data_type': parsed_data['body_type'],
-                'data': parsed_data['body'],
+                'body_type': parsed_data['body_type'],
+                'body': parsed_data['body'],
                 'files': parsed_data['files_no_parse'],
             },
         )
@@ -392,11 +403,18 @@ class SendRequests:
             {
                 'status_code': response_data['status_code'],
                 'elapsed': response_data['elapsed'],
+                'json': response_data['json'],
             },
         )
 
     @staticmethod
     def allure_dynamic_data(parsed_data: dict) -> None:
+        allure.dynamic.parameter('case_data', {'module': parsed_data['module'], 'id': parsed_data['case_id']})
+        allure.dynamic.id(parsed_data['case_id'])
+        allure.dynamic.tag(parsed_data['module'])
+        allure.dynamic.epic(parsed_data['allure_epic'])
+        allure.dynamic.feature(parsed_data['allure_feature'])
+        allure.dynamic.story(parsed_data['allure_story'])
         allure.dynamic.title(parsed_data['name'])
         allure.dynamic.description(parsed_data['description'])
         allure.dynamic.link(parsed_data['url'])

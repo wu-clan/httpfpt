@@ -23,6 +23,7 @@ class HttpFptConfig:
             # 测试报告
             self.TEST_REPORT_TITLE = glom(self.settings, 'report.title')
             self.TESTER_NAME = glom(self.settings, 'report.tester_name')
+            self.JENKINS_URL = glom(self.settings, 'report.jenkins_url')
 
             # mysql 数据库
             self.MYSQL_HOST = glom(self.settings, 'mysql.host')

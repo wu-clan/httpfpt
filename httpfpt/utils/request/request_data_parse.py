@@ -17,7 +17,7 @@ from httpfpt.common.errors import RequestDataParseError
 from httpfpt.common.log import log
 from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import httpfpt_path
-from httpfpt.db.mysql_db import mysql_client
+from httpfpt.db.mysql import mysql_client
 from httpfpt.enums.allure_severity_type import SeverityType
 from httpfpt.enums.request.auth import AuthType
 from httpfpt.enums.request.body import BodyType
@@ -40,17 +40,16 @@ def _error_msg(info: str) -> str:
 
 class RequestDataParse:
     def __init__(self, request_data: dict, request_engin: str):
-        self.request_data = var_extractor.vars_replace(
-            hook_executor.hook_func_value_replace(request_data),
-            exception=False,
-        )
+        self.config_check(request_data)
+        self.test_steps_check(request_data)
+        self.request_data = hook_executor.hook_func_value_replace(request_data)
         self.request_engin = request_engin
         self._is_run()  # put bottom
 
-    @property
-    def config(self) -> dict:
+    @staticmethod
+    def config_check(request_data: dict) -> dict:
         try:
-            config = self.request_data['config']
+            config = request_data['config']
         except _RequestDataParamGetError:
             raise RequestDataParseError(_error_msg('缺少 config 参数'))
         if not isinstance(config, dict):
@@ -175,14 +174,12 @@ class RequestDataParse:
                     raise RequestDataParseError(_error_msg('参数 config:request:proxies 不是有效的 dict 类型'))
                 keys = list(proxies.keys())
                 if 'http' not in keys or 'https' not in keys:
-                    raise RequestDataParseError(
-                        _error_msg('测试用例数据解析失败，参数 config:request:proxies 不符合规范')
-                    )
+                    raise RequestDataParseError(_error_msg('参数 config:request:proxies 不符合规范'))
                 for v in proxies.values():
                     if v is not None:
                         if not isinstance(v, str):
                             raise RequestDataParseError(
-                                _error_msg(f'测试用例数据解析失败，参数 config:request:proxies:{v} 不是有效的 str 类型')
+                                _error_msg(f'参数 config:request:proxies:{v} 不是有效的 str 类型')
                             )
                 if self.request_engin == EnginType.requests:
                     proxies = proxies
@@ -233,10 +230,10 @@ class RequestDataParse:
                 raise RequestDataParseError(_error_msg('参数 test_steps:mark 或 config:mark 不是有效的 list 类型'))
         return mark
 
-    @property
-    def test_steps(self) -> dict | list:
+    @staticmethod
+    def test_steps_check(request_data: dict) -> dict | list:
         try:
-            test_steps = self.request_data['test_steps']
+            test_steps = request_data['test_steps']
         except _RequestDataParamGetError:
             raise RequestDataParseError(_error_msg('请求参数解析失败，缺少 test_steps 参数'))
         else:
@@ -274,7 +271,7 @@ class RequestDataParse:
     def description(self) -> str | None:
         try:
             description = self.request_data['test_steps']['description']
-            if not isinstance(description, str):
+            if description and not isinstance(description, str):
                 raise RequestDataParseError(_error_msg('参数 test_steps:description 不是有效的 str 类型'))
         except _RequestDataParamGetError:
             description = None
@@ -289,13 +286,24 @@ class RequestDataParse:
             pass
         else:
             if is_run is not None:
+
+                def skip_and_log(reason: str | None = None) -> None:  # noqa: ignore
+                    log.info(f'🏷️ ID: {self.case_id}')
+                    allure.dynamic.epic(self.allure_epic)
+                    allure.dynamic.feature(self.allure_feature)
+                    allure.dynamic.story(self.allure_story)
+                    allure.dynamic.id(self.case_id)
+                    allure.dynamic.tag(self.module)
+                    allure.dynamic.title(self.name)
+                    allure.dynamic.description(self.description)
+                    allure.dynamic.link(self.url)
+                    msg = '此用例已设置跳过执行'
+                    log.warning(msg if reason is None else f'{msg}: {reason}')
+                    raise Skipped(msg if reason is None else f'{msg}: {reason}')
+
                 if isinstance(is_run, bool):
                     if not is_run:
-                        log.info(f'🏷️ ID: {self.case_id}')
-                        allure.dynamic.title(self.name)
-                        allure.dynamic.description(self.description)
-                        log.warning('此用例已设置跳过执行')
-                        raise Skipped('此用例已设置跳过执行')
+                        skip_and_log()
                     return
                 if isinstance(is_run, dict):
                     if 'reason' not in is_run.keys():
@@ -304,26 +312,20 @@ class RequestDataParse:
                     if 'skip' in is_run.keys():
                         if isinstance(is_run['skip'], bool):
                             if is_run['skip']:
-                                log.info(f'🏷️ ID: {self.case_id}')
-                                allure.dynamic.title(self.name)
-                                allure.dynamic.description(self.description)
-                                log.warning(f'此用例已设置跳过执行: {reason}')
-                                raise Skipped(f'此用例已设置跳过执行: {reason}')
+                                skip_and_log(reason)
                         else:
                             raise RequestDataParseError(_error_msg('参数 test_steps:is_run:skip 不是有效的 bool 类型'))
                     elif 'skip_if' in is_run.keys():
                         if isinstance(is_run['skip_if'], list):
                             for v in is_run['skip_if']:
-                                if not isinstance(v, str):
+                                if isinstance(v, str):
+                                    v = var_extractor.vars_replace(v, self.env)
+                                    if hook_executor.exec_any_code(v):  # type: ignore
+                                        skip_and_log(reason)
+                                else:
                                     raise RequestDataParseError(
                                         _error_msg(f'参数 test_steps:is_run:skip_if:{v} 不是有效的 str 值')
                                     )
-                                if hook_executor.exec_any_code(v):
-                                    log.info(f'🏷️ ID: {self.case_id}')
-                                    allure.dynamic.title(self.name)
-                                    allure.dynamic.description(self.description)
-                                    log.warning(f'此用例已设置跳过执行: {reason}')
-                                    raise Skipped(f'此用例已设置跳过执行: {reason}')
                     else:
                         raise RequestDataParseError(_error_msg('参数 test_steps:is_run 缺少 skip / skip_if 参数'))
                 else:

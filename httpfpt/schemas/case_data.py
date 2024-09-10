@@ -147,7 +147,7 @@ class StepsTearDownData(BaseModel):
 class Steps(BaseModel):
     name: str
     case_id: str
-    description: str
+    description: str | None = None
     is_run: bool | dict | None = None
     mark: list[str] | None = None
     retry: int | None = None

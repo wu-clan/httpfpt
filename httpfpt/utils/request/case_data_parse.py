@@ -12,9 +12,11 @@ import pytest
 from pydantic import ValidationError
 
 from httpfpt.common.errors import RequestDataParseError
+from httpfpt.common.json_handler import read_json_file
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.db.redis_db import redis_client
+from httpfpt.db.redis import redis_client
+from httpfpt.enums.case_data_type import CaseDataType
 from httpfpt.schemas.case_data import CaseCacheData
 from httpfpt.utils.file_control import get_file_hash, get_file_property, search_all_case_data_files
 from httpfpt.utils.pydantic_parser import parse_error
@@ -41,7 +43,11 @@ def case_data_init(pydantic_verify: bool) -> None:
     """
     all_case_data_files = search_all_case_data_files()
     for case_data_file in all_case_data_files:
-        case_data = read_yaml(case_data_file)
+        file_type = get_file_property(case_data_file)[2]
+        if file_type == CaseDataType.JSON:
+            case_data = read_json_file(case_data_file)
+        else:
+            case_data = read_yaml(case_data_file)
         filename = get_file_property(case_data_file)[0]
         file_hash = get_file_hash(case_data_file)
         case_data.update({'filename': filename, 'file_hash': file_hash})
@@ -119,7 +125,7 @@ def case_id_unique_verify() -> None:
         redis_client.rset(f'{redis_client.prefix}:case_id_list', str(all_case_id))
 
 
-def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
+def get_testcase_data(*, filename: str) -> tuple[list, list]:
     """
     获取测试用例数据
 
@@ -138,7 +144,6 @@ def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
     if steps is None:
         raise RequestDataParseError(test_steps_error)
 
-    allure_data = case_data['config']['allure']
     if isinstance(steps, dict):
         ids = get_ids(case_data)
         mark = get_testcase_mark(case_data)
@@ -146,7 +151,7 @@ def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
             ddt_data = pytest.param(case_data, marks=[getattr(pytest.mark, m) for m in mark])
         else:
             ddt_data = case_data
-        return allure_data, [ddt_data], ids
+        return [ddt_data], ids
     elif isinstance(steps, list):
         _ddt_data_list = []
         marked_ddt_data_list = []
@@ -162,7 +167,7 @@ def get_testcase_data(*, filename: str) -> tuple[dict, list, list]:
             else:
                 raise RequestDataParseError(test_steps_error)
         ids = get_ids(_ddt_data_list)
-        return allure_data, marked_ddt_data_list, ids
+        return marked_ddt_data_list, ids
     else:
         raise RequestDataParseError(f'请求测试用例数据文件 {filename} 格式错误, 请检查用例数据文件内容')
 

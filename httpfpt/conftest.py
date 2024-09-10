@@ -137,7 +137,7 @@ def pytest_runtest_makereport(item, call):
 
 def pytest_collection_modifyitems(items):
     """
-    解决数据驱动ids参数为中文时,控制台输出乱码问题
+    更新收集的测试用例配置
 
     :param items:
     :return:

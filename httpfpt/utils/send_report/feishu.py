@@ -29,7 +29,7 @@ class FeiShu:
                                 [{'tag': 'text', 'text': f"⚠️ 跳过用例: {self.content['skipped']}"}],
                                 [{'tag': 'text', 'text': f"⌛ 开始时间: {self.content['started_time']}"}],
                                 [{'tag': 'text', 'text': f"⏱️ 执行耗时: {self.content['elapsed']}"}],
-                                [{'tag': 'a', 'text': '➡️ 查看详情', 'href': 'https://foryourself'}],
+                                [{'tag': 'a', 'text': '➡️ 查看详情', 'href': f'{httpfpt_config.JENKINS_URL}'}],
                             ],
                         }
                     }

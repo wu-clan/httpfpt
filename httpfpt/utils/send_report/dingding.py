@@ -26,7 +26,7 @@ class DingDing:
                     f"> ⚠️ 跳过用例: {self.content['skipped']}\n\n"
                     f"> ⌛ 开始时间: {self.content['started_time']}\n\n"
                     f"> ⏱️ 执行耗时: {self.content['elapsed']}\n\n"
-                    f"> ➡️ [查看详情](https://foryourself)",
+                    f"> ➡️ [查看详情]({httpfpt_config.JENKINS_URL})",
                 },
             }
             response = requests.session().post(

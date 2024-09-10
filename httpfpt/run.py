@@ -14,8 +14,9 @@ from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import httpfpt_path
-from httpfpt.db.redis_db import redis_client
+from httpfpt.db.redis import redis_client
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
+from httpfpt.utils.cli.version import get_version
 from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.dingding import DingDing
 from httpfpt.utils.send_report.email import SendEmail
@@ -26,7 +27,6 @@ from httpfpt.utils.time_control import get_current_time
 
 def startup(
     *args,
-    testcase_generate: bool,
     log_level: Literal['-q', '-s', '-v', '-vv'],
     case_path: str | None,
     html_report: bool,
@@ -41,8 +41,6 @@ def startup(
     **kwargs,
 ) -> None:
     """运行启动程序"""
-    if testcase_generate:
-        auto_generate_testcases()
 
     run_args = [log_level]
 
@@ -143,20 +141,28 @@ def startup(
         WeChat(test_result).send()
 
     if allure:
-        if not os.path.exists(httpfpt_path.allure_report_env_file):
-            shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
+        if os.path.exists(httpfpt_path.allure_report_dir):
+            if not os.path.exists(httpfpt_path.allure_report_env_file):
+                shutil.copyfile(httpfpt_path.allure_env_file, httpfpt_path.allure_report_env_file)
 
         if allure_serve:
             subprocess.run(
-                f'allure generate {httpfpt_path.allure_report_dir} -o {httpfpt_path.allure_html_report_dir} --clean'
+                [
+                    'allure',
+                    'generate',
+                    f'{httpfpt_path.allure_report_dir}',
+                    '-o',
+                    f'{httpfpt_path.allure_html_report_dir}' '--clean',
+                ]
             )
-            subprocess.run(f'allure serve {httpfpt_path.allure_report_dir}')
+            subprocess.run(['allure', 'serve', f'{httpfpt_path.allure_report_dir}'])
 
 
 def run(
     *args,
     # auto testcases
-    testcase_generate: bool = False,
+    testcase_generate: bool = True,
+    testcase_re_generation: bool = False,
     # init
     clean_cache: bool = False,
     pydantic_verify: bool = True,
@@ -183,6 +189,7 @@ def run(
 
     :param args: pytest 运行参数
     :param testcase_generate: 自动生成测试用例（跳过同名文件），建议通过 CLI 手动执行，默认关闭
+    :param testcase_re_generation: 覆盖生成同名文件测试用例，建议通过 CLI 手动指定，默认开启
     :param clean_cache: 清理 redis 缓存数据，对于脏数据，这很有用，默认关闭
     :param pydantic_verify: 用例数据完整架构 pydantic 快速检测, 默认开启
     :param args: pytest 运行参数
@@ -201,7 +208,7 @@ def run(
     :return:
     """
     try:
-        logo = """\n
+        banner = f"""\n
          /$$   /$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$  /$$$$$$$$
         | $$  | $$|__  $$__/|__  $$__/| $$__  $$| $$_____/| $$__  $$|__  $$__/
         | $$  | $$   | $$      | $$   | $$  | $$| $$      | $$  | $$   | $$
@@ -211,12 +218,20 @@ def run(
         | $$  | $$   | $$      | $$   | $$      | $$      | $$         | $$
         |__/  |__/   |__/      |__/   |__/      |__/      |__/         |__/
 
-            """
-        log.info(logo)
+        Starting...
+
+        Version: {get_version(cli=False)}
+        """
+        log.info(banner)
         redis_client.init()
         case_data.clean_cache_data(clean_cache)
         case_data.case_data_init(pydantic_verify)
         case_data.case_id_unique_verify()
+        if testcase_generate:
+            if not testcase_re_generation:
+                auto_generate_testcases()
+            else:
+                auto_generate_testcases(rewrite=True)
         startup(
             *args,
             testcase_generate=testcase_generate,
