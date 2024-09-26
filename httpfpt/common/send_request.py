@@ -208,15 +208,16 @@ class SendRequests:
             'body': parsed_data['body'],
             'files': parsed_data['files'],
         }
-        if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
-            request_data_parsed.update({'json': request_data_parsed.pop('body')})
-        elif parsed_data['body_type'] == BodyType.binary:
-            if request_engin == EnginType.httpx:
-                request_data_parsed.update({'content': request_data_parsed.pop('body')})
-        else:
-            request_data_parsed.update({'data': request_data_parsed.pop('body')})
         try:
             request_data_parsed: dict = var_extractor.vars_replace(request_data_parsed, parsed_data['env'])  # type: ignore # noqa: ignore
+            body = request_data_parsed.pop('body')
+            if parsed_data['body_type'] == BodyType.JSON or parsed_data['body_type'] == BodyType.GraphQL:
+                request_data_parsed.update({'json': body})
+            elif parsed_data['body_type'] == BodyType.binary:
+                if request_engin == EnginType.httpx:
+                    request_data_parsed.update({'content': body})
+            else:
+                request_data_parsed.update({'data': body})
             parsed_data.update(
                 body=request_data_parsed.get('json')
                 or request_data_parsed.get('data')
