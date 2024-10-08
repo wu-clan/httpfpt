@@ -77,7 +77,7 @@ git clone https://github.com/wu-clan/httpfpt.git
 
 ## 互动
 
-[WeChat / QQ](https://wu-clan.github.io/homepage/)
+[TG / Discord](https://wu-clan.github.io/homepage/)
 
 ## 状态
 
