@@ -156,7 +156,7 @@ def startup(
                     'generate',
                     f'{httpfpt_path.allure_report_dir}',
                     '-o',
-                    f'{httpfpt_path.allure_html_report_dir}' '--clean',
+                    f'{httpfpt_path.allure_html_report_dir} --clean',
                 ]
             )
             subprocess.run(['allure', 'serve', f'{httpfpt_path.allure_report_dir}'])
