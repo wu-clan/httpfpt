@@ -99,9 +99,9 @@ def write_yaml_vars(data: dict) -> None:
     :param data:
     :return:
     """
-    _file = os.path.join(httpfpt_path.data_dir, 'global_vars.yaml')
+    _file = os.path.join(httpfpt_path.global_var_dir, 'global_vars.yaml')
     try:
-        _vars = read_yaml(httpfpt_path.data_dir, filename='global_vars.yaml')
+        _vars = read_yaml(httpfpt_path.global_var_dir, filename='global_vars.yaml')
         _vars.update(data)
         with open(_file, encoding='utf-8', mode='w') as f:
             yaml.dump(_vars, f, allow_unicode=True)
