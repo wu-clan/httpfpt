@@ -49,7 +49,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
 
@@ -63,7 +63,7 @@ version = { source = "file", path = "httpfpt/__init__.py" }
 [tool.pdm.dev-dependencies]
 test = [
     "pyright==1.1.349",
-    "ruff>=0.4.5",
+    "ruff>=0.9.6",
 ]
 
 [tool.pdm.build]

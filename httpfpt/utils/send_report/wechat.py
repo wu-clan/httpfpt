@@ -17,16 +17,16 @@ class WeChat:
             data = {
                 'msgtype': 'markdown',
                 'markdown': {
-                    'content': f"# {httpfpt_config.TEST_REPORT_TITLE}\n"
-                    f"> 👤 测试人员: **{httpfpt_config.TESTER_NAME}**\n"
-                    f"> 🤖 测试结果: **{self.content['result']}**\n"
+                    'content': f'# {httpfpt_config.TEST_REPORT_TITLE}\n'
+                    f'> 👤 测试人员: **{httpfpt_config.TESTER_NAME}**\n'
+                    f'> 🤖 测试结果: **{self.content["result"]}**\n'
                     f"> ✅ 通过用例: <font color='info'>**{self.content['passed']}**</font>\n"
-                    f"> 🔧 失败用例: **{self.content['failed']}**\n"
-                    f"> ❌ 错误用例: **{self.content['error']}**\n"
-                    f"> ⚠️ 跳过用例: **{self.content['skipped']}**\n"
-                    f"> ⌛ 开始时间: **{self.content['started_time']}**\n"
-                    f"> ⏱️ 执行耗时: **{self.content['elapsed']}**\n"
-                    f"> ➡️ 查看报告: [点击跳转]({httpfpt_config.JENKINS_URL})"
+                    f'> 🔧 失败用例: **{self.content["failed"]}**\n'
+                    f'> ❌ 错误用例: **{self.content["error"]}**\n'
+                    f'> ⚠️ 跳过用例: **{self.content["skipped"]}**\n'
+                    f'> ⌛ 开始时间: **{self.content["started_time"]}**\n'
+                    f'> ⏱️ 执行耗时: **{self.content["elapsed"]}**\n'
+                    f'> ➡️ 查看报告: [点击跳转]({httpfpt_config.JENKINS_URL})'
                 },
             }
             response = requests.session().post(

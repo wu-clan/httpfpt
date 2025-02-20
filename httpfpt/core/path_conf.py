@@ -43,62 +43,72 @@ class HttpFptPathConfig:
     @property
     def case_data_dir(self) -> str:
         """用例数据路径"""
-        return os.path.join(self.data_dir, 'test_data')
+        return os.path.join(self.project_dir, 'data', 'test_data')
 
     @property
-    def report_dir(self) -> str:
+    def _report_dir(self) -> str:
         """测试报告路径"""
         return os.path.join(self.project_dir, 'report')
 
     @property
     def allure_report_dir(self) -> str:
         """allure测试报告路径"""
-        return os.path.join(self.report_dir, 'allure_report')
-
-    @property
-    def allure_html_report_dir(self) -> str:
-        """allure html测试报告路径"""
-        return os.path.join(self.allure_report_dir, 'html')
-
-    @property
-    def html_report_dir(self) -> str:
-        """HTML测试报告路径"""
-        return os.path.join(self.report_dir, 'html_report')
-
-    @property
-    def yaml_report_dir(self) -> str:
-        """YAML测试报告路径"""
-        return os.path.join(self.report_dir, 'yaml_report')
-
-    @property
-    def allure_env_file(self) -> str:
-        """allure环境文件"""
-        return os.path.join(self.project_dir, 'core', 'allure_env', 'environment.properties')
+        return os.path.join(self._report_dir, 'allure_report')
 
     @property
     def allure_report_env_file(self) -> str:
         """allure报告环境文件，用作copy，避免allure开启清理缓存导致环境文件丢失"""
-        return os.path.join(self.allure_report_dir, 'environment.properties')
+        return os.path.join(self._report_dir, 'allure_report', 'environment.properties')
+
+    @property
+    def allure_html_report_dir(self) -> str:
+        """allure html测试报告路径"""
+        return os.path.join(self._report_dir, 'allure_report', 'html')
+
+    @property
+    def html_report_dir(self) -> str:
+        """HTML测试报告路径"""
+        return os.path.join(self._report_dir, 'html_report')
+
+    @property
+    def yaml_report_dir(self) -> str:
+        """YAML测试报告路径"""
+        return os.path.join(self._report_dir, 'yaml_report')
+
+    @property
+    def _core_dir(self) -> str:
+        """AUTH配置文件路径"""
+        return os.path.join(self.project_dir, 'core')
+
+    @property
+    def auth_conf_dir(self) -> str:
+        """AUTH配置文件路径"""
+        return self._core_dir
+
+    @property
+    def global_var_dir(self) -> str:
+        """全局变量文件路径"""
+        return self._core_dir
+
+    @property
+    def hook_dir(self) -> str:
+        """钩子函数文件路径"""
+        return self._core_dir
+
+    @property
+    def allure_env_file(self) -> str:
+        """allure环境文件"""
+        return os.path.join(self._core_dir, 'allure_env', 'environment.properties')
 
     @property
     def run_env_dir(self) -> str:
         """运行环境文件路径"""
-        return os.path.join(self.project_dir, 'core', 'run_env')
+        return os.path.join(self._core_dir, 'run_env')
 
     @property
     def testcase_dir(self) -> str:
         """测试用例路径"""
         return os.path.join(self.project_dir, 'testcases')
-
-    @property
-    def auth_conf_dir(self) -> str:
-        """AUTH配置文件路径"""
-        return os.path.join(self.project_dir, 'core')
-
-    @property
-    def settings_dir(self) -> str:
-        """核心配置文件路径"""
-        return self.auth_conf_dir
 
 
 @lru_cache(maxsize=None)

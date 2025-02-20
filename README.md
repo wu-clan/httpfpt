@@ -36,47 +36,15 @@
 
 ## 流程图
 
-![httpfpt_flowchart](https://github.com/wu-clan/image/blob/master/httpfpt_flowchart.png?raw=true)
-
-## ⬇️ 下载
-
-```shell
-pip install httpfpt
-```
-
-## 🧑‍💻 Use
-
-1. 安装 redis 数据库并启动服务
-
-   [Redis Windows](https://github.com/redis-windows/redis-windows)
-
-   [Linux / macOS](https://redis.io/download/)
-
-   [Docker](https://hub.docker.com/_/redis)
-
-2. 安装 mysql 数据库（可选，如果你需要本地数据库）
-
-   [Windows / Linux / macOS](https://dev.mysql.com/downloads/installer/)
-
-   [Docker](https://hub.docker.com/_/mysql)
-
-> [!WARNING]
-> allure 测试报告默认使用 allure-pytest 生成，但是不能直接访问，有以下选择
-> 1. 本地访问：你必须安装 [allure](https://www.yuque.com/poloyy/python/aiqlmi)
-     程序和 [Java JDK](https://adoptopenjdk.net/archive.html?variant=openjdk8&jvmVariant=hotspot) 才能进行本地可视化浏览
-> 2. Jenkins（文档内包含集成教程）: 将 allure 测试报告集成到到 Jenkins 中，通过 Jenkins 进行浏览
+![httpfpt_flowchart](https://wu-clan.github.io/picx-images-hosting/httpfpt_flowchart.png)
 
 ## 帮助
 
-有关更多详细信息，请参阅 [文档](https://wu-clan.github.io/httpfpt_docs)
+有关更多详细信息，请参阅 [官方文档](https://wu-clan.github.io/httpfpt_docs)
 
 ## 互动
 
-[WeChat / QQ](https://wu-clan.github.io/homepage/)
-
-## 状态
-
-![Alt](https://repobeats.axiom.co/api/embed/98343c7bb6875c60a529fff021611eceecb296f1.svg "Repo beats analytics image")
+[TG / Discord](https://wu-clan.github.io/homepage/)
 
 ## 赞助
 

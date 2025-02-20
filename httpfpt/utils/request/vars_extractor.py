@@ -52,25 +52,23 @@ class VarsExtractor:
         except OSError:
             raise RequestDataParseError('运行环境获取失败, 请检查测试用例环境配置')
 
-        # 执行变量替换
-        def var_replace(_var_key: str, _str_target: str) -> str:
-            cache_value = variable_cache.get(_var_key)
-            if cache_value is None:
-                global_vars = read_yaml(httpfpt_path.data_dir, filename='global_vars.yaml')
-                var_value = env_vars.get(_var_key.upper(), global_vars.get(_var_key))
-                if var_value is None:
-                    raise VariableError(_var_key)
-                log.info(f'变量 {_var_key}={var_value} 替换完成')
-                return self.vars_re.sub(str(var_value), _str_target, 1)
-            else:
-                log.info(f'变量 {_var_key}={cache_value} 替换完成')
-                return self.vars_re.sub(str(cache_value), _str_target, 1)
-
         for match in self.vars_re.finditer(str_target):
             var_key = match.group(1) or match.group(2)
             if var_key is not None:
                 try:
-                    str_target = var_replace(var_key, str_target)
+                    cache_value = variable_cache.get(var_key)
+                    if cache_value is None:
+                        global_vars = read_yaml(httpfpt_path.global_var_dir, filename='global_vars.yaml')
+                        var_value = env_vars.get(
+                            var_key.upper(), global_vars.get(var_key) if global_vars is not None else None
+                        )
+                        if var_value is None:
+                            raise VariableError(var_key)
+                        log.info(f'变量 {var_key}={var_value} 替换完成')
+                        str_target = self.vars_re.sub(str(var_value), str_target, 1)
+                    else:
+                        log.info(f'变量 {var_key}={cache_value} 替换完成')
+                        str_target = self.vars_re.sub(str(cache_value), str_target, 1)
                 except Exception as e:
                     raise VariableError(f'变量 {var_key} 替换失败: {e}')
 
