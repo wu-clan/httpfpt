@@ -54,7 +54,7 @@ class HookExecutor:
             return target
 
         # hook 返回值替换
-        exec('from httpfpt.data.hooks import *')
+        exec('from httpfpt.core.hooks import *')
         for match in self.func_re.finditer(str_target):
             hook_key = match.group(1)
             try:
@@ -91,7 +91,7 @@ class HookExecutor:
         """
         key = self.func_re.search(hook_var)
         func = key.group(1)
-        exec('from httpfpt.data.hooks import *')
+        exec('from httpfpt.core.hooks import *')
         log.info(f'执行 hook：{func}')
         exec(func)
 

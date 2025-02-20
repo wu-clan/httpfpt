@@ -58,7 +58,7 @@ class VarsExtractor:
                 try:
                     cache_value = variable_cache.get(var_key)
                     if cache_value is None:
-                        global_vars = read_yaml(httpfpt_path.data_dir, filename='global_vars.yaml')
+                        global_vars = read_yaml(httpfpt_path.global_var_dir, filename='global_vars.yaml')
                         var_value = env_vars.get(
                             var_key.upper(), global_vars.get(var_key) if global_vars is not None else None
                         )
