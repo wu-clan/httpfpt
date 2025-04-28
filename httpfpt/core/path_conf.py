@@ -64,34 +64,34 @@ class HttpFptPathConfig:
         return os.path.join(self._report_dir, 'yaml_report')
 
     @property
-    def _core_dir(self) -> str:
-        """AUTH配置文件路径"""
+    def core_dir(self) -> str:
+        """核心配置文件路径"""
         return os.path.join(self.project_dir, 'core')
 
     @property
     def auth_conf_dir(self) -> str:
         """AUTH配置文件路径"""
-        return self._core_dir
+        return self.core_dir
 
     @property
     def global_var_dir(self) -> str:
         """全局变量文件路径"""
-        return self._core_dir
+        return self.core_dir
 
     @property
     def hook_dir(self) -> str:
         """钩子函数文件路径"""
-        return self._core_dir
+        return self.core_dir
 
     @property
     def allure_env_file(self) -> str:
         """allure环境文件"""
-        return os.path.join(self._core_dir, 'allure_env', 'environment.properties')
+        return os.path.join(self.core_dir, 'allure_env', 'environment.properties')
 
     @property
     def run_env_dir(self) -> str:
         """运行环境文件路径"""
-        return os.path.join(self._core_dir, 'run_env')
+        return os.path.join(self.core_dir, 'run_env')
 
     @property
     def testcase_dir(self) -> str:
