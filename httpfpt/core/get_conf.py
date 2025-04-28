@@ -15,7 +15,7 @@ __all__ = ['httpfpt_config']
 
 class HttpFptConfig:
     def __init__(self) -> None:
-        self.settings = read_toml(httpfpt_path.settings_dir, 'conf.toml')
+        self.settings = read_toml(httpfpt_path.core_dir, 'conf.toml')
         try:
             # 项目目录名
             self.PROJECT_NAME = glom(self.settings, 'project.name')
