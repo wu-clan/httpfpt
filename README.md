@@ -44,7 +44,7 @@
 
 ## 互动
 
-[TG / Discord](https://wu-clan.github.io/homepage/)
+[Discord](https://wu-clan.github.io/homepage/)
 
 ## 赞助
 
