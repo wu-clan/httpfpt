@@ -407,7 +407,7 @@ class RequestDataParse:
                 elif auth.auth_type == AuthType.TOKEN_CUSTOM:
                     bearer_token = {'Authorization': f'Bearer {auth.bearer_token_custom}'}
                 if headers is not None:
-                    headers.update(bearer_token)
+                    headers.update(bearer_token)  # type: ignore
                 else:
                     headers = bearer_token
             return headers
