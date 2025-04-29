@@ -401,12 +401,15 @@ class RequestDataParse:
                 if len(headers) == 0:
                     raise RequestDataParseError(_error_msg('参数 test_steps:request:headers 为空'))
             if auth.is_auth:
+                bearer_token = None
                 if auth.auth_type == AuthType.TOKEN:
                     bearer_token = {'Authorization': f'Bearer {auth.bearer_token}'}
-                    headers = headers.update(bearer_token) if headers else bearer_token
                 elif auth.auth_type == AuthType.TOKEN_CUSTOM:
                     bearer_token = {'Authorization': f'Bearer {auth.bearer_token_custom}'}
-                    headers = headers.update(bearer_token) if headers else bearer_token
+                if headers is not None:
+                    headers.update(bearer_token)
+                else:
+                    headers = bearer_token
             return headers
 
     @property
@@ -421,7 +424,10 @@ class RequestDataParse:
         if auth.is_auth:
             if auth.auth_type == AuthType.COOKIE:
                 header_cookie = auth.header_cookie
-                cookies = cookies.update(header_cookie) if cookies else header_cookie
+                if cookies is not None:
+                    cookies.update(header_cookie)
+                else:
+                    cookies = header_cookie
         return cookies
 
     @property
@@ -716,27 +722,26 @@ class RequestDataParse:
         headers = self.headers
         body_type = self.body_type
         body = self.body
-        if not headers:
+        if headers is None:
             if body_type:
-                headers = {}
                 if body_type == BodyType.form_data:
                     pass  # 表单请求由引擎自动处理
                 elif body_type == BodyType.x_www_form_urlencoded:
-                    headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+                    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
                 elif body_type == BodyType.binary:
-                    headers.update({'Content-Type': 'application/octet-stream'})
+                    headers = {'Content-Type': 'application/octet-stream'}
                 elif body_type == BodyType.GraphQL:
-                    headers.update({'Content-Type': 'application/json'})
+                    headers = {'Content-Type': 'application/json'}
                 elif body_type == BodyType.TEXT:
-                    headers.update({'Content-Type': 'text/plain'})
+                    headers = {'Content-Type': 'text/plain'}
                 elif body_type == BodyType.JavaScript:
-                    headers.update({'Content-Type': 'application/javascript'})
+                    headers = {'Content-Type': 'application/javascript'}
                 elif body_type == BodyType.JSON:
-                    headers.update({'Content-Type': 'application/json'})
+                    headers = {'Content-Type': 'application/json'}
                 elif body_type == BodyType.HTML:
-                    headers.update({'Content-Type': 'text/html'})
+                    headers = {'Content-Type': 'text/html'}
                 elif body_type == BodyType.XML:
-                    headers.update({'Content-Type': 'application/xml'})
+                    headers = {'Content-Type': 'application/xml'}
         # 请求数据整合
         all_data = {
             'allure_epic': self.allure_epic,

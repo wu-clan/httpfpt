@@ -29,6 +29,7 @@ test_steps:
       body:
       files:
     setup:
+      - testcase: event_linked_001
       - testcase:
           case_id: event_linked_001
           request:
@@ -37,12 +38,6 @@ test_steps:
           response:
             - key: rcode
               jsonpath: $.status_code
-      - testcase:
-          case_id: event_linked_001
-          response:
-              - key: rcode
-                jsonpath: $.status_code
-      - testcase: event_linked_001
       - hook:
       - wait_time: 0
     teardown:
