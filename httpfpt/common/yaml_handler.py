@@ -106,7 +106,6 @@ def write_yaml_vars(data: dict) -> None:
         _yaml = YAML()
         with open(_file, encoding='utf-8', mode='r') as f:
             _vars = _yaml.load(f)
-            log.debug(_vars)
             _vars.update(data)
         with open(_file, encoding='utf-8', mode='w') as f:
             _yaml.dump(_vars, f)

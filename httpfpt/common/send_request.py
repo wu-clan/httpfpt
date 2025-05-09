@@ -84,6 +84,7 @@ class SendRequests:
             log.error(f'发送 requests 请求响应异常: {e}')
             raise SendRequestError(e.__str__())
         else:
+            log.info('请求完成')
             return response  # type: ignore
 
     @staticmethod
@@ -116,6 +117,7 @@ class SendRequests:
             log.error(f'发送 httpx 请求响应异常: {e}')
             raise SendRequestError(e.__str__())
         else:
+            log.info('请求完成')
             return response  # type: ignore
 
     def send_request(
@@ -231,6 +233,7 @@ class SendRequests:
         if log_data:
             self.log_request_up(parsed_data)
             self.allure_request_up(parsed_data)
+            log.info('<发送请求>')
 
         # 发送请求
         response_data = self.init_response_metadata
@@ -311,6 +314,7 @@ class SendRequests:
         return response_data
 
     def log_request_setup(self, setup: list) -> None:
+        log.info('<请求前置>')
         for item in setup:
             for key, value in item.items():
                 if key == SetupType.TESTCASE:
@@ -328,10 +332,13 @@ class SendRequests:
 
     @staticmethod
     def log_request_up(parsed_data: dict) -> None:
+        log.info('<数据参数>')
         log.info(f'用例 env: {parsed_data["env"]}')
         log.info(f'用例 module: {parsed_data["module"]}')
         log.info(f'用例 name: {parsed_data["name"]}')
         log.info(f'用例 description: {parsed_data["description"]}')
+
+        log.info('<请求参数>')
         log.info(f'请求 method: {parsed_data["method"]}')
         log.info(f'请求 url: {parsed_data["url"]}')
         log.info(f'请求 params: {parsed_data["params"]}')
@@ -341,6 +348,7 @@ class SendRequests:
         log.info(f'请求 files: {parsed_data["files_no_parse"]}')
 
     def log_request_teardown(self, teardown: list) -> None:
+        log.info('<请求后置>')
         for item in teardown:
             for key, value in item.items():
                 if key == TeardownType.SQL:
