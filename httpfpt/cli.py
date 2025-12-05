@@ -11,10 +11,11 @@ import cappa
 
 from cappa import Subcommands
 from rich.traceback import install as rich_install
-from typing_extensions import TYPE_CHECKING, Annotated
+from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from httpfpt import __version__
 from httpfpt.run import run
 from httpfpt.utils.cli.about_testcase import generate_testcases, testcase_data_verify
 from httpfpt.utils.cli.import_case_data import (
@@ -25,56 +26,35 @@ from httpfpt.utils.cli.import_case_data import (
     import_openapi_case_data,
     import_postman_case_data,
 )
-from httpfpt.utils.cli.version import get_version
 from httpfpt.utils.rich_console import console
-
-if TYPE_CHECKING:
-    from cappa.parser import Value
-
-
-def cmd_run_test_parse(value: Value) -> bool | Value:
-    """运行测试命令参数解析"""
-    if len(value) == 0:  # type: ignore
-        return True
-    else:
-        return value
 
 
 @cappa.command(name='httpfpt-cli')
 @dataclass
 class HttpFptCLI:
-    version: Annotated[
-        bool,
-        cappa.Arg(
-            short='-V',
-            long=True,
-            default=False,
-            help='Print version information.',
-        ),
-    ]
     run_test: Annotated[
         list[str] | None,
         cappa.Arg(
-            value_name='<PYTEST ARGS / NONE>',
+            value_name='<PYTEST ARGS>',
             short='-r',
             long='--run',
             default=None,
+            show_default=False,
             help='Run test cases, do not support use with other commands, but support custom pytest running parameters,'
             ' default parameters see `httpfpt/run.py`.',
-            parse=cmd_run_test_parse,
             num_args=-1,
         ),
     ]
     subcmd: Subcommands[TestCaseCLI | ImportCLI | None] = None
 
     def __call__(self) -> None:
-        if self.version:
-            get_version()
-        if self.run_test:
-            if self.version or self.subcmd:
-                console.print('\n❌ 暂不支持 -r/--run 命令与其他 CLI 命令同时使用')
+        if self.run_test is not None:
+            if self.subcmd:
+                console.print('\n❌ 不支持 -r/--run 命令与其他 CLI 命令同时使用')
                 raise cappa.Exit(code=1)
-            run(*self.run_test) if isinstance(self.run_test, list) else run()
+            run(*self.run_test)
+        else:
+            run()
 
 
 @cappa.command(name='testcase', help='Test case tools.')
@@ -116,7 +96,7 @@ class ImportCLI:
         tuple[str, str],
         cappa.Arg(
             value_name='<JSONFILE / URL> <PROJECT>',
-            short='-o',
+            short='-openapi',
             long='--import-openapi',
             default=(),
             help='导入 openapi 数据到 yaml 数据文件; 支持 json 文件 / url 导入, 需要指定 project 项目名.',
@@ -127,7 +107,7 @@ class ImportCLI:
         tuple[str, str],
         cappa.Arg(
             value_name='<JSONFILE> <PROJECT>',
-            short='-a',
+            short='-apifox',
             long='--import-apifox',
             default=(),
             help='Beta: 导入 apifox 数据到 yaml 数据文件; 支持 json 文件导入, 需要指定 project 项目名.',
@@ -137,7 +117,8 @@ class ImportCLI:
     har: Annotated[
         tuple[str, str],
         cappa.Arg(
-            short='-h',
+            value_name='<HAR> <PROJECT>',
+            short='-har',
             long='--import-har',
             default=(),
             help='TODO: Not started yet.',
@@ -147,7 +128,8 @@ class ImportCLI:
     jmeter: Annotated[
         tuple[str, str],
         cappa.Arg(
-            short='-j',
+            value_name='<JMETER> <PROJECT>',
+            short='-jmeter',
             long='--import-jmeter',
             default=(),
             help='TODO: Not started yet.',
@@ -157,7 +139,8 @@ class ImportCLI:
     postman: Annotated[
         tuple[str, str],
         cappa.Arg(
-            short='-p',
+            value_name='<POSTMAN> <PROJECT>',
+            short='-postman',
             long='--import-postman',
             default=(),
             help='TODO: Not started yet.',
@@ -167,7 +150,8 @@ class ImportCLI:
     git: Annotated[
         str,
         cappa.Arg(
-            value_name='<GIT HTTPS>',
+            value_name='<GIT URL>',
+            short='-git',
             long='--import-git',
             default='',
             help='导入 git 仓库测试数据到本地.',
@@ -190,11 +174,7 @@ class ImportCLI:
             import_git_case_data(self.git)
 
 
-def cappa_invoke() -> None:
+def main() -> None:
     """cli 执行程序"""
     rich_install()
-    cappa.invoke(HttpFptCLI)
-
-
-if __name__ == '__main__':
-    cappa_invoke()
+    cappa.invoke(HttpFptCLI, version=__version__)

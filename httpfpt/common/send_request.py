@@ -260,7 +260,7 @@ class SendRequests:
 
         # 记录响应数据
         response_data['url'] = str(response.url)
-        response_data['status_code'] = int(response.status_code)
+        response_data['status_code'] = int(response.status_code)  # type: ignore
         response_data['elapsed'] = response.elapsed.microseconds / 1000.0
         response_data['headers'] = res_headers
         response_data['cookies'] = dict(response.cookies)

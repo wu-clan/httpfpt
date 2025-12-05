@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: end-of-file-fixer
@@ -9,22 +9,29 @@ repos:
       - id: check-json
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.14.6
     hooks:
-      - id: ruff
+      - id: ruff-check
         args:
-          - '--config'
-          - '.ruff.toml'
+          # https://github.com/astral-sh/ruff-pre-commit/issues/64
           - '--fix'
+          - '--unsafe-fixes'
       - id: ruff-format
 
-  - repo: https://github.com/pdm-project/pdm
-    rev: 2.22.3
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.12
     hooks:
-      - id: pdm-export
+      - id: uv-lock
+      - id: uv-export
         args:
-          - -o
+          - '-o'
           - 'requirements.txt'
-          - '--without-hashes'
-        files: ^pdm.lock$
-      - id: pdm-lock-check
+          - '--no-hashes'
+
+  - repo: local
+    hooks:
+      - id: ty
+        language: python
+        name: ty
+        pass_filenames: false
+        entry: uv run ty check httpfpt

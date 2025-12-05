@@ -90,10 +90,11 @@ class HookExecutor:
         :return:
         """
         key = self.func_re.search(hook_var)
-        func = key.group(1)
-        exec('from httpfpt.core.hooks import *')
-        log.info(f'执行 hook：{func}')
-        exec(func)
+        if key:
+            func = key.group(1)
+            exec('from httpfpt.core.hooks import *')
+            log.info(f'执行 hook：{func}')
+            exec(func)
 
     @staticmethod
     def exec_any_code(code: str) -> bool:
