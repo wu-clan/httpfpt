@@ -11,10 +11,9 @@ from typing import Literal
 
 import pytest
 
-from httpfpt.utils.cli.version import get_version
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from httpfpt import __version__
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.get_conf import httpfpt_config
@@ -224,7 +223,7 @@ def run(
 
         Starting...
 
-        Version: {get_version(cli=False)}
+        Version: {__version__}
         """
         log.info(banner)
         redis_client.init()
