@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import os.path
 
 from pathlib import Path
@@ -62,8 +60,7 @@ def auto_generate_testcases(rewrite: bool = False) -> None:
                 if not create_file_root_name.startswith('test_'):
                     testcase_class_name = 'Test' + testcase_class_name
                     testcase_func_name = 'test_' + testcase_func_name
-                case_code = f'''#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+                case_code = f'''
 import pytest
 
 from httpfpt.common.send_request import send_request

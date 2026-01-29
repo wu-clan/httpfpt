@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import pytest
 
 from httpfpt.common.send_request import send_request
