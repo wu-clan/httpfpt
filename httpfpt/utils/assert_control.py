@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import re
@@ -248,7 +246,7 @@ class Asserter:
                         if len(assert_split) == 4:
                             # stdout 作为没有自定义断言错误时的信息补充
                             # 当断言错误触发时, 如果错误信息中包含自定义错误, 此项可忽略
-                            log.warning('Warning: 此 code 断言未自定义错误提示信息')
+                            log.warning('此 code 断言未自定义错误提示信息')
                         if dirty_equals_assert:
                             exec('from dirty_equals import *')
                         exec(format_assert_text)

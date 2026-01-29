@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import os
@@ -8,6 +6,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+from ruamel.yaml import YAML
 
 from httpfpt.common.log import log
 from httpfpt.core.path_conf import httpfpt_path
@@ -94,17 +94,19 @@ def write_yaml_report(
 
 def write_yaml_vars(data: dict) -> None:
     """
-    写入 yaml 全部变量
+    写入 yaml 全局变量
 
     :param data:
     :return:
     """
     _file = os.path.join(httpfpt_path.global_var_dir, 'global_vars.yaml')
     try:
-        _vars = read_yaml(httpfpt_path.global_var_dir, filename='global_vars.yaml')
-        _vars.update(data)
+        _yaml = YAML()
+        with open(_file, encoding='utf-8', mode='r') as f:
+            _vars = _yaml.load(f)
+            _vars.update(data)
         with open(_file, encoding='utf-8', mode='w') as f:
-            yaml.dump(_vars, f, allow_unicode=True)
+            _yaml.dump(_vars, f)
     except Exception as e:
         log.error(f'写入 global_vars.yaml 全局变量 {data} 错误: {e}')
     else:

@@ -1,16 +1,19 @@
 [project]
 name = "httpfpt"
 description = "基于 HTTP 请求的快速数据驱动 pytest 接口自动化测试框架"
+authors = [
+    { name = "Wu Clan", email = "jianhengwu0407@gmail.com" },
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
 dynamic = [
     "version",
-]
-authors = [
-    {name = "Wu Clan", email = "jianhengwu0407@gmail.com"},
 ]
 dependencies = [
     "allure-pytest==2.13.2",
     "cache3>=0.4.3",
-    "cappa==0.17.1",
+    "cappa>=0.31.0",
     "cryptography>=41.0.6",
     "dbutils>=3.0.2",
     "dirty-equals==0.7.1",
@@ -39,6 +42,7 @@ dependencies = [
     "jsonschema>=4.21.1",
     "pygments>=2.17.2",
     "glom==23.5.0",
+    "ruamel-yaml>=0.18.10",
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -49,40 +53,33 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-requires-python = ">=3.10"
-readme = "README.md"
-license = {text = "MIT"}
 
 [project.urls]
 homepage = "https://wu-clan.github.io/httpfpt_docs/"
 repository = "https://github.com/wu-clan/httpfpt"
 
-[tool.pdm]
-version = { source = "file", path = "httpfpt/__init__.py" }
-
-[tool.pdm.dev-dependencies]
-test = [
-    "pyright==1.1.349",
-    "ruff>=0.9.6",
+[dependency-groups]
+dev = [
+    "ruff>=0.14.8",
+    "ty>=0.0.1a31",
 ]
 
-[tool.pdm.build]
-excludes = [
-    "**/__pycache__/",
-    "**/.git/",
-    "**/.pytest_cache/",
-    "**/.ruff_cache/",
-    "**/log/",
-    "**/report/"
+[tool.ty.src]
+exclude = [
+    "**/__pycache__",
+    "**/.*",
+    "httpfpt/testcases/**",
+    "httpfpt/utils/data_manage/**",
+    "httpfpt/conftest.py",
+    "httpfpt/utils/auth_plugins.py"
 ]
+
+[tool.hatch.version]
+path = "httpfpt/__init__.py"
 
 [project.scripts]
-httpfpt = "httpfpt.cli:cappa_invoke"
-
-[tool.pdm.scripts]
-lint = "pre-commit run --all-files"
-typing = "pyright -p ."
+httpfpt = "httpfpt.cli:main"
 
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

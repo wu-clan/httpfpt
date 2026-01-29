@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import os
@@ -117,9 +115,9 @@ def startup(
     )
 
     log.info(
-        f'开始运行项目：{httpfpt_config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：{run_path}'
+        f'开始运行项目：{httpfpt_config.PROJECT_NAME}' if run_path == default_case_path else f'开始运行：\n{run_path}'
     )
-    log.info(f'Pytest CLI: pytest {run_pytest_command_args}')
+    log.info(f'当前执行 Pytest CLI: pytest {run_pytest_command_args}')
     log.info('🚀 START')
     pytest.main(run_args)
     log.info('🏁 FINISH')
@@ -220,7 +218,7 @@ def run(
 
         Starting...
 
-        Version: {get_version(cli=False)}
+        Version: {__version__}
         """
         log.info(banner)
         redis_client.init()

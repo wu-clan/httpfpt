@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import ast
@@ -161,7 +159,7 @@ def relate_testcase_extract(testcase_data: dict) -> None:
     from httpfpt.common.send_request import send_request
 
     msg = f'>>> 执行关联测试用例变量提取：{testcase_data["test_steps"]["case_id"]}'
-    log.debug(msg)
+    log.info(msg)
     allure_step(msg, '此文件为空')
     response = send_request.send_request(testcase_data, log_data=False, relate_log=True)
     relate_testcase_extract_with_response(testcase_data, response)
@@ -194,7 +192,7 @@ def relate_testcase_exec_with_new_request_data(testcase_data: dict) -> dict:
     from httpfpt.common.send_request import send_request
 
     msg = f'>>> 执行关联测试用例（使用新请求数据）：{testcase_data["test_steps"]["case_id"]}'
-    log.debug(msg)
+    log.info(msg)
     allure_step(msg, '此文件为空')
     for u in testcase_data['update_request_data']:
         keys = u['jsonpath'].split('.')[1:]
@@ -221,7 +219,7 @@ def relate_testcase_exec(testcase_data: dict) -> None:
     from httpfpt.common.send_request import send_request
 
     msg = f'>>> 执行关联测试用例：{testcase_data["test_steps"]["case_id"]}'
-    log.debug(msg)
+    log.info(msg)
     allure_step(msg, '此文件为空')
     send_request.send_request(testcase_data, log_data=False, relate_log=True)
     log.info('<<< 关联测试用例执行完成')
