@@ -1,35 +1,111 @@
 from __future__ import annotations
 
+import os
+import platform
+import shutil
+
 from dataclasses import dataclass
+from importlib.resources import path as import_path
+from pathlib import Path
+from time import sleep
 
 import cappa
 
 from cappa import Subcommands
 from pydantic import ValidationError
-from rich.prompt import Confirm
-from rich.traceback import install as rich_install
+from rich.prompt import Confirm, Prompt
+from rich.syntax import Syntax
 from typing_extensions import Annotated
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from httpfpt import __version__
-from httpfpt.common.json_handler import read_json_file
-from httpfpt.common.yaml_handler import read_yaml
-from httpfpt.core.get_conf import httpfpt_config
-from httpfpt.core.path_conf import httpfpt_path
-from httpfpt.enums.case_data_type import CaseDataType
-from httpfpt.run import run
-from httpfpt.schemas.case_data import CaseData
-from httpfpt.utils.case_auto_generator import auto_generate_testcases
-from httpfpt.utils.data_manage.apifox import ApiFoxParser
-from httpfpt.utils.data_manage.git_repo import GitRepoPaser
-from httpfpt.utils.data_manage.openapi import SwaggerParser
-from httpfpt.utils.file_control import get_file_property, search_all_case_data_files
 from httpfpt.utils.rich_console import console
+
+
+def create_new_project() -> None:
+    name = Prompt.ask('❓ Set your project a name', default='httpfpt_project')
+    path = Prompt.ask('❓ Set your project path (relative or absolute path, which automatically parses.)', default='.')
+    if path != '.':
+        if not os.path.isdir(path):
+            raise cappa.Exit(f'\n❌ The "{path}" is not a directory', code=1)
+    with console.status('[bold green]The project is being created...[/]'):
+        console.print(end='\n')
+        sleep(2)
+
+        project_path = os.path.abspath(os.sep.join([path, name]))
+        if os.path.exists(project_path):
+            raise cappa.Exit(f'\n❌ The "{project_path}" directory is not empty', code=1)
+        os.makedirs(project_path)
+        console.print('📁 Created the project folder')
+        sleep(2)
+
+        core_path = os.path.join(project_path, 'core')
+        with import_path('httpfpt.core', '') as core_data:
+            patterns = ['__init__.py', 'get_conf.py', 'path_conf.py']
+            shutil.copytree(core_data, core_path, ignore=shutil.ignore_patterns(*patterns))
+            console.print('📄 Created core files')
+            sleep(2)
+
+        data_path = os.path.join(project_path, 'data')
+        with import_path('httpfpt.data', '') as case_data:
+            shutil.copytree(case_data, data_path)
+            console.print('📄 Created case data samples')
+            sleep(2)
+
+        init_file = os.path.join(project_path, '__init__.py')
+        with import_path('httpfpt', '__init__.py') as pytest_init:
+            shutil.copyfile(pytest_init, init_file)
+
+        conftest_file = os.path.join(project_path, 'conftest.py')
+        with import_path('httpfpt', 'conftest.py') as conftest:
+            shutil.copyfile(conftest, conftest_file)
+            console.print('📄 Created pytest conftest')
+            sleep(1)
+
+        pytest_file = os.path.join(project_path, 'pytest.ini')
+        with import_path('httpfpt', 'pytest.ini') as pytest_ini:
+            shutil.copyfile(pytest_ini, pytest_file)
+            console.print('📄 Created pytest ini')
+            sleep(1)
+
+        run_tpl = """from httpfpt.run import run as httpfpt_run
+
+httpfpt_run(testcase_generate=True)
+
+"""
+        Path(os.path.join(project_path, 'run.py')).write_text(run_tpl, encoding='utf-8')
+        console.print('📄 Created run pytest file')
+
+    console.print(
+        f'\n🎉 The project <{name}> has been created.'
+        f'\n🌳 The project is located in the directory: [cyan]{project_path}[/]'
+        f'\n⚠️ Before accessing HTTPFPT, be sure to set the environment variable '
+        '[yellow]HTTPFPT_PROJECT_PATH[/] to the current project directory',
+        end='\n\n',
+    )
+    if platform.system().lower() == 'windows':
+        env_var_cmd = f"""
+# Windows
+> setx HTTPFPT_PROJECT_PATH "{project_path}"
+        """
+    else:
+        env_var_cmd = f"""
+# Unix
+> vim ~/.bashrc
+> export PATH=$PATH:{project_path}
+        """
+    console.print(Syntax(env_var_cmd, 'shell', line_numbers=True))
 
 
 def testcase_data_verify(verify: str) -> None:
     """测试数据验证"""
+    from httpfpt.common.json_handler import read_json_file
+    from httpfpt.common.yaml_handler import read_yaml
+    from httpfpt.core.get_conf import httpfpt_config
+    from httpfpt.core.path_conf import httpfpt_path
+    from httpfpt.enums.case_data_type import CaseDataType
+    from httpfpt.schemas.case_data import CaseData
+    from httpfpt.utils.file_control import get_file_property, search_all_case_data_files
+
     msg: str = ''
     try:
         count: int = 0
@@ -72,6 +148,8 @@ def testcase_data_verify(verify: str) -> None:
 
 def generate_testcases() -> None:
     """生成测试用例"""
+    from httpfpt.utils.case_auto_generator import auto_generate_testcases
+
     console.print(
         '\n'
         'Warning: 此操作生成的测试用例是依赖测试数据文件而决定的,\n'
@@ -95,6 +173,8 @@ def generate_testcases() -> None:
 
 def import_openapi_case_data(openapi: tuple[str, str]) -> None:
     """导入 openapi 测试用例数据"""
+    from httpfpt.utils.data_manage.openapi import SwaggerParser
+
     console.print(f'\n📩 正在导入测试用例数据到项目: [#0087ff]{openapi[1]}[/#0087ff]')
     result = Confirm.ask('❓ 确认执行此操作吗?', default=False)
     if result:
@@ -108,6 +188,8 @@ def import_openapi_case_data(openapi: tuple[str, str]) -> None:
 
 def import_apifox_case_data(apifox: tuple[str, str]) -> None:
     """导入 apifox 测试用例数据"""
+    from httpfpt.utils.data_manage.apifox import ApiFoxParser
+
     console.print(
         '\n'
         'Beta: 此命令目前处于测试阶段, 请谨慎使用。\n'
@@ -141,6 +223,8 @@ def import_postman_case_data(postman: tuple[str, str]) -> None:
 
 def import_git_case_data(src: str) -> None:
     """导入 git 仓库测试数据"""
+    from httpfpt.utils.data_manage.git_repo import GitRepoPaser
+
     console.print(f'\n🚀 正在导入 git 仓库测试数据到本地: {src}')
     console.print('🔥 开始导入 git 仓库测试数据...\n')
     try:
@@ -153,15 +237,6 @@ def import_git_case_data(src: str) -> None:
 @cappa.command(name='httpfpt-cli')
 @dataclass
 class HttpFptCLI:
-    version: Annotated[
-        bool,
-        cappa.Arg(
-            short='-V',
-            long=True,
-            default=False,
-            help='Print version information.',
-        ),
-    ]
     start_project: Annotated[
         bool,
         cappa.Arg(
@@ -175,8 +250,6 @@ class HttpFptCLI:
     subcmd: Subcommands[TestCaseCLI | ImportCLI | None] = None
 
     def __call__(self) -> None:
-        if self.version:
-            get_version()
         if self.start_project:
             create_new_project()
 

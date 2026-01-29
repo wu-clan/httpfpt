@@ -8,13 +8,13 @@ from typing import Literal
 
 import pytest
 
+from httpfpt import __version__
 from httpfpt.common.log import log
 from httpfpt.common.yaml_handler import read_yaml
 from httpfpt.core.get_conf import httpfpt_config
 from httpfpt.core.path_conf import httpfpt_path
 from httpfpt.db.redis import redis_client
 from httpfpt.utils.case_auto_generator import auto_generate_testcases
-from httpfpt.utils.cli.version import get_version
 from httpfpt.utils.request import case_data_parse as case_data
 from httpfpt.utils.send_report.dingding import DingDing
 from httpfpt.utils.send_report.email import SendEmail
