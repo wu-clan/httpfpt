@@ -10,15 +10,12 @@ from dataclasses import dataclass
 import cappa
 
 from cappa import Subcommands
+from pydantic import ValidationError
+from rich.prompt import Confirm
 from rich.traceback import install as rich_install
 from typing_extensions import Annotated
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import os.path
-
-from pydantic import ValidationError
-from rich.prompt import Confirm
 
 from httpfpt import __version__
 from httpfpt.common.json_handler import read_json_file
