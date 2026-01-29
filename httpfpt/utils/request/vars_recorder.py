@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from jsonpath import findall
 
 from httpfpt.common.env_handler import write_env_vars
