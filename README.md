@@ -39,8 +39,4 @@
 
 有关更多详细信息，请参阅 [官方文档](https://wu-clan.github.io/httpfpt_docs)
 
-## 互动
-
-[Discord](https://wu-clan.github.io/homepage/)
-
 [![Stargazers over time](https://starchart.cc/wu-clan/httpfpt.svg?variant=adaptive)](https://starchart.cc/wu-clan/httpfpt)
