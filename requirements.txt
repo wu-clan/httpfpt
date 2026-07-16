@@ -38,7 +38,7 @@ colorama==0.4.6 ; sys_platform == 'win32'
     # via
     #   loguru
     #   pytest
-cryptography==46.0.3
+cryptography==48.0.1
     # via httpfpt
 dbutils==3.1.2
     # via httpfpt
@@ -64,7 +64,7 @@ httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via httpfpt
-idna==3.11
+idna==3.15
     # via
     #   anyio
     #   httpx
@@ -108,7 +108,7 @@ pygments==2.19.2
     #   rich
 pymysql==1.1.2
     # via httpfpt
-pytest==8.0.2
+pytest==9.0.3
     # via
     #   allure-pytest
     #   httpfpt
@@ -123,7 +123,7 @@ pytest-metadata==3.0.0
     #   pytest-html
 pytest-pretty==1.3.0
     # via httpfpt
-python-dotenv==1.2.1
+python-dotenv==1.2.2
     # via httpfpt
 python-jsonpath==2.0.1
     # via httpfpt
@@ -137,7 +137,7 @@ referencing==0.37.0
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.5
+requests==2.33.0
     # via httpfpt
 rich==14.2.0
     # via
@@ -179,7 +179,7 @@ typing-inspection==0.4.2
     # via pydantic
 tzdata==2025.2
     # via faker
-urllib3==2.5.0
+urllib3==2.7.0
     # via requests
 win32-setctime==1.2.0 ; sys_platform == 'win32'
     # via loguru
